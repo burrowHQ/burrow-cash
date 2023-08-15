@@ -103,18 +103,16 @@ export const Declaration = () => {
 };
 
 const BugBounty = () => (
-  <NextLink href="/declaration" passHref>
-    <Link
-      href="https://immunefi.com/bounty/burrow/"
-      title="Bug Bounty"
-      target="_blank"
-      underline="none"
-    >
-      <Typography fontSize="12px" lineHeight="12px">
-        Bug Bounty
-      </Typography>
-    </Link>
-  </NextLink>
+  <Link
+    href="https://immunefi.com/bounty/burrow/"
+    title="Bug Bounty"
+    target="_blank"
+    underline="none"
+  >
+    <Typography fontSize="12px" lineHeight="12px">
+      Bug Bounty
+    </Typography>
+  </Link>
 );
 
 export default Footer;
