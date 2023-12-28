@@ -4,11 +4,11 @@ import { defaultNetwork, missingPriceTokens } from "../utils/config";
 import { initialState } from "./assetState";
 import { transformAssets } from "../transformers/asstets";
 import getAssets from "../api/get-assets";
-import getFarm from "../api/get-farm";
 
 export const fetchAssets = createAsyncThunk("assets/fetchAssets", async () => {
   const assets = await getAssets().then(transformAssets);
-  const netTvlFarm = await getFarm("NetTvl");
+  // const netTvlFarm = await getFarm("NetTvl");
+  const netTvlFarm = { block_timestamp: "1703734022337425294", rewards: {} };
   return { assets, netTvlFarm };
 });
 
