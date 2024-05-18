@@ -56,6 +56,7 @@ export async function withdraw({
       expandAmount: expandedAmount.toFixed(0),
       isMax,
       decreaseCollateralAmount,
+      enable_pyth_oracle,
     });
   } else {
     const tokenContract = await getTokenContract(tokenId);
