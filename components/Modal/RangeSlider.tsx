@@ -65,7 +65,6 @@ export default function RangeSlider(props: any) {
       const nearestValue = 100 / (splitList.length - 1);
       const ratio = Number(v) / nearestValue;
       const nearest = Math.round(ratio);
-      // console.log("changeValue", splitList.length, nearestValue, Number(v) / nearestValue, nearest);
       if (!Number.isNaN(nearest)) {
         matchedValue = splitList[nearest];
       }

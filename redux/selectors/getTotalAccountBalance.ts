@@ -41,7 +41,6 @@ export const getTotalAccountBalance = (source: "borrowed" | "supplied") =>
                 metadata.decimals + config.extra_decimals,
               ),
             ) * (price?.usd || 0);
-          // console.log(`== tokenId:${tokenId} total:${total} totalCollateral:${totalCollateral}`)
           return source === "supplied" ? total + totalCollateral : total;
         });
       }

@@ -173,6 +173,7 @@ const Modal = () => {
                 <HealthFactor value={single_healthFactor} title="Health Factor(Single)" />
               ) : null}
               <Rates rates={rates} />
+              <BorrowLimit from={maxBorrowValue} to={adjustedMaxBorrowValue} />
               {!canUseAsCollateral ? (
                 <CollateralTip />
               ) : (
@@ -182,7 +183,6 @@ const Modal = () => {
                   tokenId={asset.tokenId}
                 />
               )}
-              <BorrowLimit from={maxBorrowValue} to={adjustedMaxBorrowValue} />
             </div>
             <Alerts data={alerts} />
             <Action
