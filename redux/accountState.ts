@@ -42,6 +42,9 @@ export interface Portfolio {
     borrowed: {
       [tokenId: string]: Farm;
     };
+    tokennetbalance: {
+      [tokenId: string]: Farm;
+    };
     netTvl: {
       [tokenId: string]: FarmData;
     };
@@ -77,6 +80,7 @@ export const initialState: AccountState = {
       supplied: {},
       borrowed: {},
       netTvl: {},
+      tokennetbalance: {},
     },
     staking: initialStaking,
     hasNonFarmedAssets: false,

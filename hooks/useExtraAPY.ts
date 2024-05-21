@@ -27,7 +27,9 @@ export function useExtraAPY({
   const userNetTvlAPY = useAppSelector(getNetTvlAPY({ isStaking: false }));
   const totalNetTvlApy = useAppSelector(getTotalNetTvlAPY);
   const { hasNegativeNetLiquidity } = useNonFarmedAssets();
-
+  const asset = assets.data[assetId];
+  const assetDecimals = asset.metadata.decimals + asset.config.extra_decimals;
+  const assetPrice = assets.data[assetId].price?.usd || 0;
   const hasNetTvlFarms = Object.keys(portfolio.farms.netTvl).length > 0;
   let netLiquidityAPY;
   if (onlyMarket) {
@@ -39,9 +41,6 @@ export function useExtraAPY({
   } else {
     netLiquidityAPY = totalNetTvlApy;
   }
-  const asset = assets.data[assetId];
-  const assetDecimals = asset.metadata.decimals + asset.config.extra_decimals;
-  const assetPrice = assets.data[assetId].price?.usd || 0;
 
   const totalBorrowAssetUSD =
     Number(shrinkToken(portfolio.borrowed[assetId]?.balance || 0, assetDecimals)) * assetPrice;
@@ -54,6 +53,61 @@ export function useExtraAPY({
     ? totalBorrowAssetUSD
     : totalSupplyAssetUSD + totalCollateralAssetUSD;
 
+  const computeTokenNetRewardAPY = () => {
+    const tokenNetFarms = asset.farms.tokennetbalance || {};
+    // rewards token metas
+    const rewardMetas = Object.keys(tokenNetFarms).map(
+      (rewardTokenId) => assets.data[rewardTokenId].metadata,
+    );
+    if (onlyMarket) {
+      // market
+      const tokenNetTvl = new Decimal(totalSupplyUSD).minus(totalBorrowUSD);
+      const marketApy = Object.entries(tokenNetFarms).reduce((acc, [rewardTokenId, farmData]) => {
+        const rewardAsset = assets.data[rewardTokenId];
+        const rewardAPY = new Decimal(farmData.reward_per_day)
+          .div(
+            new Decimal(10).pow(rewardAsset.metadata.decimals + rewardAsset.config.extra_decimals),
+          )
+          .mul(365)
+          .mul(rewardAsset.price?.usd || "0")
+          .div(tokenNetTvl)
+          .mul(100);
+        acc = acc.plus(rewardAPY);
+        return acc;
+      }, new Decimal(0));
+      return {
+        apy: marketApy,
+        tokenNetRewards: rewardMetas,
+      };
+    } else {
+      // user
+      const userTokenNetFarms = portfolio.farms.tokennetbalance[assetId];
+      const userTokenNetTvl = totalSupplyAssetUSD + totalCollateralAssetUSD - totalBorrowAssetUSD;
+      const userApy = Object.entries(userTokenNetFarms).reduce((acc, [rewardTokenId, farmData]) => {
+        const rewardAsset = assets.data[rewardTokenId];
+        const { dailyAmount } = computePoolsDailyAmount(
+          "tokennetbalance",
+          asset,
+          assets.data[rewardTokenId],
+          portfolio,
+          xBRRR,
+          farmData,
+          appConfig.booster_decimals,
+        );
+        const userRewardAPY = new Decimal(dailyAmount)
+          .mul(rewardAsset.price?.usd || "0")
+          .mul(365)
+          .div(userTokenNetTvl)
+          .mul(100);
+        acc = acc.plus(userRewardAPY);
+        return acc;
+      }, new Decimal(0));
+      return {
+        apy: userApy.toFixed(),
+        tokenNetRewards: rewardMetas,
+      };
+    }
+  };
   const computeRewardAPY = (rewardTokenId, rewardsPerDay, decimals, price) => {
     const rewardAsset = assets.data[rewardTokenId];
     const type = isBorrow ? "borrowed" : "supplied";
@@ -124,5 +178,6 @@ export function useExtraAPY({
     computeStakingRewardAPY,
     netLiquidityAPY,
     netTvlMultiplier,
+    computeTokenNetRewardAPY,
   };
 }

@@ -9,6 +9,7 @@ import { useAppSelector } from "../../../redux/hooks";
 import { getAverageSupplyRewardApy } from "../../../redux/selectors/getAverageSuppliedRewardApy";
 import { getAverageBorrowedRewardApy } from "../../../redux/selectors/getAverageBorrowedRewardApy";
 import { getAverageNetRewardApy } from "../../../redux/selectors/getAverageNetRewardApy";
+import { getAverageTokenNetRewardApy } from "../../../redux/selectors/getAverageTokenNetRewardApy";
 import { useNonFarmedAssets } from "../../../hooks/hooks";
 import HtmlTooltip from "../../common/html-tooltip";
 import { format_apy } from "../../../utils/uiNumber";
@@ -18,7 +19,7 @@ export const APY = () => {
   const { weightedNetLiquidity, hasNegativeNetLiquidity, assets } = useNonFarmedAssets();
   const totalApy = netAPY + netLiquidityAPY;
   const amount = `${totalApy.toLocaleString(undefined, APY_FORMAT)}%`;
-  const showLabels = netAPY > 0 || netLiquidityAPY > 0;
+  const showLabels = netAPY !== 0 || netLiquidityAPY !== 0;
   const { averageSupplyApy, averageBorrowedApy } = useAverageAPY();
   const apyLabels = [
     [
@@ -97,7 +98,8 @@ const IncentiveAPY = () => {
   const userSupplyApy = useAppSelector(getAverageSupplyRewardApy());
   const userBorrowedApy = useAppSelector(getAverageBorrowedRewardApy());
   const userNetApy = useAppSelector(getAverageNetRewardApy());
-  const empty = !userSupplyApy && !userBorrowedApy && !userNetApy;
+  const userTokenNetApy = useAppSelector(getAverageTokenNetRewardApy());
+  const empty = !userSupplyApy && !userBorrowedApy && !userNetApy && !userTokenNetApy;
   if (empty) return null;
   return (
     <HtmlTooltip
@@ -129,6 +131,14 @@ const IncentiveAPY = () => {
           >
             <span className="text-gray-300 font-normal">Avg. Net Liquidity Reward APY</span>
             <span className="text-white font-normal">{format_apy(userNetApy)}</span>
+          </div>
+          <div
+            className={`flex items-center justify-between text-xs gap-6 ${
+              userTokenNetApy ? "" : "hidden"
+            }`}
+          >
+            <span className="text-gray-300 font-normal">Avg. Net Liquidity Reward APY</span>
+            <span className="text-white font-normal">{format_apy(userTokenNetApy)}</span>
           </div>
         </div>
       }

@@ -58,17 +58,23 @@ const ToolTip = ({
   const assets = useAppSelector(getAssets);
   // suppose only one reward
   const netTvlFarmTokenId = (Object.keys(assets?.netTvlFarm || {}) || [])[0];
-  const { computeRewardAPY, computeStakingRewardAPY, netLiquidityAPY, netTvlMultiplier } =
-    useExtraAPY({
-      tokenId,
-      isBorrow,
-      onlyMarket,
-    });
+  const {
+    computeRewardAPY,
+    computeStakingRewardAPY,
+    netLiquidityAPY,
+    netTvlMultiplier,
+    computeTokenNetRewardAPY,
+  } = useExtraAPY({
+    tokenId,
+    isBorrow,
+    onlyMarket,
+  });
   function getNetTvlFarmRewardIcon() {
     const asset = assets.data[netTvlFarmTokenId];
     const icon = asset?.metadata?.icon;
     return icon;
   }
+  const { apy, tokenNetRewards } = computeTokenNetRewardAPY();
   return (
     <HtmlTooltip
       open={showTooltip}
@@ -92,6 +98,32 @@ const ToolTip = ({
                 </div>
               </Typography>,
             ]}
+          {tokenNetRewards.length > 0
+            ? [
+                <Typography fontSize="0.75rem" key={6}>
+                  Net Liquidity APY
+                </Typography>,
+                <Typography fontSize="0.75rem" color="#fff" textAlign="right" key={7}>
+                  <div className="flex items-center justify-end gap-1.5">
+                    <div className="flex items-center flex-shrink-0">
+                      {tokenNetRewards.map((reward, index) => {
+                        return (
+                          <img
+                            key={reward.token_id}
+                            className={`w-4 h-4 rounded-full flex-shrink-0 ${
+                              index > 0 ? "-ml-1.5" : ""
+                            }`}
+                            alt=""
+                            src={reward.icon}
+                          />
+                        );
+                      })}
+                    </div>
+                    {format_apy(apy)}
+                  </div>
+                </Typography>,
+              ]
+            : null}
           {list.map(({ rewards, metadata, price, config }) => {
             const { symbol, icon } = metadata;
 
