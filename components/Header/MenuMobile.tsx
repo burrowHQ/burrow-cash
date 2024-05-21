@@ -247,30 +247,33 @@ const Links = () => {
       lineHeight="0"
       sx={{ gap: "26px" }}
     >
-      <Link
+      <a
         href="https://twitter.com/burrow_finance"
         title="Twitter"
         target="_blank"
+        rel="noopener noreferrer"
         color={theme.custom.footerIcon}
       >
         <TwitterIcon fill="#979ABE" />
-      </Link>
-      <Link
-        href="https://discord.gg/gUWBKy9Vur"
+      </a>
+      <a
+        href="https://discord.gg/reffinance"
         title="Discord"
         target="_blank"
+        rel="noopener noreferrer"
         color={theme.custom.footerIcon}
       >
         <DiscordIcon fill="#979ABE" />
-      </Link>
-      <Link
+      </a>
+      <a
         href="https://burrowfinance.medium.com/"
         title="Medium"
         target="_blank"
+        rel="noopener noreferrer"
         color={theme.custom.footerIcon}
       >
         <MediumIcon fill="#979ABE" />
-      </Link>
+      </a>
     </Box>
   );
 };
