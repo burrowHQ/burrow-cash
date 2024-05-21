@@ -295,6 +295,18 @@ const TradingOperate = () => {
 
   // end
 
+  function formatNumber(value) {
+    let formattedValue = value.toFixed(2); //
+    if (formattedValue.endsWith(".00")) {
+      //
+      formattedValue = formattedValue.substring(0, formattedValue.length - 3);
+    } else if (formattedValue.endsWith("0")) {
+      // 0
+      formattedValue = formattedValue.substring(0, formattedValue.length - 1);
+    }
+    return formattedValue;
+  }
+
   return (
     <div className="w-full pt-4 px-4 pb-9">
       <div className="flex justify-between items-center">
@@ -373,19 +385,26 @@ const TradingOperate = () => {
                   type="cate2"
                 />
               </div>
-              <p className="text-gray-300 mt-2 text-xs">Usd: ${longInputUsd}</p>
+              <p className="text-gray-300 mt-2 text-xs">Use: ${longInputUsd}</p>
             </div>
             <div className="relative my-2.5 flex justify-end z-0 w-1/2" style={{ zoom: "2" }}>
               <ShrinkArrow />
             </div>
             <div className="relative bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-20">
               {/* long out  */}
-              <input disabled type="text" value={longOutput} placeholder="0" />
+              <input
+                disabled
+                type="text"
+                value={longOutput && formatNumber(Number(longOutput))}
+                placeholder="0"
+              />
               {/*  */}
               <div className="absolute top-2 right-2">
                 <TradingToken tokenList={categoryAssets1} type="cate1" />
               </div>
-              <p className="text-gray-300 mt-2 text-xs">Long: ${longOutputUsd}</p>
+              <p className="text-gray-300 mt-2 text-xs">
+                Long: ${longOutputUsd && formatNumber(Number(longOutputUsd))}
+              </p>
             </div>
             <RangeSlider defaultValue={rangeMount} action="Long" setRangeMount={setRangeMount} />
             <div className="mt-5">
@@ -416,13 +435,19 @@ const TradingOperate = () => {
                   {estimateData?.tokensPerRoute[0].map((item, index) => {
                     return (
                       <div key={index} className="flex items-center">
-                        <div className="border-r mr-1.5 pr-1.5 border-dark-800">
-                          {item.symbol === "wNEAR" ? (
-                            <NearIconMini />
-                          ) : (
-                            <img alt="" src={item.icon} style={{ width: "16px", height: "16px" }} />
-                          )}
-                        </div>
+                        {index == 0 && (
+                          <div className="border-r mr-1.5 pr-1.5 border-dark-800">
+                            {item.symbol === "wNEAR" ? (
+                              <NearIconMini />
+                            ) : (
+                              <img
+                                alt=""
+                                src={item.icon}
+                                style={{ width: "16px", height: "16px" }}
+                              />
+                            )}
+                          </div>
+                        )}
                         <span>{item.symbol == "wNEAR" ? "NEAR" : item.symbol}</span>
                         {index + 1 < estimateData?.tokensPerRoute[0].length ? (
                           <span className="mx-2">&gt;</span>
@@ -483,19 +508,26 @@ const TradingOperate = () => {
                   type="cate2"
                 />
               </div>
-              <p className="text-gray-300 mt-2 text-xs">Usd: ${shortInputUsd}</p>
+              <p className="text-gray-300 mt-2 text-xs">Use: ${shortInputUsd}</p>
             </div>
             <div className="relative my-2.5 flex justify-end z-0 w-1/2" style={{ zoom: "2" }}>
               <ShrinkArrow />
             </div>
             <div className="relative bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-20">
               {/* short out */}
-              <input disabled type="text" value={shortOutput} placeholder="0" />
+              <input
+                disabled
+                type="text"
+                value={shortOutput && formatNumber(Number(shortOutput))}
+                placeholder="0"
+              />
               {/*  */}
               <div className="absolute top-2 right-2">
                 <TradingToken tokenList={categoryAssets1} type="cate1" />
               </div>
-              <p className="text-gray-300 mt-2 text-xs">Short: ${shortOutputUsd}</p>
+              <p className="text-gray-300 mt-2 text-xs">
+                Short: ${shortOutputUsd && formatNumber(Number(shortOutputUsd))}
+              </p>
             </div>
             <RangeSlider defaultValue={rangeMount} action="Short" setRangeMount={setRangeMount} />
             <div className="mt-5">
@@ -526,13 +558,19 @@ const TradingOperate = () => {
                   {estimateData?.tokensPerRoute[0].map((item, index) => {
                     return (
                       <div key={index} className="flex items-center">
-                        <div className="border-r mr-1.5 pr-1.5 border-dark-800">
-                          {item.symbol === "wNEAR" ? (
-                            <NearIconMini />
-                          ) : (
-                            <img alt="" src={item.icon} style={{ width: "16px", height: "16px" }} />
-                          )}
-                        </div>
+                        {index == 0 && (
+                          <div className="border-r mr-1.5 pr-1.5 border-dark-800">
+                            {item.symbol === "wNEAR" ? (
+                              <NearIconMini />
+                            ) : (
+                              <img
+                                alt=""
+                                src={item.icon}
+                                style={{ width: "16px", height: "16px" }}
+                              />
+                            )}
+                          </div>
+                        )}
                         <span>{item.symbol == "wNEAR" ? "NEAR" : item.symbol}</span>
                         {index + 1 < estimateData?.tokensPerRoute[0].length ? (
                           <span className="mx-2">&gt;</span>

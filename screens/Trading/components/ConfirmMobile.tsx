@@ -131,13 +131,15 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
                 {confirmInfo.estimateData?.tokensPerRoute[0].map((item, index) => {
                   return (
                     <div key={item.token_id + index} className="flex items-center">
-                      <div className="border-r mr-1.5 pr-1.5 border-dark-800">
-                        {item.symbol === "wNEAR" ? (
-                          <NearIconMini />
-                        ) : (
-                          <img alt="" src={item.icon} style={{ width: "16px", height: "16px" }} />
-                        )}
-                      </div>
+                      {index == 0 && (
+                        <div className="border-r mr-1.5 pr-1.5 border-dark-800">
+                          {item.symbol === "wNEAR" ? (
+                            <NearIconMini />
+                          ) : (
+                            <img alt="" src={item.icon} style={{ width: "16px", height: "16px" }} />
+                          )}
+                        </div>
+                      )}
                       <span>{item.symbol == "wNEAR" ? "NEAR" : item.symbol}</span>
                       {index + 1 < confirmInfo.estimateData?.tokensPerRoute[0].length ? (
                         <span className="mx-2">&gt;</span>

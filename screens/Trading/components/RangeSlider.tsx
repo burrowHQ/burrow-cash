@@ -11,7 +11,7 @@ const RangeSlider = ({ defaultValue, action, setRangeMount }) => {
 
     for (let i = 0; i < numItems; i++) {
       // @ts-ignore
-      sequence.push(start + i * increment);
+      sequence.push((start + i * increment).toFixed(2));
     }
 
     if (sequence[sequence.length - 1] > end) {

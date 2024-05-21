@@ -159,7 +159,11 @@ const TradingToken: React.FC<TradingTokenInter> = ({ tokenList, type, setOwnBanl
                 {token?.metadata?.symbol === "wNEAR" ? "NEAR" : token?.metadata?.symbol}
               </p>
               {selectedItem?.metadata?.symbol === token.metadata.symbol && <TokenSelected />}
-              <p className="ml-auto text-sm">${token.price?.usd}</p>
+              <p className="ml-auto text-sm">
+                {toInternationalCurrencySystem_number(
+                  shrinkToken(account.balances[token.metadata.token_id], token.metadata.decimals),
+                )}
+              </p>
             </div>
           ))}
         </div>
