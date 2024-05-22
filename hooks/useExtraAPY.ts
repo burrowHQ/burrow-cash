@@ -9,6 +9,7 @@ import { useAppSelector } from "../redux/hooks";
 import { shrinkToken } from "../store/helper";
 import { getNetTvlAPY, getTotalNetTvlAPY } from "../redux/selectors/getNetAPY";
 import { useNonFarmedAssets } from "./hooks";
+import { filterSentOutFarms, filterAccountSentOutFarms } from "../utils/index";
 
 export function useExtraAPY({
   tokenId: assetId,
@@ -54,7 +55,9 @@ export function useExtraAPY({
     : totalSupplyAssetUSD + totalCollateralAssetUSD;
 
   const computeTokenNetRewardAPY = () => {
-    const tokenNetFarms = asset.farms.tokennetbalance || {};
+    const tokenNetFarmsPending = asset.farms.tokennetbalance || {};
+    // Filter out the ones rewards sent out
+    const tokenNetFarms = filterSentOutFarms(tokenNetFarmsPending);
     // rewards token metas
     const rewardMetas = Object.keys(tokenNetFarms).map(
       (rewardTokenId) => assets.data[rewardTokenId].metadata,
@@ -76,12 +79,13 @@ export function useExtraAPY({
         return acc;
       }, new Decimal(0));
       return {
-        apy: marketApy,
+        apy: marketApy.toNumber(),
         tokenNetRewards: rewardMetas,
       };
     } else {
       // user
-      const userTokenNetFarms = portfolio.farms.tokennetbalance[assetId];
+      const userTokenNetFarmsPending = portfolio.farms.tokennetbalance[assetId] || {};
+      const userTokenNetFarms = filterAccountSentOutFarms(userTokenNetFarmsPending);
       const userTokenNetTvl = totalSupplyAssetUSD + totalCollateralAssetUSD - totalBorrowAssetUSD;
       const userApy = Object.entries(userTokenNetFarms).reduce((acc, [rewardTokenId, farmData]) => {
         const rewardAsset = assets.data[rewardTokenId];
@@ -103,7 +107,7 @@ export function useExtraAPY({
         return acc;
       }, new Decimal(0));
       return {
-        apy: userApy.toFixed(),
+        apy: userApy.toNumber(),
         tokenNetRewards: rewardMetas,
       };
     }

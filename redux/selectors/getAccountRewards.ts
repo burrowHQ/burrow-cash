@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable operator-assignment */
 import Decimal from "decimal.js";
 import { createSelector } from "@reduxjs/toolkit";
@@ -12,9 +13,9 @@ import { getStaking } from "./getStaking";
 import { INetTvlFarmRewards } from "../../interfaces";
 import { hasAssets, toUsd, emptySuppliedAsset, emptyBorrowedAsset } from "../utils";
 import { cloneObj } from "../../helpers/helpers";
-import { standardizeAsset } from "../../utils";
+import { standardizeAsset, filterAccountSentOutFarms } from "../../utils/index";
 
-interface IPortfolioReward {
+export interface IPortfolioReward {
   icon: string;
   name: string;
   symbol: string;
@@ -27,6 +28,7 @@ interface IPortfolioReward {
   newDailyAmount: number;
   multiplier: number;
   price: number;
+  remaining_rewards: string;
 }
 
 export interface IAccountRewards {
@@ -68,7 +70,7 @@ export const getGainsFromIncentive = (
   source: "supplied" | "borrowed" | "netTvl" | "tokennetbalance",
 ) => {
   if (source === "netTvl") {
-    return Object.entries(portfolio.farms[source])
+    return Object.entries(filterAccountSentOutFarms(portfolio.farms[source]))
       .map(([rewardTokenId, farmData]) => {
         const rewardAsset = assets.data[rewardTokenId];
         const rewardAssetDecimals =
@@ -88,7 +90,7 @@ export const getGainsFromIncentive = (
   } else {
     return Object.entries(portfolio.farms[source])
       .map(([tokenId, farm]: [string, Farm]) => {
-        return Object.entries(farm)
+        return Object.entries(filterAccountSentOutFarms(farm))
           .map(([rewardTokenId, farmData]) => {
             const asset = assets.data[tokenId];
             const rewardAsset = assets.data[rewardTokenId];
@@ -134,23 +136,28 @@ export const getIncentiveDailyAmount = (
 ) => {
   const result = {};
   if (source === "netTvl") {
-    Object.entries(portfolio.farms[source]).forEach(([rewardTokenId, farmData]) => {
-      const rewardAsset = assets.data[rewardTokenId];
-      const rewardAssetDecimals = rewardAsset.metadata.decimals + rewardAsset.config.extra_decimals;
-      const boostedShares = Number(shrinkToken(farmData.boosted_shares, rewardAssetDecimals));
-      const totalBoostedShares = Number(
-        shrinkToken(farmData.asset_farm_reward.boosted_shares, rewardAssetDecimals),
-      );
-      const totalRewardsPerDay = Number(
-        shrinkToken(farmData.asset_farm_reward.reward_per_day, rewardAssetDecimals),
-      );
-      const dailyAmount =
-        totalBoostedShares > 0 ? (boostedShares / totalBoostedShares) * totalRewardsPerDay : 0;
-      result[rewardTokenId] = new Decimal(result[rewardTokenId] || 0).plus(dailyAmount).toNumber();
-    });
+    Object.entries(filterAccountSentOutFarms(portfolio.farms[source])).forEach(
+      ([rewardTokenId, farmData]) => {
+        const rewardAsset = assets.data[rewardTokenId];
+        const rewardAssetDecimals =
+          rewardAsset.metadata.decimals + rewardAsset.config.extra_decimals;
+        const boostedShares = Number(shrinkToken(farmData.boosted_shares, rewardAssetDecimals));
+        const totalBoostedShares = Number(
+          shrinkToken(farmData.asset_farm_reward.boosted_shares, rewardAssetDecimals),
+        );
+        const totalRewardsPerDay = Number(
+          shrinkToken(farmData.asset_farm_reward.reward_per_day, rewardAssetDecimals),
+        );
+        const dailyAmount =
+          totalBoostedShares > 0 ? (boostedShares / totalBoostedShares) * totalRewardsPerDay : 0;
+        result[rewardTokenId] = new Decimal(result[rewardTokenId] || 0)
+          .plus(dailyAmount)
+          .toNumber();
+      },
+    );
   } else {
     Object.entries(portfolio.farms[source]).forEach(([tokenId, farm]: [string, Farm]) => {
-      Object.entries(farm).forEach(([rewardTokenId, farmData]) => {
+      Object.entries(filterAccountSentOutFarms(farm)).forEach(([rewardTokenId, farmData]) => {
         const asset = assets.data[tokenId];
         const rewardAsset = assets.data[rewardTokenId];
         const assetDecimals = asset.metadata.decimals + asset.config.extra_decimals;
@@ -253,22 +260,23 @@ export const computeNetLiquidityDailyAmount = (
   const multiplier = log >= 0 ? 1 + log : 1;
 
   const boostedShares = Number(shrinkToken(farmData.boosted_shares, assetDecimals));
-
   const totalBoostedShares = Number(
-    shrinkToken(netTvlFarm[asset.token_id].boosted_shares, assetDecimals),
+    shrinkToken(netTvlFarm[asset.token_id]?.boosted_shares || "0", assetDecimals),
   );
   const totalRewardsPerDay = Number(
-    shrinkToken(netTvlFarm[asset.token_id].reward_per_day, assetDecimals),
+    shrinkToken(netTvlFarm[asset.token_id]?.reward_per_day || "0", assetDecimals),
   );
 
-  const dailyAmount = (boostedShares / totalBoostedShares) * totalRewardsPerDay;
+  const dailyAmount =
+    totalBoostedShares > 0 ? (boostedShares / totalBoostedShares) * totalRewardsPerDay : 0;
 
   const shares =
     Number(shrinkToken(new Decimal(netLiquidity).mul(10 ** 18).toFixed(), assetDecimals)) || 0;
 
   const newBoostedShares = shares * multiplier;
   const newTotalBoostedShares = totalBoostedShares + newBoostedShares - boostedShares;
-  const newDailyAmount = (newBoostedShares / newTotalBoostedShares) * totalRewardsPerDay;
+  const newDailyAmount =
+    newTotalBoostedShares > 0 ? (newBoostedShares / newTotalBoostedShares) * totalRewardsPerDay : 0;
 
   return { dailyAmount, newDailyAmount, multiplier, totalBoostedShares, shares };
 };
@@ -312,7 +320,6 @@ export const getAccountRewards = createSelector(
             farmData,
             app.config.booster_decimals,
           );
-
           return {
             icon,
             name,
@@ -324,6 +331,7 @@ export const getAccountRewards = createSelector(
             multiplier,
             price: rewardAsset.price?.usd || 0,
             unclaimedAmountUSD: unclaimedAmount * (rewardAsset.price?.usd || 0),
+            remaining_rewards: farmData?.asset_farm_reward?.remaining_rewards || "0",
           };
         });
       };
@@ -354,24 +362,20 @@ export const getAccountRewards = createSelector(
         multiplier,
         price: rewardAsset.price?.usd || 0,
         unclaimedAmountUSD: unclaimedAmount * (rewardAsset.price?.usd || 0),
+        remaining_rewards: farmData?.asset_farm_reward?.remaining_rewards || "0",
       };
     };
 
     const { supplied, borrowed, netTvl, tokennetbalance } = account.portfolio.farms;
-    const hasNetTvlFarm = !!Object.entries(assets.netTvlFarm).length;
-
+    // const hasNetTvlFarm = !!Object.entries(assets.netTvlFarm).length;
     const suppliedRewards = Object.entries(supplied).map(computePoolsRewards("supplied")).flat();
     const borrowedRewards = Object.entries(borrowed).map(computePoolsRewards("borrowed")).flat();
     const tokenNetRewards = Object.entries(tokennetbalance)
       .map(computePoolsRewards("tokennetbalance"))
       .flat();
-
-    const netLiquidityRewards = hasNetTvlFarm
-      ? Object.entries(netTvl)
-          .filter(([tokenId]) => assets.netTvlFarm[tokenId])
-          .map(computeNetLiquidityRewards)
-      : [];
-
+    const netLiquidityRewards = Object.entries(netTvl)
+      // .filter(([tokenId]) => assets.netTvlFarm[tokenId])
+      .map(computeNetLiquidityRewards);
     const sumArrays = (array) => {
       const clonedArray = cloneObj(array);
       return clonedArray.reduce((rewards, asset) => {

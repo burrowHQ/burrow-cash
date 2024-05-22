@@ -74,14 +74,12 @@ export const Stat = ({
   title,
   titleTooltip = "",
   amount,
-  tooltip = "",
   labels,
   onClick,
 }: {
   title: string | React.ReactElement;
   titleTooltip?: string;
   amount: string | React.ReactElement;
-  tooltip?: string;
   labels?: any;
   onClick?: () => void;
 }) => {
@@ -91,7 +89,6 @@ export const Stat = ({
         {typeof title === "string" ? <div className="h6 text-gray-300">{title}</div> : title}
         {titleTooltip && <TagToolTip title={titleTooltip} />}
       </div>
-      {/* <Tooltip title={tooltip} placement="top" arrow> */}
       <div className="h2 my-1">{amount}</div>
       {/* </Tooltip> */}
       {labels && (

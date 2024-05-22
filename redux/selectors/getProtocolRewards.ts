@@ -3,6 +3,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { shrinkToken } from "../../store";
 import { RootState } from "../store";
 import { INetTvlFarmReward } from "../../interfaces/asset";
+import { filterSentOutFarms } from "../../utils/index";
 
 interface IProtocolReward {
   icon: string;
@@ -17,7 +18,7 @@ interface IProtocolReward {
 export const getProtocolRewards = createSelector(
   (state: RootState) => state.assets,
   (assets) => {
-    const rewards = Object.entries(assets.netTvlFarm).map(
+    const rewards = Object.entries(filterSentOutFarms(assets.netTvlFarm)).map(
       ([tokenId, farm]: [string, INetTvlFarmReward]) => {
         const asset = assets.data[tokenId];
         const { name, symbol, icon } = asset.metadata;

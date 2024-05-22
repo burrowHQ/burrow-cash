@@ -17,6 +17,10 @@ import { IBurrow, IConfig } from "../interfaces/burrow";
 import { getContract } from "../store";
 
 import { getWalletSelector, getAccount, functionCall } from "./wallet-selector-compat";
+import { IAssetFarmReward } from "../interfaces/asset";
+import { FarmData } from "../redux/accountState";
+// eslint-disable-next-line import/no-cycle
+import { IPortfolioReward } from "../redux/selectors/getAccountRewards";
 
 export const getViewAs = () => {
   if (window.location.href.includes("#instant-url")) {
@@ -241,4 +245,53 @@ export function standardizeAsset(asset) {
     asset.icon = fraxMetadata.icon;
   }
   return asset;
+}
+
+interface IAssetFarmRewards {
+  [token: string]: IAssetFarmReward;
+}
+interface IAccountFarmRewards {
+  [token: string]: FarmData;
+}
+export function filterSentOutFarms(FarmsPending: IAssetFarmRewards) {
+  // Filter out the ones rewards sent out
+  const tokenNetFarms = Object.entries(FarmsPending).reduce((acc, cur) => {
+    const [rewardTokenId, farmData] = cur;
+    if (farmData.remaining_rewards !== "0") {
+      return {
+        ...acc,
+        [rewardTokenId]: farmData,
+      };
+    }
+    return acc;
+  }, {}) as IAssetFarmRewards;
+  return tokenNetFarms;
+}
+export function filterAccountSentOutFarms(FarmsPending: IAccountFarmRewards) {
+  // Filter out the ones rewards sent out
+  const accountTokenNetFarms = Object.entries(FarmsPending).reduce((acc, cur) => {
+    const [rewardTokenId, farmData] = cur;
+    if (farmData.asset_farm_reward.remaining_rewards !== "0") {
+      return {
+        ...acc,
+        [rewardTokenId]: farmData,
+      };
+    }
+    return acc;
+  }, {}) as IAccountFarmRewards;
+  return accountTokenNetFarms;
+}
+export function filterAccountSentOutRewards(RewardsPending: any) {
+  // Filter out the ones rewards sent out
+  const accountTokenNetFarms = Object.entries(RewardsPending).reduce((acc, cur) => {
+    const [rewardTokenId, rewardData] = cur as any;
+    if (rewardData.remaining_rewards !== "0") {
+      return {
+        ...acc,
+        [rewardTokenId]: rewardData,
+      };
+    }
+    return acc;
+  }, {}) as IPortfolioReward;
+  return accountTokenNetFarms;
 }

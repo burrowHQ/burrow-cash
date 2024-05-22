@@ -36,7 +36,6 @@ export async function repay({
   );
 
   const extraDecimalMultiplier = expandTokenDecimal(1, extraDecimals);
-  // TODO
   const tokenBorrowedBalance = Decimal.max(
     borrowedBalance.divToInt(extraDecimalMultiplier).plus(interestChargedIn1min),
     minRepay,

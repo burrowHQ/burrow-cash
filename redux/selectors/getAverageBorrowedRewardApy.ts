@@ -2,6 +2,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { shrinkToken } from "../../store";
 import { Farm } from "../accountState";
+import { filterAccountSentOutFarms } from "../../utils/index";
 
 export const getAverageBorrowedRewardApy = () =>
   createSelector(
@@ -14,7 +15,7 @@ export const getAverageBorrowedRewardApy = () =>
         .map(([tokenId, farm]: [string, Farm]) => {
           const asset = assets.data[tokenId];
           const assetDecimals = asset.metadata.decimals + asset.config.extra_decimals;
-          const profit = Object.entries(farm)
+          const profit = Object.entries(filterAccountSentOutFarms(farm))
             .map(([rewardTokenId, farmData]) => {
               const rewardAsset = assets.data[rewardTokenId];
               const rewardAssetDecimals =

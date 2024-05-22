@@ -8,16 +8,20 @@ import { useAPY } from "../../hooks/useAPY";
 import { format_apy } from "../../utils/uiNumber";
 import { getAssets } from "../../redux/assetsSelectors";
 import { useAppSelector } from "../../redux/hooks";
+import { getProtocolRewards } from "../../redux/selectors/getProtocolRewards";
+import { filterSentOutFarms } from "../../utils/index";
 
 export const APYCell = ({
   baseAPY,
-  rewards: list,
+  rewards,
   page,
   tokenId,
   isStaking = false,
   onlyMarket = false,
   excludeNetApy = false,
 }) => {
+  // Filter out the ones rewards sent out
+  const list = rewards.filter((reward) => reward.rewards.remaining_rewards !== "0");
   const isBorrow = page === "borrow";
   const boostedAPY = useAPY({
     baseAPY,
@@ -69,6 +73,7 @@ const ToolTip = ({
     isBorrow,
     onlyMarket,
   });
+  const netTvlRewards = useAppSelector(getProtocolRewards);
   function getNetTvlFarmRewardIcon() {
     const asset = assets.data[netTvlFarmTokenId];
     const icon = asset?.metadata?.icon;
@@ -87,7 +92,8 @@ const ToolTip = ({
             {format_apy(baseAPY)}
           </Typography>
           {!isBorrow &&
-            !excludeNetApy && [
+            !excludeNetApy &&
+            netTvlRewards?.length > 0 && [
               <Typography fontSize="0.75rem" key={0}>
                 Net Liquidity APY
               </Typography>,
@@ -98,7 +104,7 @@ const ToolTip = ({
                 </div>
               </Typography>,
             ]}
-          {tokenNetRewards.length > 0
+          {!isBorrow && tokenNetRewards.length > 0
             ? [
                 <Typography fontSize="0.75rem" key={6}>
                   Net Liquidity APY

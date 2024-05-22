@@ -2,8 +2,9 @@ import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { shrinkToken } from "../../store";
 import { toUsd } from "../utils";
-import { Farm, FarmData, Portfolio } from "../accountState";
-import { Asset, AssetsState } from "../assetState";
+import { Portfolio } from "../accountState";
+import { AssetsState } from "../assetState";
+import { filterAccountSentOutFarms } from "../../utils/index";
 
 export const getAverageNetRewardApy = () =>
   createSelector(
@@ -14,7 +15,7 @@ export const getAverageNetRewardApy = () =>
       const [, totalSupplied] = getNetGains(account.portfolio, assets, "supplied");
       const [, totalBorrowed] = getNetGains(account.portfolio, assets, "borrowed");
       const { netTvl } = account.portfolio.farms;
-      const totalNetProfit = Object.entries(netTvl || {})
+      const totalNetProfit = Object.entries(filterAccountSentOutFarms(netTvl || {}))
         .map(([rewardTokenId, farmData]) => {
           const rewardAsset = assets.data[rewardTokenId];
           const rewardAssetDecimals =

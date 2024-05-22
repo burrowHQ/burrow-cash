@@ -40,7 +40,7 @@ export interface IMetadata {
 
 export interface IAssetFarmReward {
   /// The reward token ID.
-  token_id: string;
+  token_id?: string;
   /// The amount of reward distributed per day.
   reward_per_day: string;
   /// The log base for the booster. Used to compute boosted shares per account.
