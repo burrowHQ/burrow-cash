@@ -15,7 +15,8 @@ export const getAverageBorrowedRewardApy = () =>
         .map(([tokenId, farm]: [string, Farm]) => {
           const asset = assets.data[tokenId];
           const assetDecimals = asset.metadata.decimals + asset.config.extra_decimals;
-          const profit = Object.entries(filterAccountSentOutFarms(farm))
+          const curr_farm = Object.entries(filterAccountSentOutFarms(farm));
+          const profit = curr_farm
             .map(([rewardTokenId, farmData]) => {
               const rewardAsset = assets.data[rewardTokenId];
               const rewardAssetDecimals =
@@ -34,7 +35,10 @@ export const getAverageBorrowedRewardApy = () =>
               return dailyAmount * (rewardAsset.price?.usd || 0);
             })
             .reduce((acc, value) => acc + value, 0);
-          const balance = Number(shrinkToken(borrowed[tokenId]?.balance || 0, assetDecimals));
+          const balance =
+            curr_farm.length > 0
+              ? Number(shrinkToken(borrowed[tokenId]?.balance || 0, assetDecimals))
+              : 0;
           return { dailyProfit: profit, principal: balance * (asset.price?.usd || 0) };
         })
         .reduce(

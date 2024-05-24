@@ -16,7 +16,8 @@ export const getAverageTokenNetRewardApy = () =>
         .map(([tokenId, farm]: [string, Farm]) => {
           const asset = assets.data[tokenId];
           const assetDecimals = asset.metadata.decimals + asset.config.extra_decimals;
-          const profit = Object.entries(filterAccountSentOutFarms(farm))
+          const curr_farm = Object.entries(filterAccountSentOutFarms(farm));
+          const profit = curr_farm
             .map(([rewardTokenId, farmData]) => {
               const rewardAsset = assets.data[rewardTokenId];
               const rewardAssetDecimals =
@@ -35,15 +36,18 @@ export const getAverageTokenNetRewardApy = () =>
               return dailyAmount * (rewardAsset.price?.usd || 0);
             })
             .reduce((acc, value) => acc + value, 0);
-          const balance = Number(
-            shrinkToken(
-              new Decimal(supplied[tokenId]?.balance || 0)
-                .plus(collateral[tokenId]?.balance || 0)
-                .minus(borrowed[tokenId]?.balance || 0)
-                .toFixed(),
-              assetDecimals,
-            ),
-          );
+          const balance =
+            curr_farm.length > 0
+              ? Number(
+                  shrinkToken(
+                    new Decimal(supplied[tokenId]?.balance || 0)
+                      .plus(collateral[tokenId]?.balance || 0)
+                      .minus(borrowed[tokenId]?.balance || 0)
+                      .toFixed(),
+                    assetDecimals,
+                  ),
+                )
+              : 0;
           return { dailyProfit: profit, principal: balance * (asset.price?.usd || 0) };
         })
         .reduce(
