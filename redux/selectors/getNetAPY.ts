@@ -56,18 +56,13 @@ export const getNetTvlAPY = ({ isStaking = false }) =>
     },
   );
 
-export const getTotalNetTvlAPY = createSelector(
-  getProtocolRewards,
-  (state: RootState) => state.assets,
-  (rewards, assets) => {
-    if (!rewards.length) return 0;
-    const totalDailyNetTvlRewards = rewards.reduce((acc, r) => acc + r.dailyAmount * r.price, 0);
-    const totalProtocolLiquidity = Number(
-      shrinkToken(Object.values(assets.netTvlFarm || {})?.[0]?.boosted_shares, 18),
-    );
-    if (totalProtocolLiquidity > 0) {
-      return ((totalDailyNetTvlRewards * 365) / totalProtocolLiquidity) * 100;
+export const getTotalNetTvlAPY = createSelector(getProtocolRewards, (rewards) => {
+  if (!rewards.length) return 0;
+  const totalDailyNetTvlRewards = rewards.reduce((acc, r) => {
+    if (r.boosted_shares > 0) {
+      acc = acc.plus(new Decimal(r.dailyAmount * r.price * 365).div(r.boosted_shares).mul(100));
     }
-    return 0;
-  },
-);
+    return acc;
+  }, new Decimal(0));
+  return totalDailyNetTvlRewards.toNumber();
+});

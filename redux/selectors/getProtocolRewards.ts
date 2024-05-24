@@ -13,6 +13,7 @@ interface IProtocolReward {
   dailyAmount: number;
   remainingAmount: number;
   price: number;
+  boosted_shares: number;
 }
 
 export const getProtocolRewards = createSelector(
@@ -26,6 +27,7 @@ export const getProtocolRewards = createSelector(
 
         const dailyAmount = Number(shrinkToken(farm.reward_per_day, assetDecimals));
         const remainingAmount = Number(shrinkToken(farm.remaining_rewards, assetDecimals));
+        const boosted_shares = Number(shrinkToken(farm.boosted_shares, 18));
         return {
           icon,
           name,
@@ -34,6 +36,7 @@ export const getProtocolRewards = createSelector(
           dailyAmount,
           remainingAmount,
           price: asset.price?.usd || 0,
+          boosted_shares,
         } as IProtocolReward;
       },
     );
