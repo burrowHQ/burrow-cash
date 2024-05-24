@@ -64,7 +64,6 @@ export function useExtraAPY({
     );
     if (onlyMarket) {
       // market
-      const tokenNetTvl = new Decimal(totalSupplyUSD).minus(totalBorrowUSD);
       const marketApy = Object.entries(tokenNetFarms).reduce((acc, [rewardTokenId, farmData]) => {
         const rewardAsset = assets.data[rewardTokenId];
         const rewardAPY = new Decimal(farmData.reward_per_day)
@@ -73,7 +72,11 @@ export function useExtraAPY({
           )
           .mul(365)
           .mul(rewardAsset.price?.usd || "0")
-          .div(tokenNetTvl)
+          .div(
+            new Decimal(shrinkToken(farmData.boosted_shares, assetDecimals)).mul(
+              asset.price?.usd || "0",
+            ),
+          )
           .mul(100);
         acc = acc.plus(rewardAPY);
         return acc;
