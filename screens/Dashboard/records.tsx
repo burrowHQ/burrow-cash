@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CopyToClipboard from "react-copy-to-clipboard";
 import CustomModal from "../../components/CustomModal/CustomModal";
 import CustomTable from "../../components/CustomTable/CustomTable";
@@ -9,7 +9,12 @@ import { useAppSelector } from "../../redux/hooks";
 import { getAssets } from "../../redux/assetsSelectors";
 import { getDateString, maskMiddleString } from "../../helpers/helpers";
 import { nearNativeTokens, nearTokenId, standardizeAsset } from "../../utils";
-import { CopyIcon } from "../../components/Icons/Icons";
+import {
+  CopyIcon,
+  ExternalLink,
+  NearblocksIcon,
+  PikespeakIcon,
+} from "../../components/Icons/Icons";
 
 const Records = ({ isShow }) => {
   const accountId = useAccountId();
@@ -67,8 +72,14 @@ const Records = ({ isShow }) => {
     }
   };
 
-  const handleTxClick = (txid) => {
-    window.open(`https://nearblocks.io/txns/${txid}`);
+  const handleTxClick = (txid, type) => {
+    let url = "";
+    if (type === "nearblocks") {
+      url = `https://nearblocks.io/txns/${txid}`;
+    } else if (type === "pikespeak") {
+      url = `https://pikespeak.ai/transaction-viewer/${txid}`;
+    }
+    window.open(url, "_blank");
   };
 
   const columns = getColumns({ showToast, handleTxClick });
@@ -126,36 +137,122 @@ const getColumns = ({ showToast, handleTxClick }) => [
   {
     header: "Time",
     cell: ({ originalData }) => {
+      const [tooltipVisible, setTooltipVisible] = useState(false);
       const { timestamp } = originalData || {};
-      return <div className="text-gray-300 truncate">{getDateString(timestamp / 1000000)}</div>;
-    },
-  },
-  {
-    header: () => <div className="text-right">View in NEAR explorer</div>,
-    cell: ({ originalData }) => {
       const { receipt_id, txid } = originalData || {};
+      const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+      const [copyIconVisible, setCopyIconVisible] = useState({});
+      const [isHovered, setIsHovered] = useState(false);
+      const handleMouseEnter = () => {
+        if (timeoutRef.current !== null) {
+          clearTimeout(timeoutRef.current);
+        }
+        setTooltipVisible(true);
+        setIsHovered(true);
+      };
+      const handleMouseLeave = () => {
+        timeoutRef.current = setTimeout(() => {
+          setTooltipVisible(false);
+          setCopyIconVisible({});
+          setIsHovered(false);
+        }, 100);
+      };
+      const handleCopyIconMouseEnter = (id) => {
+        setCopyIconVisible((prev) => ({ ...prev, [id]: true }));
+      };
+      const handleCopyIconMouseLeave = (id) => {
+        setCopyIconVisible((prev) => ({ ...prev, [id]: false }));
+      };
       if (!receipt_id) {
         return null;
       }
       return (
-        <div className="flex items-center gap-2 justify-end">
+        <div className="text-gray-300 flex items-center">
+          {getDateString(timestamp / 1000000)}
           <div
-            className="text-gray-300 text-right cursor-pointer hover:underline transform hover:opacity-80"
-            onClick={() => handleTxClick(txid)}
+            className="ml-2 cursor-pointer relative"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
           >
-            {maskMiddleString(txid, 4, 34)}
+            <ExternalLink color={isHovered ? "white" : "#C0C4E9"} />
+            {tooltipVisible && (
+              <div
+                className="absolute right-0 top-4 bg-dark-250 border p-2 shadow-lg z-50 border border-dark-500 rounded-lg p-2"
+                style={{ width: "212px" }}
+              >
+                <div
+                  className="p-3 hover:bg-dark-1150 text-white rounded-md flex items-center mb-1"
+                  onMouseEnter={() => handleCopyIconMouseEnter(1)}
+                  onMouseLeave={() => handleCopyIconMouseLeave(1)}
+                >
+                  <NearblocksIcon />
+                  <div
+                    className="ml-2 hover:text-gray-300 hover:underline text-sm"
+                    onClick={() => handleTxClick(txid, "nearblocks")}
+                  >
+                    {maskMiddleString(txid, 4, 34)}
+                  </div>
+                  {copyIconVisible[1] && (
+                    <CopyToClipboard text={txid} onCopy={() => showToast("Copied")}>
+                      <div className="cursor-pointer ml-2">
+                        <CopyIcon />
+                      </div>
+                    </CopyToClipboard>
+                  )}
+                </div>
+                <div
+                  className="p-3 hover:bg-dark-1150 text-white rounded-md flex items-center"
+                  onMouseEnter={() => handleCopyIconMouseEnter(2)}
+                  onMouseLeave={() => handleCopyIconMouseLeave(2)}
+                >
+                  <PikespeakIcon />
+                  <div
+                    className="ml-2 hover:text-gray-300 hover:underline text-sm"
+                    onClick={() => handleTxClick(txid, "pikespeak")}
+                  >
+                    {maskMiddleString(txid, 4, 34)}
+                  </div>
+                  {copyIconVisible[2] && (
+                    <CopyToClipboard text={txid} onCopy={() => showToast("Copied")}>
+                      <div className="cursor-pointer ml-2">
+                        <CopyIcon />
+                      </div>
+                    </CopyToClipboard>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
-
-          <CopyToClipboard text={txid} onCopy={() => showToast("Copied")}>
-            <div className="cursor-pointer">
-              <CopyIcon />
-            </div>
-          </CopyToClipboard>
         </div>
       );
     },
-    size: 180,
   },
+  // {
+  //   header: () => <div className="text-right">View in NEAR explorer</div>,
+  //   cell: ({ originalData }) => {
+  //     const { receipt_id, txid } = originalData || {};
+  //     if (!receipt_id) {
+  //       return null;
+  //     }
+  //     return (
+  //       <div className="flex items-center gap-2 justify-end">
+  //         <div
+  //           className="text-gray-300 text-right cursor-pointer hover:underline transform hover:opacity-80"
+  //           onClick={() => handleTxClick(txid)}
+  //         >
+  //           {maskMiddleString(txid, 4, 34)}
+  //         </div>
+
+  //         <CopyToClipboard text={txid} onCopy={() => showToast("Copied")}>
+  //           <div className="cursor-pointer">
+  //             <CopyIcon />
+  //           </div>
+  //         </CopyToClipboard>
+  //       </div>
+  //     );
+  //   },
+  //   size: 180,
+  // },
 ];
 
 export default Records;
