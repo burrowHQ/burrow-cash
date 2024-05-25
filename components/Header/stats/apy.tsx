@@ -9,8 +9,7 @@ import { useAppSelector } from "../../../redux/hooks";
 import { getAverageSupplyRewardApy } from "../../../redux/selectors/getAverageSuppliedRewardApy";
 import { getAverageBorrowedRewardApy } from "../../../redux/selectors/getAverageBorrowedRewardApy";
 import { getAverageNetRewardApy } from "../../../redux/selectors/getAverageNetRewardApy";
-import { getAverageTokenNetRewardApy } from "../../../redux/selectors/getAverageTokenNetRewardApy";
-import { useNonFarmedAssets } from "../../../hooks/hooks";
+import { getListTokenNetRewardApy } from "../../../redux/selectors/getListTokenNetRewardApy";
 import HtmlTooltip from "../../common/html-tooltip";
 import { format_apy } from "../../../utils/uiNumber";
 
@@ -58,8 +57,8 @@ const IncentiveAPY = () => {
   const userSupplyApy = useAppSelector(getAverageSupplyRewardApy());
   const userBorrowedApy = useAppSelector(getAverageBorrowedRewardApy());
   const userNetApy = useAppSelector(getAverageNetRewardApy());
-  const userTokenNetApy = useAppSelector(getAverageTokenNetRewardApy());
-  const empty = !userSupplyApy && !userBorrowedApy && !userNetApy && !userTokenNetApy;
+  const userListTokenNetApy = useAppSelector(getListTokenNetRewardApy());
+  const empty = !userSupplyApy && !userBorrowedApy && !userNetApy && !userListTokenNetApy.length;
   if (empty) return null;
   return (
     <HtmlTooltip
@@ -93,12 +92,21 @@ const IncentiveAPY = () => {
             <span className="text-white font-normal">{format_apy(userNetApy)}</span>
           </div>
           <div
-            className={`flex items-center justify-between text-xs gap-6 ${
-              userTokenNetApy ? "" : "hidden"
-            }`}
+            className={`flex flex-col gap-2 text-xs ${userListTokenNetApy.length ? "" : "hidden"}`}
           >
-            <span className="text-gray-300 font-normal">Avg. Net Liquidity Reward APY</span>
-            <span className="text-white font-normal">{format_apy(userTokenNetApy)}</span>
+            {userListTokenNetApy.map((apyData) => {
+              return (
+                <div
+                  className="flex items-center justify-between gap-3"
+                  key={apyData.asset.token_id}
+                >
+                  <span className="text-gray-300 font-normal">
+                    {apyData.asset.metadata.symbol} Net Liquidity Reward APY
+                  </span>
+                  <span className="text-white font-normal">{format_apy(apyData.apy)}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       }
