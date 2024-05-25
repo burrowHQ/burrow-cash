@@ -10,6 +10,7 @@ export const getListTokenNetRewardApy = () =>
     (state: RootState) => state.assets,
     (state: RootState) => state.account,
     (assets, account) => {
+      // todo
       const { supplied, collateral, borrowed, farms } = account.portfolio;
       const tokenNetFarms = farms.tokennetbalance || {};
       const list = Object.entries(tokenNetFarms)
