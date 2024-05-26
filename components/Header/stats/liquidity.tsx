@@ -53,15 +53,7 @@ export const UserLiquidity = () => {
   const userDeposited = useAppSelector(getTotalAccountBalance("supplied"));
   const userBorrowed = useAppSelector(getTotalAccountBalance("borrowed"));
   const userNetLiquidity = new Decimal(userDeposited).minus(userBorrowed).toNumber();
-  const weightedNetLiquidity = useAppSelector(getWeightedNetLiquidity);
-
-  // const userNetLiquidityValue = fullDigits?.user
-  //   ? userNetLiquidity.toLocaleString(undefined, COMPACT_USD_FORMAT)
-  //   : `$${m(userNetLiquidity)}`;
   const userNetLiquidityValue = userNetLiquidity > 0 ? `$${m(userNetLiquidity)}` : `$0`;
-  const userWeightedNetLiquidityValue =
-    weightedNetLiquidity > 0 ? `$${m(weightedNetLiquidity)}` : "$0";
-
   const userDepositedValue = userDeposited > 0 ? `$${m(userDeposited)}` : `$0`;
   const userBorrowedValue = userBorrowed > 0 ? `$${m(userBorrowed)}` : "$0";
   const showLabels = userDeposited > 0 || userBorrowed > 0;

@@ -18,9 +18,10 @@ export const getNetAPY = ({ isStaking = false }: { isStaking: boolean }) =>
       if (!hasAssets(assets)) return 0;
       const { amount } = app.staking;
       const booster_token_asset = assets.data[app.config.booster_token_id];
-      const [gainCollateral, totalCollateral] = getGains(account.portfolio, assets, "collateral");
+      const { borrows, collaterals } = account?.portfolio || {};
+      const [gainBorrowed, totalBorrowed] = getGainsArr(borrows, assets);
+      const [gainCollateral, totalCollateral] = getGainsArr(collaterals, assets);
       const [gainSupplied, totalSupplied] = getGains(account.portfolio, assets, "supplied");
-      const [gainBorrowed, totalBorrowed] = getGains(account.portfolio, assets, "borrowed");
 
       const gainExtra = extraDaily * 365;
 
@@ -46,9 +47,9 @@ export const getNetTvlAPY = ({ isStaking = false }) =>
       if (!hasAssets(assets)) return 0;
       const { amount } = app.staking;
       const booster_token_asset = assets.data[app.config.booster_token_id];
-      const [, totalCollateral] = getGains(account.portfolio, assets, "collateral");
       const [, totalSupplied] = getGains(account.portfolio, assets, "supplied");
-      const [, totalBorrowed] = getGains(account.portfolio, assets, "borrowed");
+      const [, totalCollateral] = getGainsArr(account.portfolio.collaterals, assets);
+      const [, totalBorrowed] = getGainsArr(account.portfolio.borrows, assets);
 
       const netTvlRewards = Object.values(rewards.net).reduce(
         (acc, r) => acc + (isStaking ? r.newDailyAmount : r.dailyAmount) * r.price,
@@ -66,24 +67,6 @@ export const getNetTvlAPY = ({ isStaking = false }) =>
       return apy || 0;
     },
   );
-
-// export const getTotalNetTvlAPY = createSelector(
-//   getProtocolRewards,
-//   getTotalBalance("supplied", true),
-//   getTotalBalance("borrowed", true),
-//   (state: RootState) => state.assets,
-//   (rewards, supplied, borrowed, assets) => {
-//     if (!rewards.length) return 0;
-//     const totalDailyNetTvlRewards = rewards.reduce(
-//       (acc, r) =>
-//         acc + (r.dailyAmount * r.price * assets.data[r.tokenId].config.net_tvl_multiplier) / 10000,
-//       0,
-//     );
-//     const totalProtocolLiquidity = supplied - borrowed;
-//     const apy = ((totalDailyNetTvlRewards * 365) / totalProtocolLiquidity) * 100;
-//     return apy;
-//   },
-// );
 export const getTotalNetTvlAPY = createSelector(
   getProtocolRewards,
   (state: RootState) => state.assets,

@@ -1,4 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
+import Decimal from "decimal.js";
 import { RootState } from "../store";
 import { shrinkToken } from "../../store";
 import { Farm } from "../accountState";
@@ -9,9 +10,8 @@ export const getAverageBorrowedRewardApy = () =>
     (state: RootState) => state.assets,
     (state: RootState) => state.account,
     (assets, account) => {
-      const { borrowed, farms } = account.portfolio;
-      // const borrowFarms = farms.borrowed || {};
-      const borrowFarms = filterAccountEndedFarms(farms, assets.allFarms).borrowed || {};
+      const { borrows, farms } = account.portfolio;
+      const borrowFarms = farms.borrowed || {};
       const [dailyTotalBorrowProfit, totalBorrow] = Object.entries(borrowFarms)
         .map(([tokenId, farm]: [string, Farm]) => {
           const asset = assets.data[tokenId];
@@ -35,7 +35,10 @@ export const getAverageBorrowedRewardApy = () =>
               return dailyAmount * (rewardAsset.price?.usd || 0);
             })
             .reduce((acc, value) => acc + value, 0);
-          const balance = Number(shrinkToken(borrowed[tokenId]?.balance || 0, assetDecimals));
+          const balanceDecimal = borrows
+            .filter((b) => b.token_id === tokenId)
+            .reduce((acc, cur) => acc.plus(cur.balance), new Decimal(0));
+          const balance = Number(shrinkToken(balanceDecimal.toNumber(), assetDecimals));
           return { dailyProfit: profit, principal: balance * (asset.price?.usd || 0) };
         })
         .reduce(

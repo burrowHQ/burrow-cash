@@ -146,9 +146,10 @@ export const getGainsFromIncentive = (
 export const getDailyAmount = (
   portfolio: Portfolio,
   assets: AssetsState,
-  source: "supplied" | "collateral" | "borrowed",
+  source: "supplies" | "collaterals" | "borrows",
 ) => {
-  return Object.entries(portfolio[source]).map(([tokenId, assetData]) => {
+  return portfolio[source].map((assetData) => {
+    const tokenId = assetData.token_id;
     const asset = assets.data[tokenId];
     const assetDecimals = asset.metadata.decimals + asset.config.extra_decimals;
     const balance = Number(shrinkToken(assetData.balance, assetDecimals));
@@ -574,11 +575,10 @@ export const getAccountDailyRewards = createSelector(
       app,
     });
     const baseCollateralUsdDaily =
-      getGains(accountDustProcess.portfolio, assets, "collateral")[0] / 365;
+      getGainsArr(accountDustProcess.portfolio.collaterals, assets)[0] / 365;
     const baseSuppliedUsdDaily =
       getGains(accountDustProcess.portfolio, assets, "supplied")[0] / 365;
-    const baseBorrowedUsdDaily =
-      getGains(accountDustProcess.portfolio, assets, "borrowed")[0] / 365;
+    const baseBorrowedUsdDaily = getGainsArr(accountDustProcess.portfolio.borrows, assets)[0] / 365;
 
     const farmSuppliedUsdDaily = getGainsFromIncentive(account.portfolio, assets, "supplied");
     const farmBorrowedUsdDaily = getGainsFromIncentive(account.portfolio, assets, "borrowed");
@@ -587,18 +587,14 @@ export const getAccountDailyRewards = createSelector(
     const baseSuppliedAmountDaily = getDailyAmount(
       accountDustProcess.portfolio,
       assets,
-      "supplied",
+      "supplies",
     );
     const baseCollateralAmountDaily = getDailyAmount(
       accountDustProcess.portfolio,
       assets,
-      "collateral",
+      "collaterals",
     );
-    const baseBorrowedAmountDaily = getDailyAmount(
-      accountDustProcess.portfolio,
-      assets,
-      "borrowed",
-    );
+    const baseBorrowedAmountDaily = getDailyAmount(accountDustProcess.portfolio, assets, "borrows");
 
     const farmSuppliedAmountDaily = getIncentiveDailyAmount(account.portfolio, assets, "supplied");
     const farmBorrowedAmountDaily = getIncentiveDailyAmount(account.portfolio, assets, "borrowed");

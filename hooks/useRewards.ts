@@ -136,9 +136,9 @@ export function useStakeRewardApy() {
     const { tokenId, newDailyAmount } = cur;
     return sum + (assets.data[tokenId].price?.usd || 0) * newDailyAmount;
   }, 0);
-  const [, totalCollateral] = getNetGains(portfolio, assets, "collateral");
-  const [, totalSupplied] = getNetGains(portfolio, assets, "supplied");
-  const [, totalBorrowed] = getNetGains(portfolio, assets, "borrowed");
+  const [, totalCollateral] = getNetGains(portfolio.collaterals, assets);
+  const [, totalSupplied] = getNetGains(portfolio.supplies, assets);
+  const [, totalBorrowed] = getNetGains(portfolio.borrows, assets);
   const totalNetPrincipal = totalCollateral + totalSupplied - totalBorrowed;
 
   const supplyAPY =

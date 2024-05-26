@@ -37,9 +37,6 @@ export function useUserHealth() {
     healthFactor && healthFactor <= 100
       ? Math.floor(Number(healthFactor) * 100) / 100
       : Math.trunc(Number(healthFactor));
-  // const valueLocale = healthFactor?.toLocaleString(undefined, {
-  //   maximumFractionDigits: healthFactor <= 105 ? 2 : 0,
-  // });
   const valueLabel = healthFactor === -1 || healthFactor === null ? "-%" : `${valueLocale}%`;
 
   const label =
