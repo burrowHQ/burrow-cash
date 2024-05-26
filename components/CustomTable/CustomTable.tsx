@@ -228,9 +228,6 @@ const StyledTable = styled.div`
   .custom-table-td {
     flex: 1;
     word-break: break-word;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
   }
 
   .custom-table-thead {
