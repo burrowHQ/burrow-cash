@@ -104,7 +104,7 @@ const yourSuppliedColumns = [
     },
   },
   {
-    header: "Your APY",
+    header: "APY",
     cell: ({ originalData }) => {
       return (
         <APYCell
@@ -263,7 +263,7 @@ const yourBorrowedColumns = [
     },
   },
   {
-    header: "Your APY",
+    header: "APY",
     cell: ({ originalData }) => {
       return (
         <APYCell
