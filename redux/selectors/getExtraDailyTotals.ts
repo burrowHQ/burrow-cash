@@ -3,6 +3,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { hasAssets } from "../utils";
 import { getAccountRewards } from "./getAccountRewards";
+import { filterAccountSentOutRewards } from "../../utils/index";
 
 export const getExtraDailyTotals = ({ isStaking = false }: { isStaking: boolean }) =>
   createSelector(
@@ -11,8 +12,8 @@ export const getExtraDailyTotals = ({ isStaking = false }: { isStaking: boolean 
     (state: RootState) => state.app.config,
     (assets, rewards, config) => {
       if (!hasAssets(assets)) return 0;
-      const { poolRewards } = rewards;
-
+      const { poolRewards: poolRewardsPending } = rewards;
+      const poolRewards = filterAccountSentOutRewards(poolRewardsPending);
       const gainExtra = Object.keys(poolRewards).reduce((acc, tokenId) => {
         const price = assets.data[tokenId]?.price?.usd || 0;
         const daily = isStaking
