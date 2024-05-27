@@ -2,7 +2,6 @@ import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import styled from "styled-components";
 import { ContentBox } from "../../components/ContentBox/ContentBox";
-import DashboardApy from "./dashboardApy";
 import DashboardReward from "./dashboardReward";
 import { formatTokenValue, formatUSDValue, millifyNumber } from "../../helpers/helpers";
 import { AdjustButton, MarketButton, RepayButton, WithdrawButton } from "./supplyBorrowButtons";
@@ -160,11 +159,6 @@ const SupplyItem = ({ data }) => {
 
       <div style={{ padding: "16px" }}>
         <ItemRow label="APY">
-          {/* <DashboardApy
-            baseAPY={data?.apy}
-            rewardList={data?.depositRewards}
-            tokenId={data?.tokenId}
-          /> */}
           <APYCell
             rewards={data?.depositRewards}
             baseAPY={data?.apy}
@@ -218,12 +212,6 @@ const BorrowItem = ({ data }) => {
       </div>
       <div style={{ padding: "16px" }}>
         <ItemRow label="APY">
-          {/* <DashboardApy
-            baseAPY={data?.borrowApy}
-            rewardList={data?.borrowRewards}
-            tokenId={data?.tokenId}
-            isBorrow
-          /> */}
           <APYCell
             rewards={data?.borrowRewards}
             baseAPY={data?.borrowApy}

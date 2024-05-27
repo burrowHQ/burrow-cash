@@ -8,7 +8,6 @@ import SupplyTokenSvg from "../../public/svg/Group 24791.svg";
 import BorrowTokenSvg from "../../public/svg/Group 24677.svg";
 import { useAccountId, useAvailableAssets, usePortfolioAssets } from "../../hooks/hooks";
 import DashboardReward from "./dashboardReward";
-import DashboardApy from "./dashboardApy";
 import CustomTable from "../../components/CustomTable/CustomTable";
 import {
   formatTokenValue,
@@ -108,11 +107,6 @@ const yourSuppliedColumns = [
     header: "Your APY",
     cell: ({ originalData }) => {
       return (
-        // <DashboardApy
-        //   baseAPY={originalData?.apy}
-        //   rewardList={originalData?.depositRewards}
-        //   tokenId={originalData?.tokenId}
-        // />
         <APYCell
           rewards={originalData?.depositRewards}
           baseAPY={originalData?.apy}
@@ -272,12 +266,6 @@ const yourBorrowedColumns = [
     header: "Your APY",
     cell: ({ originalData }) => {
       return (
-        // <DashboardApy
-        //   baseAPY={originalData?.borrowApy}
-        //   rewardList={originalData?.borrowRewards}
-        //   tokenId={originalData?.tokenId}
-        //   isBorrow
-        // />
         <APYCell
           rewards={originalData?.borrowRewards}
           baseAPY={originalData?.borrowApy}

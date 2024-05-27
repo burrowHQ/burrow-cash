@@ -64,6 +64,7 @@ const ToolTip = ({
   const netTvlFarmTokenId = (Object.keys(assets?.netTvlFarm || {}) || [])[0];
   const {
     computeRewardAPY,
+    computeRewardAPY2,
     computeStakingRewardAPY,
     netLiquidityAPY,
     netTvlMultiplier,
@@ -133,12 +134,16 @@ const ToolTip = ({
           {list.map(({ rewards, metadata, price, config }) => {
             const { symbol, icon } = metadata;
 
-            const rewardAPY = computeRewardAPY(
+            const rewardAPY2 = computeRewardAPY2(
               metadata.token_id,
               rewards.reward_per_day,
               metadata.decimals + config.extra_decimals,
               price || 0,
             );
+            const rewardAPY = computeRewardAPY({
+              rewardTokenId: metadata.token_id,
+              rewardData: rewards,
+            });
 
             const stakingRewardAPY = computeStakingRewardAPY(metadata.token_id);
 

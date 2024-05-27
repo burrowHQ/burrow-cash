@@ -32,6 +32,13 @@ export function useExtraAPY({
   const assetDecimals = asset.metadata.decimals + asset.config.extra_decimals;
   const assetPrice = assets.data[assetId].price?.usd || 0;
   const hasNetTvlFarms = Object.keys(portfolio.farms.netTvl).length > 0;
+  const suppliedBalancePerShare = new Decimal(asset.supplied.balance).div(
+    asset.supplied.shares || "1",
+  );
+  const borrowedBalancePerShare = new Decimal(asset.borrowed.balance).div(
+    asset.borrowed.shares || "1",
+  );
+
   let netLiquidityAPY;
   if (onlyMarket) {
     netLiquidityAPY = totalNetTvlApy;
@@ -115,7 +122,7 @@ export function useExtraAPY({
       };
     }
   };
-  const computeRewardAPY = (rewardTokenId, rewardsPerDay, decimals, price) => {
+  const computeRewardAPY2 = (rewardTokenId, rewardsPerDay, decimals, price) => {
     const rewardAsset = assets.data[rewardTokenId];
     const type = isBorrow ? "borrowed" : "supplied";
     const farmData = portfolio.farms?.[type]?.[assetId]?.[rewardTokenId];
@@ -153,6 +160,51 @@ export function useExtraAPY({
 
     return apy || 0;
   };
+  const computeRewardAPY = ({ rewardTokenId, rewardData }) => {
+    const { reward_per_day, boosted_shares } = rewardData;
+    const rewardAsset = assets.data[rewardTokenId];
+    const decimals = asset.metadata.decimals + asset.config.extra_decimals;
+    const type = isBorrow ? "borrowed" : "supplied";
+    const farmData = portfolio.farms?.[type]?.[assetId]?.[rewardTokenId];
+
+    const totalDailyRewards = new Decimal(reward_per_day)
+      .div(new Decimal(10).pow(decimals))
+      .toNumber();
+
+    const totalDeposits = (isBorrow ? borrowedBalancePerShare : suppliedBalancePerShare)
+      .mul(boosted_shares)
+      .div(new Decimal(10).pow(assetDecimals))
+      .mul(asset.price?.usd || "0");
+
+    const totalDeposits2 = isBorrow ? totalBorrowUSD : totalSupplyUSD;
+    if (!farmData || onlyMarket) {
+      return (
+        new Decimal(reward_per_day)
+          .div(new Decimal(10).pow(decimals))
+          .mul(365)
+          .mul(rewardAsset.price?.usd || "0")
+          .div(totalDeposits)
+          .mul(100)
+          .toNumber() || 0
+      );
+    }
+    const { multiplier, totalBoostedShares, shares } = computePoolsDailyAmount(
+      type,
+      asset,
+      rewardAsset,
+      portfolio,
+      xBRRR,
+      farmData,
+      appConfig.booster_decimals,
+    );
+
+    const apy =
+      ((totalDailyRewards * +(rewardAsset.price?.usd || "0") * 365 * multiplier) /
+        ((totalUserAssetUSD * totalBoostedShares) / shares)) *
+      100;
+
+    return apy || 0;
+  };
 
   const computeStakingRewardAPY = (rewardTokenId: string) => {
     const rewardAsset = assets.data[rewardTokenId];
@@ -182,6 +234,7 @@ export function useExtraAPY({
 
   return {
     computeRewardAPY,
+    computeRewardAPY2,
     computeStakingRewardAPY,
     netLiquidityAPY,
     netTvlMultiplier,

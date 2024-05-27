@@ -29,12 +29,16 @@ const APYCell = ({
   if (hiddenAssets.includes(tokenId)) return <Box />;
 
   const extraAPY = list.reduce((acc: number, { metadata, rewards, price, config }) => {
-    const apy = computeRewardAPY(
-      metadata.token_id,
-      rewards.reward_per_day,
-      metadata.decimals + config.extra_decimals,
-      price || 0,
-    );
+    // const apy = computeRewardAPY(
+    //   metadata.token_id,
+    //   rewards.reward_per_day,
+    //   metadata.decimals + config.extra_decimals,
+    //   price || 0,
+    // );
+    const apy = computeRewardAPY({
+      rewardTokenId: metadata.token_id,
+      rewardData: rewards,
+    });
 
     return acc + apy;
   }, 0);
@@ -117,12 +121,16 @@ const ToolTip = ({
           {list.map(({ rewards, metadata, price, config }) => {
             const { symbol, icon } = metadata;
 
-            const rewardAPY = computeRewardAPY(
-              metadata.token_id,
-              rewards.reward_per_day,
-              metadata.decimals + config.extra_decimals,
-              price || 0,
-            );
+            // const rewardAPY = computeRewardAPY(
+            //   metadata.token_id,
+            //   rewards.reward_per_day,
+            //   metadata.decimals + config.extra_decimals,
+            //   price || 0,
+            // );
+            const rewardAPY = computeRewardAPY({
+              rewardTokenId: metadata.token_id,
+              rewardData: rewards,
+            });
 
             const stakingRewardAPY = computeStakingRewardAPY(metadata.token_id);
 
