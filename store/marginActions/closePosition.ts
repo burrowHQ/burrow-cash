@@ -11,6 +11,7 @@ export async function closePosition({
   token_d_id,
   min_token_d_amount,
   swap_indication,
+  isLong,
 }: {
   pos_id: string;
   token_p_id: string;
@@ -18,7 +19,9 @@ export async function closePosition({
   token_d_id: string;
   min_token_d_amount: string;
   swap_indication: any;
+  isLong?: boolean;
 }) {
+  console.log(isLong);
   const { logicContract } = await getBurrow();
   const transactions: Transaction[] = [];
   transactions.push({
@@ -42,36 +45,38 @@ export async function closePosition({
       },
     ],
   });
-  transactions.push({
-    receiverId: logicContract.contractId,
-    functionCalls: [
-      {
-        methodName: ChangeMethodsLogic[ChangeMethodsLogic.margin_execute_with_pyth],
-        args: {
-          actions: [
-            {
-              Withdraw: {
-                token_id: token_p_id,
+  if (!isLong) {
+    transactions.push({
+      receiverId: logicContract.contractId,
+      functionCalls: [
+        {
+          methodName: ChangeMethodsLogic[ChangeMethodsLogic.margin_execute_with_pyth],
+          args: {
+            actions: [
+              {
+                Withdraw: {
+                  token_id: token_p_id,
+                },
               },
-            },
-          ],
+            ],
+          },
+          gas: new BN("100000000000000"),
         },
-        gas: new BN("100000000000000"),
-      },
-      {
-        methodName: ChangeMethodsLogic[ChangeMethodsLogic.margin_execute_with_pyth],
-        args: {
-          actions: [
-            {
-              Withdraw: {
-                token_id: token_d_id,
+        {
+          methodName: ChangeMethodsLogic[ChangeMethodsLogic.margin_execute_with_pyth],
+          args: {
+            actions: [
+              {
+                Withdraw: {
+                  token_id: token_d_id,
+                },
               },
-            },
-          ],
+            ],
+          },
+          gas: new BN("100000000000000"),
         },
-        gas: new BN("100000000000000"),
-      },
-    ],
-  });
+      ],
+    });
+  }
   await prepareAndExecuteTransactions(transactions);
 }

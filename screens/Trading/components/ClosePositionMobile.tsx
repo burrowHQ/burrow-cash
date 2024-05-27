@@ -89,6 +89,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     console.log(extraProps, "extraProps....");
     try {
       const res = await closePosition({
+        isLong: positionType.label === "Long",
         swap_indication: estimateData.swap_indication,
         min_token_d_amount: estimateData.min_amount_out,
         pos_id: itemKey,
