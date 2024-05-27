@@ -9,6 +9,9 @@ export type Asset = Omit<IAssetDetailed, "farms"> & {
     borrowed: {
       [token: string]: IAssetFarmReward;
     };
+    tokennetbalance: {
+      [token: string]: IAssetFarmReward;
+    };
   };
 };
 

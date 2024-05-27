@@ -3,18 +3,20 @@ import Decimal from "decimal.js";
 import { RootState } from "../store";
 import { shrinkToken } from "../../store";
 import { Farm } from "../accountState";
-import { filterAccountSentOutFarms } from "../../utils/index";
+import { filterAccountSentOutFarms, standardizeAsset } from "../../utils/index";
 
-export const getAverageBorrowedRewardApy = () =>
+export const getListTokenNetRewardApy = () =>
   createSelector(
     (state: RootState) => state.assets,
     (state: RootState) => state.account,
     (assets, account) => {
-      const { borrows, farms } = account.portfolio;
-      const borrowFarms = farms.borrowed || {};
-      const [dailyTotalBorrowProfit, totalBorrow] = Object.entries(borrowFarms)
+      // todo
+      const { supplied, collateral, borrowed, farms } = account.portfolio;
+      const tokenNetFarms = farms.tokennetbalance || {};
+      const list = Object.entries(tokenNetFarms)
         .map(([tokenId, farm]: [string, Farm]) => {
-          const asset = assets.data[tokenId];
+          const asset = JSON.parse(JSON.stringify(assets.data[tokenId] || {}));
+          asset.metadata = standardizeAsset(asset.metadata || {});
           const assetDecimals = asset.metadata.decimals + asset.config.extra_decimals;
           const curr_farm = Object.entries(filterAccountSentOutFarms(farm));
           const profit = curr_farm
@@ -33,21 +35,27 @@ export const getAverageBorrowedRewardApy = () =>
                 totalBoostedShares > 0
                   ? (boostedShares / totalBoostedShares) * totalRewardsPerDay
                   : 0;
-              return dailyAmount * (rewardAsset.price?.usd || 0);
+              return dailyAmount * (rewardAsset.price?.usd || 0) * 365;
             })
             .reduce((acc, value) => acc + value, 0);
-          const balanceDecimal = borrows
-            .filter((b) => b.token_id === tokenId)
-            .reduce((acc, cur) => acc.plus(cur.balance), new Decimal(0));
-          const balance = Number(shrinkToken(balanceDecimal.toNumber(), assetDecimals));
-          return { dailyProfit: profit, principal: balance * (asset.price?.usd || 0) };
+          const principal =
+            Number(
+              shrinkToken(
+                new Decimal(supplied[tokenId]?.balance || 0)
+                  .plus(collateral[tokenId]?.balance || 0)
+                  .minus(borrowed[tokenId]?.balance || 0)
+                  .toFixed(),
+                assetDecimals,
+              ),
+            ) * (asset.price?.usd || 0);
+          let apy = 0;
+          if (principal > 0) {
+            apy = (profit / principal) * 100;
+          }
+
+          return { asset, apy, rewardOpen: curr_farm.length > 0 };
         })
-        .reduce(
-          (acc, data) => {
-            return [acc[0] + data.dailyProfit, acc[1] + data.principal];
-          },
-          [0, 0],
-        );
-      return totalBorrow > 0 ? (dailyTotalBorrowProfit / totalBorrow) * 365 * 100 : 0;
+        .filter((item) => item.rewardOpen);
+      return list;
     },
   );

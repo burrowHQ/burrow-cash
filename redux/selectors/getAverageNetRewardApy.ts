@@ -3,6 +3,7 @@ import { RootState } from "../store";
 import { shrinkToken } from "../../store";
 import { toUsd } from "../utils";
 import { AssetsState } from "../assetState";
+import { filterAccountSentOutFarms } from "../../utils/index";
 
 export const getAverageNetRewardApy = () =>
   createSelector(
@@ -13,7 +14,7 @@ export const getAverageNetRewardApy = () =>
       const [, totalSupplied] = getNetGains(account.portfolio.supplies, assets);
       const [, totalBorrowed] = getNetGains(account.portfolio.borrows, assets);
       const { netTvl } = account.portfolio.farms;
-      const totalNetProfit = Object.entries(netTvl || {})
+      const totalNetProfit = Object.entries(filterAccountSentOutFarms(netTvl || {}))
         .map(([rewardTokenId, farmData]) => {
           const rewardAsset = assets.data[rewardTokenId];
           const rewardAssetDecimals =

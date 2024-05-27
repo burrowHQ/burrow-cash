@@ -8,16 +8,19 @@ import { useAPY } from "../../hooks/useAPY";
 import { format_apy } from "../../utils/uiNumber";
 import { getAssets } from "../../redux/assetsSelectors";
 import { useAppSelector } from "../../redux/hooks";
+import { getProtocolRewards } from "../../redux/selectors/getProtocolRewards";
 
 export const APYCell = ({
   baseAPY,
-  rewards: list,
+  rewards,
   page,
   tokenId,
   isStaking = false,
   onlyMarket = false,
   excludeNetApy = false,
 }) => {
+  // Filter out the ones rewards sent out
+  const list = rewards.filter((reward) => reward.rewards.remaining_rewards !== "0");
   const isBorrow = page === "borrow";
   const boostedAPY = useAPY({
     baseAPY,
@@ -58,17 +61,24 @@ const ToolTip = ({
   const assets = useAppSelector(getAssets);
   // suppose only one reward
   const netTvlFarmTokenId = (Object.keys(assets?.netTvlFarm || {}) || [])[0];
-  const { computeRewardAPY, computeStakingRewardAPY, netLiquidityAPY, netTvlMultiplier } =
-    useExtraAPY({
-      tokenId,
-      isBorrow,
-      onlyMarket,
-    });
+  const {
+    computeRewardAPY,
+    computeStakingRewardAPY,
+    netLiquidityAPY,
+    netTvlMultiplier,
+    computeTokenNetRewardAPY,
+  } = useExtraAPY({
+    tokenId,
+    isBorrow,
+    onlyMarket,
+  });
+  const netTvlRewards = useAppSelector(getProtocolRewards);
   function getNetTvlFarmRewardIcon() {
     const asset = assets.data[netTvlFarmTokenId];
     const icon = asset?.metadata?.icon;
     return icon;
   }
+  const { apy, tokenNetRewards } = computeTokenNetRewardAPY();
   return (
     <HtmlTooltip
       open={showTooltip}
@@ -81,7 +91,8 @@ const ToolTip = ({
             {format_apy(baseAPY)}
           </Typography>
           {!isBorrow &&
-            !excludeNetApy && [
+            !excludeNetApy &&
+            netTvlRewards?.length > 0 && [
               <Typography fontSize="0.75rem" key={0}>
                 Net Liquidity APY
               </Typography>,
@@ -92,14 +103,38 @@ const ToolTip = ({
                 </div>
               </Typography>,
             ]}
+          {!isBorrow && tokenNetRewards.length > 0
+            ? [
+                <Typography fontSize="0.75rem" key={6}>
+                  Net Liquidity APY
+                </Typography>,
+                <Typography fontSize="0.75rem" color="#fff" textAlign="right" key={7}>
+                  <div className="flex items-center justify-end gap-1.5">
+                    <div className="flex items-center flex-shrink-0">
+                      {tokenNetRewards.map((reward, index) => {
+                        return (
+                          <img
+                            key={reward.token_id}
+                            className={`w-4 h-4 rounded-full flex-shrink-0 ${
+                              index > 0 ? "-ml-1.5" : ""
+                            }`}
+                            alt=""
+                            src={reward.icon}
+                          />
+                        );
+                      })}
+                    </div>
+                    {format_apy(apy)}
+                  </div>
+                </Typography>,
+              ]
+            : null}
           {list.map(({ rewards, metadata, price, config }) => {
             const { symbol, icon } = metadata;
-            const rewardAPY = computeRewardAPY(
-              metadata.token_id,
-              rewards.reward_per_day,
-              metadata.decimals + config.extra_decimals,
-              price || 0,
-            );
+            const rewardAPY = computeRewardAPY({
+              rewardTokenId: metadata.token_id,
+              rewardData: rewards,
+            });
 
             const stakingRewardAPY = computeStakingRewardAPY(metadata.token_id);
 

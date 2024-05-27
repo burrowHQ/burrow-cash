@@ -122,7 +122,6 @@ export const getModalData = (asset): UIAsset & Props & { disabled: boolean } => 
       data.rates = [];
       break;
     case "Repay": {
-      // TODO available
       let minRepay = "0";
       if (poolAsset?.supplied?.shares) {
         minRepay = shrinkToken(

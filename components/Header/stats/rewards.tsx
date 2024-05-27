@@ -25,6 +25,7 @@ export const UserDailyRewards = () => {
     baseBorrowedUsdDaily,
     farmSuppliedUsdDaily,
     farmBorrowedUsdDaily,
+    farmTokenNetUsdDaily,
     farmNetTvlUsdDaily,
     farmTotalUsdDaily,
     totalUsdDaily,
@@ -52,6 +53,7 @@ export const UserDailyRewards = () => {
             farmSuppliedUsdDaily={farmSuppliedUsdDaily}
             farmBorrowedUsdDaily={farmBorrowedUsdDaily}
             farmNetTvlUsdDaily={farmNetTvlUsdDaily}
+            farmTokenNetUsdDaily={farmTokenNetUsdDaily}
           />
         ),
       },
@@ -107,9 +109,15 @@ export const ProtocolDailyRewards = () => {
   );
 };
 
-const IncentiveMore = ({ farmSuppliedUsdDaily, farmBorrowedUsdDaily, farmNetTvlUsdDaily }) => {
+const IncentiveMore = ({
+  farmSuppliedUsdDaily,
+  farmBorrowedUsdDaily,
+  farmNetTvlUsdDaily,
+  farmTokenNetUsdDaily,
+}) => {
   const [showTooltip, setShowTooltip] = useState(false);
-  const empty = !farmSuppliedUsdDaily && !farmBorrowedUsdDaily && !farmNetTvlUsdDaily;
+  const empty =
+    !farmSuppliedUsdDaily && !farmBorrowedUsdDaily && !farmNetTvlUsdDaily && !farmTokenNetUsdDaily;
   if (empty) return null;
   return (
     <HtmlTooltip
@@ -146,6 +154,16 @@ const IncentiveMore = ({ farmSuppliedUsdDaily, farmBorrowedUsdDaily, farmNetTvlU
             <span className="text-gray-300 font-normal">Net Liquidity</span>
             <span className="text-white font-normal">
               {toInternationalCurrencySystem_usd(farmNetTvlUsdDaily)}
+            </span>
+          </div>
+          <div
+            className={`flex items-center justify-between text-xs gap-6 ${
+              farmTokenNetUsdDaily ? "" : "hidden"
+            }`}
+          >
+            <span className="text-gray-300 font-normal">Net Liquidity</span>
+            <span className="text-white font-normal">
+              {toInternationalCurrencySystem_usd(farmTokenNetUsdDaily)}
             </span>
           </div>
         </div>
