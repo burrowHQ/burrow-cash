@@ -89,9 +89,10 @@ export function useStakeRewardApy() {
       avgStakeSupplyAPY: 0,
       avgStakeBorrowAPY: 0,
       avgStakeNetAPY: 0,
+      totalTokenNetMap: {},
     };
-  const { suppliedRewards, borrowedRewards, netLiquidityRewards } = assetRewards;
-  const { supplied, collateral, borrowed, farms } = portfolio;
+  const { suppliedRewards, borrowedRewards, tokenNetRewards, netLiquidityRewards } = assetRewards;
+  const { supplied, collateralAll, borrows, farms } = portfolio;
   const supplyFarms = farms.supplied || {};
   const borrowFarms = farms.borrowed || {};
   // supply
@@ -106,7 +107,7 @@ export function useStakeRewardApy() {
       const balance = Number(
         shrinkToken(
           new Decimal(supplied[tokenId]?.balance || 0)
-            .plus(collateral[tokenId]?.balance || 0)
+            .plus(collateralAll[tokenId]?.balance || 0)
             .toNumber(),
           assetDecimals,
         ),
@@ -124,13 +125,45 @@ export function useStakeRewardApy() {
     .map(([tokenId]) => {
       const asset = assets.data[tokenId];
       const assetDecimals = asset.metadata.decimals + asset.config.extra_decimals;
-      const balance = Number(
-        shrinkToken(new Decimal(borrowed[tokenId]?.balance || 0).toNumber(), assetDecimals),
-      );
+      const borrowedBalance = borrows
+        .filter((a) => a.token_id === tokenId)
+        .reduce((acc, cur) => {
+          acc = acc.plus(cur.balance);
+          return acc;
+        }, new Decimal(0));
+      const balance = Number(shrinkToken(borrowedBalance.toNumber(), assetDecimals));
       return balance * (asset.price?.usd || 0);
     })
     .reduce((acc, cur) => acc + cur, 0);
 
+  // tokennet
+  const totalTokenNetMap = tokenNetRewards.reduce((acc, cur) => {
+    const { tokenId, newDailyAmount, assetTokenId } = cur as any;
+    const assetToken = assets.data[assetTokenId];
+    const borrowedBalance = borrows
+      .filter((a) => a.token_id === assetTokenId)
+      .reduce((sum, c) => {
+        sum = sum.plus(c.balance);
+        return sum;
+      }, new Decimal(0));
+    const totalTokenNetPrincipal = new Decimal(supplied?.[assetTokenId]?.balance || 0)
+      .plus(collateralAll?.[assetTokenId]?.balance || 0)
+      .minus(borrowedBalance)
+      .div(new Decimal(10).pow(assetToken.metadata.decimals + assetToken.config.extra_decimals))
+      .mul(assets.data[assetTokenId].price?.usd || 0);
+    if (acc[assetTokenId]) {
+      acc[assetTokenId].dailyRewardsUsd = new Decimal(acc[assetTokenId].dailyRewardsUsd).plus(
+        (assets.data[tokenId].price?.usd || 0) * newDailyAmount,
+      );
+    } else {
+      acc[assetTokenId] = {
+        dailyRewardsUsd: (assets.data[tokenId].price?.usd || 0) * newDailyAmount,
+        totalTokenNetPrincipal: totalTokenNetPrincipal.toFixed(),
+        asset: assets.data[assetTokenId],
+      };
+    }
+    return acc;
+  }, {});
   // net
   const totalNetProfit = netLiquidityRewards.reduce((sum, cur) => {
     const { tokenId, newDailyAmount } = cur;
@@ -146,5 +179,10 @@ export function useStakeRewardApy() {
   const borrowAPY =
     totalBorrowedPrincipal > 0 ? (totalBorrowProfit / totalBorrowedPrincipal) * 365 * 100 : 0;
   const netAPY = totalNetPrincipal > 0 ? (totalNetProfit / totalNetPrincipal) * 365 * 100 : 0;
-  return { avgStakeSupplyAPY: supplyAPY, avgStakeBorrowAPY: borrowAPY, avgStakeNetAPY: netAPY };
+  return {
+    avgStakeSupplyAPY: supplyAPY,
+    avgStakeBorrowAPY: borrowAPY,
+    avgStakeNetAPY: netAPY,
+    totalTokenNetMap,
+  };
 }

@@ -2,6 +2,7 @@ import { Contract } from "near-api-js";
 import BN from "bn.js";
 import Decimal from "decimal.js";
 
+import { isEmpty } from "lodash";
 import getConfig, { defaultNetwork, LOGIC_CONTRACT_NAME } from "./config";
 import { nearMetadata, wooMetadata, sfraxMetadata, fraxMetadata } from "../components/Assets";
 
@@ -20,7 +21,7 @@ import { getContract } from "../store";
 
 import { getWalletSelector, getAccount, functionCall } from "./wallet-selector-compat";
 import { IAssetFarmReward } from "../interfaces/asset";
-import { FarmData } from "../redux/accountState";
+import { FarmData, Portfolio, Farm } from "../redux/accountState";
 // eslint-disable-next-line import/no-cycle
 import { IPortfolioReward } from "../redux/selectors/getAccountRewards";
 
@@ -302,4 +303,32 @@ export function filterAccountSentOutRewards(RewardsPending: any) {
     return acc;
   }, {}) as IPortfolioReward;
   return accountTokenNetFarms;
+}
+export function filterAccountAllSentOutFarms(portfolio: Portfolio) {
+  // Filter out the ones rewards sent out
+  const { supplied, borrowed, netTvl, tokennetbalance } = portfolio.farms;
+  const newSupplied = filterTypeFarms(supplied);
+  const newBorrowed = filterTypeFarms(borrowed);
+  const newTokennetbalance = filterTypeFarms(tokennetbalance);
+  const newNetTvl = filterAccountSentOutFarms(netTvl);
+  return {
+    supplied: newSupplied,
+    borrowed: newBorrowed,
+    tokennetbalance: newTokennetbalance,
+    netTvl: newNetTvl,
+  };
+}
+function filterTypeFarms(typeFarmData): IFarms {
+  const newTypeFarmData = Object.entries(typeFarmData).reduce((acc, [tokenId, farm]: any) => {
+    const newFarm = JSON.parse(JSON.stringify(filterAccountSentOutFarms(farm)));
+    if (isEmpty(newFarm)) return acc;
+    return {
+      [tokenId]: newFarm,
+    };
+  }, {});
+  return newTypeFarmData;
+}
+
+interface IFarms {
+  [tokenId: string]: Farm;
 }

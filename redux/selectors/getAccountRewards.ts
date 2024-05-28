@@ -14,7 +14,11 @@ import { INetTvlFarmRewards } from "../../interfaces";
 import { hasAssets, toUsd, emptySuppliedAsset, emptyBorrowedAsset } from "../utils";
 import { cloneObj } from "../../helpers/helpers";
 import { lpTokenPrefix, DEFAULT_POSITION } from "../../utils/config";
-import { standardizeAsset, filterAccountSentOutFarms } from "../../utils/index";
+import {
+  standardizeAsset,
+  filterAccountSentOutFarms,
+  filterAccountAllSentOutFarms,
+} from "../../utils/index";
 
 export interface IPortfolioReward {
   icon: string;
@@ -30,6 +34,7 @@ export interface IPortfolioReward {
   multiplier: number;
   price: number;
   remaining_rewards: string;
+  assetTokenId?: string;
 }
 
 export interface IAccountRewards {
@@ -49,6 +54,7 @@ export interface IAccountRewards {
   suppliedRewards: IPortfolioReward[];
   borrowedRewards: IPortfolioReward[];
   netLiquidityRewards: IPortfolioReward[];
+  tokenNetRewards: IPortfolioReward[];
   totalUnClaimUSD: number;
 }
 
@@ -220,11 +226,10 @@ export const computePoolsDailyAmount = (
   boosterDecimals: number,
   boost_suppress_factor: number,
 ) => {
-  const position = asset.token_id.indexOf(lpTokenPrefix) > -1 ? asset.token_id : DEFAULT_POSITION;
+  // const position = asset.token_id.indexOf(lpTokenPrefix) > -1 ? asset.token_id : DEFAULT_POSITION;
   const boosterLogBase = Number(
     shrinkToken(farmData.asset_farm_reward.booster_log_base, boosterDecimals),
   );
-
   const assetDecimals = asset.metadata.decimals + asset.config.extra_decimals;
   const rewardAssetDecimals = rewardAsset.metadata.decimals + rewardAsset.config.extra_decimals;
   const log = Math.log(xBRRRAmount / boost_suppress_factor) / Math.log(boosterLogBase);
@@ -246,14 +251,18 @@ export const computePoolsDailyAmount = (
     shrinkToken(portfolio.supplied[asset.token_id]?.shares || 0, assetDecimals),
   );
   const collateralShares = Number(
-    shrinkToken(
-      portfolio.positions[position]?.collateral?.[asset.token_id]?.shares || 0,
-      assetDecimals,
-    ),
+    shrinkToken(portfolio.collateralAll?.[asset.token_id]?.shares || 0, assetDecimals),
   );
   const borrowedShares = Number(
     shrinkToken(
-      portfolio.positions[position]?.borrowed?.[asset.token_id]?.shares || 0,
+      // portfolio.positions[position]?.borrowed?.[asset.token_id]?.shares || 0,
+      portfolio.borrows
+        .filter((a) => asset.token_id === a.token_id)
+        .reduce((acc, cur) => {
+          acc = acc.plus(cur.shares);
+          return acc;
+        }, new Decimal(0))
+        .toFixed(),
       assetDecimals,
     ),
   );
@@ -269,7 +278,6 @@ export const computePoolsDailyAmount = (
     const collateralBalance = Number(
       shrinkToken(portfolio.collateralAll[asset.token_id]?.balance || 0, assetDecimals),
     );
-    // TODO neek check
     const borrowedBalance = Number(
       shrinkToken(
         portfolio.borrows
@@ -480,7 +488,7 @@ export const getAccountRewardsForApy = createSelector(
     const xBRRRAmount = xBRRR + extraXBRRRAmount;
 
     const computePoolsRewards =
-      (type: "supplied" | "borrowed") =>
+      (type: "supplied" | "borrowed" | "tokennetbalance") =>
       ([tokenId, farm]: [string, Farm]) => {
         return Object.entries(farm).map(([rewardTokenId, farmData]) => {
           const asset = assets.data[tokenId];
@@ -516,6 +524,7 @@ export const getAccountRewardsForApy = createSelector(
             multiplier,
             price: rewardAsset.price?.usd || 0,
             unclaimedAmountUSD: unclaimedAmount * (rewardAsset.price?.usd || 0),
+            assetTokenId: tokenId,
           };
         });
       };
@@ -550,17 +559,24 @@ export const getAccountRewardsForApy = createSelector(
       };
     };
 
-    const { supplied, borrowed, netTvl } = filterAccountEndedFarms(
-      account.portfolio.farms,
-      assets.allFarms,
+    const { supplied, borrowed, netTvl, tokennetbalance } = filterAccountAllSentOutFarms(
+      account.portfolio,
     );
     const hasNetTvlFarm = !!Object.entries(assets.netTvlFarm).length;
     const suppliedRewards = Object.entries(supplied).map(computePoolsRewards("supplied")).flat();
     const borrowedRewards = Object.entries(borrowed).map(computePoolsRewards("borrowed")).flat();
+    const tokenNetRewards = Object.entries(tokennetbalance)
+      .map(computePoolsRewards("tokennetbalance"))
+      .flat();
     const netLiquidityRewards = hasNetTvlFarm
       ? Object.entries(netTvl).map(computeNetLiquidityRewards)
       : [];
-    const allRewards = [...suppliedRewards, ...borrowedRewards, ...netLiquidityRewards];
+    const allRewards = [
+      ...suppliedRewards,
+      ...borrowedRewards,
+      ...tokenNetRewards,
+      ...netLiquidityRewards,
+    ];
     let totalUnClaimUSD = 0;
     allRewards.forEach((d) => {
       totalUnClaimUSD += d.unclaimedAmountUSD;
@@ -569,6 +585,7 @@ export const getAccountRewardsForApy = createSelector(
       suppliedRewards,
       borrowedRewards,
       netLiquidityRewards,
+      tokenNetRewards,
     } as IAccountRewards;
   },
 );

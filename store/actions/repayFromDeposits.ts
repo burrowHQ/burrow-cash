@@ -25,7 +25,6 @@ export async function repayFromDeposits({
   isMax: boolean;
   enable_pyth_oracle: boolean;
 }) {
-  // TODO repay from supplied
   const { logicContract, oracleContract } = await getBurrow();
   const { decimals } = (await getMetadata(tokenId))!;
   const account = await getAccount().then(transformAccount);

@@ -6,8 +6,6 @@ import { hasAssets } from "../utils";
 import { getExtraDailyTotals } from "./getExtraDailyTotals";
 import { getAccountRewards, getGains, getGainsArr } from "./getAccountRewards";
 import { getProtocolRewards } from "./getProtocolRewards";
-import { shrinkToken } from "../../store/helper";
-import { filterAccountSentOutRewards } from "../../utils";
 
 export const getNetAPY = ({ isStaking = false }: { isStaking: boolean }) =>
   createSelector(

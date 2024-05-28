@@ -27,7 +27,6 @@ export async function repay({
   minRepay: string;
   interestChargedIn1min: string;
 }) {
-  // TODO repay from wallet
   const { account, logicContract } = await getBurrow();
   const tokenContract = await getTokenContract(tokenId);
   const { decimals } = (await getMetadata(tokenId))!;

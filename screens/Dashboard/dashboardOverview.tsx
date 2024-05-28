@@ -205,39 +205,6 @@ const DashboardOverview = ({ suppliedRows, borrowedRows }) => {
                       </div>
                     )}
                   </div>
-
-                  <div
-                    className="flex flex-wrap mt-3 lg3:mt-1"
-                    style={{ minWidth: rewardsObj?.extra?.length > 1 ? 45 : 20 }}
-                  >
-                    {rewardsObj?.brrr?.icon ? (
-                      <img
-                        src={rewardsObj?.brrr?.icon}
-                        width={26}
-                        height={26}
-                        alt="token"
-                        className="rounded-full"
-                        style={{ margin: -3 }}
-                      />
-                    ) : null}
-
-                    {rewardsObj?.extra?.length
-                      ? rewardsObj.extra.map((d, i) => {
-                          const extraData = d?.[1];
-                          return (
-                            <img
-                              src={extraData?.icon}
-                              width={26}
-                              key={(extraData?.tokenId || "0") + i}
-                              height={26}
-                              alt="token"
-                              className="rounded-full"
-                              style={{ margin: -3, maxWidth: "none" }}
-                            />
-                          );
-                        })
-                      : null}
-                  </div>
                 </div>
               </div>
             </div>

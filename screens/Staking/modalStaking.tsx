@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import Decimal from "decimal.js";
 import { DateTime } from "luxon";
 import styled from "styled-components";
 import RangeSlider, { MonthSlider } from "../../components/Modal/RangeSlider";
@@ -48,7 +49,8 @@ const ModalStaking = ({ isOpen, onClose }) => {
   const invalidAmount = +amount > +total;
   const invalidMonths = months === maxMonth ? false : months < selectedMonths;
   const disabledStake = !amount || invalidAmount || invalidMonths;
-  const { avgStakeSupplyAPY, avgStakeBorrowAPY, avgStakeNetAPY } = useStakeRewardApy();
+  const { avgStakeSupplyAPY, avgStakeBorrowAPY, avgStakeNetAPY, totalTokenNetMap } =
+    useStakeRewardApy();
 
   const inputAmount = `${amount}`
     .replace(/[^0-9.-]/g, "")
@@ -192,6 +194,23 @@ const ModalStaking = ({ isOpen, onClose }) => {
             <div className="h5 text-gray-300">Avg. NetLiquidity Reward APY</div>
             <div className="h5 text-primary">{format_apy(avgStakeNetAPY)}</div>
           </div>
+          {Object.values(totalTokenNetMap).map((tokenNetData) => {
+            const { asset, totalTokenNetPrincipal, dailyRewardsUsd } = tokenNetData as any;
+            const apy = new Decimal(totalTokenNetPrincipal).gt(0)
+              ? new Decimal(dailyRewardsUsd).div(totalTokenNetPrincipal).mul(365).mul(100)
+              : new Decimal("0");
+            return (
+              <div
+                key={asset.token_id}
+                className={`flex justify-between mb-4 ${apy.gt(0) ? "" : "hidden"}`}
+              >
+                <div className="h5 text-gray-300">
+                  {asset.metadata.symbol} Net Liquidity Reward APY
+                </div>
+                <div className="h5 text-primary">{format_apy(apy.toFixed())}</div>
+              </div>
+            );
+          })}
         </StyledRow>
 
         <CustomButton
