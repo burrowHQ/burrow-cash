@@ -335,7 +335,7 @@ const yourBorrowedColumns = [
       return (
         <div>
           <div>{collateralType}</div>
-          <div className="h6 text-gray-300 truncate">{tokenNames}</div>
+          <div className="h6 text-gray-300">{tokenNames}</div>
         </div>
       );
     },
