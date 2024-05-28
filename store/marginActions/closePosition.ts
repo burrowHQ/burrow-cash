@@ -21,7 +21,6 @@ export async function closePosition({
   swap_indication: any;
   isLong?: boolean;
 }) {
-  console.log(isLong);
   const { logicContract } = await getBurrow();
   const transactions: Transaction[] = [];
   transactions.push({
@@ -45,10 +44,9 @@ export async function closePosition({
       },
     ],
   });
-  if (!isLong) {
-    transactions.push({
-      receiverId: logicContract.contractId,
-      functionCalls: [
+
+  const withDrawMapList = !isLong
+    ? [
         {
           methodName: ChangeMethodsLogic[ChangeMethodsLogic.margin_execute_with_pyth],
           args: {
@@ -75,8 +73,26 @@ export async function closePosition({
           },
           gas: new BN("100000000000000"),
         },
-      ],
-    });
-  }
+      ]
+    : [
+        {
+          methodName: ChangeMethodsLogic[ChangeMethodsLogic.margin_execute_with_pyth],
+          args: {
+            actions: [
+              {
+                Withdraw: {
+                  token_id: token_d_id,
+                },
+              },
+            ],
+          },
+          gas: new BN("100000000000000"),
+        },
+      ];
+
+  transactions.push({
+    receiverId: logicContract.contractId,
+    functionCalls: withDrawMapList,
+  });
   await prepareAndExecuteTransactions(transactions);
 }
