@@ -1,10 +1,16 @@
 import BN from "bn.js";
 import { getBurrow, nearTokenId } from "../../utils";
 import { expandTokenDecimal } from "../helper";
-import { ChangeMethodsLogic, ChangeMethodsNearToken, ChangeMethodsToken } from "../../interfaces";
+import {
+  ChangeMethodsLogic,
+  ChangeMethodsNearToken,
+  ChangeMethodsToken,
+  ChangeMethodsOracle,
+} from "../../interfaces";
 import { Transaction } from "../wallet";
 import { prepareAndExecuteTransactions } from "../tokens";
 import { Assets } from "../../redux/assetState";
+import getConfig from "../../api/get-config";
 
 export async function openPosition({
   token_c_id,
@@ -25,7 +31,8 @@ export async function openPosition({
   swap_indication: any;
   assets: Assets;
 }) {
-  const { logicContract } = await getBurrow();
+  const { logicContract, oracleContract } = await getBurrow();
+  const { enable_pyth_oracle } = await getConfig();
   const isNEAR = token_c_id === nearTokenId;
   const expanded_c_amount = expandTokenDecimal(
     token_c_amount,
@@ -63,25 +70,37 @@ export async function openPosition({
       },
     ],
   });
+  const actionsTemplate = {
+    actions: [
+      {
+        OpenPosition: {
+          token_c_id,
+          token_c_amount: expanded_c_amount.toFixed(0),
+          token_d_id,
+          token_d_amount: expanded_d_amount.toFixed(0),
+          token_p_id,
+          min_token_p_amount,
+          swap_indication,
+        },
+      },
+    ],
+  };
   transactions.push({
-    receiverId: logicContract.contractId,
+    receiverId: enable_pyth_oracle ? logicContract.contractId : oracleContract.contractId,
     functionCalls: [
       {
-        methodName: ChangeMethodsLogic[ChangeMethodsLogic.margin_execute_with_pyth],
+        methodName: enable_pyth_oracle
+          ? ChangeMethodsLogic[ChangeMethodsLogic.margin_execute_with_pyth]
+          : ChangeMethodsOracle[ChangeMethodsOracle.oracle_call],
         args: {
-          actions: [
-            {
-              OpenPosition: {
-                token_c_id,
-                token_c_amount: expanded_c_amount.toFixed(0),
-                token_d_id,
-                token_d_amount: expanded_d_amount.toFixed(0),
-                token_p_id,
-                min_token_p_amount,
-                swap_indication,
-              },
-            },
-          ],
+          ...(enable_pyth_oracle
+            ? actionsTemplate
+            : {
+                receiver_id: logicContract.contractId,
+                msg: JSON.stringify({
+                  MarginExecute: actionsTemplate,
+                }),
+              }),
         },
         gas: new BN("300000000000000"),
       },

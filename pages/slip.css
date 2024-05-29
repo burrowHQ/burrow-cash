@@ -1,9 +1,9 @@
 .slip-fater:hover .slip-child {
-    display: block;
+  display: block;
 }
 .slip-child {
-    display: none;
+  display: none;
 }
 .slip-child:hover {
-    display: block;
+  display: block;
 }
