@@ -121,12 +121,6 @@ const CustomTable = ({
     }
   };
 
-  const handleRowLeave = () => {
-    if (typeof onSelectRow === "function") {
-      onSelectRow(null, null);
-    }
-  };
-
   const headers = columns?.map((d) => {
     let text;
     if (typeof d.header === "function") {
@@ -179,9 +173,6 @@ const CustomTable = ({
         }
         const styles: { flex?: string } = {};
         const colSize = headersWidth[colIndex];
-        // if (col.size) {
-        //   styles.flex = `0 0 ${col.size}px`;
-        // }
         if (colSize) {
           styles.flex = `0 0 ${colSize}px`;
         }

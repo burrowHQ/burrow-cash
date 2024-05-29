@@ -12,7 +12,7 @@ import { DEFAULT_POSITION } from "../../utils/config";
 import { CONST_COLLATERAL_TYPE } from "../../const/constCommon";
 
 export const getPortfolioRewards = (
-  type: "supplied" | "borrowed",
+  type: "supplied" | "borrowed" | "tokennetbalance",
   asset: Asset,
   farm: Farm,
   assets: Assets,
@@ -99,12 +99,20 @@ export const getPortfolioAssets = createSelector(
           supplied: suppliedToken,
           canUseAsCollateral: asset.config.can_use_as_collateral,
           canWithdraw: asset.config.can_withdraw,
-          rewards: getPortfolioRewards(
-            "supplied",
-            asset,
-            account.portfolio.farms.supplied[tokenId],
-            assets.data,
-          ),
+          rewards: [
+            ...getPortfolioRewards(
+              "supplied",
+              asset,
+              account.portfolio.farms.supplied[tokenId],
+              assets.data,
+            ),
+            ...getPortfolioRewards(
+              "tokennetbalance",
+              asset,
+              account.portfolio.farms.tokennetbalance[tokenId],
+              assets.data,
+            ),
+          ],
           depositRewards: getRewards("supplied", asset, assets.data),
           totalSupplyMoney: toUsd(totalSupplyD, asset),
         });

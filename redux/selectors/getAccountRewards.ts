@@ -686,13 +686,16 @@ export const getAccountDailyRewards = createSelector(
     const allRewards = Object.entries(mergedGainRewards).reduce((acc, [tokenId, amount]) => {
       const assetCopy = JSON.parse(JSON.stringify(assets.data[tokenId] || {}));
       standardizeAsset(assetCopy.metadata || {});
-      return {
-        ...acc,
-        [tokenId]: {
-          amount,
-          asset: assetCopy,
-        },
-      };
+      if (Number(amount) !== 0) {
+        return {
+          ...acc,
+          [tokenId]: {
+            amount,
+            asset: assetCopy,
+          },
+        };
+      }
+      return acc;
     }, {});
     return {
       baseDepositUsdDaily: baseCollateralUsdDaily + baseSuppliedUsdDaily,

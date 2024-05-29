@@ -1,15 +1,11 @@
 import { useEffect, useState } from "react";
 import { Box, Typography, Stack, Alert, Link, useTheme } from "@mui/material";
-import { FcInfo } from "@react-icons/all-files/fc/FcInfo";
 import { BeatLoader } from "react-spinners";
 import { twMerge } from "tailwind-merge";
-import TokenIcon from "../TokenIcon";
 import { actionMapTitle } from "./utils";
-import APYCell from "../Table/common/apy-cell";
 import { TOKEN_FORMAT, USD_FORMAT } from "../../store";
 import { useDegenMode } from "../../hooks/hooks";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
-import { getSelectedValues, getAssetData } from "../../redux/appSelectors";
 import { toggleUseAsCollateral, hideModal, showModal } from "../../redux/appSlice";
 import { isInvalid, formatWithCommas_usd } from "../../utils/uiNumber";
 import { YellowSolidSubmitButton, RedSolidSubmitButton } from "./button";

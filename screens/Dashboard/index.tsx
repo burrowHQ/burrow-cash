@@ -26,7 +26,7 @@ import { APYCell } from "../Market/APYCell";
 
 const Index = () => {
   const accountId = useAccountId();
-  const [suppliedRows, borrowedRows, totalSuppliedUSD, totalBorrowedUSD, borrowed_LP, borrowedAll] =
+  const [suppliedRows, borrowedRows, totalSuppliedUSD, totalBorrowedUSD, , borrowedAll] =
     usePortfolioAssets();
   const isMobile = isMobileDevice();
 
@@ -163,16 +163,11 @@ const yourSuppliedColumns = [
   {
     header: "Rewards",
     cell: ({ originalData }) => {
-      if (!originalData?.depositRewards?.length) {
+      if (!originalData?.rewards?.length) {
         return "-";
       }
 
-      return (
-        <>
-          <DashboardReward rewardList={originalData?.rewards} page="deposit" />
-          {/* <div className="h6 text-gray-300 mt-1">{originalData.price}</div> */}
-        </>
-      );
+      return <DashboardReward rewardList={originalData?.rewards} page="deposit" />;
     },
   },
   {
