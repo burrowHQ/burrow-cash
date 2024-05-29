@@ -1,5 +1,6 @@
 import { useState, createContext } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
+import { BeatLoader } from "react-spinners";
 import { useAppDispatch } from "../../../redux/hooks";
 import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
@@ -8,6 +9,10 @@ import { RefLogoIcon, RightShoulder } from "./TradingIcon";
 import { toInternationalCurrencySystem_number, toDecimal } from "../../../utils/uiNumber";
 import { openPosition } from "../../../store/marginActions/openPosition";
 import { NearIcon, NearIconMini } from "../../MarginTrading/components/Icon";
+import {
+  YellowSolidSubmitButton as YellowSolidButton,
+  RedSolidSubmitButton as RedSolidButton,
+} from "../../../components/Modal/button";
 
 export const ModalContext = createContext(null) as any;
 const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
@@ -15,8 +20,9 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
   const theme = useTheme();
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
   const actionShowRedColor = action === "Long";
-
+  const [isDisabled, setIsDisabled] = useState(false);
   const confirmOpenPosition = async () => {
+    setIsDisabled(true);
     if (action == "Long") {
       try {
         await openPosition({
@@ -28,9 +34,12 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
           min_token_p_amount: confirmInfo.estimateData.min_amount_out,
           swap_indication: confirmInfo.estimateData.swap_indication,
           assets: confirmInfo.assets.data,
+        }).finally(() => {
+          setIsDisabled(false);
         });
       } catch (error) {
         console.log(error);
+        setIsDisabled(false);
       }
     } else {
       try {
@@ -43,9 +52,12 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
           min_token_p_amount: confirmInfo.estimateData.min_amount_out,
           swap_indication: confirmInfo.estimateData.swap_indication,
           assets: confirmInfo.assets.data,
+        }).finally(() => {
+          setIsDisabled(false);
         });
       } catch (error) {
         console.log(error);
+        setIsDisabled(false);
       }
     }
   };
@@ -151,7 +163,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
                 })}
               </div>
             </div>
-            <div
+            {/* <div
               className={`flex items-center justify-between text-dark-200 text-base rounded-md h-12 text-center cursor-pointer ${
                 actionShowRedColor ? "bg-primary" : "bg-red-50"
               }`}
@@ -159,7 +171,33 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
               <div onClick={confirmOpenPosition} className="flex-grow">
                 Confirm {action} NEAR {confirmInfo.rangeMount}X
               </div>
-            </div>
+            </div> */}
+
+            {actionShowRedColor ? (
+              <YellowSolidButton
+                className="w-full"
+                disabled={isDisabled}
+                onClick={confirmOpenPosition}
+              >
+                {isDisabled ? (
+                  <BeatLoader size={5} color="#14162B" />
+                ) : (
+                  ` Confirm ${action} NEAR ${confirmInfo.rangeMount}X`
+                )}
+              </YellowSolidButton>
+            ) : (
+              <RedSolidButton
+                className="w-full"
+                disabled={isDisabled}
+                onClick={confirmOpenPosition}
+              >
+                {isDisabled ? (
+                  <BeatLoader size={5} color="#14162B" />
+                ) : (
+                  ` Confirm ${action} NEAR ${confirmInfo.rangeMount}X`
+                )}
+              </RedSolidButton>
+            )}
           </Box>
         </ModalContext.Provider>
       </Wrapper>

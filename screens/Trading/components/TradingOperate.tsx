@@ -16,6 +16,10 @@ import { NearIcon, NearIconMini } from "../../MarginTrading/components/Icon";
 import { setSlippageToleranceFromRedux } from "../../../redux/marginTrading";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";
 import { expandTokenDecimal, expandToken, shrinkToken } from "../../../store/helper";
+import {
+  YellowSolidSubmitButton as YellowSolidButton,
+  RedSolidSubmitButton as RedSolidButton,
+} from "../../../components/Modal/button";
 
 // main components
 const TradingOperate = () => {
@@ -140,13 +144,13 @@ const TradingOperate = () => {
       const currentBalance2 = Number(ReduxcategoryCurrentBalance2) || 0;
 
       const inputValue = activeTab === "long" ? longInput : shortInput;
-
+      const outputValue = activeTab === "long" ? longOutput : shortOutput;
       const isValidInput = isValidDecimalString(inputValue);
 
-      setIsDisabled(!isValidInput || !(Number(inputValue) <= currentBalance2));
+      setIsDisabled(!isValidInput || !(Number(inputValue) <= currentBalance2) || !outputValue);
     };
     setDisableBasedOnInputs();
-  }, [activeTab, ReduxcategoryCurrentBalance2, longInput, shortInput]);
+  }, [activeTab, ReduxcategoryCurrentBalance2, longInput, shortInput, longOutput, shortOutput]);
 
   const isValidDecimalString = (str) => {
     if (str <= 0) return false;
@@ -385,7 +389,7 @@ const TradingOperate = () => {
                   type="cate2"
                 />
               </div>
-              <p className="text-gray-300 mt-2 text-xs">Use: ${longInputUsd}</p>
+              <p className="text-gray-300 mt-2 text-xs">Use: ${longInputUsd.toFixed(2)}</p>
             </div>
             <div className="relative my-2.5 flex justify-end z-0 w-1/2" style={{ zoom: "2" }}>
               <ShrinkArrow />
@@ -460,14 +464,21 @@ const TradingOperate = () => {
                 </div>
               </div>
               <div className=" text-red-150 text-xs font-normal">{estimateData?.swapError}</div>
-              <div
+              {/* <div
                 className={`flex items-center justify-between  text-dark-200 text-base rounded-md h-12 text-center  ${
                   isDisabled ? "bg-slate-700 cursor-default" : "bg-primary cursor-pointer"
                 }`}
                 onClick={handleConfirmButtonClick}
               >
                 <div className="flex-grow">Long NEAR {rangeMount}x</div>
-              </div>
+              </div> */}
+              <YellowSolidButton
+                className="w-full"
+                disabled={isDisabled}
+                onClick={handleConfirmButtonClick}
+              >
+                Long NEAR {rangeMount}x
+              </YellowSolidButton>
               {isConfirmModalOpen && (
                 <ConfirmMobile
                   open={isConfirmModalOpen}
@@ -508,7 +519,7 @@ const TradingOperate = () => {
                   type="cate2"
                 />
               </div>
-              <p className="text-gray-300 mt-2 text-xs">Use: ${shortInputUsd}</p>
+              <p className="text-gray-300 mt-2 text-xs">Use: ${shortInputUsd.toFixed(2)}</p>
             </div>
             <div className="relative my-2.5 flex justify-end z-0 w-1/2" style={{ zoom: "2" }}>
               <ShrinkArrow />
@@ -582,14 +593,21 @@ const TradingOperate = () => {
                   })}
                 </div>
               </div>
-              <div
+              {/* <div
                 className={`flex items-center justify-between  text-dark-200 text-base rounded-md h-12 text-center  ${
                   isDisabled ? "bg-slate-700 cursor-default" : "bg-red-50 cursor-pointer"
                 }`}
                 onClick={handleConfirmButtonClick}
               >
                 <div className="flex-grow">Short NEAR {rangeMount}x</div>
-              </div>
+              </div> */}
+              <RedSolidButton
+                className="w-full"
+                disabled={isDisabled}
+                onClick={handleConfirmButtonClick}
+              >
+                Short NEAR {rangeMount}x
+              </RedSolidButton>
               {isConfirmModalOpen && (
                 <ConfirmMobile
                   open={isConfirmModalOpen}

@@ -1,5 +1,6 @@
 import { useState, createContext } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
+import { BeatLoader } from "react-spinners";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
@@ -11,6 +12,10 @@ import { useEstimateSwap } from "../../../hooks/useEstimateSwap";
 import { useAccountId } from "../../../hooks/hooks";
 import { usePoolsData } from "../../../hooks/useGetPoolsData";
 import { shrinkToken } from "../../../store/helper";
+import {
+  YellowSolidSubmitButton as YellowSolidButton,
+  RedSolidSubmitButton as RedSolidButton,
+} from "../../../components/Modal/button";
 
 export const ModalContext = createContext(null) as any;
 const ClosePositionMobile = ({ open, onClose, extraProps }) => {
@@ -84,9 +89,10 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     slippageTolerance: ReduxSlippageTolerance / 100,
   });
   console.log(estimateData, "85>>>");
-
+  const [isDisabled, setIsDisabled] = useState(false);
   const handleCloseOpsitionEvt = async () => {
     console.log(extraProps, "extraProps....");
+    setIsDisabled(true);
     try {
       const res = await closePosition({
         isLong: positionType.label === "Long",
@@ -99,9 +105,12 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
           item.token_p_id == item.token_c_info.token_id
             ? toDecimal(Number(item.token_p_amount) + Number(item.token_c_info.balance))
             : item.token_p_amount,
+      }).finally(() => {
+        setIsDisabled(false);
       });
     } catch (error) {
       console.log(error);
+      setIsDisabled(false);
     }
   };
   return (
@@ -187,14 +196,32 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
                 <span className="text-xs text-gray-300 ml-1.5">-</span>
               </div>
             </div>
-            <div
+            {/* <div
               className={`flex items-center justify-between text-dark-200 text-base rounded-md h-12 text-center cursor-pointer ${
                 actionShowRedColor ? "bg-primary" : "bg-red-50"
               }`}
               onClick={handleCloseOpsitionEvt}
             >
               <div className="flex-grow">Close</div>
-            </div>
+            </div> */}
+
+            {actionShowRedColor ? (
+              <YellowSolidButton
+                className="w-full"
+                disabled={isDisabled}
+                onClick={handleCloseOpsitionEvt}
+              >
+                {isDisabled ? <BeatLoader size={5} color="#14162B" /> : `Close`}
+              </YellowSolidButton>
+            ) : (
+              <RedSolidButton
+                className="w-full"
+                disabled={isDisabled}
+                onClick={handleCloseOpsitionEvt}
+              >
+                {isDisabled ? <BeatLoader size={5} color="#14162B" /> : `Close`}
+              </RedSolidButton>
+            )}
           </Box>
         </ModalContext.Provider>
       </Wrapper>
