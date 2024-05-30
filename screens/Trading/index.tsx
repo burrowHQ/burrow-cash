@@ -27,8 +27,7 @@ init_env("dev");
 
 const Trading = () => {
   const accountId = useAccountId();
-  const { useMarginAccountList, parseTokenValue, getAssetDetails, getAssetById } =
-    useMarginAccount();
+  const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
   const { categoryAssets1, categoryAssets2 } = useMarginConfigToken();
   const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
 
@@ -270,7 +269,7 @@ const Trading = () => {
           <TradingOperate />
         </div>
       </div>
-      {accountId && <TradingTable positionsList={useMarginAccountList} />}
+      {accountId && <TradingTable positionsList={marginAccountList} />}
 
       <ModalWithCountdown show={showModal} onClose={handleClose} />
     </LayoutBox>

@@ -35,6 +35,7 @@ import { formatWithCommas_usd } from "../../utils/uiNumber";
 import { isMobileDevice } from "../../helpers/helpers";
 import getConfig from "../../utils/config";
 import CopyToClipboardComponent from "./CopyToClipboardComponent";
+import { fetchMarginAccount } from "../../redux/marginAccountSlice";
 
 const config = getConfig();
 
@@ -63,6 +64,7 @@ const WalletButton = () => {
   const fetchData = (id?: string) => {
     dispatch(setAccountId(id));
     dispatch(fetchAccount());
+    dispatch(fetchMarginAccount());
     dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
   };
 

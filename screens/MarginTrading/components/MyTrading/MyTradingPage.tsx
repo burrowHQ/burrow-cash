@@ -6,8 +6,7 @@ import { toInternationalCurrencySystem_number } from "../../../../utils/uiNumber
 
 const MyMarginTradingPage = () => {
   const [showCollateralPopup, setShowCollateralPopup] = useState(false);
-  const { useMarginAccountList, parseTokenValue, getAssetDetails, getAssetById } =
-    useMarginAccount();
+  const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
   const { getPositionType } = useMarginConfigToken();
   const [totalLongSizeValue, setTotalLongSizeValue] = useState(0);
   const [totalShortSizeValue, setTotalShortSizeValue] = useState(0);
@@ -16,7 +15,7 @@ const MyMarginTradingPage = () => {
     let longTotal = 0;
     let shortTotal = 0;
     let collateralTotal = 0;
-    Object.values(useMarginAccountList).forEach((item) => {
+    Object.values(marginAccountList).forEach((item) => {
       const positionType = getPositionType(item.token_d_info.token_id).label;
       const assetD = getAssetById(item.token_d_info.token_id);
       const assetC = getAssetById(item.token_c_info.token_id);
@@ -42,7 +41,7 @@ const MyMarginTradingPage = () => {
   };
   useEffect(() => {
     calculateTotalSizeValues();
-  }, [useMarginAccountList]);
+  }, [marginAccountList]);
   let timer;
   const handleMouseEnter = () => {
     clearTimeout(timer);
@@ -88,7 +87,7 @@ const MyMarginTradingPage = () => {
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
                 >
-                  {Object.values(useMarginAccountList).map((item, index) => {
+                  {Object.values(marginAccountList).map((item, index) => {
                     const assetC = getAssetById(item.token_c_info.token_id);
                     const {
                       icon: iconC,
@@ -121,7 +120,7 @@ const MyMarginTradingPage = () => {
           </div>
         </div>
       </div>
-      <TradingTable positionsList={useMarginAccountList} />
+      <TradingTable positionsList={marginAccountList} />
     </div>
   );
 };

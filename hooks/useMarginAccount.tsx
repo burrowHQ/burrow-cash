@@ -5,7 +5,7 @@ import { shrinkToken } from "../store/helper";
 
 export function useMarginAccount() {
   const assets = useAppSelector(getAssets);
-  const useMarginAccountList = useAppSelector(getMarginAccountPositions);
+  const marginAccountList = useAppSelector(getMarginAccountPositions);
 
   const parseTokenValue = (tokenAmount, decimals) => {
     if (!tokenAmount || !decimals) return 0;
@@ -29,7 +29,7 @@ export function useMarginAccount() {
     return (priceD ? leverageD * priceD : 0) / (priceC ? leverageC * priceC : 0);
   };
   return {
-    useMarginAccountList,
+    marginAccountList,
     assets,
     parseTokenValue,
     getAssetDetails,

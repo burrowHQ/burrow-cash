@@ -48,7 +48,6 @@ export const useEstimateSwap = ({
       !isEmpty(stablePoolsDetail) &&
       Number(tokenIn_amount) > 0
     ) {
-      console.log("i am coming");
       getEstimateSwapData();
     }
   }, [

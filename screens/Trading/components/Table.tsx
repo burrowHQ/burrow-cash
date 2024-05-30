@@ -17,13 +17,8 @@ const TradingTable = ({ positionsList }) => {
   const [assets, setAssets] = useState<IAssetEntry[]>([]);
   const [closePositionModalProps, setClosePositionModalProps] = useState(null);
   const [totalCollateral, setTotalCollateral] = useState(0);
-  const {
-    useMarginAccountList,
-    parseTokenValue,
-    getAssetDetails,
-    getAssetById,
-    calculateLeverage,
-  } = useMarginAccount();
+  const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById, calculateLeverage } =
+    useMarginAccount();
   const { getPositionType, marginConfigTokens } = useMarginConfigToken();
   const handleTabClick = (tabNumber) => {
     setSelectedTab(tabNumber);
@@ -49,7 +44,7 @@ const TradingTable = ({ positionsList }) => {
   }, []);
   const calculateTotalSizeValues = () => {
     let collateralTotal = 0;
-    Object.values(useMarginAccountList).forEach((item) => {
+    Object.values(marginAccountList).forEach((item) => {
       const assetC = getAssetById(item.token_c_info.token_id);
       const { price: priceC, symbol: symbolC, decimals: decimalsC } = getAssetDetails(assetC);
       const netValue = parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
@@ -59,7 +54,7 @@ const TradingTable = ({ positionsList }) => {
   };
   useEffect(() => {
     calculateTotalSizeValues();
-  }, [useMarginAccountList]);
+  }, [marginAccountList]);
   return (
     <div className="flex flex-col items-center justify-center w-full">
       <div className="w-full border border-dark-50 bg-gray-800 rounded-md">
