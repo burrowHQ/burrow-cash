@@ -76,48 +76,52 @@ export async function closePosition({
       },
     ],
   };
-  const withDrawMapList = [
-    ...(!isLong
-      ? [
-          {
-            methodName: enable_pyth_oracle
-              ? ChangeMethodsLogic[ChangeMethodsLogic.margin_execute_with_pyth]
-              : ChangeMethodsOracle[ChangeMethodsOracle.oracle_call],
-            args: {
-              ...(enable_pyth_oracle
-                ? pWithDrawActionsTemplate
-                : {
-                    receiver_id: logicContract.contractId,
-                    msg: JSON.stringify({
-                      MarginExecute: pWithDrawActionsTemplate,
-                    }),
+
+  if (!isLong) {
+    transactions.push({
+      receiverId: enable_pyth_oracle ? logicContract.contractId : oracleContract.contractId,
+      functionCalls: [
+        {
+          methodName: enable_pyth_oracle
+            ? ChangeMethodsLogic[ChangeMethodsLogic.margin_execute_with_pyth]
+            : ChangeMethodsOracle[ChangeMethodsOracle.oracle_call],
+          args: {
+            ...(enable_pyth_oracle
+              ? pWithDrawActionsTemplate
+              : {
+                  receiver_id: logicContract.contractId,
+                  msg: JSON.stringify({
+                    MarginExecute: pWithDrawActionsTemplate,
                   }),
-            },
-            gas: new BN("300000000000000"),
+                }),
           },
-        ]
-      : []),
-    {
-      methodName: enable_pyth_oracle
-        ? ChangeMethodsLogic[ChangeMethodsLogic.margin_execute_with_pyth]
-        : ChangeMethodsOracle[ChangeMethodsOracle.oracle_call],
-      args: {
-        ...(enable_pyth_oracle
-          ? dWithDrawActionsTemplate
-          : {
-              receiver_id: logicContract.contractId,
-              msg: JSON.stringify({
-                MarginExecute: dWithDrawActionsTemplate,
-              }),
-            }),
-      },
-      gas: new BN("300000000000000"),
-    },
-  ];
+          gas: new BN("300000000000000"),
+        },
+      ],
+    });
+  }
 
   transactions.push({
     receiverId: enable_pyth_oracle ? logicContract.contractId : oracleContract.contractId,
-    functionCalls: withDrawMapList,
+    functionCalls: [
+      {
+        methodName: enable_pyth_oracle
+          ? ChangeMethodsLogic[ChangeMethodsLogic.margin_execute_with_pyth]
+          : ChangeMethodsOracle[ChangeMethodsOracle.oracle_call],
+        args: {
+          ...(enable_pyth_oracle
+            ? dWithDrawActionsTemplate
+            : {
+                receiver_id: logicContract.contractId,
+                msg: JSON.stringify({
+                  MarginExecute: dWithDrawActionsTemplate,
+                }),
+              }),
+        },
+        gas: new BN("300000000000000"),
+      },
+    ],
   });
+
   await prepareAndExecuteTransactions(transactions);
 }
