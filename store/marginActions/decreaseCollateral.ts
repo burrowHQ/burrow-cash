@@ -56,5 +56,35 @@ export async function decreaseCollateral({
       },
     ],
   });
+  const withDrawActionsTemplate = {
+    actions: [
+      {
+        Withdraw: {
+          token_id: token_c_id,
+        },
+      },
+    ],
+  };
+  transactions.push({
+    receiverId: enable_pyth_oracle ? logicContract.contractId : oracleContract.contractId,
+    functionCalls: [
+      {
+        methodName: enable_pyth_oracle
+          ? ChangeMethodsLogic[ChangeMethodsLogic.margin_execute_with_pyth]
+          : ChangeMethodsOracle[ChangeMethodsOracle.oracle_call],
+        args: {
+          ...(enable_pyth_oracle
+            ? withDrawActionsTemplate
+            : {
+                receiver_id: logicContract.contractId,
+                msg: JSON.stringify({
+                  MarginExecute: withDrawActionsTemplate,
+                }),
+              }),
+        },
+        gas: new BN("300000000000000"),
+      },
+    ],
+  });
   await prepareAndExecuteTransactions(transactions);
 }
