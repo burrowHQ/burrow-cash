@@ -147,7 +147,9 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
             <div className="pt-10 pb-8 flex items-center justify-around  border-b border-dark-700 -mx-5 px-5 mb-5">
               <div className="text-center leading-3">
                 <p className="text-lg">
-                  ${toInternationalCurrencySystem_number(sizeValue)}{" "}
+                  {positionType.label === "Long"
+                    ? Number(sizeValueLong).toFixed(2)
+                    : Number(sizeValueShort).toFixed(2)}{" "}
                   {positionType.label === "Long" ? `${symbolP}` : `${symbolD}`}
                 </p>
                 <span className="text-xs text-gray-300">Close amount</span>
@@ -156,7 +158,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Entry & Index Price</div>
               <div>
-                ${entryPrice} / ${indexPrice}
+                ${entryPrice.toFixed(2)} / ${indexPrice}
               </div>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
