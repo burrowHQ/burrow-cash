@@ -1,4 +1,4 @@
-import { useState, createContext } from "react";
+import { useState, createContext, useMemo } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
 import { useAppDispatch } from "../../../redux/hooks";
@@ -61,6 +61,24 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
       }
     }
   };
+
+  const [percentList, setPercentList] = useState([]);
+  useMemo(() => {
+    if (confirmInfo.estimateData?.identicalRoutes) {
+      const { identicalRoutes } = confirmInfo.estimateData;
+      let sum = 0;
+      const perArray = identicalRoutes.map((routes) => {
+        const k = routes.reduce((pre, cur) => {
+          return pre + (Number(cur.pool?.partialAmountIn) || 0);
+        }, 0);
+        sum += k; //
+        return k;
+      });
+
+      const perStrArray = perArray.map((item) => ((item * 100) / sum).toFixed(2)); //
+      setPercentList(perStrArray);
+    }
+  }, [confirmInfo.estimateData]);
   return (
     <MUIModal open={open} onClose={onClose}>
       <Wrapper
@@ -137,27 +155,41 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
               <div className="text-gray-300">Liq. Price</div>
               <div>${confirmInfo.LiqPrice}</div>
             </div>
-            <div className="flex items-center justify-between text-sm mb-4">
-              <div className="text-gray-300">Route</div>
-              <div className="flex items-center justify-center">
-                {confirmInfo.estimateData?.tokensPerRoute[0].map((item, index) => {
+            <div className="flex items-baseline justify-between text-sm mb-4">
+              <div className="text-gray-300 flex items-center">
+                <RefLogoIcon />
+                <span className="ml-2">Route</span>
+              </div>
+              <div className="flex flex-col justify-end">
+                {confirmInfo.estimateData?.tokensPerRoute.map((item, index) => {
                   return (
-                    <div key={item.token_id + index} className="flex items-center">
-                      {index == 0 && (
-                        <div className="border-r mr-1.5 pr-1.5 border-dark-800">
-                          {item.symbol === "wNEAR" ? (
-                            <NearIconMini />
-                          ) : (
-                            <img alt="" src={item.icon} style={{ width: "16px", height: "16px" }} />
-                          )}
-                        </div>
-                      )}
-                      <span>{item.symbol == "wNEAR" ? "NEAR" : item.symbol}</span>
-                      {index + 1 < confirmInfo.estimateData?.tokensPerRoute[0].length ? (
-                        <span className="mx-2">&gt;</span>
-                      ) : (
-                        ""
-                      )}
+                    <div key={index} className="flex mb-2 items-center">
+                      {item.map((ite, ind) => {
+                        return (
+                          <>
+                            {ind == 0 && (
+                              <>
+                                <div
+                                  className={`bg-opacity-10  text-xs py-0.5 pl-2.5 pr-1.5 rounded ${
+                                    actionShowRedColor
+                                      ? "bg-primary text-primary"
+                                      : "bg-red-50 text-red-50"
+                                  }`}
+                                >{`${percentList[index]}%`}</div>
+                                <span className="mx-2">|</span>
+                              </>
+                            )}
+                            <div key={ind} className="flex items-center">
+                              <span>{ite.symbol == "wNEAR" ? "NEAR" : ite.symbol}</span>
+                              {ind + 1 < confirmInfo.estimateData?.tokensPerRoute[index].length ? (
+                                <span className="mx-2">&gt;</span>
+                              ) : (
+                                ""
+                              )}
+                            </div>
+                          </>
+                        );
+                      })}
                     </div>
                   );
                 })}

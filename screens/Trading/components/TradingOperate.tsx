@@ -175,6 +175,23 @@ const TradingOperate = () => {
     stablePoolsDetail,
     slippageTolerance: slippageTolerance / 100,
   });
+  const [percentList, setPercentList] = useState([]);
+  useMemo(() => {
+    if (estimateData?.identicalRoutes) {
+      const { identicalRoutes } = estimateData;
+      let sum = 0;
+      const perArray = identicalRoutes.map((routes) => {
+        const k = routes.reduce((pre, cur) => {
+          return pre + (Number(cur.pool?.partialAmountIn) || 0);
+        }, 0);
+        sum += k; //
+        return k;
+      });
+
+      const perStrArray = perArray.map((item) => ((item * 100) / sum).toFixed(2)); //
+      setPercentList(perStrArray);
+    }
+  }, [estimateData]);
 
   // long & short input change fn.
   const inputPriceChange = _.debounce((newValue) => {
@@ -433,34 +450,39 @@ const TradingOperate = () => {
                   <span className="text-xs text-gray-300 ml-1.5">($0.89)</span>
                 </div>
               </div>
-              <div className="flex items-center justify-between text-sm mb-4">
-                <div className="text-gray-300">Route</div>
-                <div className="flex items-center justify-center">
-                  {estimateData?.tokensPerRoute[0].map((item, index) => {
-                    return (
-                      <div key={index} className="flex items-center">
-                        {index == 0 && (
-                          <div className="border-r mr-1.5 pr-1.5 border-dark-800">
-                            {item.symbol === "wNEAR" ? (
-                              <NearIconMini />
-                            ) : (
-                              <img
-                                alt=""
-                                src={item.icon}
-                                style={{ width: "16px", height: "16px" }}
-                              />
-                            )}
-                          </div>
-                        )}
-                        <span>{item.symbol == "wNEAR" ? "NEAR" : item.symbol}</span>
-                        {index + 1 < estimateData?.tokensPerRoute[0].length ? (
-                          <span className="mx-2">&gt;</span>
-                        ) : (
-                          ""
-                        )}
-                      </div>
-                    );
-                  })}
+              <div className="flex items-baseline justify-between text-sm mb-4">
+                <div className="text-gray-300 flex items-center">
+                  <RefLogoIcon />
+                  <span className="ml-2">Route</span>
+                </div>
+                <div className="flex flex-col justify-end">
+                  {!isDisabled &&
+                    estimateData?.tokensPerRoute.map((item, index) => {
+                      return (
+                        <div key={index} className="flex mb-2 items-center">
+                          {item.map((ite, ind) => {
+                            return (
+                              <>
+                                {ind == 0 && (
+                                  <>
+                                    <div className="bg-opacity-10  text-xs py-0.5 pl-2.5 pr-1.5 rounded  bg-primary text-primary">{`${percentList[index]}%`}</div>
+                                    <span className="mx-2">|</span>
+                                  </>
+                                )}
+                                <div key={ind} className="flex items-center">
+                                  <span>{ite.symbol == "wNEAR" ? "NEAR" : ite.symbol}</span>
+                                  {ind + 1 < estimateData?.tokensPerRoute[index].length ? (
+                                    <span className="mx-2">&gt;</span>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
               <div className=" text-red-150 text-xs font-normal">{estimateData?.swapError}</div>
@@ -563,36 +585,42 @@ const TradingOperate = () => {
                   <span className="text-xs text-gray-300 ml-1.5">($0.89)</span>
                 </div>
               </div>
-              <div className="flex items-center justify-between text-sm mb-4">
-                <div className="text-gray-300">Route</div>
-                <div className="flex items-center justify-center">
-                  {estimateData?.tokensPerRoute[0].map((item, index) => {
-                    return (
-                      <div key={index} className="flex items-center">
-                        {index == 0 && (
-                          <div className="border-r mr-1.5 pr-1.5 border-dark-800">
-                            {item.symbol === "wNEAR" ? (
-                              <NearIconMini />
-                            ) : (
-                              <img
-                                alt=""
-                                src={item.icon}
-                                style={{ width: "16px", height: "16px" }}
-                              />
-                            )}
-                          </div>
-                        )}
-                        <span>{item.symbol == "wNEAR" ? "NEAR" : item.symbol}</span>
-                        {index + 1 < estimateData?.tokensPerRoute[0].length ? (
-                          <span className="mx-2">&gt;</span>
-                        ) : (
-                          ""
-                        )}
-                      </div>
-                    );
-                  })}
+              <div className="flex items-baseline justify-between text-sm mb-4">
+                <div className="text-gray-300 flex items-center">
+                  <RefLogoIcon />
+                  <span className="ml-2">Route</span>
+                </div>
+                <div className="flex flex-col justify-end">
+                  {!isDisabled &&
+                    estimateData?.tokensPerRoute.map((item, index) => {
+                      return (
+                        <div key={index} className="flex mb-2 items-center">
+                          {item.map((ite, ind) => {
+                            return (
+                              <>
+                                {ind == 0 && (
+                                  <>
+                                    <div className="bg-opacity-10  text-xs py-0.5 pl-2.5 pr-1.5 rounded  bg-red-50 text-red-50">{`${percentList[index]}%`}</div>
+                                    <span className="mx-2">|</span>
+                                  </>
+                                )}
+                                <div key={ind} className="flex items-center">
+                                  <span>{ite.symbol == "wNEAR" ? "NEAR" : ite.symbol}</span>
+                                  {ind + 1 < estimateData?.tokensPerRoute[index].length ? (
+                                    <span className="mx-2">&gt;</span>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
+
               {/* <div
                 className={`flex items-center justify-between  text-dark-200 text-base rounded-md h-12 text-center  ${
                   isDisabled ? "bg-slate-700 cursor-default" : "bg-red-50 cursor-pointer"
