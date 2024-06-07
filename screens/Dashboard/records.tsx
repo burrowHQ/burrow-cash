@@ -77,7 +77,7 @@ const Records = ({ isShow }) => {
     if (type === "nearblocks") {
       url = `https://nearblocks.io/txns/${txid}`;
     } else if (type === "pikespeak") {
-      url = `https://pikespeak.ai/transaction-viewer${txid}`;
+      url = `https://pikespeak.ai/transaction-viewer/${txid}`;
     }
     window.open(url, "_blank");
   };
