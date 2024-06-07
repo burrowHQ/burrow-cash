@@ -41,8 +41,8 @@ export const getAssetsDetailed = async (): Promise<IAssetDetailed[]> => {
   const assets: IAssetEntry[] = await getAssets();
   const detailedAssets = await Promise.all(assets.map((asset) => getAssetDetailed(asset.token_id)));
   // it is a switch
-  return detailedAssets;
-  // return detailedAssets.filter((asset) => !asset.token_id.includes(lpTokenPrefix));
+  // return detailedAssets;
+  return detailedAssets.filter((asset) => !asset.token_id.includes(lpTokenPrefix));
 };
 
 export const getUnitLptAssets = async (pool_ids: number[]): Promise<IUnitLptAsset> => {
