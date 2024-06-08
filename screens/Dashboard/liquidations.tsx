@@ -88,7 +88,7 @@ const columns = [
     ),
     cell: ({ originalData }) => {
       const { LiquidatedAssets } = originalData || {};
-      return <div>{LiquidatedAssets?.[0]?.data?.isLpToken ? "LP token" : "Single token"}</div>;
+      return <div>{LiquidatedAssets?.[0]?.data?.isLpToken ? "LP token" : "Standard Token"}</div>;
     },
   },
   {

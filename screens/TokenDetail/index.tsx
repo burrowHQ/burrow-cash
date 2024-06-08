@@ -1129,7 +1129,7 @@ function YouBorrowed() {
     return Object.values(borrowedList).reduce((acc, b: any) => acc + b.borrowed || 0, 0);
   }, [borrowedList]) as number;
   function getName(position) {
-    if (position === DEFAULT_POSITION) return "(Single token as collateral)";
+    if (position === DEFAULT_POSITION) return "(Standard Token as collateral)";
     const a = assets.find((asset: UIAsset) => asset.tokenId === position);
     const symbols = a.tokens.reduce(
       (acc, cur, index) =>

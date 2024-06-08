@@ -54,7 +54,7 @@ export function useUserHealth() {
     hasBorrow = true;
     allHealths.push({
       id: `token${healthFactor}`,
-      type: "Single Token",
+      type: "Standard Token",
       healthFactor: Math.floor(healthFactor),
       healthStatus: getHealthStatus(healthFactor),
     });

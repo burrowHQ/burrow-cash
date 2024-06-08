@@ -25,7 +25,7 @@ export function CollateralTypeSelectorBorrow({
       .reduce((acc, cur) => ({ ...acc, [cur.tokenId]: cur }), {});
   }, [assets]);
   function getName(position) {
-    if (position === DEFAULT_POSITION) return "Single token";
+    if (position === DEFAULT_POSITION) return "Standard Token";
     const asset: UIAsset = LPAssetMap[position];
     const symbols = asset.tokens.reduce(
       (acc, cur, index) =>
@@ -46,15 +46,18 @@ export function CollateralTypeSelectorBorrow({
       <div className="flex items-center justify-between px-1">
         <span className="text-sm text-gray-300 whitespace-nowrap">Collateral Type</span>
         <div
-          className="flex items-center cursor-pointer"
-          onClick={() => {
-            setShow(!show);
-          }}
+          className="flex items-center"
+          // className="flex items-center cursor-pointer"
+          // TODO open after has lp asset
+          // onClick={() => {
+          //   setShow(!show);
+          // }}
         >
-          <span className="text-sm text-gray-300 mr-2.5 whitespace-nowrap xsm:max-w-[120px] overflow-hidden text-ellipsis">
+          <span className="text-sm text-gray-300 whitespace-nowrap xsm:max-w-[120px] overflow-hidden text-ellipsis">
             {getName(selectedCollateralType)}
           </span>
-          <ArrowDownIcon className={`${show ? " transform rotate-180" : ""}`} />
+          {/* TODO open after has lp asset */}
+          {/* <ArrowDownIcon className={`ml-1.5 ${show ? " transform rotate-180" : ""}`} /> */}
         </div>
       </div>
       {/* list */}
@@ -109,7 +112,7 @@ export function CollateralTypeSelectorRepay({
       .reduce((acc, cur) => ({ ...acc, [cur.tokenId]: cur }), {});
   }, [assets]);
   function getName(position) {
-    if (position === DEFAULT_POSITION) return "Single token";
+    if (position === DEFAULT_POSITION) return "Standard Token";
     const asset: UIAsset = LPAssetMap[position];
     const symbols = asset.tokens.reduce(
       (acc, cur, index) =>
@@ -130,15 +133,16 @@ export function CollateralTypeSelectorRepay({
       <div className="flex items-center justify-between px-1">
         <span className="text-sm text-gray-300 whitespace-nowrap">Collateral Type</span>
         <div
-          className="flex items-center cursor-pointer"
-          onClick={() => {
-            setShow(!show);
-          }}
+          // className="flex items-center cursor-pointer"
+          className="flex items-center"
+          // onClick={() => {
+          //   setShow(!show);
+          // }}
         >
-          <span className="text-sm text-gray-300 mr-2.5 whitespace-nowrap">
+          <span className="text-sm text-gray-300 whitespace-nowrap">
             {getName(selectedCollateralType)}
           </span>
-          <ArrowDownIcon className={`${show ? " transform rotate-180" : ""}`} />
+          {/* <ArrowDownIcon className={`ml-2.5 ${show ? " transform rotate-180" : ""}`} /> */}
         </div>
       </div>
       {/* list */}

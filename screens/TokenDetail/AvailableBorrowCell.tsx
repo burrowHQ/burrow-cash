@@ -15,7 +15,7 @@ const AvailableBorrowCell = ({
   const [showTooltip, setShowTooltip] = useState(false);
   const assets = useAvailableAssets();
   function getName(position) {
-    if (position === DEFAULT_POSITION) return "Single token";
+    if (position === DEFAULT_POSITION) return "Standard Token";
     const t = assets.find((a: UIAsset) => a.tokenId === position);
     const symbols = t?.tokens?.reduce(
       (acc, cur, index) =>

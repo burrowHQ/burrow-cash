@@ -281,7 +281,7 @@ const BorrowItem = ({ data }) => {
 
         <ItemRow label="Collateral Type">
           <div className="flex gap-2 items-center">
-            <div style={{ fontSize: 14 }}>{tokenNames || "Single token"}</div>
+            <div style={{ fontSize: 14 }}>{tokenNames || "Standard Token"}</div>
           </div>
         </ItemRow>
 
