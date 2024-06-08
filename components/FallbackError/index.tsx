@@ -7,7 +7,6 @@ const FallbackError = ({ error }) => {
     localStorage.removeItem("persist:root");
     window.location.reload();
   };
-
   return (
     <Stack gap={0.5} direction="column" alignItems="center" justifyContent="center" height="100vh">
       <SadHog />

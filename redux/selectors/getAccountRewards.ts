@@ -255,7 +255,6 @@ export const computePoolsDailyAmount = (
   );
   const borrowedShares = Number(
     shrinkToken(
-      // portfolio.positions[position]?.borrowed?.[asset.token_id]?.shares || 0,
       portfolio.borrows
         .filter((a) => asset.token_id === a.token_id)
         .reduce((acc, cur) => {
@@ -432,15 +431,12 @@ export const getAccountRewards = createSelector(
     };
 
     const { supplied, borrowed, netTvl, tokennetbalance } = account.portfolio.farms;
-    // const hasNetTvlFarm = !!Object.entries(assets.netTvlFarm).length;
     const suppliedRewards = Object.entries(supplied).map(computePoolsRewards("supplied")).flat();
     const borrowedRewards = Object.entries(borrowed).map(computePoolsRewards("borrowed")).flat();
     const tokenNetRewards = Object.entries(tokennetbalance)
       .map(computePoolsRewards("tokennetbalance"))
       .flat();
-    const netLiquidityRewards = Object.entries(netTvl)
-      // .filter(([tokenId]) => assets.netTvlFarm[tokenId])
-      .map(computeNetLiquidityRewards);
+    const netLiquidityRewards = Object.entries(netTvl).map(computeNetLiquidityRewards);
     const sumArrays = (array) => {
       const clonedArray = cloneObj(array);
       return clonedArray.reduce((rewards, asset) => {

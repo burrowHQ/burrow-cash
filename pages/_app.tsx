@@ -15,14 +15,15 @@ import { useRouter } from "next/router";
 import { store, persistor } from "../redux/store";
 import { FallbackError, Layout, Modal } from "../components";
 import { posthog, isPostHogEnabled } from "../utils/telemetry";
-import { useAppDispatch } from "../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { fetchAssets, fetchRefPrices } from "../redux/assetsSlice";
-import { fetchAccount } from "../redux/accountSlice";
+import { fetchAccount, logoutAccount } from "../redux/accountSlice";
 import { fetchConfig } from "../redux/appSlice";
 import { ToastMessage } from "../components/ToastMessage";
 import Popup from "../components/popup";
 import RpcList from "../components/Rpc";
 import PubTestModal from "../components/PubTestModal";
+import { getAccountId, getAccountPortfolio } from "../redux/accountSelectors";
 
 ModalReact.defaultStyles = {
   overlay: {
@@ -85,6 +86,52 @@ const Init = () => {
 
   return null;
 };
+function Upgrade({ Component, pageProps }) {
+  const [upgrading, setUpgrading] = useState<boolean>(true);
+  const dispatch = useAppDispatch();
+  const accountId = useAppSelector(getAccountId);
+  const portfolio = useAppSelector(getAccountPortfolio);
+  useEffect(() => {
+    if (!portfolio.positions) {
+      fetch();
+    } else {
+      setUpgrading(false);
+    }
+  }, [accountId, portfolio.positions]);
+  async function fetch() {
+    localStorage.removeItem("persist:root");
+    await dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
+    await dispatch(fetchConfig());
+    if (accountId) {
+      await dispatch(fetchAccount());
+    } else {
+      await dispatch(logoutAccount());
+    }
+  }
+  return (
+    <div>
+      {upgrading ? (
+        <div className="flex flex-col items-center justify-center  h-screen">
+          <img src="/loading-brrr.gif" alt="" width="75px" />
+          <span className="flex items-center text-sm text-gray-300 mt-2">
+            Refreshing assets data...
+          </span>
+        </div>
+      ) : (
+        <Layout>
+          <Popup className="lg:hidden" />
+          <Init />
+          <Modal />
+          <ToastMessage />
+          <Component {...pageProps} />
+          <Popup className="xsm:hidden" />
+          <RpcList />
+          <PubTestModal />
+        </Layout>
+      )}
+    </div>
+  );
+}
 export default function MyApp({ Component, pageProps }: AppProps) {
   const [progress, setProgress] = useState(0);
   const router = useRouter();
@@ -110,16 +157,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             <meta name="viewport" content="width=device-width, initial-scale=1" />
             <title>Burrow Finance</title>
           </Head>
-          <Layout>
-            <Popup className="lg:hidden" />
-            <Init />
-            <Modal />
-            <ToastMessage />
-            <Component {...pageProps} />
-            <Popup className="xsm:hidden" />
-            <RpcList />
-            <PubTestModal />
-          </Layout>
+          <Upgrade Component={Component} pageProps={pageProps} />
         </PersistGate>
       </Provider>
     </ErrorBoundary>

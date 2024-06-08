@@ -38,11 +38,11 @@ const Popup = ({ className }) => {
             spaceBetween={30}
             centeredSlides
             autoHeight={false}
-            autoplay={{
-              delay: 10000,
-              disableOnInteraction: false,
-            }}
-            loop
+            // autoplay={{
+            //   delay: 10000,
+            //   disableOnInteraction: false,
+            // }}
+            // loop
           >
             <SwiperSlide>
               <>
@@ -53,7 +53,7 @@ const Popup = ({ className }) => {
                 <SupplyCarousel />
               </>
             </SwiperSlide>
-            <SwiperSlide>
+            {/* <SwiperSlide>
               <>
                 <CloseButton
                   className="absolute cursor-pointer top-3 right-6 xsm:right-6 z-50"
@@ -61,7 +61,7 @@ const Popup = ({ className }) => {
                 />
                 <StakeCarousel />
               </>
-            </SwiperSlide>
+            </SwiperSlide> */}
           </Swiper>
         </div>
       </div>
