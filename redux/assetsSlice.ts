@@ -1,15 +1,16 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-import { defaultNetwork, missingPriceTokens } from "../utils/config";
-import { initialState } from "./assetState";
-import { transformAssets } from "../transformers/asstets";
+import { defaultNetwork, missingPriceTokens, BRRR_TOKEN } from "../utils/config";
+import { transformAssets, transformFarms } from "../transformers/asstets";
 import getAssets from "../api/get-assets";
-import getFarm from "../api/get-farm";
+import getFarm, { getAllFarms } from "../api/get-farm";
+import { initialState } from "./assetState";
 
 export const fetchAssets = createAsyncThunk("assets/fetchAssets", async () => {
   const assets = await getAssets().then(transformAssets);
   const netTvlFarm = await getFarm("NetTvl");
-  return { assets, netTvlFarm };
+  const allFarms = await getAllFarms().then(transformFarms);
+  return { assets, netTvlFarm, allFarms };
 });
 
 export const fetchRefPrices = createAsyncThunk("assets/fetchRefPrices", async () => {
@@ -19,7 +20,6 @@ export const fetchRefPrices = createAsyncThunk("assets/fetchRefPrices", async ()
 
   return prices;
 });
-
 export const assetSlice = createSlice({
   name: "assets",
   initialState,
@@ -31,6 +31,7 @@ export const assetSlice = createSlice({
     builder.addCase(fetchAssets.fulfilled, (state, action) => {
       state.data = action.payload.assets;
       state.netTvlFarm = action.payload.netTvlFarm?.rewards || {};
+      state.allFarms = action.payload.allFarms || [];
       state.status = action.meta.requestStatus;
       state.fetchedAt = new Date().toString();
     });
@@ -43,11 +44,20 @@ export const assetSlice = createSlice({
       missingPriceTokens.forEach((missingToken) => {
         const missingTokenId = missingToken[defaultNetwork];
         if (missingTokenId && state.data[missingTokenId] && !state.data[missingTokenId]["price"]) {
-          state.data[missingTokenId]["price"] = {
-            decimals: action.payload[missingToken.mainnet].decimal,
-            usd: Number(action.payload[missingToken.mainnet].price),
-            multiplier: "1",
-          };
+          if (missingTokenId === "brrr.ft.ref-labs.testnet") {
+            // for pubtestnet env
+            state.data[missingTokenId]["price"] = {
+              decimals: action.payload[BRRR_TOKEN.mainnet].decimal,
+              usd: Number(action.payload[BRRR_TOKEN.mainnet].price),
+              multiplier: "1",
+            };
+          } else {
+            state.data[missingTokenId]["price"] = {
+              decimals: action.payload[missingToken.mainnet].decimal,
+              usd: Number(action.payload[missingToken.mainnet].price),
+              multiplier: "1",
+            };
+          }
         }
       });
     });

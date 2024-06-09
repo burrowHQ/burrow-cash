@@ -49,8 +49,8 @@ export const AdjustButton = ({ tokenId }) => {
   );
 };
 
-export const RepayButton = ({ tokenId }) => {
-  const handleRepayClick = useRepayTrigger(tokenId);
+export const RepayButton = ({ tokenId, position }) => {
+  const handleRepayClick = useRepayTrigger(tokenId, position);
   return (
     <div
       role="button"

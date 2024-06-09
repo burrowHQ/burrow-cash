@@ -97,6 +97,8 @@ export const getAssetData = createSelector(
     return {
       tokenId: asset?.token_id,
       action: app.selected.action,
+      position: app.selected.position,
+      portfolio: account.portfolio,
       ...(asset ? transformAsset(asset, account, assets, app) : {}),
     };
   },

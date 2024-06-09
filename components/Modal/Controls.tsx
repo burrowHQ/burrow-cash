@@ -1,7 +1,6 @@
 import Decimal from "decimal.js";
 import { updateAmount } from "../../redux/appSlice";
 import { useAppDispatch } from "../../redux/hooks";
-import { trackMaxButton } from "../../utils/telemetry";
 import { formatWithCommas_number } from "../../utils/uiNumber";
 import RangeSlider from "./RangeSlider";
 import TokenBox from "./TokenBox";
@@ -25,14 +24,6 @@ export default function Controls({
       return;
     }
     dispatch(updateAmount({ isMax: false, amount: value }));
-  };
-
-  const handleMaxClick = () => {
-    dispatch(updateAmount({ isMax: true, amount: available }));
-  };
-
-  const handleFocus = (e) => {
-    e.target.select();
   };
 
   const handleSliderChange = (percent) => {

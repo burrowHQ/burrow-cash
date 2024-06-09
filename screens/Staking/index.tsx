@@ -79,7 +79,7 @@ const Staking = () => {
           <StakingBox
             text1="💰 Available"
             value1={total > 0 ? total.toLocaleString(undefined, TOKEN_FORMAT) : 0}
-            text2="Your APY"
+            text2="Your Net APY"
             value2={`${formatAPYValue(stakingNetAPY + stakingNetTvlAPY)}%`}
             value2ClassName="text-primary"
           >
@@ -114,21 +114,6 @@ const Staking = () => {
               Unstake
             </CustomButton>
           </StakingBox>
-
-          {/* <StakingBox */}
-          {/*  text1="🎁 Unclaimed Reward" */}
-          {/*  value1={<LiveUnclaimedAmount />} */}
-          {/*  logoIcon={<GiftIcon />} */}
-          {/* > */}
-          {/*  <CustomButton */}
-          {/*    onClick={handleClaimAll} */}
-          {/*    className="w-full bg-claim border-claim text-black" */}
-          {/*    color="custom" */}
-          {/*    isLoading={isLoading} */}
-          {/*  > */}
-          {/*    Claim */}
-          {/*  </CustomButton> */}
-          {/* </StakingBox> */}
         </div>
       </div>
 

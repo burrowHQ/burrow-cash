@@ -9,16 +9,15 @@ import { useAppSelector } from "../../../redux/hooks";
 import { getAverageSupplyRewardApy } from "../../../redux/selectors/getAverageSuppliedRewardApy";
 import { getAverageBorrowedRewardApy } from "../../../redux/selectors/getAverageBorrowedRewardApy";
 import { getAverageNetRewardApy } from "../../../redux/selectors/getAverageNetRewardApy";
-import { useNonFarmedAssets } from "../../../hooks/hooks";
+import { getListTokenNetRewardApy } from "../../../redux/selectors/getListTokenNetRewardApy";
 import HtmlTooltip from "../../common/html-tooltip";
 import { format_apy } from "../../../utils/uiNumber";
 
 export const APY = () => {
-  const { netAPY, netLiquidityAPY, dailyReturns } = useUserHealth();
-  const { weightedNetLiquidity, hasNegativeNetLiquidity, assets } = useNonFarmedAssets();
+  const { netAPY, netLiquidityAPY } = useUserHealth();
   const totalApy = netAPY + netLiquidityAPY;
   const amount = `${totalApy.toLocaleString(undefined, APY_FORMAT)}%`;
-  const showLabels = netAPY > 0 || netLiquidityAPY > 0;
+  const showLabels = netAPY !== 0 || netLiquidityAPY !== 0;
   const { averageSupplyApy, averageBorrowedApy } = useAverageAPY();
   const apyLabels = [
     [
@@ -40,11 +39,6 @@ export const APY = () => {
       },
     ],
   ];
-  const netLiquidityTooltip = hasNegativeNetLiquidity ? (
-    <NotFarmingNetLiquidity assets={assets} liquidity={weightedNetLiquidity} />
-  ) : undefined;
-  const tooltip = `${dailyReturns.toLocaleString(undefined, USD_FORMAT)} / day`;
-
   return (
     <div className="relative">
       <div className="flex items-end">
@@ -52,52 +46,19 @@ export const APY = () => {
           title="Net APY"
           titleTooltip="Net APY = Daily Total Profit / Your Net Liquidity * 365 days"
           amount={amount}
-          tooltip={tooltip}
           labels={showLabels ? apyLabels : []}
         />
       </div>
     </div>
   );
 };
-
-const NotFarmingNetLiquidity = ({ assets, liquidity }) => (
-  <Stack gap="1">
-    <Typography fontSize="0.85rem">
-      Your weighted net liquidity is <b>{liquidity.toLocaleString(undefined, USD_FORMAT)}</b> which
-      is below 0.
-    </Typography>
-    <Typography fontSize="0.85rem">
-      The following assets have the net liquidity coefficient below 1:
-      <Stack gap={1} component="span" direction="row" display="inline-flex" ml={1}>
-        {assets.map((asset) => (
-          <span key={asset.token_id}>
-            {asset.metadata.symbol} ({asset.config.net_tvl_multiplier / 10000})
-          </span>
-        ))}
-      </Stack>
-    </Typography>
-    <Typography fontSize="0.85rem">
-      In order to start farming the net liquidity rewards you need to have a positive balance.
-    </Typography>
-    <Typography fontSize="0.85rem">
-      For more information about the net liquidity coefficients{" "}
-      <Link
-        href="https://burrowcash.medium.com/net-liquidity-farming-part-2-varied-coefficients-6b839ae2178b"
-        target="_blank"
-        color="#ACFFD1"
-        fontWeight={500}
-      >
-        click here
-      </Link>
-    </Typography>
-  </Stack>
-);
 const IncentiveAPY = () => {
   const [showTooltip, setShowTooltip] = useState(false);
   const userSupplyApy = useAppSelector(getAverageSupplyRewardApy());
   const userBorrowedApy = useAppSelector(getAverageBorrowedRewardApy());
   const userNetApy = useAppSelector(getAverageNetRewardApy());
-  const empty = !userSupplyApy && !userBorrowedApy && !userNetApy;
+  const userListTokenNetApy = useAppSelector(getListTokenNetRewardApy());
+  const empty = !userSupplyApy && !userBorrowedApy && !userNetApy && !userListTokenNetApy.length;
   if (empty) return null;
   return (
     <HtmlTooltip
@@ -129,6 +90,23 @@ const IncentiveAPY = () => {
           >
             <span className="text-gray-300 font-normal">Avg. Net Liquidity Reward APY</span>
             <span className="text-white font-normal">{format_apy(userNetApy)}</span>
+          </div>
+          <div
+            className={`flex flex-col gap-2 text-xs ${userListTokenNetApy.length ? "" : "hidden"}`}
+          >
+            {userListTokenNetApy.map((apyData) => {
+              return (
+                <div
+                  className="flex items-center justify-between gap-3"
+                  key={apyData.asset.token_id}
+                >
+                  <span className="text-gray-300 font-normal">
+                    {apyData.asset.metadata.symbol} Net Liquidity Reward APY
+                  </span>
+                  <span className="text-white font-normal">{format_apy(apyData.apy)}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       }

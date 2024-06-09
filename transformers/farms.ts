@@ -16,6 +16,7 @@ export const transformAccountFarms = (list) => {
     supplied: {},
     borrowed: {},
     netTvl: {},
+    tokennetbalance: {},
   };
 
   const netTvlFarms = list.find((f) => f.farm_id === "NetTvl");

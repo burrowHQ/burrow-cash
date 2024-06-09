@@ -7,30 +7,48 @@ import { RootState } from "../store";
 import { hasAssets } from "../utils";
 import { getAdjustedSum } from "./getWithdrawMaxAmount";
 
-export const recomputeHealthFactorRepay = (tokenId: string, amount: number) =>
+export const recomputeHealthFactorRepay = (tokenId: string, amount: number, position: string) =>
   createSelector(
     (state: RootState) => state.assets,
     (state: RootState) => state.account,
     (assets, account) => {
-      if (!hasAssets(assets)) return 0;
-      if (!account.portfolio || !tokenId || !account.portfolio.borrowed[tokenId]) return 0;
-      const { metadata, config } = assets.data[tokenId];
+      if (!hasAssets(assets)) return { healthFactor: 0, maxBorrowValue: 0 };
+      if (
+        !account.portfolio ||
+        !tokenId ||
+        !account.portfolio.positions[position]?.borrowed?.[tokenId]
+      )
+        return { healthFactor: 0, maxBorrowValue: 0 };
+      const asset = assets.data[tokenId];
+      const { metadata, config } = asset;
       const decimals = metadata.decimals + config.extra_decimals;
 
-      const borrowedBalance = new Decimal(account.portfolio.borrowed[tokenId].balance);
+      const borrowedBalance = new Decimal(
+        account.portfolio.positions[position].borrowed[tokenId].balance,
+      );
       const newBalance = Decimal.max(
         0,
         borrowedBalance.minus(expandTokenDecimal(amount, decimals)),
       );
 
       const clonedAccount = clone(account);
-      clonedAccount.portfolio.borrowed[tokenId].balance = newBalance.toFixed();
+      clonedAccount.portfolio.positions[position].borrowed[tokenId].balance = newBalance.toFixed();
 
-      const adjustedCollateralSum = getAdjustedSum("collateral", account.portfolio, assets.data);
-      const adjustedBorrowedSum = getAdjustedSum("borrowed", clonedAccount.portfolio, assets.data);
-
-      const healthFactor = adjustedCollateralSum.div(adjustedBorrowedSum).mul(100).toNumber();
-
-      return healthFactor < MAX_RATIO ? healthFactor : MAX_RATIO;
+      const adjustedCollateralSum = getAdjustedSum(
+        "collateral",
+        account.portfolio,
+        assets.data,
+        position,
+      );
+      const adjustedBorrowedSum = getAdjustedSum(
+        "borrowed",
+        clonedAccount.portfolio,
+        assets.data,
+        position,
+      );
+      const maxBorrowValue = adjustedCollateralSum.sub(adjustedBorrowedSum);
+      const healthFactorTemp = adjustedCollateralSum.div(adjustedBorrowedSum).mul(100).toNumber();
+      const healthFactor = healthFactorTemp < MAX_RATIO ? healthFactorTemp : MAX_RATIO;
+      return { healthFactor, maxBorrowValue };
     },
   );

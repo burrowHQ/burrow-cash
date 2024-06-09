@@ -24,7 +24,16 @@ export interface FarmData {
 export interface Farm {
   [reward_token_id: string]: FarmData;
 }
-
+export interface IPositions {
+  [shadow_id: string]: {
+    collateral: {
+      [tokenId: string]: PortfolioAsset;
+    };
+    borrowed: {
+      [tokenId: string]: PortfolioAsset;
+    };
+  };
+}
 export interface Portfolio {
   supplied: {
     [tokenId: string]: PortfolioAsset;
@@ -32,14 +41,24 @@ export interface Portfolio {
   collateral: {
     [tokenId: string]: PortfolioAsset;
   };
+  collateralAll: {
+    [tokenId: string]: PortfolioAsset;
+  };
   borrowed: {
     [tokenId: string]: PortfolioAsset;
   };
+  supplies: any[];
+  collaterals: any[];
+  borrows: any[];
+  positions: IPositions;
   farms: {
     supplied: {
       [tokenId: string]: Farm;
     };
     borrowed: {
+      [tokenId: string]: Farm;
+    };
+    tokennetbalance: {
       [tokenId: string]: Farm;
     };
     netTvl: {
@@ -70,13 +89,19 @@ export const initialState: AccountState = {
   accountId: "",
   balances: {},
   portfolio: {
+    supplies: [],
+    borrows: [],
+    collaterals: [],
     supplied: {},
     collateral: {},
+    collateralAll: {},
     borrowed: {},
+    positions: {},
     farms: {
       supplied: {},
       borrowed: {},
       netTvl: {},
+      tokennetbalance: {},
     },
     staking: initialStaking,
     hasNonFarmedAssets: false,
@@ -85,3 +110,15 @@ export const initialState: AccountState = {
   isClaiming: undefined,
   fetchedAt: undefined,
 };
+
+export interface IAccountFarms {
+  supplied: {
+    [tokenId: string]: Farm;
+  };
+  borrowed: {
+    [tokenId: string]: Farm;
+  };
+  netTvl: {
+    [tokenId: string]: FarmData;
+  };
+}

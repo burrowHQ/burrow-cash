@@ -1,20 +1,18 @@
 import { useEffect, useState } from "react";
 import { Box, Typography, Stack, Alert, Link, useTheme } from "@mui/material";
-import { FcInfo } from "@react-icons/all-files/fc/FcInfo";
 import { BeatLoader } from "react-spinners";
-import TokenIcon from "../TokenIcon";
+import { twMerge } from "tailwind-merge";
 import { actionMapTitle } from "./utils";
-import APYCell from "../Table/common/apy-cell";
 import { TOKEN_FORMAT, USD_FORMAT } from "../../store";
 import { useDegenMode } from "../../hooks/hooks";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
-import { getSelectedValues, getAssetData } from "../../redux/appSelectors";
 import { toggleUseAsCollateral, hideModal, showModal } from "../../redux/appSlice";
 import { isInvalid, formatWithCommas_usd } from "../../utils/uiNumber";
 import { YellowSolidSubmitButton, RedSolidSubmitButton } from "./button";
 import { getCollateralAmount } from "../../redux/selectors/getCollateralAmount";
-import { TipIcon, CloseIcon, WarnIcon, JumpTipIcon } from "./svg";
+import { TipIcon, CloseIcon, WarnIcon, JumpTipIcon, ArrowRight } from "./svg";
 import ReactToolTip from "../ToolTip";
+import { IToken } from "../../interfaces/asset";
 
 export const USNInfo = () => (
   <Box mt="1rem">
@@ -70,32 +68,48 @@ export const CloseButton = ({ onClose, ...props }) => (
   </Box>
 );
 
-export const TokenInfo = ({ apy, asset, onClose }) => {
-  const { action, symbol, tokenId, icon, depositRewards, borrowRewards } = asset;
-  const page = ["Withdraw", "Adjust", "Supply"].includes(action) ? "deposit" : "borrow";
-  const isRepay = action === "Repay";
-  const { degenMode, isRepayFromDeposits, setRepayFromDeposits } = useDegenMode();
-  const actionDoc = {
-    Supply: "https://docs.burrow.finance/product-docs/using-burrow/supplying",
-    Withdraw: "https://docs.burrow.finance/product-docs/using-burrow/supplying",
-    Adjust: "https://docs.burrow.finance/product-docs/using-burrow/supplying",
-    Borrow: "https://docs.burrow.finance/product-docs/using-burrow/borrowing",
-    Repay: "https://docs.burrow.finance/product-docs/using-burrow/borrowing",
-  };
+export const ModalTitle = ({ asset, onClose }) => {
+  const { action, symbol, isLpToken, tokens } = asset;
+  function getSymbols() {
+    return (
+      <div className="flex items-center flex-shrink-0">
+        {isLpToken ? (
+          tokens.map((token: IToken, index) => {
+            const { metadata } = token;
+            return (
+              <span className="text-base xsm:text-sm text-whit" key={token.token_id}>
+                {metadata?.symbol}
+                {index === tokens.length - 1 ? "" : "-"}
+              </span>
+            );
+          })
+        ) : (
+          <span className="text-base text-white">{symbol}</span>
+        )}
+      </div>
+    );
+  }
   return (
     <div className="mb-[20px]">
       <div className="flex items-center justify-between text-lg text-white">
-        <div className="flex items-center gap-2">
-          {actionMapTitle[action]} <span className="ml-1.5">{symbol}</span>
-          <JumpTipIcon
-            className="cursor-pointer text-gray-400 hover:text-white hover:text-opacity-50"
-            onClick={() => {
-              window.open(actionDoc[action]);
-            }}
-          />
+        <div
+          className={`flex items-center flex-wrap ${
+            tokens?.length > 2 && action === "Adjust" ? "" : "gap-1.5"
+          }`}
+        >
+          {actionMapTitle[action]} <span>{getSymbols()}</span>
         </div>
         <CloseIcon onClick={onClose} />
       </div>
+    </div>
+  );
+};
+export const RepayTab = ({ asset }) => {
+  const { action } = asset;
+  const isRepay = action === "Repay";
+  const { degenMode, isRepayFromDeposits, setRepayFromDeposits } = useDegenMode();
+  return (
+    <div className="mb-[20px]">
       {isRepay && degenMode.enabled && (
         <div className="flex items-center justify-between border border-dark-500 rounded-md bg-dark-600 h-12 mt-5 p-1.5">
           <span
@@ -128,7 +142,7 @@ export const Available = ({ totalAvailable, available$ }) => (
   </Box>
 );
 
-export const HealthFactor = ({ value }) => {
+export const HealthFactor = ({ value, title }: { value: number; title?: string }) => {
   const healthFactorColor =
     value === -1
       ? "text-primary"
@@ -141,8 +155,20 @@ export const HealthFactor = ({ value }) => {
 
   return (
     <div className="flex items-center justify-between">
-      <span className="text-sm text-gray-300">Health Factor</span>
+      <span className="text-sm text-gray-300">{title || "Health Factor"}</span>
       <span className={`text-sm ${healthFactorColor}`}>{healthFactorDisplayValue}</span>
+    </div>
+  );
+};
+export const BorrowLimit = ({ from, to }: { from: string | number; to: string | number }) => {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-sm text-gray-300">Borrow limit</span>
+      <div className="flex items-center text-sm">
+        <span className="text-gray-300 line-through">{formatWithCommas_usd(from)}</span>
+        <ArrowRight className="mx-1.5" />
+        <span className="text-white">{formatWithCommas_usd(to)}</span>
+      </div>
     </div>
   );
 };
@@ -256,7 +282,7 @@ export const SubmitButton = ({ action, disabled, onClick, loading }) => {
   );
 };
 
-export const Alerts = ({ data }) => {
+export const Alerts = ({ data, errorClassName }: any) => {
   const sort = (b: any, a: any) => {
     if (b[1].severity === "error") return 1;
     if (a[1].severity === "error") return -1;
@@ -271,7 +297,13 @@ export const Alerts = ({ data }) => {
           if (data[alert].severity === "warning") {
             return <AlertWarning className="-mt-2" key={alert} title={data[alert].title} />;
           } else {
-            return <AlertError className="pb-5 -mb-7" key={alert} title={data[alert].title} />;
+            return (
+              <AlertError
+                className={twMerge("pb-5 -mb-7", errorClassName || "")}
+                key={alert}
+                title={data[alert].title}
+              />
+            );
           }
         })}
     </div>
@@ -324,9 +356,9 @@ export function useBorrowTrigger(tokenId: string) {
   };
 }
 
-export function useRepayTrigger(tokenId: string) {
+export function useRepayTrigger(tokenId: string, position?: string) {
   const dispatch = useAppDispatch();
   return () => {
-    dispatch(showModal({ action: "Repay", tokenId, amount: "0" }));
+    dispatch(showModal({ action: "Repay", tokenId, amount: "0", position }));
   };
 }

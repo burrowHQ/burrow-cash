@@ -42,6 +42,7 @@ module.exports = {
         h1: "90px",
         h2: "26px",
         h3: "18px",
+        56: "56px",
       },
       borderRadius: {
         sm: "6px",
@@ -102,6 +103,7 @@ module.exports = {
           950: "#787B93",
           1000: "#3A3A3A",
           1050: "#ECECEC",
+          1100: "#2F324B",
         },
         toolTipBoxBorderColor: "#D2FF3A",
         toolTipBoxBgColor: "rgba(35,37,58,0.8)",

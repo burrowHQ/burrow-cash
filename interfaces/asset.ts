@@ -40,7 +40,7 @@ export interface IMetadata {
 
 export interface IAssetFarmReward {
   /// The reward token ID.
-  token_id: string;
+  token_id?: string;
   /// The amount of reward distributed per day.
   reward_per_day: string;
   /// The log base for the booster. Used to compute boosted shares per account.
@@ -95,6 +95,8 @@ export interface IAssetDetailed {
   // price mixin
   price?: IPrice;
   prot_fee: string;
+  isLpToken: boolean;
+  lptMetadata: IUnitLptAssetDetail;
 }
 
 export interface AssetFarm {
@@ -180,4 +182,29 @@ export interface UIAsset {
   borrowRewards: IReward[];
   can_borrow: boolean;
   can_deposit: boolean;
+  tokens: IToken[];
+  isLpToken: boolean;
+}
+
+export interface IToken {
+  token_id: string;
+  amount: string;
+  usd?: string;
+  metadata?: IMetadata;
+}
+export interface IUnitLptAssetDetail {
+  timestamp: string;
+  decimals: number;
+  tokens: IToken[];
+}
+export interface IUnitLptAsset {
+  [lp_token_id: string]: IUnitLptAssetDetail;
+}
+
+export interface IShadowRecord {
+  shadow_in_farm: string;
+  shadow_in_burrow: string;
+}
+export interface IShadowRecordInfo {
+  [pool_id: string]: IShadowRecord;
 }

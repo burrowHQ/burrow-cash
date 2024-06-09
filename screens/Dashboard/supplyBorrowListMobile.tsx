@@ -1,13 +1,13 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import styled from "styled-components";
 import { ContentBox } from "../../components/ContentBox/ContentBox";
-import DashboardApy from "./dashboardApy";
 import DashboardReward from "./dashboardReward";
 import { formatTokenValue, formatUSDValue, millifyNumber } from "../../helpers/helpers";
 import { AdjustButton, MarketButton, RepayButton, WithdrawButton } from "./supplyBorrowButtons";
 import { NoDataMascot } from "../../components/Icons/Icons";
 import { hiddenAssets } from "../../utils/config";
+import CustomTooltips from "../../components/CustomTooltips/CustomTooltips";
 import { APYCell } from "../Market/APYCell";
 
 const SupplyBorrowListMobile = ({ suppliedRows, borrowedRows, accountId }) => {
@@ -22,7 +22,7 @@ const SupplyBorrowListMobile = ({ suppliedRows, borrowedRows, accountId }) => {
 
   if (suppliedRows?.length) {
     supplyNode = suppliedRows?.map((d) => (
-      <ContentBox style={{ padding: 0, overflow: "hidden", marginBottom: 15 }} key={d.tokenId}>
+      <ContentBox style={{ padding: 0, marginBottom: 15 }} key={d.tokenId}>
         <SupplyItem data={d} key={d.tokenId} />
       </ContentBox>
     ));
@@ -126,17 +126,62 @@ const StyledTabActiveBall = styled.div`
 `;
 
 const SupplyItem = ({ data }) => {
-  const { canUseAsCollateral } = data || {};
+  const { canUseAsCollateral, metadata } = data || {};
+  const { icon, tokens, symbol } = metadata || {};
+  let iconImg;
+  let symbolNode = symbol;
+  if (icon) {
+    iconImg = <img src={icon} width={26} height={26} alt="token" className="rounded-full" />;
+  } else if (tokens?.length) {
+    symbolNode = "";
+    let symbolTooltips = "";
+    iconImg = (
+      <div className="grid" style={{ marginRight: 2, gridTemplateColumns: "15px 12px" }}>
+        {tokens?.map((d, i) => {
+          const isLast = i === tokens.length - 1;
+          if (tokens?.length > 3) {
+            symbolTooltips += `${d.metadata.symbol}${!isLast ? "-" : ""}`;
+          } else {
+            symbolNode += `${d.metadata.symbol}${!isLast ? "-" : ""}`;
+          }
+
+          return (
+            <img
+              key={d.metadata.symbol}
+              src={d.metadata?.icon}
+              width={20}
+              height={20}
+              alt="token"
+              className="rounded-full w-[20px] h-[20px] -m-1"
+              style={{ maxWidth: "none" }}
+            />
+          );
+        })}
+      </div>
+    );
+
+    if (tokens?.length > 3) {
+      symbolNode = (
+        <CustomTooltips
+          text={symbolTooltips}
+          style={{ left: 0, right: "auto", maxWidth: "70vw", top: "100%", height: 26 }}
+        >
+          {tokens?.length} pool
+        </CustomTooltips>
+      );
+    }
+  }
+
   return (
     <div>
       <div
         className="flex justify-between border-b"
         style={{ padding: "16px", borderColor: "#31344C" }}
       >
-        <div className="flex gap-2 items-center">
-          <img src={data?.icon} width={26} height={26} alt="token" className="rounded-full" />
+        <div className="flex gap-2 items-center pr-2">
+          {iconImg}
           <div className="flex flex-col">
-            <div className="truncate h4b">{data?.symbol}</div>
+            <div className="h4b">{symbolNode}</div>
             {hiddenAssets.includes(data?.tokenId || "") ? null : (
               <MarketButton
                 tokenId={data?.tokenId}
@@ -160,11 +205,6 @@ const SupplyItem = ({ data }) => {
 
       <div style={{ padding: "16px" }}>
         <ItemRow label="APY">
-          {/* <DashboardApy
-            baseAPY={data?.apy}
-            rewardList={data?.depositRewards}
-            tokenId={data?.tokenId}
-          /> */}
           <APYCell
             rewards={data?.depositRewards}
             baseAPY={data?.apy}
@@ -191,6 +231,12 @@ const SupplyItem = ({ data }) => {
 };
 
 const BorrowItem = ({ data }) => {
+  const { metadataLP, collateralType } = data || {};
+  let tokenNames = "";
+  metadataLP?.tokens?.forEach((d, i) => {
+    const isLast = i === metadataLP.tokens.length - 1;
+    tokenNames += `${d.metadata.symbol}${!isLast ? "-" : ""}`;
+  });
   return (
     <div>
       <div
@@ -218,12 +264,6 @@ const BorrowItem = ({ data }) => {
       </div>
       <div style={{ padding: "16px" }}>
         <ItemRow label="APY">
-          {/* <DashboardApy
-            baseAPY={data?.borrowApy}
-            rewardList={data?.borrowRewards}
-            tokenId={data?.tokenId}
-            isBorrow
-          /> */}
           <APYCell
             rewards={data?.borrowRewards}
             baseAPY={data?.borrowApy}
@@ -239,8 +279,14 @@ const BorrowItem = ({ data }) => {
           </div>
         </ItemRow>
 
+        <ItemRow label="Collateral Type">
+          <div className="flex gap-2 items-center">
+            <div style={{ fontSize: 14 }}>{tokenNames || "Standard Token"}</div>
+          </div>
+        </ItemRow>
+
         <div className="">
-          <RepayButton tokenId={data?.tokenId} />
+          <RepayButton tokenId={data?.tokenId} position={data?.shadow_id} />
         </div>
       </div>
     </div>

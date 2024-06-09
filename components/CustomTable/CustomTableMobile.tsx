@@ -52,7 +52,7 @@ const CustomTableMobile = ({ data, columns, noDataText, isLoading }) => {
 
 const ItemRow = ({ label, children, style = {} }) => {
   return (
-    <div className="flex justify-between mb-4" style={style}>
+    <div className="flex justify-between mb-4 gap-2" style={style}>
       <div className="h4c text-gray-300">{label}</div>
       <div className="text-right">{children}</div>
     </div>

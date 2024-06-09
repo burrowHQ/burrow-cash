@@ -16,4 +16,4 @@ export const mainMenuList: Imenu[] = [
   { title: "Dashboard", link: "/dashboard", allLinks: ["/dashboard"], icon: <DashboardIcon /> },
   { title: "Staking", link: "/staking", allLinks: ["/staking"], icon: <StakeIcon /> },
 ];
-export const helpMenu: Imenu = { title: "Help", link: "https://docs.burrow.finance/" };
+export const helpMenu: Imenu = { title: "Docs", link: "https://docs.burrow.finance/" };

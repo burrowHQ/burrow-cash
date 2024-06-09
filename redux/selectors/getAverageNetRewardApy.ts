@@ -2,19 +2,19 @@ import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { shrinkToken } from "../../store";
 import { toUsd } from "../utils";
-import { Farm, FarmData, Portfolio } from "../accountState";
-import { Asset, AssetsState } from "../assetState";
+import { AssetsState } from "../assetState";
+import { filterAccountSentOutFarms } from "../../utils/index";
 
 export const getAverageNetRewardApy = () =>
   createSelector(
     (state: RootState) => state.assets,
     (state: RootState) => state.account,
     (assets, account) => {
-      const [, totalCollateral] = getNetGains(account.portfolio, assets, "collateral");
-      const [, totalSupplied] = getNetGains(account.portfolio, assets, "supplied");
-      const [, totalBorrowed] = getNetGains(account.portfolio, assets, "borrowed");
+      const [, totalCollateral] = getNetGains(account.portfolio.collaterals, assets);
+      const [, totalSupplied] = getNetGains(account.portfolio.supplies, assets);
+      const [, totalBorrowed] = getNetGains(account.portfolio.borrows, assets);
       const { netTvl } = account.portfolio.farms;
-      const totalNetProfit = Object.entries(netTvl || {})
+      const totalNetProfit = Object.entries(filterAccountSentOutFarms(netTvl || {}))
         .map(([rewardTokenId, farmData]) => {
           const rewardAsset = assets.data[rewardTokenId];
           const rewardAssetDecimals =
@@ -35,23 +35,20 @@ export const getAverageNetRewardApy = () =>
       return netLiquidity > 0 ? (totalNetProfit / netLiquidity) * 365 * 100 : 0;
     },
   );
-export const getNetGains = (
-  portfolio: Portfolio,
-  assets: AssetsState,
-  source: "supplied" | "collateral" | "borrowed",
-) =>
-  Object.keys(portfolio[source])
-    .map((id) => {
-      const asset = assets.data[id];
-      const netTvlMultiplier = (asset?.config.net_tvl_multiplier || 0) / 10000;
 
-      const { balance } = portfolio[source][id];
-      const apr = Number(portfolio[source][id].apr);
-      const balanceUSD = toUsd(balance, asset);
+export const getNetGains = (tokens: any[], assets: AssetsState) => {
+  const res = tokens.map((data) => {
+    const asset = assets.data[data.token_id];
+    const netTvlMultiplier = asset.config.net_tvl_multiplier / 10000;
+    const { balance } = data;
+    const apr = Number(data.apr);
+    const balanceUSD = toUsd(balance, asset);
 
-      return [balanceUSD * (netTvlMultiplier ? 1 : 0), apr];
-    })
-    .reduce(
-      ([gain, sum], [balanceUSD, apr]) => [gain + balanceUSD * apr, sum + balanceUSD],
-      [0, 0],
-    );
+    return [balanceUSD * (netTvlMultiplier ? 1 : 0), apr];
+  });
+  const result = res.reduce(
+    ([gain, sum], [balanceUSD, apr]) => [gain + balanceUSD * apr, sum + balanceUSD],
+    [0, 0],
+  );
+  return result;
+};

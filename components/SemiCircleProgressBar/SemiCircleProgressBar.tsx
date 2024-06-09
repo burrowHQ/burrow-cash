@@ -27,7 +27,7 @@ const SemiCircleProgressBar = ({
     }
   }
   // temp
-  rotateDegree = value + rotateDegree;
+  rotateDegree = value ? value + rotateDegree : rotateDegree;
   rotateDegree = Math.min(rotateDegree, MAX_DEGREE);
   let node;
   if (children) {

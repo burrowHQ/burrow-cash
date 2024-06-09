@@ -88,25 +88,7 @@ const columns = [
     ),
     cell: ({ originalData }) => {
       const { LiquidatedAssets } = originalData || {};
-      return (
-        <div>
-          {LiquidatedAssets?.[0]?.data?.isLpToken ||
-          LiquidatedAssets?.[0]?.token_id?.indexOf("shadow_ref_v1") > -1
-            ? "LP token"
-            : "Single token"}
-        </div>
-      );
-    },
-  },
-  {
-    header: () => (
-      <div style={{ whiteSpace: "normal" }}>
-        Liquidation<div>Type</div>
-      </div>
-    ),
-    cell: ({ originalData }) => {
-      const { liquidation_type } = originalData || {};
-      return <div>{liquidation_type || "-"}</div>;
+      return <div>{LiquidatedAssets?.[0]?.data?.isLpToken ? "LP token" : "Standard Token"}</div>;
     },
   },
   {
@@ -124,7 +106,11 @@ const columns = [
     },
   },
   {
-    header: () => <div style={{ whiteSpace: "normal" }}>Repaid Assets Amount</div>,
+    header: () => (
+      <div style={{ whiteSpace: "normal" }}>
+        Repaid Assets <div>Amount</div>
+      </div>
+    ),
     cell: ({ originalData }) => {
       const { RepaidAssets } = originalData || {};
       if (!RepaidAssets?.length) {
@@ -166,7 +152,17 @@ const columns = [
       const node = LiquidatedAssets?.map((d) => {
         const { metadata, config } = d.data || {};
         const { extra_decimals } = config || {};
-        const tokenSymbol = metadata?.symbol || d.token_id;
+        let tokenSymbol = "";
+        if (metadata?.tokens?.length) {
+          metadata?.tokens?.forEach((t, i) => {
+            const { symbol, token_id } = t.metadata || {};
+            tokenSymbol += `${i !== 0 ? "-" : ""}${symbol || token_id}`;
+          });
+        }
+        if (!tokenSymbol) {
+          tokenSymbol = metadata?.symbol || d.token_id;
+        }
+
         const tokenAmount = Number(
           shrinkToken(d.amount, (metadata?.decimals || 0) + (extra_decimals || 0)),
         );
@@ -187,17 +183,12 @@ const columns = [
   },
   {
     header: () => (
-      <div style={{ whiteSpace: "normal" }}>
-        Health Factor
-        <div>after Liquidate</div>
+      <div style={{ whiteSpace: "normal", textAlign: "right" }}>
+        Health Factor<div>after Liquidate</div>
       </div>
     ),
     cell: ({ originalData }) => {
-      const { healthFactor_after, liquidation_type } = originalData || {};
-      if (liquidation_type === "ForceClose") {
-        return <div style={{ textAlign: "right" }}>-</div>;
-      }
-
+      const { healthFactor_after } = originalData || {};
       return (
         <div style={{ textAlign: "right" }}>{(Number(healthFactor_after) * 100).toFixed(2)}%</div>
       );

@@ -62,14 +62,6 @@ export const getPrices = async (): Promise<IPrices | undefined> => {
     return oracleResponse;
   }
 };
-export async function getContractConfig() {
-  const { view, logicContract } = await getBurrow();
-  const config = (await view(
-    logicContract,
-    ViewMethodsLogic[ViewMethodsLogic.get_config],
-  )) as IConfig;
-  return config;
-}
 const getPythPrices = async () => {
   const { view, pythContract, logicContract } = await getBurrow();
   const COINList = await view(

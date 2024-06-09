@@ -5,7 +5,6 @@ import { showModal } from "../../redux/appSlice";
 import { useAvailableAssets } from "../../hooks/hooks";
 import { useTableSorting } from "../../hooks/useTableSorting";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
-import { MarketLoadIcon } from "./svg";
 
 const Market = () => {
   const dispatch = useAppDispatch();
