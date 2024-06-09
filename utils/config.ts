@@ -29,7 +29,7 @@ export const BRRR_TOKEN = {
   testnet: "test_brrr.1638481328.burrow.testnet",
   mainnet: "token.burrow.near",
 };
-// for pubtestnet env
+// for pubtestnet env todo
 export const BRRR_LABS_TOKEN = {
   testnet: "brrr.ft.ref-labs.testnet",
   mainnet: "brrr.ft.ref-labs.testnet",
