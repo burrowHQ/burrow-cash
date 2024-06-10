@@ -83,11 +83,6 @@ const StyledWrapper = styled.div`
       }
     }
   }
-
-  //input {
-  //  border: 1px solid #40435a;
-  //  background: #282a42;
-  //}
 `;
 
 export default CustomModal;

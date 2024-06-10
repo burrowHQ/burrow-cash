@@ -97,14 +97,20 @@ export const transformAsset = (
 
   if (account.accountId) {
     const decimals = asset.metadata.decimals + asset.config.extra_decimals;
-
     const supplied = Number(
       shrinkToken(account.portfolio.supplied[tokenId]?.balance || 0, decimals),
     );
     const collateral = Number(
-      shrinkToken(account.portfolio.collateral[tokenId]?.balance || 0, decimals),
+      shrinkToken(
+        asset.isLpToken
+          ? account.portfolio.positions?.[tokenId]?.collateral?.[tokenId]?.balance || 0
+          : account.portfolio.collateral?.[tokenId]?.balance || 0,
+        decimals,
+      ),
     );
-    const borrowed = account.portfolio.borrowed[tokenId]?.balance || 0;
+    const borrowed = asset.isLpToken
+      ? account.portfolio.positions?.[tokenId]?.borrowed?.[tokenId]?.balance || 0
+      : account.portfolio.borrowed?.[tokenId]?.balance || 0;
     const available = account.balances[tokenId] || 0;
     const availableNEAR = account.balances["near"] || 0;
 
@@ -120,7 +126,7 @@ export const transformAsset = (
   }
   return standardizeAsset({
     tokenId,
-    ...pick(["icon", "symbol", "name", "decimals"], asset.metadata),
+    ...pick(["icon", "symbol", "name", "decimals", "tokens"], asset.metadata),
     price: asset.price ? asset.price.usd : 0,
     supplyApy: Number(asset.supply_apr) * 100,
     totalSupply,
@@ -152,10 +158,15 @@ export const transformAsset = (
     borrowRewards: getRewards("borrowed", asset, assets),
     can_borrow: asset.config.can_borrow,
     can_deposit: asset.config.can_deposit,
+    isLpToken: asset.isLpToken,
   });
 };
 
-export const getRewards = (action: "supplied" | "borrowed", asset: Asset, assets: Assets) => {
+export const getRewards = (
+  action: "supplied" | "borrowed" | "tokennetbalance",
+  asset: Asset,
+  assets: Assets,
+) => {
   return Object.entries(asset.farms[action]).map(([tokenId, rewards]) => ({
     rewards,
     metadata: assets[tokenId].metadata,

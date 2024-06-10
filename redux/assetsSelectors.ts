@@ -17,7 +17,9 @@ export const getAvailableAssets = (source?: "supply" | "borrow" | "") =>
         : Object.keys(assets);
       return assets_filter_by_source
         .filter((tokenId) => !hiddenAssets.includes(assets[tokenId].token_id))
-        .map((tokenId) => transformAsset(assets[tokenId], account, assets, app));
+        .map((tokenId) => {
+          return transformAsset(assets[tokenId], account, assets, app);
+        });
     },
   );
 

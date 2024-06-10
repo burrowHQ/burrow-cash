@@ -778,6 +778,37 @@ options-list::-webkit-scrollbar {
                                   supported by Chrome, Edge, Opera and Firefox */
 }
 
+/* slider start*/
+.month-slider {
+  height: 20px;
+}
+
+.month-slider .track-1 {
+  height: 10px;
+  top: 6px;
+  border-radius: 6px;
+  background-color: #282a42;
+  border: 1px solid #40435a;
+}
+
+.month-slider .thumb {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  border-radius: 100%;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
+  border: 3px solid #343649;
+  outline: none;
+  background: #d2ff3a;
+}
+
+.month-slider .track-0 {
+  height: 8px;
+  top: 7px;
+  border-radius: 6px;
+  background-color: #d2ff3a;
+}
+/* slider end*/
 .radio-custom {
   width: 16px;
   height: 16px;
@@ -804,4 +835,21 @@ options-list::-webkit-scrollbar {
   height: 10px;
   border-radius: 50%;
   background: #d2ff3a;
+}
+.health-tab {
+  border-radius: 4px;
+}
+.health-tab:hover,
+.health-tab-active {
+  background: #2e304b;
+}
+
+.health-tab .arrow-left {
+  position: absolute;
+  right: 100%;
+  width: 0;
+  height: 0;
+  border-top: 16px solid transparent;
+  border-bottom: 15px solid transparent;
+  border-right: 10px solid #2e304b;
 }

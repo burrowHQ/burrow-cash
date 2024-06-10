@@ -11,12 +11,6 @@ interface RewardProps {
 }
 
 const DashboardReward = ({ rewardList = [], page }: RewardProps) => {
-  // const netLiquidityRewards = page === "deposit" ? useNetLiquidityRewards() : [];
-  //
-  // const restRewards = netLiquidityRewards.filter(
-  //   (r) => !rewardList.some((lr) => lr.metadata.symbol === r.metadata.symbol),
-  // );
-
   let node;
   let totalUsd = 0;
   if (rewardList?.length) {
@@ -26,14 +20,6 @@ const DashboardReward = ({ rewardList = [], page }: RewardProps) => {
         rewards.reward_per_day || 0,
         decimals + config.extra_decimals,
       );
-
-      // const amount = isCompact
-      //   ? millify(Number(dailyRewards), { precision: PERCENT_DIGITS })
-      //   : formatPortfolioRewardAmount(Number(dailyRewards));
-
-      // if (Number(dailyRewards) < 0.001) {
-      //   return "-";
-      // }
       const usdPrice = price ? Number(dailyRewards) * price : 0;
       totalUsd += usdPrice;
       const cloned = metadata && standardizeAsset({ ...metadata });
@@ -49,7 +35,7 @@ const DashboardReward = ({ rewardList = [], page }: RewardProps) => {
     totalUsd !== 0 && totalUsd < 0.01 ? `<${formatUSDValue(0.01)}` : formatUSDValue(totalUsd);
 
   return (
-    <div className="flex gap-2 md:gap-0 md:flex-col">
+    <div className="flex gap-2 md:gap-0 md:flex-col px-1">
       <div className="flex items-center md:mb-1">{node}</div>
       <div className="md:h6 md:text-gray-300">{usdNode}</div>
     </div>

@@ -1,15 +1,18 @@
 import { createSelector } from "@reduxjs/toolkit";
 import Decimal from "decimal.js";
 
+import { omit } from "lodash";
 import { RootState } from "../store";
 import { emptySuppliedAsset, emptyBorrowedAsset, hasAssets, getRewards, toUsd } from "../utils";
 import { shrinkToken, expandToken } from "../../store";
 import { Asset, Assets } from "../assetState";
 import { Farm } from "../accountState";
 import { standardizeAsset } from "../../utils";
+import { DEFAULT_POSITION } from "../../utils/config";
+import { CONST_COLLATERAL_TYPE } from "../../const/constCommon";
 
 export const getPortfolioRewards = (
-  type: "supplied" | "borrowed",
+  type: "supplied" | "borrowed" | "tokennetbalance",
   asset: Asset,
   farm: Farm,
   assets: Assets,
@@ -47,22 +50,34 @@ export const getPortfolioAssets = createSelector(
   (state: RootState) => state.assets,
   (state: RootState) => state.account,
   (app, assets, account) => {
-    if (!hasAssets(assets)) return [[], [], 0, 0];
+    if (!hasAssets(assets)) return [[], [], 0, 0, {}, []];
     const brrrTokenId = app.config.booster_token_id;
+    const lpPositions = omit(account.portfolio.positions, DEFAULT_POSITION);
+    let portfolioLpAssets = {};
+    Object.keys(lpPositions).forEach((shadow_id: string) => {
+      portfolioLpAssets = {
+        ...portfolioLpAssets,
+        ...lpPositions[shadow_id].collateral,
+      };
+    });
     const portfolioAssets = {
       ...account.portfolio.supplied,
       ...account.portfolio.collateral,
+      ...portfolioLpAssets,
     };
     let totalSuppliedUSD = 0;
     let totalBorrowedUSD = 0;
     const supplied = Object.keys(portfolioAssets)
       .map((tokenId) => {
         const asset = assets.data[tokenId];
+        const { isLpToken } = asset;
         const collateral = shrinkToken(
-          account.portfolio.collateral[tokenId]?.balance || 0,
+          (isLpToken
+            ? account.portfolio.positions[tokenId]?.collateral?.[tokenId]?.balance || 0
+            : account.portfolio.collateral?.[tokenId]?.balance) || 0,
           asset.metadata.decimals + asset.config.extra_decimals,
         );
-        const suppliedBalance = account.portfolio.supplied[tokenId]?.balance || 0;
+        const suppliedBalance = account.portfolio.supplied?.[tokenId]?.balance || 0;
         const totalSupplyD = new Decimal(asset.supplied.balance)
           .plus(new Decimal(asset.reserved))
           .toFixed();
@@ -75,6 +90,7 @@ export const getPortfolioAssets = createSelector(
         totalSuppliedUSD += suppliedUSD;
         return standardizeAsset({
           tokenId,
+          metadata: asset.metadata,
           symbol: asset.metadata.symbol,
           icon: asset.metadata.icon,
           price: asset.price?.usd ?? 0,
@@ -83,19 +99,27 @@ export const getPortfolioAssets = createSelector(
           supplied: suppliedToken,
           canUseAsCollateral: asset.config.can_use_as_collateral,
           canWithdraw: asset.config.can_withdraw,
-          rewards: getPortfolioRewards(
-            "supplied",
-            asset,
-            account.portfolio.farms.supplied[tokenId],
-            assets.data,
-          ),
+          rewards: [
+            ...getPortfolioRewards(
+              "supplied",
+              asset,
+              account.portfolio.farms.supplied[tokenId],
+              assets.data,
+            ),
+            ...getPortfolioRewards(
+              "tokennetbalance",
+              asset,
+              account.portfolio.farms.tokennetbalance[tokenId],
+              assets.data,
+            ),
+          ],
           depositRewards: getRewards("supplied", asset, assets.data),
           totalSupplyMoney: toUsd(totalSupplyD, asset),
         });
       })
       .filter(app.showDust ? Boolean : emptySuppliedAsset);
-
-    const borrowed = Object.keys(account.portfolio.borrowed)
+    // borrow from regular position
+    const borrowed = Object.keys(account.portfolio.borrowed || {})
       .map((tokenId) => {
         const asset = assets.data[tokenId];
 
@@ -113,6 +137,9 @@ export const getPortfolioAssets = createSelector(
         totalBorrowedUSD += borrowedUSD;
         return standardizeAsset({
           tokenId,
+          shadow_id: DEFAULT_POSITION,
+          collateralType: CONST_COLLATERAL_TYPE.SINGLE_TOKEN,
+          metadata: asset.metadata,
           symbol: asset.metadata.symbol,
           icon: asset.metadata.icon,
           price: asset.price?.usd ?? 0,
@@ -133,7 +160,56 @@ export const getPortfolioAssets = createSelector(
         });
       })
       .filter(app.showDust ? Boolean : emptyBorrowedAsset);
+    // borrow from lp position
+    const borrowed_LP = Object.keys(lpPositions).reduce((acc, shadow_id: string) => {
+      const b = Object.keys(lpPositions[shadow_id].borrowed)
+        .map((tokenId) => {
+          const asset = assets.data[tokenId];
+          const lpAsset = assets.data[shadow_id];
+          const borrowedBalance = lpPositions[shadow_id].borrowed[tokenId].balance;
+          const brrrUnclaimedAmount =
+            account.portfolio.farms.borrowed[tokenId]?.[brrrTokenId]?.unclaimed_amount || "0";
+          const totalSupplyD = new Decimal(asset.supplied.balance)
+            .plus(new Decimal(asset.reserved))
+            .toFixed();
+          const borrowedToken = Number(
+            shrinkToken(borrowedBalance, asset.metadata.decimals + asset.config.extra_decimals),
+          );
+          const borrowedUSD = borrowedToken * (asset.price?.usd || 0);
+          totalBorrowedUSD += borrowedUSD;
+          return standardizeAsset({
+            tokenId,
+            shadow_id,
+            collateralType: CONST_COLLATERAL_TYPE.LP_TOKEN,
+            metadata: asset.metadata,
+            metadataLP: lpAsset.metadata,
+            symbol: asset.metadata.symbol,
+            icon: asset.metadata.icon,
+            price: asset.price?.usd ?? 0,
+            supplyApy: Number(asset.supply_apr) * 100,
+            borrowApy: Number(asset.borrow_apr) * 100,
+            borrowed: borrowedToken,
+            brrrUnclaimedAmount: Number(
+              shrinkToken(brrrUnclaimedAmount, assets.data[brrrTokenId].metadata.decimals),
+            ),
+            rewards: getPortfolioRewards(
+              "borrowed",
+              asset,
+              account.portfolio.farms.borrowed[tokenId],
+              assets.data,
+            ),
+            borrowRewards: getRewards("borrowed", asset, assets.data),
+            totalSupplyMoney: toUsd(totalSupplyD, asset),
+          });
+        })
+        .filter(app.showDust ? Boolean : emptyBorrowedAsset);
+      return { ...acc, [shadow_id]: b };
+    }, {});
 
-    return [supplied, borrowed, totalSuppliedUSD, totalBorrowedUSD];
+    const borrowedAll = Array.from(borrowed);
+    Object.entries(borrowed_LP).forEach(([positionId, value]: [string, any]) => {
+      borrowedAll.push(...value);
+    });
+    return [supplied, borrowed, totalSuppliedUSD, totalBorrowedUSD, borrowed_LP, borrowedAll];
   },
 );

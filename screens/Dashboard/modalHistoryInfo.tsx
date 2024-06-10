@@ -57,7 +57,7 @@ const ModalHistoryInfo = ({ isOpen, onClose, tab }) => {
       onClose={handleModelClose}
       onOutsideClick={handleModelClose}
       className="modal-mobile-bottom modal-history"
-      size="lg"
+      size="xl"
     >
       <div
         className="flex justify-between"

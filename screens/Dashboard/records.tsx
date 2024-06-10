@@ -97,23 +97,63 @@ const Records = ({ isShow }) => {
 const getColumns = ({ showToast, handleTxClick }) => [
   {
     header: "Assets",
+    minSize: 220,
     cell: ({ originalData }) => {
       const { data } = originalData || {};
+      const { metadata } = data || {};
+      const { icon, tokens, symbol } = metadata || {};
+      let iconImg;
+      let symbolNode = symbol;
+      if (icon) {
+        iconImg = (
+          <img
+            src={icon}
+            width={26}
+            height={26}
+            alt="token"
+            className="rounded-full w-[26px] h-[26px]"
+            style={{ marginRight: 6, marginLeft: 3 }}
+          />
+        );
+      } else if (tokens?.length) {
+        symbolNode = "";
+        iconImg = (
+          <div
+            className="grid"
+            style={{ marginRight: 2, gridTemplateColumns: "15px 12px", paddingLeft: 5 }}
+          >
+            {tokens?.map((d, i) => {
+              const isLast = i === tokens.length - 1;
+              symbolNode += `${d.metadata.symbol}${!isLast ? "-" : ""}`;
+              return (
+                <img
+                  key={d.metadata.symbol}
+                  src={d.metadata?.icon}
+                  width={20}
+                  height={20}
+                  alt="token"
+                  className="rounded-full w-[20px] h-[20px] -m-1"
+                  style={{ maxWidth: "none" }}
+                />
+              );
+            })}
+          </div>
+        );
+      }
 
       return (
-        <div className="flex truncate">
+        <div className="flex">
           <div style={{ flex: "0 0 26px" }} className="mr-2">
-            {data?.metadata?.icon && (
-              <img
-                src={data?.metadata?.icon}
-                width={26}
-                height={26}
-                alt="token"
-                className="rounded-full"
-              />
-            )}
+            {iconImg}
           </div>
-          <div className="truncate">{data?.metadata?.symbol}</div>
+          <div
+            title={symbolNode}
+            style={{
+              whiteSpace: "normal",
+            }}
+          >
+            {symbolNode}
+          </div>
         </div>
       );
     },
@@ -121,9 +161,11 @@ const getColumns = ({ showToast, handleTxClick }) => [
   {
     header: "Type",
     accessorKey: "event",
+    maxSize: 180,
   },
   {
     header: "Amount",
+    maxSize: 180,
     cell: ({ originalData }) => {
       const { amount, data } = originalData || {};
       const { metadata, config } = data || {};
@@ -136,6 +178,7 @@ const getColumns = ({ showToast, handleTxClick }) => [
   },
   {
     header: "Time",
+    maxSize: 180,
     cell: ({ originalData }) => {
       const [tooltipVisible, setTooltipVisible] = useState(false);
       const { timestamp } = originalData || {};

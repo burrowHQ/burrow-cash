@@ -2,6 +2,7 @@ export enum ViewMethodsLogic {
   // accounts
   get_account,
   get_accounts_paged,
+  get_account_all_positions,
   // assets
   get_asset,
   get_assets,
@@ -69,6 +70,17 @@ export enum ChangeMethodsToken {
   ft_transfer_call,
   storage_deposit,
   register_account,
+}
+
+export enum ViewMethodsREFV1 {
+  get_unit_lpt_assets,
+  get_pool_shares,
+  get_shadow_records,
+  get_pool_volumes_by_ids,
+  list_pool_volumes,
+}
+export enum ChangeMethodsREFV1 {
+  shadow_action,
 }
 export enum ViewMethodsPyth {
   get_price,

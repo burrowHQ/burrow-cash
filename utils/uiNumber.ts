@@ -64,6 +64,23 @@ export const format_apy = (v) => {
   }
 };
 
+export function digitalProcess(v: string | number, precision: number = 2) {
+  if (isInvalid(v)) return "-";
+  let zero = "";
+  for (let i = 0; i < precision - 1; i++) {
+    zero += "0";
+  }
+  zero = `0.${zero}1`;
+  const decimal = new Decimal(v);
+  if (decimal.eq(0)) {
+    return "0";
+  } else if (decimal.lt(zero)) {
+    return `<${zero}`;
+  } else {
+    return `${decimal.toFixed(precision)}`;
+  }
+}
+
 export const isInvalid = (v) => {
   if (v === "" || v === undefined || v == null) return true;
   return false;

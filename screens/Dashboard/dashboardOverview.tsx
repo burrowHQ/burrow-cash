@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BeatLoader } from "react-spinners";
 import { twMerge } from "tailwind-merge";
 import { Modal, Box, useTheme } from "@mui/material";
 import SemiCircleProgressBar from "../../components/SemiCircleProgressBar/SemiCircleProgressBar";
 import { useUserHealth } from "../../hooks/useUserHealth";
-import { formatTokenValue, formatUSDValue, isMobileDevice } from "../../helpers/helpers";
+import { formatTokenValue, isMobileDevice } from "../../helpers/helpers";
 import CustomButton from "../../components/CustomButton/CustomButton";
 import { useRewards } from "../../hooks/useRewards";
 import ClaimAllRewards from "../../components/ClaimAllRewards";
@@ -17,6 +17,7 @@ import { UserDailyRewards } from "../../components/Header/stats/rewards";
 import { UserLiquidity } from "../../components/Header/stats/liquidity";
 import { APY } from "../../components/Header/stats/apy";
 import { ContentBox } from "../../components/ContentBox/ContentBox";
+import { StatLabel } from "../../components/Header/stats/components";
 import { TagToolTip } from "../../components/ToolTip";
 import { Wrapper } from "../../components/Modal/style";
 import { CloseIcon } from "../../components/Modal/svg";
@@ -27,6 +28,7 @@ const DashboardOverview = ({ suppliedRows, borrowedRows }) => {
     data: null,
   });
   const userHealth = useUserHealth();
+  const [userHealthCur, setUserHealthCur] = useState<any>();
   const rewardsObj = useRewards();
   const { unreadLiquidation, fetchUnreadLiquidation } = useUnreadLiquidation();
   const isMobile = isMobileDevice();
@@ -42,6 +44,12 @@ const DashboardOverview = ({ suppliedRows, borrowedRows }) => {
   useEffect(() => {
     fetchUnreadLiquidation().then();
   }, []);
+
+  useEffect(() => {
+    if (userHealth?.allHealths?.length && userHealth?.hasBorrow) {
+      handleHealthClick(userHealth.allHealths[0]);
+    }
+  }, [JSON.stringify(userHealth)]);
 
   let totalSuppliedUSD = 0;
   suppliedRows?.forEach((d) => {
@@ -104,6 +112,21 @@ const DashboardOverview = ({ suppliedRows, borrowedRows }) => {
     );
   });
 
+  const handleHealthClick = (o) => {
+    const valueLocale = o.healthFactor;
+    setUserHealthCur({
+      ...userHealth,
+      id: o.id,
+      healthFactor: valueLocale,
+      data: {
+        label: o.healthStatus,
+        valueLabel: `${valueLocale}%`,
+        valueLocale,
+      },
+    });
+  };
+
+  const hasMultiHealths = userHealth?.allHealths?.length > 1 && userHealth?.hasBorrow;
   return (
     <>
       <div className="flex gap-2 justify-between items-center mb-4 lg3:hidden">
@@ -122,7 +145,7 @@ const DashboardOverview = ({ suppliedRows, borrowedRows }) => {
                 <UserDailyRewards />
               </div>
 
-              <div className="gap-6 flex flex-col flex-1">
+              <div className="gap-6 flex flex-col">
                 <APY />
                 <div className="flex flex-col">
                   <div className="h6 text-gray-300 flex items-center gap-1">
@@ -192,8 +215,56 @@ const DashboardOverview = ({ suppliedRows, borrowedRows }) => {
               {recordsButton}
             </div>
 
-            <div className="relative lg3:mr-10">
-              <HealthFactor userHealth={userHealth} />
+            <div className="relative flex xsm2:flex-col xsm:items-center items-end gap-4">
+              <HealthFactor userHealth={userHealthCur} />
+              {hasMultiHealths ? (
+                <div className="lp-healths flex flex-col items-center gap-2 mt-4">
+                  {userHealth.allHealths.map((value: any) => {
+                    const isActive = value.id === userHealthCur?.id;
+                    const healthColor = {
+                      good: "text-primary",
+                      warning: "text-warning",
+                      danger: "text-red-100",
+                    };
+
+                    let tokensName = value?.type;
+                    value?.metadata?.tokens?.forEach((d, i) => {
+                      const isLast = i === value.metadata.tokens.length - 1;
+                      if (i === 0) {
+                        tokensName += ":";
+                      }
+                      tokensName += `${d.metadata.symbol}${!isLast ? "-" : ""}`;
+                    });
+                    return (
+                      <div
+                        key={value.id}
+                        className={`cursor-pointer relative health-tab ${
+                          isActive && "health-tab-active"
+                        }`}
+                        onClick={() => handleHealthClick(value)}
+                      >
+                        {isActive && <div className="arrow-left" />}
+                        <StatLabel
+                          title={{ text: tokensName }}
+                          wrapStyle={{
+                            background: "none",
+                            border: "1px solid #2E304B",
+                            padding: "7px 8px",
+                          }}
+                          titleWrapClass="w-[158px] rounded-[4px] md:rounded-[4px]"
+                          titleClass="w-[118px] truncate"
+                          row={[
+                            {
+                              value: `${value?.healthFactor}%`,
+                              valueClass: `${healthColor[value.healthStatus]}`,
+                            },
+                          ]}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
@@ -212,6 +283,9 @@ const HealthFactor = ({ userHealth }) => {
   const { data, healthFactor, lowHealthFactor, dangerHealthFactor } = userHealth || {};
   const isDanger = healthFactor !== -1 && healthFactor < dangerHealthFactor;
   const isWarning = healthFactor !== -1 && healthFactor < lowHealthFactor;
+  const healthFactorLabel = [-1, null, undefined].includes(healthFactor)
+    ? "-%"
+    : `${healthFactor}%`;
   const isMobile = isMobileDevice();
 
   let dangerTooltipStyles = {};
@@ -252,7 +326,7 @@ const HealthFactor = ({ userHealth }) => {
               <DangerIcon />
             </CustomTooltips>
           )}
-          {data.valueLabel}
+          {healthFactorLabel}
         </div>
         <div className="h5 text-gray-300 flex gap-1 items-center justify-center">
           Health Factor
@@ -267,34 +341,6 @@ const HealthFactor = ({ userHealth }) => {
         </div>
       </div>
     </SemiCircleProgressBar>
-  );
-};
-
-type OverviewItemProps = {
-  title: string;
-  value?: any;
-  labels?: any;
-};
-const OverviewItem = ({ title, value, labels }: OverviewItemProps) => {
-  return (
-    <div>
-      <div className="h6 text-gray-300">{title}</div>
-      <div className="h2">{value}</div>
-      {labels?.map((row, i) => (
-        <div className="flex gap-2" key={i}>
-          {row?.map((d) => (
-            <div
-              key={d.text}
-              className="flex items-center gap-2 h5 rounded-[21px] bg-dark-100"
-              style={{ padding: "1px 8px" }}
-            >
-              <div style={d.textStyle}>{d.text}</div>
-              <div style={d.valueStyle}>{d.value}</div>
-            </div>
-          ))}
-        </div>
-      ))}
-    </div>
   );
 };
 

@@ -8,7 +8,6 @@ import SupplyTokenSvg from "../../public/svg/Group 24791.svg";
 import BorrowTokenSvg from "../../public/svg/Group 24677.svg";
 import { useAccountId, useAvailableAssets, usePortfolioAssets } from "../../hooks/hooks";
 import DashboardReward from "./dashboardReward";
-import DashboardApy from "./dashboardApy";
 import CustomTable from "../../components/CustomTable/CustomTable";
 import {
   formatTokenValue,
@@ -27,7 +26,8 @@ import { APYCell } from "../Market/APYCell";
 
 const Index = () => {
   const accountId = useAccountId();
-  const [suppliedRows, borrowedRows, totalSuppliedUSD, totalBorrowedUSD] = usePortfolioAssets();
+  const [suppliedRows, borrowedRows, totalSuppliedUSD, totalBorrowedUSD, , borrowedAll] =
+    usePortfolioAssets();
   const isMobile = isMobileDevice();
 
   let overviewNode;
@@ -57,7 +57,7 @@ const Index = () => {
     supplyBorrowNode = (
       <SupplyBorrowListMobile
         suppliedRows={suppliedRows}
-        borrowedRows={borrowedRows}
+        borrowedRows={borrowedAll}
         accountId={accountId}
       />
     );
@@ -65,7 +65,7 @@ const Index = () => {
     supplyBorrowNode = (
       <StyledSupplyBorrow className="gap-6 lg:flex mb-10">
         <YourSupplied suppliedRows={suppliedRows} accountId={accountId} total={totalSuppliedUSD} />
-        <YourBorrowed borrowedRows={borrowedRows} accountId={accountId} total={totalBorrowedUSD} />
+        <YourBorrowed borrowedRows={borrowedAll} accountId={accountId} total={totalBorrowedUSD} />
       </StyledSupplyBorrow>
     );
   }
@@ -89,30 +89,67 @@ const StyledSupplyBorrow = styled.div`
 const yourSuppliedColumns = [
   {
     header: "Assets",
+    size: 160,
     cell: ({ originalData }) => {
-      return (
-        <div className="flex gap-2 items-center">
+      const { metadata, icon } = originalData || {};
+      const { tokens, symbol } = metadata || {};
+      let iconImg;
+      let symbolNode = symbol;
+      if (icon) {
+        iconImg = (
           <img
-            src={originalData?.icon}
+            src={icon}
             width={26}
             height={26}
             alt="token"
             className="rounded-full w-[26px] h-[26px]"
+            style={{ marginRight: 6, marginLeft: 3 }}
           />
-          <div className="truncate">{originalData?.symbol}</div>
+        );
+      } else if (tokens?.length) {
+        symbolNode = "";
+        iconImg = (
+          <div
+            className="grid"
+            style={{ marginRight: 2, gridTemplateColumns: "15px 12px", paddingLeft: 5 }}
+          >
+            {tokens?.map((d, i) => {
+              const isLast = i === tokens.length - 1;
+              symbolNode += `${d.metadata.symbol}${!isLast ? "-" : ""}`;
+              return (
+                <img
+                  key={d.metadata.symbol}
+                  src={d.metadata?.icon}
+                  width={20}
+                  height={20}
+                  alt="token"
+                  className="rounded-full w-[20px] h-[20px] -m-1"
+                  style={{ maxWidth: "none" }}
+                />
+              );
+            })}
+          </div>
+        );
+      }
+      return (
+        <div className="flex gap-2 items-center">
+          {iconImg}
+          <div
+            title={symbolNode}
+            style={{
+              whiteSpace: "normal",
+            }}
+          >
+            {symbolNode}
+          </div>
         </div>
       );
     },
   },
   {
-    header: "Your APY",
+    header: "APY",
     cell: ({ originalData }) => {
       return (
-        // <DashboardApy
-        //   baseAPY={originalData?.apy}
-        //   rewardList={originalData?.depositRewards}
-        //   tokenId={originalData?.tokenId}
-        // />
         <APYCell
           rewards={originalData?.depositRewards}
           baseAPY={originalData?.apy}
@@ -126,16 +163,11 @@ const yourSuppliedColumns = [
   {
     header: "Rewards",
     cell: ({ originalData }) => {
-      if (!originalData?.depositRewards?.length) {
+      if (!originalData?.rewards?.length) {
         return "-";
       }
 
-      return (
-        <>
-          <DashboardReward rewardList={originalData?.rewards} page="deposit" />
-          {/* <div className="h6 text-gray-300 mt-1">{originalData.price}</div> */}
-        </>
-      );
+      return <DashboardReward rewardList={originalData?.rewards} page="deposit" />;
     },
   },
   {
@@ -176,6 +208,7 @@ type TableRowSelect = {
   data: {
     tokenId: string | null | undefined;
     canUseAsCollateral: boolean | undefined;
+    shadow_id?: string | null | undefined;
   } | null;
   index: number | null | undefined;
 };
@@ -222,11 +255,11 @@ const YourSupplied = ({ suppliedRows, accountId, total }) => {
 
 const StyledCustomTable = styled(CustomTable)`
   .custom-table-tbody {
-    margin: -2px -30px 0;
+    margin-top: -2px;
 
     .custom-table-row {
-      padding-left: 30px;
-      padding-right: 30px;
+      //padding-left: 20px;
+      //padding-right: 20px;
       cursor: pointer;
 
       .custom-table-action {
@@ -248,11 +281,21 @@ const StyledCustomTable = styled(CustomTable)`
       }
     }
   }
+
+  .custom-table-thead,
+  .custom-table-tbody {
+    margin: 0 -30px;
+  }
+  .custom-table-header-row,
+  .custom-table-row {
+    padding: 0 20px;
+  }
 `;
 
 const yourBorrowedColumns = [
   {
     header: "Assets",
+    size: 140,
     cell: ({ originalData }) => {
       return (
         <div className="flex gap-2 items-center">
@@ -269,15 +312,27 @@ const yourBorrowedColumns = [
     },
   },
   {
-    header: "Your APY",
+    header: "Collateral Type",
+    size: 130,
+    cell: ({ originalData }) => {
+      const { collateralType, metadataLP } = originalData || {};
+      let tokenNames = "";
+      metadataLP?.tokens?.forEach((d, i) => {
+        const isLast = i === metadataLP.tokens.length - 1;
+        tokenNames += `${d.metadata.symbol}${!isLast ? "-" : ""}`;
+      });
+      return (
+        <div>
+          <div>{collateralType}</div>
+          <div className="h6 text-gray-300">{tokenNames}</div>
+        </div>
+      );
+    },
+  },
+  {
+    header: "APY",
     cell: ({ originalData }) => {
       return (
-        // <DashboardApy
-        //   baseAPY={originalData?.borrowApy}
-        //   rewardList={originalData?.borrowRewards}
-        //   tokenId={originalData?.tokenId}
-        //   isBorrow
-        // />
         <APYCell
           rewards={originalData?.borrowRewards}
           baseAPY={originalData?.borrowApy}
@@ -347,7 +402,7 @@ const YourBorrowed = ({ borrowedRows, accountId, total }) => {
         actionRow={
           <div className="flex gap-2 pb-6 table-action-row">
             <MarketButton tokenId={selected?.data?.tokenId} />
-            <RepayButton tokenId={selected?.data?.tokenId} />
+            <RepayButton tokenId={selected?.data?.tokenId} position={selected?.data?.shadow_id} />
           </div>
         }
       />

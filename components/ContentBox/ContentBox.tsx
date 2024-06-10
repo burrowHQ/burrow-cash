@@ -14,6 +14,25 @@ export const ContentBox = ({ children, style, className, padding }: BoxProps) =>
     </StyledBox>
   );
 };
+export const ContentTipBox = ({ children, style, className, padding }: BoxProps) => {
+  return (
+    <StyledTipBox style={style} className={className} padding={padding}>
+      {children}
+    </StyledTipBox>
+  );
+};
+
+const StyledTipBox = styled.div<{ padding?: string }>`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+  border-radius: 6px;
+  border: 1px solid #4f5178;
+  background: #2e304b;
+  font-size: 12px;
+  padding: ${(p) => p.padding ?? "20px 30px"};
+`;
 
 const StyledBox = styled.div<{ padding?: string }>`
   position: relative;
