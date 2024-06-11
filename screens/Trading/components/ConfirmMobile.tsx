@@ -9,6 +9,8 @@ import { RefLogoIcon, RightShoulder } from "./TradingIcon";
 import { toInternationalCurrencySystem_number, toDecimal } from "../../../utils/uiNumber";
 import { openPosition } from "../../../store/marginActions/openPosition";
 import { NearIcon, NearIconMini } from "../../MarginTrading/components/Icon";
+import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
+import { useMarginAccount } from "../../../hooks/useMarginAccount";
 import {
   YellowSolidSubmitButton as YellowSolidButton,
   RedSolidSubmitButton as RedSolidButton,
@@ -21,7 +23,30 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
   const actionShowRedColor = action === "Long";
   const [isDisabled, setIsDisabled] = useState(false);
+  const { marginConfigTokens } = useMarginConfigToken();
+  const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
+  const {
+    price: priceP,
+    symbol: symbolP,
+    decimals: decimalsP,
+  } = getAssetDetails(
+    action == "Long"
+      ? getAssetById(confirmInfo.longOutputName?.token_id)
+      : getAssetById(confirmInfo.longInputName?.token_id),
+  );
   const confirmOpenPosition = async () => {
+    console.log(
+      action == "Long"
+        ? getAssetById(confirmInfo.longOutputName?.token_id)
+        : getAssetById(confirmInfo.longInputName?.token_id),
+    );
+
+    return console.log(
+      parseTokenValue(confirmInfo.estimateData.min_amount_out, decimalsP) >
+        confirmInfo.tokenInAmount /
+          (confirmInfo.indexPrice * (1 - marginConfigTokens.max_slippage_rate / 10000)),
+    );
+
     setIsDisabled(true);
     if (action == "Long") {
       try {

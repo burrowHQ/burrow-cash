@@ -156,12 +156,15 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
               </div>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
-              <div className="text-gray-300">Entry & Index Price</div>
-              <div>
-                ${entryPrice.toFixed(2)} / ${indexPrice}
-              </div>
+              <div className="text-gray-300">Entry</div>
+              <div>${entryPrice.toFixed(2)}</div>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
+              <div className="text-gray-300">Index Price</div>
+              <div>${indexPrice}</div>
+            </div>
+
+            {/* <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Leverage</div>
               <div className="flex items-center justify-center">
                 <span className="text-gray-300 mr-2 line-through">{leverage.toFixed(2)}X</span>
@@ -178,7 +181,8 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
                 <RightArrow />
                 <p className="ml-2"> $0.00</p>
               </div>
-            </div>
+            </div> */}
+            {/*  */}
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Collateral</div>
               <div className="flex items-center justify-center">

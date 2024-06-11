@@ -106,5 +106,6 @@ export async function openPosition({
       },
     ],
   });
+
   await prepareAndExecuteTransactions(transactions);
 }

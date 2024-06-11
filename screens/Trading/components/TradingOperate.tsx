@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
-import _ from "lodash";
+import _, { range } from "lodash";
 import TradingToken from "./tokenbox";
 import { RefLogoIcon, SetUp, ShrinkArrow, errorTipsIcon } from "./TradingIcon";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
@@ -147,7 +147,12 @@ const TradingOperate = () => {
       const outputValue = activeTab === "long" ? longOutput : shortOutput;
       const isValidInput = isValidDecimalString(inputValue);
 
-      setIsDisabled(!isValidInput || !(Number(inputValue) <= currentBalance2) || !outputValue);
+      setIsDisabled(
+        !isValidInput ||
+          !(Number(inputValue) <= currentBalance2) ||
+          !outputValue ||
+          rangeMount == 1,
+      );
     };
     setDisableBasedOnInputs();
   }, [activeTab, ReduxcategoryCurrentBalance2, longInput, shortInput, longOutput, shortOutput]);

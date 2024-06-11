@@ -46,6 +46,12 @@ const RangeSlider = ({ defaultValue, action, setRangeMount }) => {
     }
   }, [value, splitList, allowedValues]);
 
+  // add center
+  useEffect(() => {
+    setValue(splitList[2]);
+    setRangeMount(splitList[2]);
+  }, []);
+
   function changeValue(v) {
     const numValue = Number(v);
     const nearestValue = allowedValues.reduce((prev, curr) => {
