@@ -35,17 +35,17 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
       : getAssetById(confirmInfo.longInputName?.token_id),
   );
   const confirmOpenPosition = async () => {
-    console.log(
-      action == "Long"
-        ? getAssetById(confirmInfo.longOutputName?.token_id)
-        : getAssetById(confirmInfo.longInputName?.token_id),
-    );
+    // console.log(
+    //   action == "Long"
+    //     ? getAssetById(confirmInfo.longOutputName?.token_id)
+    //     : getAssetById(confirmInfo.longInputName?.token_id),
+    // );
 
-    return console.log(
-      parseTokenValue(confirmInfo.estimateData.min_amount_out, decimalsP) >
-        confirmInfo.tokenInAmount /
-          (confirmInfo.indexPrice * (1 - marginConfigTokens.max_slippage_rate / 10000)),
-    );
+    // return console.log(
+    //   parseTokenValue(confirmInfo.estimateData.min_amount_out, decimalsP) >
+    //     confirmInfo.tokenInAmount /
+    //       (confirmInfo.indexPrice * (1 - marginConfigTokens.max_slippage_rate / 10000)),
+    // );
 
     setIsDisabled(true);
     if (action == "Long") {
