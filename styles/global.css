@@ -856,11 +856,10 @@ options-list::-webkit-scrollbar {
 
 .loading-dots {
   display: inline-block;
-  margin-left: 0.5rem;
   font-size: 1rem;
 }
 
 .loading-dots::after {
-  content: '...';
+  content: "...";
   animation: fadeInOut 1s infinite;
 }
