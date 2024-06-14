@@ -1,19 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import CopyToClipboard from "react-copy-to-clipboard";
-import CustomModal from "../../components/CustomModal/CustomModal";
 import CustomTable from "../../components/CustomTable/CustomTable";
 import Datasource from "../../data/datasource";
 import { useAccountId, useToastMessage } from "../../hooks/hooks";
 import { shrinkToken, TOKEN_FORMAT } from "../../store";
 import { useAppSelector } from "../../redux/hooks";
 import { getAssets } from "../../redux/assetsSelectors";
-import { getDateString, maskMiddleString } from "../../helpers/helpers";
+import { getDateString } from "../../helpers/helpers";
 import { nearNativeTokens, nearTokenId, standardizeAsset } from "../../utils";
 import {
-  CopyIcon,
   ExternalLink,
   NearblocksIcon,
   PikespeakIcon,
+  TxLeftArrow,
 } from "../../components/Icons/Icons";
 
 const Records = ({ isShow }) => {
@@ -29,6 +27,7 @@ const Records = ({ isShow }) => {
   }>({
     page: 1,
   });
+  const [txLoadingStates, setTxLoadingStates] = useState({});
 
   useEffect(() => {
     if (isShow) {
@@ -51,10 +50,8 @@ const Records = ({ isShow }) => {
         const cloned = { ...d.data };
         cloned.metadata = standardizeAsset({ ...cloned.metadata });
         d.data = cloned;
-        const txidResponse = await Datasource.shared.getTxId(d.receipt_id).catch(() => ({}));
-        const txid = txidResponse?.receipts?.[0]?.originated_from_transaction_hash;
 
-        return { ...d, txid };
+        return { ...d };
       });
       const resolvedList = await Promise.all(list);
       setDocs(resolvedList);
@@ -72,17 +69,32 @@ const Records = ({ isShow }) => {
     }
   };
 
-  const handleTxClick = (txid, type) => {
-    let url = "";
-    if (type === "nearblocks") {
-      url = `https://nearblocks.io/txns/${txid}`;
-    } else if (type === "pikespeak") {
-      url = `https://pikespeak.ai/transaction-viewer/${txid}`;
+  const handleTxClick = async (receipt_id, event, type) => {
+    const uniqueId = `${receipt_id}_${event}`;
+    setTxLoadingStates((prevState) => ({ ...prevState, [uniqueId]: true }));
+    try {
+      const txidResponse = await Datasource.shared.getTxId(receipt_id).catch(() => ({}));
+      const txid = txidResponse?.receipts?.[0]?.originated_from_transaction_hash;
+      let url = "";
+      if (txid) {
+        if (type === "nearblocks") {
+          url = `https://nearblocks.io/txns/${txid}`;
+        } else if (type === "pikespeak") {
+          url = `https://pikespeak.ai/transaction-viewer/${txid}`;
+        }
+        window.open(url, "_blank");
+      } else {
+        showToast("Transaction ID not found.");
+      }
+    } catch (error) {
+      console.error(error);
+      showToast("Failed to fetch transaction ID.");
+    } finally {
+      setTxLoadingStates((prevState) => ({ ...prevState, [uniqueId]: false }));
     }
-    window.open(url, "_blank");
   };
 
-  const columns = getColumns({ showToast, handleTxClick });
+  const columns = getColumns({ showToast, handleTxClick, txLoadingStates });
   return (
     <CustomTable
       data={docs}
@@ -94,10 +106,9 @@ const Records = ({ isShow }) => {
   );
 };
 
-const getColumns = ({ showToast, handleTxClick }) => [
+const getColumns = ({ showToast, handleTxClick, txLoadingStates }) => [
   {
     header: "Assets",
-    minSize: 220,
     cell: ({ originalData }) => {
       const { data } = originalData || {};
       const { metadata } = data || {};
@@ -161,11 +172,9 @@ const getColumns = ({ showToast, handleTxClick }) => [
   {
     header: "Type",
     accessorKey: "event",
-    maxSize: 180,
   },
   {
     header: "Amount",
-    maxSize: 180,
     cell: ({ originalData }) => {
       const { amount, data } = originalData || {};
       const { metadata, config } = data || {};
@@ -178,14 +187,17 @@ const getColumns = ({ showToast, handleTxClick }) => [
   },
   {
     header: "Time",
-    maxSize: 180,
     cell: ({ originalData }) => {
       const [tooltipVisible, setTooltipVisible] = useState(false);
       const { timestamp } = originalData || {};
-      const { receipt_id, txid } = originalData || {};
+      const { receipt_id } = originalData || {};
+      const { event } = originalData || {};
+      const uniqueId = `${receipt_id}_${event}`;
+      const isRowLoading = txLoadingStates[uniqueId];
       const timeoutRef = useRef<NodeJS.Timeout | null>(null);
       const [copyIconVisible, setCopyIconVisible] = useState({});
       const [isHovered, setIsHovered] = useState(false);
+      const [isArrowVisible, setIsArrowVisible] = useState({});
       const handleMouseEnter = () => {
         if (timeoutRef.current !== null) {
           clearTimeout(timeoutRef.current);
@@ -206,6 +218,12 @@ const getColumns = ({ showToast, handleTxClick }) => [
       const handleCopyIconMouseLeave = (id) => {
         setCopyIconVisible((prev) => ({ ...prev, [id]: false }));
       };
+      const handleArrowMouseEnter = (id) => {
+        setIsArrowVisible((prev) => ({ ...prev, [id]: true }));
+      };
+      const handleArrowMouseLeave = (id) => {
+        setIsArrowVisible((prev) => ({ ...prev, [id]: false }));
+      };
       if (!receipt_id) {
         return null;
       }
@@ -217,51 +235,69 @@ const getColumns = ({ showToast, handleTxClick }) => [
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
-            <ExternalLink color={isHovered ? "white" : "#C0C4E9"} />
+            {isRowLoading ? (
+              <span className="loading-dots" />
+            ) : (
+              <ExternalLink color={isHovered ? "white" : "#C0C4E9"} />
+            )}
             {tooltipVisible && (
               <div
                 className="absolute right-0 top-4 bg-dark-250 border p-2 shadow-lg z-50 border border-dark-500 rounded-lg p-2"
-                style={{ width: "212px" }}
+                style={{ width: "180px" }}
               >
                 <div
                   className="p-3 hover:bg-dark-1150 text-white rounded-md flex items-center mb-1"
-                  onMouseEnter={() => handleCopyIconMouseEnter(1)}
-                  onMouseLeave={() => handleCopyIconMouseLeave(1)}
+                  onClick={() => handleTxClick(receipt_id, event, "nearblocks")}
+                  onMouseEnter={() => {
+                    handleArrowMouseEnter(1);
+                    handleCopyIconMouseEnter(1);
+                  }}
+                  onMouseLeave={() => {
+                    handleArrowMouseLeave(1);
+                    handleCopyIconMouseLeave(1);
+                  }}
                 >
                   <NearblocksIcon />
-                  <div
-                    className="ml-2 hover:text-gray-300 hover:underline text-sm"
-                    onClick={() => handleTxClick(txid, "nearblocks")}
-                  >
-                    {maskMiddleString(txid, 4, 34)}
-                  </div>
-                  {copyIconVisible[1] && (
+                  <div className="ml-2 text-sm">nearblocks</div>
+                  {isArrowVisible[1] && (
+                    <div className="ml-3">
+                      <TxLeftArrow />
+                    </div>
+                  )}
+                  {/* {copyIconVisible[1] && (
                     <CopyToClipboard text={txid} onCopy={() => showToast("Copied")}>
                       <div className="cursor-pointer ml-2">
                         <CopyIcon />
                       </div>
                     </CopyToClipboard>
-                  )}
+                  )} */}
                 </div>
                 <div
                   className="p-3 hover:bg-dark-1150 text-white rounded-md flex items-center"
-                  onMouseEnter={() => handleCopyIconMouseEnter(2)}
-                  onMouseLeave={() => handleCopyIconMouseLeave(2)}
+                  onClick={() => handleTxClick(receipt_id, event, "pikespeak")}
+                  onMouseEnter={() => {
+                    handleArrowMouseEnter(2);
+                    handleCopyIconMouseEnter(1);
+                  }}
+                  onMouseLeave={() => {
+                    handleArrowMouseLeave(2);
+                    handleCopyIconMouseLeave(1);
+                  }}
                 >
                   <PikespeakIcon />
-                  <div
-                    className="ml-2 hover:text-gray-300 hover:underline text-sm"
-                    onClick={() => handleTxClick(txid, "pikespeak")}
-                  >
-                    {maskMiddleString(txid, 4, 34)}
-                  </div>
-                  {copyIconVisible[2] && (
+                  <div className="ml-2 text-sm">Pikespeak...</div>
+                  {isArrowVisible[2] && (
+                    <div className="ml-3">
+                      <TxLeftArrow />
+                    </div>
+                  )}
+                  {/* {copyIconVisible[2] && (
                     <CopyToClipboard text={txid} onCopy={() => showToast("Copied")}>
                       <div className="cursor-pointer ml-2">
                         <CopyIcon />
                       </div>
                     </CopyToClipboard>
-                  )}
+                  )} */}
                 </div>
               </div>
             )}
