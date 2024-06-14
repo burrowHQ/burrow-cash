@@ -49,24 +49,24 @@ const CustomTable = ({
   selectedRowIndex,
 }: Props) => {
   const isMobile = isMobileDevice();
-  const headersRef = useRef<any>([]);
-  const [dimensions, setDimensions] = React.useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
+  // const headersRef = useRef<any>([]);
+  // const [dimensions, setDimensions] = React.useState({
+  //   width: window.innerWidth,
+  //   height: window.innerHeight,
+  // });
 
-  const handleResize = () => {
-    setDimensions({
-      width: window.innerWidth,
-      height: window.innerHeight,
-    });
-  };
+  // const handleResize = () => {
+  //   setDimensions({
+  //     width: window.innerWidth,
+  //     height: window.innerHeight,
+  //   });
+  // };
 
-  React.useEffect(() => {
-    window.addEventListener("resize", handleResize);
+  // React.useEffect(() => {
+  //   window.addEventListener("resize", handleResize);
 
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  //   return () => window.removeEventListener("resize", handleResize);
+  // }, []);
 
   if (isMobile) {
     return (
@@ -131,7 +131,7 @@ const CustomTable = ({
     return { text, size: d.size, minSize: d.minSize, maxSize: d.maxSize };
   });
 
-  const headersWidth = headersRef.current.map((d) => d.getBoundingClientRect().width);
+  // const headersWidth = headersRef.current.map((d) => d.getBoundingClientRect().width);
   const headerNode = (
     <div className="custom-table-tr custom-table-header-row">
       {headers?.map((d, i) => {
@@ -147,11 +147,11 @@ const CustomTable = ({
         }
         const keyId = typeof d.text === "string" ? d.text : i;
 
-        const assignRef = (el) => {
-          headersRef.current[i] = el;
-        };
+        // const assignRef = (el) => {
+        //   headersRef.current[i] = el;
+        // };
         return (
-          <div key={keyId} className="custom-table-th text-gray-400" style={styles} ref={assignRef}>
+          <div key={keyId} className="custom-table-th text-gray-400" style={styles}>
             {d.text}
           </div>
         );
@@ -172,10 +172,10 @@ const CustomTable = ({
           content = d[col.accessorKey];
         }
         const styles: { flex?: string } = {};
-        const colSize = headersWidth[colIndex];
-        if (colSize) {
-          styles.flex = `0 0 ${colSize}px`;
-        }
+        // const colSize = headersWidth[colIndex];
+        // if (colSize) {
+        //   styles.flex = `0 0 ${colSize}px`;
+        // }
         return (
           <div className="custom-table-td" key={col.id || col.header} style={styles}>
             {content}

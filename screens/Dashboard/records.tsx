@@ -51,8 +51,8 @@ const Records = ({ isShow }) => {
         const cloned = { ...d.data };
         cloned.metadata = standardizeAsset({ ...cloned.metadata });
         d.data = cloned;
-        const txidResponse = await Datasource.shared.getTxId(d.receipt_id);
-        const txid = txidResponse?.receipts[0]?.originated_from_transaction_hash;
+        const txidResponse = await Datasource.shared.getTxId(d.receipt_id).catch(() => ({}));
+        const txid = txidResponse?.receipts?.[0]?.originated_from_transaction_hash;
 
         return { ...d, txid };
       });
