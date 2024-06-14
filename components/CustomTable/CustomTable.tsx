@@ -147,11 +147,11 @@ const CustomTable = ({
         }
         const keyId = typeof d.text === "string" ? d.text : i;
 
-        // const assignRef = (el) => {
-        //   headersRef.current[i] = el;
-        // };
+        const assignRef = (el) => {
+          headersRef.current[i] = el;
+        };
         return (
-          <div key={keyId} className="custom-table-th text-gray-400" style={styles}>
+          <div key={keyId} className="custom-table-th text-gray-400" style={styles} ref={assignRef}>
             {d.text}
           </div>
         );
