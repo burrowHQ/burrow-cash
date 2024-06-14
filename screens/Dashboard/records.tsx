@@ -187,151 +187,134 @@ const getColumns = ({ showToast, handleTxClick, txLoadingStates }) => [
   },
   {
     header: "Time",
-    cell: ({ originalData }) => {
-      const [tooltipVisible, setTooltipVisible] = useState(false);
-      const { timestamp } = originalData || {};
-      const { receipt_id } = originalData || {};
-      const { event } = originalData || {};
-      const uniqueId = `${receipt_id}_${event}`;
-      const isRowLoading = txLoadingStates[uniqueId];
-      const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-      const [copyIconVisible, setCopyIconVisible] = useState({});
-      const [isHovered, setIsHovered] = useState(false);
-      const [isArrowVisible, setIsArrowVisible] = useState({});
-      const handleMouseEnter = () => {
-        if (timeoutRef.current !== null) {
-          clearTimeout(timeoutRef.current);
-        }
-        setTooltipVisible(true);
-        setIsHovered(true);
-      };
-      const handleMouseLeave = () => {
-        timeoutRef.current = setTimeout(() => {
-          setTooltipVisible(false);
-          setCopyIconVisible({});
-          setIsHovered(false);
-        }, 100);
-      };
-      const handleCopyIconMouseEnter = (id) => {
-        setCopyIconVisible((prev) => ({ ...prev, [id]: true }));
-      };
-      const handleCopyIconMouseLeave = (id) => {
-        setCopyIconVisible((prev) => ({ ...prev, [id]: false }));
-      };
-      const handleArrowMouseEnter = (id) => {
-        setIsArrowVisible((prev) => ({ ...prev, [id]: true }));
-      };
-      const handleArrowMouseLeave = (id) => {
-        setIsArrowVisible((prev) => ({ ...prev, [id]: false }));
-      };
-      if (!receipt_id) {
-        return null;
-      }
-      return (
-        <div className="text-gray-300 flex items-center">
-          {getDateString(timestamp / 1000000)}
-          <div
-            className="ml-2 cursor-pointer relative"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
-            {isRowLoading ? (
-              <span className="loading-dots" />
-            ) : (
-              <ExternalLink color={isHovered ? "white" : "#C0C4E9"} />
-            )}
-            {tooltipVisible && (
-              <div
-                className="absolute right-0 top-4 bg-dark-250 border p-2 shadow-lg z-50 border border-dark-500 rounded-lg p-2"
-                style={{ width: "180px" }}
-              >
-                <div
-                  className="p-3 hover:bg-dark-1150 text-white rounded-md flex items-center mb-1"
-                  onClick={() => handleTxClick(receipt_id, event, "nearblocks")}
-                  onMouseEnter={() => {
-                    handleArrowMouseEnter(1);
-                    handleCopyIconMouseEnter(1);
-                  }}
-                  onMouseLeave={() => {
-                    handleArrowMouseLeave(1);
-                    handleCopyIconMouseLeave(1);
-                  }}
-                >
-                  <NearblocksIcon />
-                  <div className="ml-2 text-sm">nearblocks</div>
-                  {isArrowVisible[1] && (
-                    <div className="ml-3">
-                      <TxLeftArrow />
-                    </div>
-                  )}
-                  {/* {copyIconVisible[1] && (
-                    <CopyToClipboard text={txid} onCopy={() => showToast("Copied")}>
-                      <div className="cursor-pointer ml-2">
-                        <CopyIcon />
-                      </div>
-                    </CopyToClipboard>
-                  )} */}
-                </div>
-                <div
-                  className="p-3 hover:bg-dark-1150 text-white rounded-md flex items-center"
-                  onClick={() => handleTxClick(receipt_id, event, "pikespeak")}
-                  onMouseEnter={() => {
-                    handleArrowMouseEnter(2);
-                    handleCopyIconMouseEnter(1);
-                  }}
-                  onMouseLeave={() => {
-                    handleArrowMouseLeave(2);
-                    handleCopyIconMouseLeave(1);
-                  }}
-                >
-                  <PikespeakIcon />
-                  <div className="ml-2 text-sm">Pikespeak...</div>
-                  {isArrowVisible[2] && (
-                    <div className="ml-3">
-                      <TxLeftArrow />
-                    </div>
-                  )}
-                  {/* {copyIconVisible[2] && (
-                    <CopyToClipboard text={txid} onCopy={() => showToast("Copied")}>
-                      <div className="cursor-pointer ml-2">
-                        <CopyIcon />
-                      </div>
-                    </CopyToClipboard>
-                  )} */}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    },
+    cell: ({ originalData }) => (
+      <TimeConponent
+        originalData={originalData}
+        txLoadingStates={txLoadingStates}
+        handleTxClick={handleTxClick}
+      />
+    ),
   },
-  // {
-  //   header: () => <div className="text-right">View in NEAR explorer</div>,
-  //   cell: ({ originalData }) => {
-  //     const { receipt_id, txid } = originalData || {};
-  //     if (!receipt_id) {
-  //       return null;
-  //     }
-  //     return (
-  //       <div className="flex items-center gap-2 justify-end">
-  //         <div
-  //           className="text-gray-300 text-right cursor-pointer hover:underline transform hover:opacity-80"
-  //           onClick={() => handleTxClick(txid)}
-  //         >
-  //           {maskMiddleString(txid, 4, 34)}
-  //         </div>
-
-  //         <CopyToClipboard text={txid} onCopy={() => showToast("Copied")}>
-  //           <div className="cursor-pointer">
-  //             <CopyIcon />
-  //           </div>
-  //         </CopyToClipboard>
-  //       </div>
-  //     );
-  //   },
-  //   size: 180,
-  // },
 ];
+function TimeConponent({ originalData, txLoadingStates, handleTxClick }) {
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+  const { timestamp } = originalData || {};
+  const { receipt_id } = originalData || {};
+  const { event } = originalData || {};
+  const uniqueId = `${receipt_id}_${event}`;
+  const isRowLoading = txLoadingStates[uniqueId];
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [copyIconVisible, setCopyIconVisible] = useState({});
+  const [isHovered, setIsHovered] = useState(false);
+  const [isArrowVisible, setIsArrowVisible] = useState({});
+  const handleMouseEnter = () => {
+    if (timeoutRef.current !== null) {
+      clearTimeout(timeoutRef.current);
+    }
+    setTooltipVisible(true);
+    setIsHovered(true);
+  };
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setTooltipVisible(false);
+      setCopyIconVisible({});
+      setIsHovered(false);
+    }, 100);
+  };
+  const handleCopyIconMouseEnter = (id) => {
+    setCopyIconVisible((prev) => ({ ...prev, [id]: true }));
+  };
+  const handleCopyIconMouseLeave = (id) => {
+    setCopyIconVisible((prev) => ({ ...prev, [id]: false }));
+  };
+  const handleArrowMouseEnter = (id) => {
+    setIsArrowVisible((prev) => ({ ...prev, [id]: true }));
+  };
+  const handleArrowMouseLeave = (id) => {
+    setIsArrowVisible((prev) => ({ ...prev, [id]: false }));
+  };
+  if (!receipt_id) {
+    return null;
+  }
+  return (
+    <div className="text-gray-300 flex items-center">
+      {getDateString(timestamp / 1000000)}
+      <div
+        className="ml-2 cursor-pointer relative"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        <div className="flex items-center w-5 h-5">
+          {isRowLoading ? (
+            <span className="loading-dots" />
+          ) : (
+            <ExternalLink color={isHovered ? "white" : "#C0C4E9"} />
+          )}
+        </div>
+        {tooltipVisible && (
+          <div
+            className="absolute right-0 top-6 bg-dark-250 border p-2 shadow-lg z-50 border-dark-500 rounded-lg"
+            style={{ width: "180px" }}
+          >
+            <div
+              className="p-3 hover:bg-dark-1150 text-white rounded-md flex items-center mb-1"
+              onClick={() => handleTxClick(receipt_id, event, "nearblocks")}
+              onMouseEnter={() => {
+                handleArrowMouseEnter(1);
+                handleCopyIconMouseEnter(1);
+              }}
+              onMouseLeave={() => {
+                handleArrowMouseLeave(1);
+                handleCopyIconMouseLeave(1);
+              }}
+            >
+              <NearblocksIcon />
+              <div className="ml-2 text-sm">nearblocks</div>
+              {isArrowVisible[1] && (
+                <div className="ml-3">
+                  <TxLeftArrow />
+                </div>
+              )}
+              {/* {copyIconVisible[1] && (
+                    <CopyToClipboard text={txid} onCopy={() => showToast("Copied")}>
+                      <div className="cursor-pointer ml-2">
+                        <CopyIcon />
+                      </div>
+                    </CopyToClipboard>
+                  )} */}
+            </div>
+            <div
+              className="p-3 hover:bg-dark-1150 text-white rounded-md flex items-center"
+              onClick={() => handleTxClick(receipt_id, event, "pikespeak")}
+              onMouseEnter={() => {
+                handleArrowMouseEnter(2);
+                handleCopyIconMouseEnter(1);
+              }}
+              onMouseLeave={() => {
+                handleArrowMouseLeave(2);
+                handleCopyIconMouseLeave(1);
+              }}
+            >
+              <PikespeakIcon />
+              <div className="ml-2 text-sm">Pikespeak...</div>
+              {isArrowVisible[2] && (
+                <div className="ml-3">
+                  <TxLeftArrow />
+                </div>
+              )}
+              {/* {copyIconVisible[2] && (
+                    <CopyToClipboard text={txid} onCopy={() => showToast("Copied")}>
+                      <div className="cursor-pointer ml-2">
+                        <CopyIcon />
+                      </div>
+                    </CopyToClipboard>
+                  )} */}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default Records;
