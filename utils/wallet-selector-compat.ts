@@ -17,6 +17,7 @@ import { BrowserLocalStorageKeyStore } from "near-api-js/lib/key_stores";
 import BN from "bn.js";
 import { map, distinctUntilChanged } from "rxjs";
 import { setupKeypom } from "@keypom/selector";
+import { setupOKXWallet } from "@near-wallet-selector/okx-wallet";
 
 import getConfig, {
   defaultNetwork,
@@ -117,6 +118,7 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         },
       }),
       setupLedger(),
+      setupOKXWallet({}),
     ],
     network: defaultNetwork,
     debug: !!isTestnet,
