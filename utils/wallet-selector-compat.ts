@@ -10,6 +10,7 @@ import { setupNeth } from "@near-wallet-selector/neth";
 import { setupNearMobileWallet } from "@near-wallet-selector/near-mobile-wallet";
 import { setupModal } from "@near-wallet-selector/modal-ui";
 import { setupLedger } from "@near-wallet-selector/ledger";
+import { setupMintbaseWallet } from "@near-wallet-selector/mintbase-wallet";
 import type { WalletSelectorModal } from "@near-wallet-selector/modal-ui";
 import { Near } from "near-api-js/lib/near";
 import { Account } from "near-api-js/lib/account";
@@ -17,6 +18,7 @@ import { BrowserLocalStorageKeyStore } from "near-api-js/lib/key_stores";
 import BN from "bn.js";
 import { map, distinctUntilChanged } from "rxjs";
 import { setupKeypom } from "@keypom/selector";
+import { setupOKXWallet } from "@near-wallet-selector/okx-wallet";
 
 import getConfig, {
   defaultNetwork,
@@ -117,6 +119,12 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         },
       }),
       setupLedger(),
+      setupMintbaseWallet({
+        walletUrl: "https://wallet.mintbase.xyz",
+        contractId: LOGIC_CONTRACT_NAME,
+        deprecated: false,
+      }),
+      setupOKXWallet({}),
     ],
     network: defaultNetwork,
     debug: !!isTestnet,
