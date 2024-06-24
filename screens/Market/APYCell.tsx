@@ -6,6 +6,7 @@ import TokenIcon from "../../components/TokenIcon";
 import { useExtraAPY } from "../../hooks/useExtraAPY";
 import { useAPY } from "../../hooks/useAPY";
 import { format_apy } from "../../utils/uiNumber";
+import { standardizeAsset } from "../../utils/index";
 import { getAssets } from "../../redux/assetsSelectors";
 import { useAppSelector } from "../../redux/hooks";
 import { getProtocolRewards } from "../../redux/selectors/getProtocolRewards";
@@ -78,6 +79,9 @@ const ToolTip = ({
     const icon = asset?.metadata?.icon;
     return icon;
   }
+  const assetMetadata = standardizeAsset(
+    JSON.parse(JSON.stringify(assets?.data?.[tokenId]?.metadata || {})),
+  );
   const { apy, tokenNetRewards } = computeTokenNetRewardAPY();
   return (
     <HtmlTooltip
@@ -106,7 +110,9 @@ const ToolTip = ({
           {!isBorrow && tokenNetRewards.length > 0
             ? [
                 <Typography fontSize="0.75rem" key={6}>
-                  Net Liquidity APY
+                  <span className="whitespace-nowrap">
+                    {assetMetadata?.symbol} Net Liquidity Reward APY
+                  </span>
                 </Typography>,
                 <Typography fontSize="0.75rem" color="#fff" textAlign="right" key={7}>
                   <div className="flex items-center justify-end gap-1.5">
