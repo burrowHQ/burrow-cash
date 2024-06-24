@@ -853,3 +853,13 @@ options-list::-webkit-scrollbar {
   border-bottom: 15px solid transparent;
   border-right: 10px solid #2e304b;
 }
+
+.loading-dots {
+  display: inline-block;
+  font-size: 1rem;
+}
+
+.loading-dots::after {
+  content: "...";
+  animation: fadeInOut 1s infinite;
+}

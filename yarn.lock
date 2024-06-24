@@ -2638,6 +2638,16 @@
     js-sha256 "0.9.0"
     rxjs "7.8.1"
 
+"@near-wallet-selector/core@8.9.10":
+  version "8.9.10"
+  resolved "https://registry.yarnpkg.com/@near-wallet-selector/core/-/core-8.9.10.tgz#0e19b22bbe69208c9e82b149682be37f6f9b76c5"
+  integrity sha512-do+DDahRHPzr5VKiFS7NWKyNbspXu64/w7CuSBi8IUDsDsclmV7Os6Hp5HcVAq+X3Whi//NxKGX6mPMb+SRPqw==
+  dependencies:
+    borsh "0.7.0"
+    events "3.3.0"
+    js-sha256 "0.9.0"
+    rxjs "7.8.1"
+
 "@near-wallet-selector/core@8.9.5":
   version "8.9.5"
   resolved "https://registry.yarnpkg.com/@near-wallet-selector/core/-/core-8.9.5.tgz#15e49f17252ee4e54a1c9719b8c2b98fd71aae74"
@@ -2652,16 +2662,6 @@
   version "8.9.7"
   resolved "https://registry.yarnpkg.com/@near-wallet-selector/core/-/core-8.9.7.tgz#d55cb97b8d4932f1bd786805c3365205cd084b61"
   integrity sha512-WFAtNrA/w7gnobKmHGEqV4r/RtDM1QTf33TF0Kaf/1nK5jBNNyoYldyAPnbP08t1S+IbbVJ9NcWW3P7hdXe4Lg==
-  dependencies:
-    borsh "0.7.0"
-    events "3.3.0"
-    js-sha256 "0.9.0"
-    rxjs "7.8.1"
-
-"@near-wallet-selector/core@8.9.8":
-  version "8.9.8"
-  resolved "https://registry.yarnpkg.com/@near-wallet-selector/core/-/core-8.9.8.tgz#eae4022824a7796bd2bf172f2d9cbbb1d87918dd"
-  integrity sha512-HkOH+IsVPrjLmNnq783kUaayUyxfauaqHoNcXCjekz/Vugz8FW/Jcd9eqhv8TqoulpVyBpvTXrnz7jPeGS0hPQ==
   dependencies:
     borsh "0.7.0"
     events "3.3.0"
@@ -2710,9 +2710,9 @@
     "@near-wallet-selector/wallet-utils" "8.5.4"
 
 "@near-wallet-selector/mintbase-wallet@^8.9.7":
-  version "8.9.8"
-  resolved "https://registry.yarnpkg.com/@near-wallet-selector/mintbase-wallet/-/mintbase-wallet-8.9.8.tgz#8334bb5682d2343e8ca2a9672039835be38930df"
-  integrity sha512-BbHSQYnLD8TuoEKUkhq72jqnNSHoRowLQFGePorl1MpqNwq2+Tye6v3ka32udD+RPnN1im+UbkxjhcN/YJ6hww==
+  version "8.9.10"
+  resolved "https://registry.yarnpkg.com/@near-wallet-selector/mintbase-wallet/-/mintbase-wallet-8.9.10.tgz#c3a2d5ea2b4a188627e70fedf998b5d9a3f50c62"
+  integrity sha512-OtkHhAN5cDGFPaW9ahvtZpZv07RO4pe0NoVx2B2sXlfMUDXggPfrCugdFboQ5nWQFMn89bfKuUOwhIXXx56nWQ==
   dependencies:
     "@mintbase-js/wallet" "0.6.0-beta.3"
 
@@ -2764,6 +2764,14 @@
     "@near-wallet-selector/wallet-utils" "8.9.7"
     is-mobile "4.0.0"
 
+"@near-wallet-selector/okx-wallet@^8.9.10":
+  version "8.9.10"
+  resolved "https://registry.yarnpkg.com/@near-wallet-selector/okx-wallet/-/okx-wallet-8.9.10.tgz#cc16b829cc61bf13da48463d75fbaa4614fff415"
+  integrity sha512-kklbIdQdsAl0CYvlrwdiXlUtEeriWnTQUiBo0XCUBFdjhoK98tNA0OarRnt/wXjM3IxQNMOuqoCFO03YAg0niQ==
+  dependencies:
+    "@near-wallet-selector/core" "8.9.10"
+    is-mobile "4.0.0"
+
 "@near-wallet-selector/sender@^8.9.7":
   version "8.9.7"
   resolved "https://registry.yarnpkg.com/@near-wallet-selector/sender/-/sender-8.9.7.tgz#871f418204b9584595307fb627a90f964954ddba"
@@ -2807,11 +2815,11 @@
     bn.js "5.2.1"
 
 "@near-wallet-selector/wallet-utils@^8.9.5":
-  version "8.9.8"
-  resolved "https://registry.yarnpkg.com/@near-wallet-selector/wallet-utils/-/wallet-utils-8.9.8.tgz#b8323194b688c337dabc5b28552cb1bdc7b1b050"
-  integrity sha512-4XiOxfVsMHd8ATWcj7jY+JYO2YuKRi6kBBmxW0LF/IycdOW2yfO6ki5slCt6L/AdnYM+SAHadRI1rBea+iPEfQ==
+  version "8.9.10"
+  resolved "https://registry.yarnpkg.com/@near-wallet-selector/wallet-utils/-/wallet-utils-8.9.10.tgz#1e6d97464d995cccb4ec34314a1dd90e63901c39"
+  integrity sha512-Jq00IUAMvltaH8lvkaI8SRP6JWhqE4c0427ODSv+X10NwlkM8WKul9ZNZMxeCTC2ncZH23kDyaA+3MiYTX+DUg==
   dependencies:
-    "@near-wallet-selector/core" "8.9.8"
+    "@near-wallet-selector/core" "8.9.10"
     bn.js "5.2.1"
 
 "@next/env@12.3.1":

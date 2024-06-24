@@ -671,3 +671,16 @@ export const ExternalLink = ({ color }) => {
     </svg>
   );
 };
+
+export const TxLeftArrow = () => {
+  return (
+    <svg width="8" height="12" viewBox="0 0 8 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M1.75 1.6543L6.34619 6.25049L1.75 10.8467"
+        stroke="white"
+        strokeWidth="1.2"
+        strokeLinecap="square"
+      />
+    </svg>
+  );
+};
