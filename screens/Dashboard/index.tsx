@@ -29,7 +29,6 @@ const Index = () => {
   const [suppliedRows, borrowedRows, totalSuppliedUSD, totalBorrowedUSD, , borrowedAll] =
     usePortfolioAssets();
   const isMobile = isMobileDevice();
-
   let overviewNode;
   if (accountId) {
     overviewNode = <DashboardOverview suppliedRows={suppliedRows} borrowedRows={borrowedRows} />;
@@ -91,10 +90,10 @@ const yourSuppliedColumns = [
     header: "Assets",
     size: 160,
     cell: ({ originalData }) => {
-      const { metadata, icon } = originalData || {};
+      const { symbol: standardizeSymbol, metadata, icon } = originalData || {};
       const { tokens, symbol } = metadata || {};
       let iconImg;
-      let symbolNode = symbol;
+      let symbolNode = standardizeSymbol || symbol;
       if (icon) {
         iconImg = (
           <img
