@@ -67,6 +67,7 @@ module.exports = {
     "react/destructuring-assignment": ["off"],
     "@typescript-eslint/no-inferrable-types": ["off"],
     "no-underscore-dangle": "off",
+    "react/no-unused-prop-types": "off",
   },
   settings: {
     react: {

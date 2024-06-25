@@ -67,7 +67,7 @@ export const getGains = (
   const data = portfolio[source];
   const res = Object.keys(data).map((id) => {
     const asset = assets.data[id];
-    const netTvlMultiplier = asset.config.net_tvl_multiplier / 10000;
+    const netTvlMultiplier = (asset?.config?.net_tvl_multiplier ?? 0) / 10000;
 
     const { balance } = data[id];
     const apr = Number(data[id].apr);
@@ -85,7 +85,7 @@ export const getGains = (
 export const getGainsArr = (tokens: any[], assets: AssetsState, withNetTvlMultiplier = false) => {
   const res = tokens.map((data) => {
     const asset = assets.data[data.token_id];
-    const netTvlMultiplier = asset.config.net_tvl_multiplier / 10000;
+    const netTvlMultiplier = (asset?.config?.net_tvl_multiplier ?? 0) / 10000;
     const { balance } = data;
     const apr = Number(data.apr);
     const balanceUSD = toUsd(balance, asset);

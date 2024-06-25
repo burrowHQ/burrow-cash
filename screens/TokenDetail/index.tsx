@@ -749,7 +749,7 @@ function TokenSupplyChart({ tokenDetails, handlePeriodClick }) {
           </span>
         </div>
         <div className="flex flex-col justify-between ml-10">
-          <span className="text-sm text-gray-300">Rewards</span>
+          <span className="text-sm text-gray-300">Rewards/day</span>
           <span className="font-bold text-lg text-white">
             <RewardsV2
               rewards={tokenRow.depositRewards}
@@ -765,7 +765,7 @@ function TokenSupplyChart({ tokenDetails, handlePeriodClick }) {
         <LabelMobile title="Total Supplied" value={value} subValue={value_value} subMode="space" />
         <LabelMobileAPY title="APY" tokenRow={tokenRow} />
         <LabelMobile
-          title="Rewards"
+          title="Rewards/day"
           value={
             <RewardsV2
               rewards={tokenRow.depositRewards}
