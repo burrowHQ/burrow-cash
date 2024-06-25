@@ -160,12 +160,11 @@ const Reward = ({ metadata, rewards, config, tokenId }) => {
         <Typography fontSize="0.75rem">{symbol}</Typography>
       </Stack>
       <Typography key={2} fontSize="0.75rem" textAlign="right">
-        {amount} / day
+        {amount}
       </Typography>
     </>
   );
 };
-// TODOXXX
 export const RewardsV2 = ({ rewards: list = [], layout, page, tokenId }: Props) => {
   const isHorizontalLayout = layout === "horizontal";
   const assets = useAppSelector(getAssets);
@@ -278,7 +277,7 @@ const RewardV2 = ({ metadata, rewards, config, tokenId }) => {
         <img className="w-4 h-4 rounded-full" alt="" src={icon} />
       </Stack>
       <Typography key={2} fontSize="0.75rem" textAlign="right">
-        {amount} / day
+        {amount}
       </Typography>
     </div>
   );
@@ -300,7 +299,7 @@ const RewardV2List = ({ rewardsList }) => {
               <img className="w-4 h-4 rounded-full flex-shrink-0" alt="" src={metadata?.icon} />
             </Stack>
             <Typography key={2} fontSize="0.75rem" textAlign="right">
-              {amount} / day
+              {amount}
             </Typography>
           </div>
         );
@@ -366,7 +365,7 @@ const TotalDailyRewardsUsd = ({
           </div>
         ) : null}
       </div>
-      <span className="text-white text-lg xsm:text-sm">{total_usd}/day</span>
+      <span className="text-white text-lg xsm:text-sm">{total_usd}</span>
     </div>
   );
 };
