@@ -167,7 +167,7 @@ export const getRewards = (
   asset: Asset,
   assets: Assets,
 ) => {
-  return Object.entries(asset.farms[action]).map(([tokenId, rewards]) => ({
+  return Object.entries(asset.farms[action] || {}).map(([tokenId, rewards]) => ({
     rewards,
     metadata: assets[tokenId].metadata,
     config: assets[tokenId].config,

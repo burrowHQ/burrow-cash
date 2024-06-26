@@ -11,8 +11,9 @@ import { useProtocolNetLiquidity } from "./useNetLiquidity";
 import { shrinkToken, USD_FORMAT } from "../store";
 import { useAvailableAssets } from "./hooks";
 import { getAccountPortfolio } from "../redux/accountSelectors";
+import { getRewards } from "../redux/utils";
 import { getAssets } from "../redux/assetsSelectors";
-import { standardizeAsset } from "../utils";
+import { standardizeAsset, filterSentOutFarms } from "../utils";
 import { getNetGains } from "../redux/selectors/getAverageNetRewardApy";
 
 export function useRewards() {
@@ -67,9 +68,14 @@ export function useNetLiquidityRewards() {
   const rewards = useAppSelector(getNetLiquidityRewards);
   return rewards;
 }
+export function useTokenNetLiquidityRewards(tokenId: string) {
+  const assets = useAppSelector(getAssets);
+  const asset = assets.data[tokenId];
+  const rewards = getRewards("tokennetbalance", asset, assets.data);
+  return rewards;
+}
 
 export function useProRataNetLiquidityReward(tokenId, dailyAmount) {
-  const rows = useAvailableAssets();
   const assets = useAppSelector(getAssets);
   const net_tvl_multiplier = (assets?.data?.[tokenId].config.net_tvl_multiplier || 0) / 10000;
   const { protocolNetLiquidity } = useProtocolNetLiquidity(true);
