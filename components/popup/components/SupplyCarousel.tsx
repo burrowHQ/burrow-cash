@@ -49,7 +49,7 @@ const SupplyCarousel = () => {
         <img style={{ width: "22px", marginRight: "6px" }} alt="" src={ETHIcon} />
         <img style={{ width: "22px" }} alt="" src={FRAXIcon} />
       </div>
-      <div className="absolute content w-[340px] h-[200px] lg:top-[50px] xsm:top-[25px] left-[24px] lg:pl-[22px] pr-[36px] xsm:pl-[22px]">
+      <div className="absolute content w-[340px] h-[200px] lg:top-[50px] xsm:top-[25px] left-[20px] lg:pl-[22px] pr-[36px] xsm:pl-[22px] xsm:left-[25px]">
         {status === 1 ? (
           <p className="text-gray-300 text-sm pt-[74px]">
             If you have contributed liquidity to native{" "}
