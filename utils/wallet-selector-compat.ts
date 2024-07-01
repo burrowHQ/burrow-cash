@@ -91,6 +91,7 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
 
   selector = await setupWalletSelector({
     modules: [
+      setupOKXWallet({}),
       myNearWallet,
       setupSender() as any,
       setupMeteorWallet(),
@@ -124,7 +125,6 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         contractId: LOGIC_CONTRACT_NAME,
         deprecated: false,
       }),
-      setupOKXWallet({}),
     ],
     network: defaultNetwork,
     debug: !!isTestnet,

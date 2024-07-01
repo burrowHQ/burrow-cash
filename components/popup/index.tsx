@@ -12,7 +12,7 @@ const Popup = ({ className }) => {
   const [show, setShow] = useState<boolean>(false);
 
   useEffect(() => {
-    if (INCENTIVE_POPUP_STATUS === "3") {
+    if (INCENTIVE_POPUP_STATUS === "4") {
       setShow(false);
     } else {
       setShow(true);
@@ -21,7 +21,7 @@ const Popup = ({ className }) => {
 
   function closePopup() {
     setShow(false);
-    localStorage.setItem("INCENTIVE_POPUP_STATUS", "3");
+    localStorage.setItem("INCENTIVE_POPUP_STATUS", "4");
   }
   if (!show) return null;
   return (
