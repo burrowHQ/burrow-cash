@@ -16,7 +16,7 @@ interface IProtocolReward {
   boosted_shares: number;
 }
 
-export const getProtocolRewardsOld = createSelector(
+export const getProtocolRewards = createSelector(
   (state: RootState) => state.assets,
   (assets) => {
     const rewards = Object.entries(filterSentOutFarms(assets.netTvlFarm)).map(
@@ -44,7 +44,7 @@ export const getProtocolRewardsOld = createSelector(
     return rewards;
   },
 );
-export const getProtocolRewards = createSelector(
+export const getTokenNetBalanceRewards = createSelector(
   (state: RootState) => state.assets,
   (assets) => {
     const tokenNetBalanceRewards = Object.entries(assets.allFarms?.tokenNetBalance || {}).reduce(

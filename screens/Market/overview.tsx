@@ -8,9 +8,9 @@ import { isMobileDevice } from "../../helpers/helpers";
 const MarketOverviewData = createContext(null) as any;
 function MarketsOverview() {
   const { protocolBorrowed, protocolDeposited, protocolNetLiquidity } = useProtocolNetLiquidity();
-  const { protocol } = useRewards();
+  const { tokenNetBalanceRewards } = useRewards();
   const sumRewards = (acc, r) => acc + r.dailyAmount * r.price;
-  const amount = protocol.reduce(sumRewards, 0);
+  const amount = tokenNetBalanceRewards.reduce(sumRewards, 0);
   const isMobile = isMobileDevice();
   return (
     <MarketOverviewData.Provider

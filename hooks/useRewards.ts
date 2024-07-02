@@ -5,7 +5,11 @@ import {
   getAccountDailyRewards,
   getAccountRewardsForApy,
 } from "../redux/selectors/getAccountRewards";
-import { getNetLiquidityRewards, getProtocolRewards } from "../redux/selectors/getProtocolRewards";
+import {
+  getNetLiquidityRewards,
+  getProtocolRewards,
+  getTokenNetBalanceRewards,
+} from "../redux/selectors/getProtocolRewards";
 import { getTokenLiquidity } from "../redux/selectors/getTokenLiquidity";
 import { useProtocolNetLiquidity } from "./useNetLiquidity";
 import { shrinkToken, USD_FORMAT } from "../store";
@@ -19,6 +23,7 @@ import { getNetGains } from "../redux/selectors/getAverageNetRewardApy";
 export function useRewards() {
   const assetRewards = useAppSelector(getAccountRewards);
   const protocol = useAppSelector(getProtocolRewards);
+  const tokenNetBalanceRewards = useAppSelector(getTokenNetBalanceRewards);
   const { brrr, totalUnClaimUSD } = assetRewards || {};
   const extra = Object.entries(assetRewards.extra);
   const net = Object.entries(assetRewards.net);
@@ -52,6 +57,7 @@ export function useRewards() {
     net,
     poolRewards,
     protocol,
+    tokenNetBalanceRewards,
     data: {
       array: all,
       totalUnClaimUSD,
