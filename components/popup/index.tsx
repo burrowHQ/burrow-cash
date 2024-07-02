@@ -44,7 +44,7 @@ const Popup = ({ className }) => {
               delay: 5000,
               disableOnInteraction: false,
             }}
-            // loop
+            loop
           >
             <SwiperSlide>
               <>
