@@ -40,10 +40,10 @@ const Popup = ({ className }) => {
             spaceBetween={30}
             centeredSlides
             autoHeight={false}
-            // autoplay={{
-            //   delay: 10000,
-            //   disableOnInteraction: false,
-            // }}
+            autoplay={{
+              delay: 5000,
+              disableOnInteraction: false,
+            }}
             // loop
           >
             <SwiperSlide>
