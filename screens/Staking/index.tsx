@@ -87,8 +87,7 @@ const Staking = () => {
               <CustomButton
                 onClick={() => setModal({ name: "staking" })}
                 className="w-full"
-                // disabled={!total}
-                disabled
+                disabled={!total}
               >
                 Stake
               </CustomButton>
