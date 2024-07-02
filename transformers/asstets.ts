@@ -47,12 +47,15 @@ export function transformFarms(allFarms): IFarms {
       if (Type === "Borrowed") {
         acc.borrowed[tokenId] = farmData.rewards;
       }
+      if (Type === "TokenNetBalance") {
+        acc.tokenNetBalance[tokenId] = farmData.rewards;
+      }
       if (tokenData === "NetTvl") {
         acc.netTvl = farmData.rewards;
       }
       return acc;
     },
-    { supplied: {}, borrowed: {}, netTvl: {} },
+    { supplied: {}, borrowed: {}, netTvl: {}, tokenNetBalance: {} },
   );
   return transformed;
 }
