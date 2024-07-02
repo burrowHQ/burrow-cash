@@ -29,7 +29,7 @@ export interface AssetsState {
 export const initialState: AssetsState = {
   data: {},
   netTvlFarm: {},
-  allFarms: { supplied: {}, borrowed: {}, netTvl: {} },
+  allFarms: { supplied: {}, borrowed: {}, netTvl: {}, tokenNetBalance: {} },
   status: null,
   fetchedAt: undefined,
 };
@@ -37,5 +37,6 @@ export const initialState: AssetsState = {
 export interface IFarms {
   supplied: Record<string, INetTvlFarmRewards>;
   borrowed: Record<string, INetTvlFarmRewards>;
+  tokenNetBalance: Record<string, INetTvlFarmRewards>;
   netTvl: Record<string, INetTvlFarmRewards>;
 }
