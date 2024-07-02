@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useState, memo } from "react";
 import { twMerge } from "tailwind-merge";
 import SupplyCarousel from "./components/SupplyCarousel";
 import StakeCarousel from "./components/StakeCarousel";
+import DeltaCarouse from "./components/DeltaCarouse";
 
 SwiperCore.use([Autoplay]);
 const Popup = ({ className }) => {
@@ -53,15 +54,21 @@ const Popup = ({ className }) => {
                 <SupplyCarousel />
               </>
             </SwiperSlide>
-            {/* <SwiperSlide>
-              <>
-                <CloseButton
-                  className="absolute cursor-pointer top-3 right-6 xsm:right-6 z-50"
-                  onClick={closePopup}
+            <SwiperSlide>
+              <CloseButton
+                className="absolute cursor-pointer top-3 right-6 xsm:right-6 z-50"
+                onClick={closePopup}
+              />
+              <div className="mt-8 relative">
+                <DeltaCarouse />
+                <div
+                  className="w-40 h-10 bg-transparent absolute bottom-10 right-10"
+                  onClick={() => {
+                    window.open("https://www.deltatrade.ai/activity/home");
+                  }}
                 />
-                <StakeCarousel />
-              </>
-            </SwiperSlide> */}
+              </div>
+            </SwiperSlide>
           </Swiper>
         </div>
       </div>
