@@ -44,6 +44,43 @@ export const getProtocolRewards = createSelector(
     return rewards;
   },
 );
+export const getTokenNetBalanceRewards = createSelector(
+  (state: RootState) => state.assets,
+  (assets) => {
+    const tokenNetBalanceRewards = Object.entries(assets.allFarms?.tokenNetBalance || {}).reduce(
+      (acc, cur) => {
+        const [assetId, rewards] = cur;
+        const rewardList: IProtocolReward[] = [];
+        Object.entries(rewards).forEach(([rewardId, farmData]: [string, INetTvlFarmReward]) => {
+          if (farmData.remaining_rewards !== "0") {
+            const rewardAsset = assets.data[rewardId];
+            const { name, symbol, icon } = rewardAsset.metadata;
+            const rewardAssetDecimals =
+              rewardAsset.metadata.decimals + rewardAsset.config.extra_decimals;
+            const dailyAmount = Number(shrinkToken(farmData.reward_per_day, rewardAssetDecimals));
+            const remainingAmount = Number(
+              shrinkToken(farmData.remaining_rewards, rewardAssetDecimals),
+            );
+            const boosted_shares = Number(shrinkToken(farmData.boosted_shares, 18));
+            rewardList.push({
+              icon,
+              name,
+              symbol,
+              tokenId: assetId,
+              dailyAmount,
+              remainingAmount,
+              price: rewardAsset.price?.usd || 0,
+              boosted_shares,
+            });
+          }
+        });
+        return [...acc, ...rewardList];
+      },
+      [] as IProtocolReward[],
+    );
+    return tokenNetBalanceRewards;
+  },
+);
 
 export const getNetLiquidityRewards = createSelector(
   (state: RootState) => state.assets,
