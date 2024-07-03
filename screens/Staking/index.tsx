@@ -91,7 +91,7 @@ const Staking = () => {
             value1={Number(total || 0) > 0 ? total.toLocaleString(undefined, TOKEN_FORMAT) : 0}
             text2="Your Net APY"
             value2={`${formatAPYValue(stakingNetAPY + stakingNetTvlAPY)}%`}
-            text3="Balance"
+            text3="WalletBalance"
             value3={formatWithCommas_number(new Decimal(brrrAvailable || 0).toFixed())}
             value2ClassName="text-primary"
           >

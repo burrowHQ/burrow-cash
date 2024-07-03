@@ -131,7 +131,7 @@ const ModalStaking = ({ isOpen, onClose }) => {
       onClose={handleModalClose}
       onOutsideClick={handleModalClose}
       className="modal-mobile-bottom"
-      width={500}
+      style={{ width: "500px", height: "80vh", overflow: "auto" }}
       title="Stake BRRR"
     >
       <div className="px-2">
