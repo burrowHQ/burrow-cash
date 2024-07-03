@@ -34,7 +34,7 @@ export const getStaking = createSelector(
       (BRRR + Number(amount)) * xBRRRMultiplier,
     );
     const extraXBRRRAmount = totalXBRRR - xBRRR;
-
+    const totalXBRRRStaked = compare(xBRRR, BRRR);
     return {
       BRRR,
       xBRRR,
@@ -43,6 +43,7 @@ export const getStaking = createSelector(
       stakingTimestamp,
       amount,
       months,
+      totalXBRRRStaked,
     };
   },
 );

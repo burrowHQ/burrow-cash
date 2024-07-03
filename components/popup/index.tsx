@@ -14,7 +14,7 @@ const Popup = ({ className }) => {
   const [show, setShow] = useState<boolean>(false);
 
   useEffect(() => {
-    if (INCENTIVE_POPUP_STATUS === "5") {
+    if (INCENTIVE_POPUP_STATUS === "6") {
       setShow(false);
     } else {
       setShow(true);
@@ -23,7 +23,7 @@ const Popup = ({ className }) => {
 
   function closePopup() {
     setShow(false);
-    localStorage.setItem("INCENTIVE_POPUP_STATUS", "5");
+    localStorage.setItem("INCENTIVE_POPUP_STATUS", "6");
   }
   if (!show) return null;
   return (
@@ -68,6 +68,15 @@ const Popup = ({ className }) => {
                     window.open("https://www.deltatrade.ai/activity/home");
                   }}
                 />
+              </div>
+            </SwiperSlide>
+            <SwiperSlide>
+              <CloseButton
+                className="absolute cursor-pointer top-8 right-8 xsm:top-3.5 xsm:right-7 z-50"
+                onClick={closePopup}
+              />
+              <div className={`${isMobileDevice() ? "mt-0" : "mt-8"} relative`}>
+                <StakeCarousel />
               </div>
             </SwiperSlide>
           </Swiper>

@@ -4,11 +4,13 @@ import { useAvailableAssets } from "../../../hooks/hooks";
 import { incentiveTokens } from "../../../utils/config";
 import { isMobileDevice } from "../../../helpers/helpers";
 import { useAPY } from "../../../hooks/useAPY";
+import useTokenNetAPY from "../../../hooks/useTokenNetAPY";
 
 const StakeCarousel = () => {
   const [tokenRowOne, setTokenRowOne] = useState<any>();
   const [tokenRowTwo, setTokenRowTwo] = useState<any>();
   const [tokenRowThree, setTokenRowThree] = useState<any>();
+  const [tokenRowFour, setTokenRowFour] = useState<any>();
   const assets = useAvailableAssets();
   useEffect(() => {
     if (assets?.length) {
@@ -17,6 +19,7 @@ const StakeCarousel = () => {
         setTokenRowOne(incentiveTokensData[0]);
         setTokenRowTwo(incentiveTokensData[1]);
         setTokenRowThree(incentiveTokensData[2]);
+        setTokenRowFour(incentiveTokensData[3]);
       }
     }
   }, [assets?.length]);
@@ -25,7 +28,12 @@ const StakeCarousel = () => {
       {isMobileDevice() ? <BoxMobileSvg /> : <BoxSvg />}
       <div className="absolute content lg:top-[76px] xsm:top-[48px] left-[200px] pl-[12px] flex flex-col items-center">
         {tokenRowOne && tokenRowTwo ? (
-          <APYComponent rowOne={tokenRowOne} rowTwo={tokenRowTwo} rowThree={tokenRowThree} />
+          <APYComponent
+            rowOne={tokenRowOne}
+            rowTwo={tokenRowTwo}
+            rowThree={tokenRowThree}
+            tokenRowFour={tokenRowFour}
+          />
         ) : (
           <p className="text-primary text-6xl font-bold pt-[62px]">0%</p>
         )}
@@ -278,29 +286,28 @@ function Arrow() {
     </svg>
   );
 }
-function APYComponent({ rowOne, rowTwo, rowThree }: any) {
-  const rowOneAPY = useAPY({
-    baseAPY: rowOne.supplyApy,
-    rewards: rowOne.depositRewards,
+function APYComponent({ rowOne, rowTwo, rowThree, tokenRowFour }: any) {
+  const rowOneAPY = useTokenNetAPY({
     tokenId: rowOne.tokenId,
     page: "market",
     onlyMarket: true,
   });
-  const rowTwoAPY = useAPY({
-    baseAPY: rowTwo.supplyApy,
-    rewards: rowTwo.depositRewards,
+  const rowTwoAPY = useTokenNetAPY({
     tokenId: rowTwo.tokenId,
     page: "market",
     onlyMarket: true,
   });
-  const rowThreeAPY = useAPY({
-    baseAPY: rowThree.supplyApy,
-    rewards: rowThree.depositRewards,
+  const rowThreeAPY = useTokenNetAPY({
     tokenId: rowThree.tokenId,
     page: "market",
     onlyMarket: true,
   });
-  const highestAPY = Math.max(rowOneAPY, rowTwoAPY, rowThreeAPY);
+  const rowFourAPY = useTokenNetAPY({
+    tokenId: tokenRowFour.tokenId,
+    page: "market",
+    onlyMarket: true,
+  });
+  const highestAPY = Math.max(rowOneAPY, rowTwoAPY, rowThreeAPY, rowFourAPY);
   const percentage = (highestAPY * 1.3).toFixed(0);
   return <p className="text-primary text-6xl font-bold pt-[62px] xsm:text-56">{percentage}%</p>;
 }
