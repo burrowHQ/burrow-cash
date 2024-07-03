@@ -25,6 +25,7 @@ import { getAssets } from "../../redux/assetsSelectors";
 import { BRRR_TOKEN, defaultNetwork } from "../../utils/config";
 import { shrinkToken } from "../../store/helper";
 import { toPrecision } from "../../utils/number";
+import { formatWithCommas_number } from "../../utils/uiNumber";
 import { getAccountBoostRatioData } from "../../redux/selectors/getAccountRewards";
 
 const Staking = () => {
@@ -91,7 +92,7 @@ const Staking = () => {
             text2="Your Net APY"
             value2={`${formatAPYValue(stakingNetAPY + stakingNetTvlAPY)}%`}
             text3="Balance"
-            value3={toPrecision(new Decimal(brrrAvailable || 0).toFixed(), 2)}
+            value3={formatWithCommas_number(new Decimal(brrrAvailable || 0).toFixed())}
             value2ClassName="text-primary"
           >
             {accountId ? (
