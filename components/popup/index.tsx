@@ -41,7 +41,7 @@ const Popup = ({ className }) => {
             centeredSlides
             autoHeight={false}
             autoplay={{
-              delay: 50000000,
+              delay: 5000,
               disableOnInteraction: false,
             }}
             loop
