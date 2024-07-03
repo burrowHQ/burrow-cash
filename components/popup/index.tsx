@@ -41,7 +41,7 @@ const Popup = ({ className }) => {
             centeredSlides
             autoHeight={false}
             autoplay={{
-              delay: 5000,
+              delay: 50000000,
               disableOnInteraction: false,
             }}
             loop
@@ -72,7 +72,7 @@ const Popup = ({ className }) => {
             </SwiperSlide>
             <SwiperSlide>
               <CloseButton
-                className="absolute cursor-pointer top-8 right-8 xsm:right-4 z-50"
+                className="absolute cursor-pointer top-8 right-8 xsm:top-3.5 xsm:right-7 z-50"
                 onClick={closePopup}
               />
               <div className={`${isMobileDevice() ? "mt-0" : "mt-8"} relative`}>
