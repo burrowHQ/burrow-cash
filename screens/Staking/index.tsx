@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Stack, Typography, Box, useTheme } from "@mui/material";
 import { DateTime } from "luxon";
 import styled from "styled-components";
 import { twMerge } from "tailwind-merge";
+import Decimal from "decimal.js";
 import { BrrrLogo, StakingPill, StakingCard, LiveUnclaimedAmount } from "./components";
 import { useAppSelector } from "../../redux/hooks";
 import { getTotalBRRR } from "../../redux/selectors/getTotalBRRR";
@@ -20,10 +21,19 @@ import { modalProps } from "../../interfaces/common";
 import { LockIcon, Mascot, UnlockIcon } from "../../components/Icons/Icons";
 import { formatAPYValue, isMobileDevice } from "../../helpers/helpers";
 import { ConnectWalletButton } from "../../components/Header/WalletButton";
+import { getAssets } from "../../redux/assetsSelectors";
+import { BRRR_TOKEN, defaultNetwork } from "../../utils/config";
+import { shrinkToken } from "../../store/helper";
+import { toPrecision } from "../../utils/number";
+import { getAccountBoostRatioData } from "../../redux/selectors/getAccountRewards";
 
 const Staking = () => {
   const [total, totalUnclaim, totalToken] = useAppSelector(getTotalBRRR);
+  const accountBalances = useAppSelector((state) => state.account.balances);
+  const assets = useAppSelector(getAssets);
+  // available: ,
   const { BRRR, stakingTimestamp, stakingNetAPY, stakingNetTvlAPY } = useStaking();
+  const [, , , multiplierStaked] = useAppSelector(getAccountBoostRatioData);
   const { handleClaimAll, isLoading } = useClaimAllRewards("staking");
   const [loadingUnstake, setLoadingUnstake] = useState(false);
   const [isModalOpen, openModal] = useState(false);
@@ -33,6 +43,20 @@ const Staking = () => {
   const isMobile = isMobileDevice();
   const unstakeDate = DateTime.fromMillis(stakingTimestamp / 1e6);
   const disabledUnstake = !BRRR || DateTime.now() < unstakeDate;
+  const displayMultiplierStaked = toPrecision(
+    new Decimal(multiplierStaked || 0).toFixed(),
+    4,
+    false,
+    false,
+  );
+  const brrrAvailable = useMemo(() => {
+    const brrrId = BRRR_TOKEN[defaultNetwork];
+    if (assets.data?.[brrrId]) {
+      const brrrAsset = assets.data?.[brrrId];
+      return Number(shrinkToken(accountBalances[brrrId] || 0, brrrAsset.metadata.decimals));
+    }
+    return 0;
+  }, [Object.keys(accountBalances || {}), Object.keys(assets.data || {})]);
 
   const handleUnstake = async () => {
     try {
@@ -43,21 +67,6 @@ const Staking = () => {
       console.error(e);
     }
   };
-
-  // if (!accountId) {
-  //   return (
-  //     <div>
-  //       <div className="flex justify-center">
-  //         <div className="mb-10">
-  //           <div className="flex justify-center">
-  //             <Mascot />
-  //           </div>
-  //         </div>
-  //       </div>
-  //       <div className="h2 flex justify-center">Please connect your wallet.</div>
-  //     </div>
-  //   );
-  // }
   const totalAmount = Number(BRRR) + Number(total);
 
   return (
@@ -78,9 +87,11 @@ const Staking = () => {
         <div className="md:flex justify-center gap-4 md:gap-6">
           <StakingBox
             text1="💰 Available"
-            value1={total > 0 ? total.toLocaleString(undefined, TOKEN_FORMAT) : 0}
+            value1={Number(total || 0) > 0 ? total.toLocaleString(undefined, TOKEN_FORMAT) : 0}
             text2="Your Net APY"
             value2={`${formatAPYValue(stakingNetAPY + stakingNetTvlAPY)}%`}
+            text3="Balance"
+            value3={toPrecision(new Decimal(brrrAvailable || 0).toFixed(), 2)}
             value2ClassName="text-primary"
           >
             {accountId ? (
@@ -102,6 +113,8 @@ const Staking = () => {
             text1="🔒 Staking"
             value1={BRRR ? BRRR.toLocaleString(undefined, TOKEN_FORMAT) : 0}
             text2={BRRR ? "Due to" : ""}
+            text4="Boost Ratio"
+            value4={displayMultiplierStaked}
             value2={BRRR ? unstakeDate.toFormat("yyyy-MM-dd / HH:mm") : ""}
           >
             <CustomButton
@@ -139,6 +152,10 @@ type StakingBoxProps = {
   value1?: string | React.ReactNode;
   text2?: string;
   value2?: string;
+  text3?: string;
+  value3?: string;
+  text4?: string;
+  value4?: string;
   value2ClassName?: string;
   children?: string | React.ReactNode;
   disabled?: boolean;
@@ -149,10 +166,17 @@ const StakingBox = ({
   value1,
   text2,
   value2,
+  text3,
+  value3,
+  text4,
+  value4,
   value2ClassName,
   children,
   disabled,
 }: StakingBoxProps) => {
+  function GotoDetailPage() {
+    window.open(`/tokenDetail/${BRRR_TOKEN[defaultNetwork]}`);
+  }
   return (
     <ContentBox className="mb-4 md:w-[363px]" padding="26px">
       <div className="flex justify-between flex-col h-full">
@@ -172,6 +196,26 @@ const StakingBox = ({
             <div className="h2">{value1}</div>
           </div>
         </div>
+        {text3 ? (
+          <div className="flex justify-between text-gray-380 h5 mb-2" style={{ minHeight: 20 }}>
+            <div>{text3}</div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-white">{value3}</span>
+              <span
+                className="text-xs text-primary border-b border-dashed cursor-pointer"
+                onClick={GotoDetailPage}
+              >
+                Supply
+              </span>
+            </div>
+          </div>
+        ) : null}
+        {text4 ? (
+          <div className="flex justify-between text-gray-380 h5 mb-2" style={{ minHeight: 20 }}>
+            <div>{text4}</div>
+            <span className="text-white">{value4}</span>
+          </div>
+        ) : null}
         <div>
           <div className="flex justify-between text-gray-380 h5 mb-2" style={{ minHeight: 20 }}>
             <div>{text2}</div>
