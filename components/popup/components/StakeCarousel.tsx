@@ -4,6 +4,7 @@ import { useAvailableAssets } from "../../../hooks/hooks";
 import { incentiveTokens } from "../../../utils/config";
 import { isMobileDevice } from "../../../helpers/helpers";
 import { useAPY } from "../../../hooks/useAPY";
+import useTokenNetAPY from "../../../hooks/useTokenNetAPY";
 
 const StakeCarousel = () => {
   const [tokenRowOne, setTokenRowOne] = useState<any>();
@@ -286,30 +287,22 @@ function Arrow() {
   );
 }
 function APYComponent({ rowOne, rowTwo, rowThree, tokenRowFour }: any) {
-  const rowOneAPY = useAPY({
-    baseAPY: rowOne.supplyApy,
-    rewards: rowOne.depositRewards,
+  const rowOneAPY = useTokenNetAPY({
     tokenId: rowOne.tokenId,
     page: "market",
     onlyMarket: true,
   });
-  const rowTwoAPY = useAPY({
-    baseAPY: rowTwo.supplyApy,
-    rewards: rowTwo.depositRewards,
+  const rowTwoAPY = useTokenNetAPY({
     tokenId: rowTwo.tokenId,
     page: "market",
     onlyMarket: true,
   });
-  const rowThreeAPY = useAPY({
-    baseAPY: rowThree.supplyApy,
-    rewards: rowThree.depositRewards,
+  const rowThreeAPY = useTokenNetAPY({
     tokenId: rowThree.tokenId,
     page: "market",
     onlyMarket: true,
   });
-  const rowFourAPY = useAPY({
-    baseAPY: tokenRowFour.supplyApy,
-    rewards: tokenRowFour.depositRewards,
+  const rowFourAPY = useTokenNetAPY({
     tokenId: tokenRowFour.tokenId,
     page: "market",
     onlyMarket: true,

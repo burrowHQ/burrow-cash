@@ -323,6 +323,7 @@ function filterTypeFarms(typeFarmData): IFarms {
     const newFarm = JSON.parse(JSON.stringify(filterAccountSentOutFarms(farm)));
     if (isEmpty(newFarm)) return acc;
     return {
+      ...acc,
       [tokenId]: newFarm,
     };
   }, {});
