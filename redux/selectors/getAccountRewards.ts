@@ -586,6 +586,44 @@ export const getAccountRewardsForApy = createSelector(
   },
 );
 
+export const getAccountBoostRatioData = createSelector(
+  (state: RootState) => state.account,
+  (state: RootState) => state.app,
+  getStaking,
+  (account, app, staking) => {
+    const { totalXBRRR, BRRR, amount, totalXBRRRStaked } = staking;
+    const xBRRRAmount = totalXBRRR;
+    if (!app?.config?.boost_suppress_factor || !app?.config?.booster_decimals)
+      return [BRRR, amount, 1, 1];
+    const { tokennetbalance, supplied, borrowed } = filterAccountAllSentOutFarms(account.portfolio);
+    let booster_log_base = getBoosterLogBaseFromAccountFarms(tokennetbalance);
+    if (!booster_log_base) {
+      booster_log_base = getBoosterLogBaseFromAccountFarms(supplied);
+      if (!booster_log_base) {
+        booster_log_base = getBoosterLogBaseFromAccountFarms(borrowed);
+      }
+    }
+    if (booster_log_base) {
+      const boosterLogBase = Number(shrinkToken(booster_log_base, app.config.booster_decimals));
+      const log =
+        Math.log(xBRRRAmount / app.config.boost_suppress_factor) / Math.log(boosterLogBase);
+      const logStaked =
+        Math.log(totalXBRRRStaked / app.config.boost_suppress_factor) / Math.log(boosterLogBase);
+      const multiplier = log >= 0 ? 1 + log : 1;
+      const multiplierStaked = logStaked >= 0 ? 1 + logStaked : 1;
+      return [BRRR, amount, multiplier, multiplierStaked];
+    }
+    return [BRRR, amount, 1, 1];
+  },
+);
+function getBoosterLogBaseFromAccountFarms(accountfarms) {
+  const farms = Object.values(accountfarms)?.[0];
+  const farm = Object.values(farms || {})?.[0];
+  if (farm) {
+    return farm.asset_farm_reward?.booster_log_base;
+  }
+  return "";
+}
 export const getWeightedNetLiquidity = createSelector(
   (state: RootState) => state.assets,
   (state: RootState) => state.account,

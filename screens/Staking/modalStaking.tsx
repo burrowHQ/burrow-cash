@@ -15,6 +15,7 @@ import { useRewards, useStakeRewardApy } from "../../hooks/useRewards";
 import { ContentTipBox } from "../../components/ContentBox/ContentBox";
 import { BrrrLogo } from "./components";
 import { Alerts } from "../../components/Modal/components";
+import Booster from "./booster";
 import { format_apy } from "../../utils/uiNumber";
 
 const ModalStaking = ({ isOpen, onClose }) => {
@@ -176,7 +177,7 @@ const ModalStaking = ({ isOpen, onClose }) => {
           </StyledRow>
           <br />
         </StyledRow>
-
+        <Booster />
         <StyledRow>
           <div className="flex mb-4 items-center">
             <div className="mr-2">Reward</div>

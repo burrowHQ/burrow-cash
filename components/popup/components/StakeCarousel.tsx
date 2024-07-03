@@ -9,6 +9,7 @@ const StakeCarousel = () => {
   const [tokenRowOne, setTokenRowOne] = useState<any>();
   const [tokenRowTwo, setTokenRowTwo] = useState<any>();
   const [tokenRowThree, setTokenRowThree] = useState<any>();
+  const [tokenRowFour, setTokenRowFour] = useState<any>();
   const assets = useAvailableAssets();
   useEffect(() => {
     if (assets?.length) {
@@ -17,6 +18,7 @@ const StakeCarousel = () => {
         setTokenRowOne(incentiveTokensData[0]);
         setTokenRowTwo(incentiveTokensData[1]);
         setTokenRowThree(incentiveTokensData[2]);
+        setTokenRowFour(incentiveTokensData[3]);
       }
     }
   }, [assets?.length]);
@@ -25,7 +27,12 @@ const StakeCarousel = () => {
       {isMobileDevice() ? <BoxMobileSvg /> : <BoxSvg />}
       <div className="absolute content lg:top-[76px] xsm:top-[48px] left-[200px] pl-[12px] flex flex-col items-center">
         {tokenRowOne && tokenRowTwo ? (
-          <APYComponent rowOne={tokenRowOne} rowTwo={tokenRowTwo} rowThree={tokenRowThree} />
+          <APYComponent
+            rowOne={tokenRowOne}
+            rowTwo={tokenRowTwo}
+            rowThree={tokenRowThree}
+            tokenRowFour={tokenRowFour}
+          />
         ) : (
           <p className="text-primary text-6xl font-bold pt-[62px]">0%</p>
         )}
@@ -278,7 +285,7 @@ function Arrow() {
     </svg>
   );
 }
-function APYComponent({ rowOne, rowTwo, rowThree }: any) {
+function APYComponent({ rowOne, rowTwo, rowThree, tokenRowFour }: any) {
   const rowOneAPY = useAPY({
     baseAPY: rowOne.supplyApy,
     rewards: rowOne.depositRewards,
@@ -300,7 +307,14 @@ function APYComponent({ rowOne, rowTwo, rowThree }: any) {
     page: "market",
     onlyMarket: true,
   });
-  const highestAPY = Math.max(rowOneAPY, rowTwoAPY, rowThreeAPY);
+  const rowFourAPY = useAPY({
+    baseAPY: tokenRowFour.supplyApy,
+    rewards: tokenRowFour.depositRewards,
+    tokenId: tokenRowFour.tokenId,
+    page: "market",
+    onlyMarket: true,
+  });
+  const highestAPY = Math.max(rowOneAPY, rowTwoAPY, rowThreeAPY, rowFourAPY);
   const percentage = (highestAPY * 1.3).toFixed(0);
   return <p className="text-primary text-6xl font-bold pt-[62px] xsm:text-56">{percentage}%</p>;
 }

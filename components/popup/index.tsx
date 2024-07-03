@@ -70,6 +70,15 @@ const Popup = ({ className }) => {
                 />
               </div>
             </SwiperSlide>
+            <SwiperSlide>
+              <CloseButton
+                className="absolute cursor-pointer top-8 right-8 xsm:right-4 z-50"
+                onClick={closePopup}
+              />
+              <div className={`${isMobileDevice() ? "mt-0" : "mt-8"} relative`}>
+                <StakeCarousel />
+              </div>
+            </SwiperSlide>
           </Swiper>
         </div>
       </div>
