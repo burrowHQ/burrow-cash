@@ -251,14 +251,14 @@ function TableRow({
 }) {
   const { NATIVE_TOKENS, NEW_TOKENS } = getConfig() as any;
   const isMobile = isMobileDevice();
-  const depositAPY = useAPY({
+  const [depositAPY] = useAPY({
     baseAPY: row.supplyApy,
     rewards: row.depositRewards,
     tokenId: row.tokenId,
     page: "deposit",
     onlyMarket: true,
   });
-  const borrowAPY = useAPY({
+  const [borrowAPY] = useAPY({
     baseAPY: row.borrowApy,
     rewards: row.borrowRewards,
     tokenId: row.tokenId,
@@ -411,7 +411,7 @@ function TableRowPc({
             <>-</>
           )}
         </div>
-        <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
+        <div className="col-span-1 flex flex-col justify-center pl-3 xl:pl-7 whitespace-nowrap">
           <span className="flex items-center gap-2 text-sm text-white">
             {row.can_deposit ? (
               <APYCell
@@ -575,7 +575,7 @@ function TemplateMobileAPY({ title, row, canShow, booster }) {
   return (
     <div className="flex flex-col">
       <span className="text-gray-300 text-sm">{title}</span>
-      <div className="flex items-center mt-1 gap-2">
+      <div className="flex items-center xsm:flex-wrap mt-1 gap-2">
         {canShow ? (
           <APYCell
             rewards={row.depositRewards}

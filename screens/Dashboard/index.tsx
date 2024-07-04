@@ -88,7 +88,7 @@ const StyledSupplyBorrow = styled.div`
 const yourSuppliedColumns = [
   {
     header: "Assets",
-    size: 160,
+    size: 130,
     cell: ({ originalData }) => {
       const { symbol: standardizeSymbol, metadata, icon } = originalData || {};
       const { tokens, symbol } = metadata || {};
@@ -147,6 +147,7 @@ const yourSuppliedColumns = [
   },
   {
     header: "APY",
+    size: 160,
     cell: ({ originalData }) => {
       return (
         <APYCell

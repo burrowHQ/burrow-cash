@@ -82,14 +82,14 @@ function TokenDetailView({ tokenRow, assets }: { tokenRow: UIAsset; assets: UIAs
   const isMobile = isMobileDevice();
   const router = useRouter();
   const { NATIVE_TOKENS, NEW_TOKENS } = getConfig() as any;
-  const depositAPY = useAPY({
+  const [depositAPY] = useAPY({
     baseAPY: tokenRow.supplyApy,
     rewards: tokenRow.depositRewards,
     tokenId: tokenRow.tokenId,
     page: "deposit",
     onlyMarket: true,
   });
-  const borrowAPY = useAPY({
+  const [borrowAPY] = useAPY({
     baseAPY: tokenRow.borrowApy,
     rewards: tokenRow.borrowRewards,
     tokenId: tokenRow.tokenId,

@@ -863,3 +863,7 @@ options-list::-webkit-scrollbar {
   content: "...";
   animation: fadeInOut 1s infinite;
 }
+
+.MuiTooltip-tooltip {
+  max-width: 330px !important;
+}
