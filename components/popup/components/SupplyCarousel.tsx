@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState, memo } from "react";
 import { BeatLoader } from "react-spinners";
 import { twMerge } from "tailwind-merge";
+import { useRouter } from "next/router";
 import {
   useNonFarmedAssets,
   useAccountId,
@@ -28,6 +29,7 @@ const SupplyCarousel = () => {
     return true;
   }, [hasNonFarmedAssets, hasNegativeNetLiquidity]);
   const accountId = useAccountId();
+  const router = useRouter();
   const [suppliedRows] = usePortfolioAssets() as IPortfolioAsset[][];
   const status = useMemo(() => {
     // 0: new 1: join and claim 2: joined
@@ -38,7 +40,7 @@ const SupplyCarousel = () => {
     return 0;
   }, [needJoinAndClaim, accountId, suppliedRows]);
   function jump(tokenId) {
-    window.open(`/tokenDetail/${tokenId}`);
+    router.push(`/tokenDetail/${tokenId}`);
   }
   return (
     <div className="flex items-center justify-center">
