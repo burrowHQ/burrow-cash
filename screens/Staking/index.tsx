@@ -27,6 +27,7 @@ import { shrinkToken } from "../../store/helper";
 import { toPrecision } from "../../utils/number";
 import { formatWithCommas_number } from "../../utils/uiNumber";
 import { getAccountBoostRatioData } from "../../redux/selectors/getAccountRewards";
+import HtmlTooltip from "../../components/common/html-tooltip";
 
 const Staking = () => {
   const [total, totalUnclaim, totalToken] = useAppSelector(getTotalBRRR);
@@ -39,6 +40,7 @@ const Staking = () => {
   const [loadingUnstake, setLoadingUnstake] = useState(false);
   const [isModalOpen, openModal] = useState(false);
   const [modal, setModal] = useState<modalProps>();
+  const [showTooltip, setShowTooltip] = useState(false);
   const accountId = useAccountId();
   const theme = useTheme();
   const isMobile = isMobileDevice();
@@ -96,13 +98,28 @@ const Staking = () => {
             value2ClassName="text-primary"
           >
             {accountId ? (
-              <CustomButton
-                onClick={() => setModal({ name: "staking" })}
-                className="w-full"
-                disabled={!total}
+              <HtmlTooltip
+                open={showTooltip}
+                placement="top"
+                onOpen={() => setShowTooltip(true)}
+                onClose={() => setShowTooltip(false)}
+                title={!total ? "Must supply first" : ""}
               >
-                Stake
-              </CustomButton>
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowTooltip(!showTooltip);
+                  }}
+                >
+                  <CustomButton
+                    onClick={() => setModal({ name: "staking" })}
+                    className="w-full"
+                    disabled={!total}
+                  >
+                    Stake
+                  </CustomButton>
+                </span>
+              </HtmlTooltip>
             ) : (
               <ConnectWalletButton accountId={accountId} className="w-full" />
             )}

@@ -1,7 +1,7 @@
 import { Tooltip, styled, TooltipProps, tooltipClasses } from "@mui/material";
 
 const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
-  <Tooltip placement="top-start" {...props} classes={{ popper: className }} />
+  <Tooltip placement={props.placement || "top-start"} {...props} classes={{ popper: className }} />
 ))(({ theme }) => ({
   [`& .${tooltipClasses.tooltip}`]: {
     backgroundColor: "#2E304B",
