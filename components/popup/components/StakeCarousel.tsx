@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState, memo } from "react";
+import { useRouter } from "next/router";
 import { twMerge } from "tailwind-merge";
 import { useAvailableAssets } from "../../../hooks/hooks";
 import { incentiveTokens } from "../../../utils/config";
 import { isMobileDevice } from "../../../helpers/helpers";
-import { useAPY } from "../../../hooks/useAPY";
 import useTokenNetAPY from "../../../hooks/useTokenNetAPY";
 
 const StakeCarousel = () => {
@@ -12,6 +12,7 @@ const StakeCarousel = () => {
   const [tokenRowThree, setTokenRowThree] = useState<any>();
   const [tokenRowFour, setTokenRowFour] = useState<any>();
   const assets = useAvailableAssets();
+  const router = useRouter();
   useEffect(() => {
     if (assets?.length) {
       const incentiveTokensData = assets.filter((asset) => incentiveTokens.includes(asset.tokenId));
@@ -40,7 +41,7 @@ const StakeCarousel = () => {
         <Button
           classInfo="text-dark-200 bg-primary cursor-pointer font-medium"
           onClick={() => {
-            window.open(`/staking`);
+            router.push("/staking");
           }}
         >
           <p className="mr-1"> Stake BRRR</p> <Arrow />
@@ -308,6 +309,6 @@ function APYComponent({ rowOne, rowTwo, rowThree, tokenRowFour }: any) {
     onlyMarket: true,
   });
   const highestAPY = Math.max(rowOneAPY, rowTwoAPY, rowThreeAPY, rowFourAPY);
-  const percentage = (highestAPY * 1.3).toFixed(0);
+  const percentage = (highestAPY * 1.5).toFixed(0);
   return <p className="text-primary text-6xl font-bold pt-[62px] xsm:text-56">{percentage}%</p>;
 }
