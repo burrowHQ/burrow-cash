@@ -174,6 +174,7 @@ export function useStakeRewardApy() {
         asset: assets.data[assetTokenId],
       };
     }
+    acc[assetTokenId].marketAPY = getTokennetMarketAPY(assetToken, assets);
     return acc;
   }, {});
   // net
@@ -197,4 +198,31 @@ export function useStakeRewardApy() {
     avgStakeNetAPY: netAPY,
     totalTokenNetMap,
   };
+}
+
+function getTokennetMarketAPY(asset, assets) {
+  const assetDecimals = asset.metadata.decimals + asset.config.extra_decimals;
+  const tokenNetFarmsPending = asset.farms.tokennetbalance || {};
+  // Filter out the ones rewards sent out
+  const tokenNetFarms = filterSentOutFarms(tokenNetFarmsPending);
+  // rewards token metas
+  const rewardMetas = Object.keys(tokenNetFarms).map(
+    (rewardTokenId) => assets.data[rewardTokenId].metadata,
+  );
+  const marketApy = Object.entries(tokenNetFarms).reduce((acc, [rewardTokenId, farmData]) => {
+    const rewardAsset = assets.data[rewardTokenId];
+    const rewardAPY = new Decimal(farmData.reward_per_day)
+      .div(new Decimal(10).pow(rewardAsset.metadata.decimals + rewardAsset.config.extra_decimals))
+      .mul(365)
+      .mul(rewardAsset.price?.usd || "0")
+      .div(
+        new Decimal(shrinkToken(farmData.boosted_shares, assetDecimals)).mul(
+          asset.price?.usd || "0",
+        ),
+      )
+      .mul(100);
+    acc = acc.plus(rewardAPY);
+    return acc;
+  }, new Decimal(0));
+  return marketApy.toNumber();
 }

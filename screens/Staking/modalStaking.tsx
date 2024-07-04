@@ -15,6 +15,7 @@ import { useRewards, useStakeRewardApy } from "../../hooks/useRewards";
 import { ContentTipBox } from "../../components/ContentBox/ContentBox";
 import { BrrrLogo } from "./components";
 import { Alerts } from "../../components/Modal/components";
+import { ArrowRight } from "../../components/Icons/Icons";
 import Booster from "./booster";
 import { format_apy } from "../../utils/uiNumber";
 
@@ -196,7 +197,8 @@ const ModalStaking = ({ isOpen, onClose }) => {
             <div className="h5 text-primary">{format_apy(avgStakeNetAPY)}</div>
           </div>
           {Object.values(totalTokenNetMap).map((tokenNetData) => {
-            const { asset, totalTokenNetPrincipal, dailyRewardsUsd } = tokenNetData as any;
+            const { asset, totalTokenNetPrincipal, dailyRewardsUsd, marketAPY } =
+              tokenNetData as any;
             const apy = new Decimal(totalTokenNetPrincipal).gt(0)
               ? new Decimal(dailyRewardsUsd).div(totalTokenNetPrincipal).mul(365).mul(100)
               : new Decimal("0");
@@ -208,7 +210,11 @@ const ModalStaking = ({ isOpen, onClose }) => {
                 <div className="h5 text-gray-300">
                   {asset.metadata.symbol} Net Liquidity Reward APY
                 </div>
-                <div className="h5 text-primary">{format_apy(apy.toFixed())}</div>
+                <div className="flex items-center gap-2 h5 text-primary">
+                  <span className="line-through">{format_apy(marketAPY)}</span>
+                  <ArrowRight className="transform rotate-90" />
+                  {format_apy(apy.toFixed())}
+                </div>
               </div>
             );
           })}
