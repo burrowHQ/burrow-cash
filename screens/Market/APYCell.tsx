@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Decimal from "decimal.js";
 import { Box, Typography, Stack, useTheme } from "@mui/material";
-
+import { useRouter } from "next/router";
 import HtmlTooltip from "../../components/common/html-tooltip";
 import TokenIcon from "../../components/TokenIcon";
 import { useExtraAPY } from "../../hooks/useExtraAPY";
@@ -66,6 +66,7 @@ const ToolTip = ({
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const assets = useAppSelector(getAssets);
+  const router = useRouter();
   // suppose only one reward
   const netTvlFarmTokenId = (Object.keys(assets?.netTvlFarm || {}) || [])[0];
   const {
@@ -143,8 +144,9 @@ const ToolTip = ({
                   Max Boost <span className="text-white font-extrabold">1.5X</span> by{" "}
                   <span
                     className="text-xs text-primary underline cursor-pointer"
-                    onClick={() => {
-                      window.open("/staking");
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push("/staking");
                     }}
                   >
                     staking BRRR🔥
