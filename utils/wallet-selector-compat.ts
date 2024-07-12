@@ -1,5 +1,5 @@
 import { setupWalletSelector } from "@near-wallet-selector/core";
-import type { WalletSelector } from "@near-wallet-selector/core";
+import type { WalletSelector, Network } from "@near-wallet-selector/core";
 import { setupSender } from "@near-wallet-selector/sender";
 import { setupHereWallet } from "@near-wallet-selector/here-wallet";
 import { setupNightly } from "@near-wallet-selector/nightly";
@@ -19,6 +19,7 @@ import BN from "bn.js";
 import { map, distinctUntilChanged } from "rxjs";
 import { setupKeypom } from "@keypom/selector";
 import { setupOKXWallet } from "@near-wallet-selector/okx-wallet";
+import { getRpcList } from "../components/Rpc/tool";
 
 import getConfig, {
   defaultNetwork,
@@ -88,7 +89,15 @@ const KEYPOM_OPTIONS = {
 export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorArgs) => {
   if (init) return selector;
   init = true;
-
+  const RPC_LIST = getRpcList();
+  let endPoint = "defaultRpc";
+  try {
+    endPoint = window.localStorage.getItem("endPoint") || endPoint;
+    if (!RPC_LIST[endPoint]) {
+      endPoint = "defaultRpc";
+      localStorage.removeItem("endPoint");
+    }
+  } catch (error) {}
   selector = await setupWalletSelector({
     modules: [
       setupOKXWallet({}),
@@ -126,7 +135,10 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         deprecated: false,
       }),
     ],
-    network: defaultNetwork,
+    network: {
+      networkId: defaultNetwork,
+      nodeUrl: RPC_LIST[endPoint].url,
+    } as Network,
     debug: !!isTestnet,
     optimizeWalletOrder: false,
   });
