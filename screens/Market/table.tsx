@@ -21,7 +21,7 @@ import {
   formatWithCommas_usd,
 } from "../../utils/uiNumber";
 import { APYCell } from "./APYCell";
-import getConfig, { incentiveTokens } from "../../utils/config";
+import getConfig, { incentiveTokens, topTokens } from "../../utils/config";
 
 function MarketsTable({ rows, sorting }: TableProps) {
   return (
@@ -202,15 +202,27 @@ function TableBody({ rows, sorting }: TableProps) {
         a_comparator_value = 99999999999999;
       }
       if (incentiveTokens.includes(b.tokenId)) {
-        b_comparator_value = 999999999999999;
+        b_comparator_value = 99999999999999;
+      }
+      if (topTokens.includes(a.tokenId)) {
+        a_comparator_value = 99999999999998;
+      }
+      if (topTokens.includes(b.tokenId)) {
+        b_comparator_value = 99999999999998;
       }
       return a_comparator_value - b_comparator_value;
     } else {
       if (incentiveTokens.includes(a.tokenId)) {
-        a_comparator_value = -99999999999999;
+        a_comparator_value = -999999999999999;
       }
       if (incentiveTokens.includes(b.tokenId)) {
         b_comparator_value = -999999999999999;
+      }
+      if (topTokens.includes(a.tokenId)) {
+        a_comparator_value = -999999999999998;
+      }
+      if (topTokens.includes(b.tokenId)) {
+        b_comparator_value = -999999999999998;
       }
       return b_comparator_value - a_comparator_value;
     }
