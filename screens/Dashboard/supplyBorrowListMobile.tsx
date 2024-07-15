@@ -126,8 +126,8 @@ const StyledTabActiveBall = styled.div`
 `;
 
 const SupplyItem = ({ data }) => {
-  const { canUseAsCollateral, metadata } = data || {};
-  const { icon, tokens, symbol } = metadata || {};
+  const { canUseAsCollateral, metadata, symbol, icon } = data || {};
+  const { tokens } = metadata || {};
   let iconImg;
   let symbolNode = symbol;
   if (icon) {
