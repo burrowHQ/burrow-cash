@@ -60,15 +60,6 @@ const Popup = ({ className }) => {
               </div>
             </SwiperSlide>
             <SwiperSlide>
-              <>
-                <CloseButton
-                  className="absolute cursor-pointer top-4 right-10 xsm:right-8  z-50 xsm:top-3"
-                  onClick={closePopup}
-                />
-                <SupplyCarousel />
-              </>
-            </SwiperSlide>
-            <SwiperSlide>
               <CloseButton
                 className="absolute cursor-pointer top-3 right-6 xsm:right-4 z-50"
                 onClick={closePopup}
@@ -82,6 +73,15 @@ const Popup = ({ className }) => {
                   }}
                 />
               </div>
+            </SwiperSlide>
+            <SwiperSlide>
+              <>
+                <CloseButton
+                  className="absolute cursor-pointer top-4 right-10 xsm:right-8  z-50 xsm:top-3"
+                  onClick={closePopup}
+                />
+                <SupplyCarousel />
+              </>
             </SwiperSlide>
             <SwiperSlide>
               <CloseButton
