@@ -24,6 +24,8 @@ import Popup from "../components/popup";
 import RpcList from "../components/Rpc";
 import PubTestModal from "../components/PubTestModal";
 import { getAccountId, getAccountPortfolio } from "../redux/accountSelectors";
+import { getAssets } from "../redux/assetsSelectors";
+import { getConfig } from "../redux/appSelectors";
 
 ModalReact.defaultStyles = {
   overlay: {
@@ -91,13 +93,25 @@ function Upgrade({ Component, pageProps }) {
   const dispatch = useAppDispatch();
   const accountId = useAppSelector(getAccountId);
   const portfolio = useAppSelector(getAccountPortfolio);
+  const assets = useAppSelector(getAssets);
+  const config = useAppSelector(getConfig);
   useEffect(() => {
-    if (!portfolio.positions) {
+    if (
+      !portfolio.positions ||
+      !Object.keys(assets?.data || {}).length ||
+      !config?.booster_token_id
+    ) {
+      setUpgrading(true);
       fetch();
     } else {
       setUpgrading(false);
     }
-  }, [accountId, portfolio.positions]);
+  }, [
+    accountId,
+    portfolio.positions,
+    Object.keys(assets?.data || {}).length,
+    JSON.stringify(config || {}),
+  ]);
   async function fetch() {
     localStorage.removeItem("persist:root");
     await dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
@@ -116,6 +130,7 @@ function Upgrade({ Component, pageProps }) {
           <span className="flex items-center text-sm text-gray-300 mt-2">
             Refreshing assets data...
           </span>
+          <RpcList />
         </div>
       ) : (
         <Layout>
