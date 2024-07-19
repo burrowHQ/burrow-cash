@@ -35,6 +35,33 @@ export const getNetAPY = ({ isStaking = false }: { isStaking: boolean }) =>
       return netAPY || 0;
     },
   );
+export const getYourNetAPY = () =>
+  createSelector(
+    (state: RootState) => state.assets,
+    (state: RootState) => state.account,
+    getExtraDailyTotals({ isStaking: false }),
+    (assets, account, extraDaily) => {
+      if (!hasAssets(assets)) return 0;
+      const { borrows, collaterals } = account?.portfolio || {};
+      const [gainBorrowed, totalBorrowed] = getGainsArr(borrows, assets);
+      const [gainCollateral, totalCollateral] = getGainsArr(collaterals, assets);
+      const [gainSupplied, totalSupplied] = getGains(account.portfolio, assets, "supplied");
+
+      const gainExtra = extraDaily * 365;
+
+      const netGains = gainCollateral + gainSupplied + gainExtra - gainBorrowed;
+      const netTotals = totalCollateral + totalSupplied - totalBorrowed;
+      const baseAPY = ((gainCollateral + gainSupplied - gainBorrowed) / netTotals) * 100;
+      const tokenNetAPY = (gainExtra / netTotals) * 100;
+      const totalAPY = (netGains / netTotals) * 100;
+
+      return {
+        baseAPY,
+        tokenNetAPY,
+        totalAPY,
+      };
+    },
+  );
 
 export const getNetTvlAPY = ({ isStaking = false }) =>
   createSelector(
