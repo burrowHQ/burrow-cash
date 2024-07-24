@@ -89,7 +89,38 @@ const getConfig = (env: string = defaultNetwork) => {
         PYTH_ORACLE_CONTRACT_ID: string;
         recordsUrl: string;
       };
-
+    case "privateMainnet":
+      return {
+        networkId: "mainnet",
+        nodeUrl: RPC_LIST[endPoint].url,
+        walletUrl: "https://wallet.near.org",
+        helperUrl: "https://helper.mainnet.near.org",
+        explorerUrl: "https://explorer.mainnet.near.org",
+        liquidationUrl: "https://api.data-service.burrow.finance",
+        recordsUrl: "https://indexer.preprd.ref-finance.com",
+        txIdApiUrl: "https://api3.nearblocks.io",
+        SPECIAL_REGISTRATION_TOKEN_IDS: [
+          "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
+        ],
+        NATIVE_TOKENS: [
+          "usdt.tether-token.near",
+          "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
+        ],
+        NEW_TOKENS: [
+          "usdt.tether-token.near",
+          "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
+          "853d955acef822db058eb8505911ed77f175b99e.factory.bridge.near",
+          "a663b02cf0a4b149d2ad41910cb81e23e1c41c32.factory.bridge.near",
+          "shadow_ref_v1-4179",
+          "aurora",
+        ],
+        PYTH_ORACLE_CONTRACT_ID: "pyth-oracle.near",
+        REF_FI_CONTRACT_ID: "v2.ref-finance.near",
+      } as unknown as ConnectConfig & {
+        REF_FI_CONTRACT_ID: string;
+        PYTH_ORACLE_CONTRACT_ID: string;
+        recordsUrl: string;
+      };
     case "development":
     case "testnet":
       return {
