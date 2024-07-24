@@ -122,7 +122,7 @@ const ToolTip = ({
                   </span>
                 </Typography>,
                 <Typography fontSize="0.75rem" color="#fff" textAlign="right" key={7}>
-                  <div className="flex items-center justify-end gap-1.5 whitespace-nowrap">
+                  <div className="flex items-center justify-end gap-1.5 break-all">
                     <div className="flex items-center flex-shrink-0">
                       {tokenNetRewards.map((reward, index) => {
                         return (

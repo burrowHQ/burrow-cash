@@ -865,5 +865,5 @@ options-list::-webkit-scrollbar {
 }
 
 .MuiTooltip-tooltip {
-  max-width: 330px !important;
+  max-width: 350px !important;
 }

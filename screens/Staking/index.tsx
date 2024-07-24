@@ -28,6 +28,7 @@ import { toPrecision } from "../../utils/number";
 import { formatWithCommas_number } from "../../utils/uiNumber";
 import { getAccountBoostRatioData } from "../../redux/selectors/getAccountRewards";
 import HtmlTooltip from "../../components/common/html-tooltip";
+import YourAPY from "./yourAPY";
 
 const Staking = () => {
   const [total, totalUnclaim, totalToken] = useAppSelector(getTotalBRRR);
@@ -91,8 +92,8 @@ const Staking = () => {
           <StakingBox
             text1="💰 Available"
             value1={Number(total || 0) > 0 ? total.toLocaleString(undefined, TOKEN_FORMAT) : 0}
-            text2="Your Net APY"
-            value2={`${formatAPYValue(stakingNetAPY + stakingNetTvlAPY)}%`}
+            text2="Your APY"
+            value2={<YourAPY />}
             text3="WalletBalance"
             value3={formatWithCommas_number(new Decimal(brrrAvailable || 0).toFixed())}
             value2ClassName="text-primary"
@@ -169,7 +170,7 @@ type StakingBoxProps = {
   text1?: string | React.ReactNode;
   value1?: string | React.ReactNode;
   text2?: string;
-  value2?: string;
+  value2?: string | React.ReactNode;
   text3?: string;
   value3?: string;
   text4?: string;

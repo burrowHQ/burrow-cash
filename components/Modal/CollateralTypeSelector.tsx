@@ -5,8 +5,7 @@ import { useAvailableAssets } from "../../hooks/hooks";
 import { digitalProcess } from "../../utils/uiNumber";
 import { UIAsset } from "../../interfaces";
 import { DEFAULT_POSITION } from "../../utils/config";
-import { shrinkToken } from "../../store";
-import { Asset } from "../../redux/assetState";
+import CollateralTypeName from "./CollateralTypeName";
 
 export function CollateralTypeSelectorBorrow({
   maxBorrowAmountPositions,
@@ -46,18 +45,18 @@ export function CollateralTypeSelectorBorrow({
       <div className="flex items-center justify-between px-1">
         <span className="text-sm text-gray-300 whitespace-nowrap">Collateral Type</span>
         <div
-          className="flex items-center"
-          // className="flex items-center cursor-pointer"
-          // TODO open after has lp asset
-          // onClick={() => {
-          //   setShow(!show);
-          // }}
+          className="flex items-center cursor-pointer"
+          onClick={() => {
+            setShow(!show);
+          }}
         >
-          <span className="text-sm text-gray-300 whitespace-nowrap xsm:max-w-[120px] overflow-hidden text-ellipsis">
-            {getName(selectedCollateralType)}
-          </span>
+          <CollateralTypeName>
+            <span className="text-sm text-gray-300 whitespace-nowrap xsm:max-w-[120px] overflow-hidden text-ellipsis">
+              {getName(selectedCollateralType)}
+            </span>
+          </CollateralTypeName>
           {/* TODO open after has lp asset */}
-          {/* <ArrowDownIcon className={`ml-1.5 ${show ? " transform rotate-180" : ""}`} /> */}
+          <ArrowDownIcon className={`ml-1.5 ${show ? " transform rotate-180" : ""}`} />
         </div>
       </div>
       {/* list */}
@@ -133,16 +132,17 @@ export function CollateralTypeSelectorRepay({
       <div className="flex items-center justify-between px-1">
         <span className="text-sm text-gray-300 whitespace-nowrap">Collateral Type</span>
         <div
-          // className="flex items-center cursor-pointer"
-          className="flex items-center"
-          // onClick={() => {
-          //   setShow(!show);
-          // }}
+          className="flex items-center cursor-pointer"
+          onClick={() => {
+            setShow(!show);
+          }}
         >
-          <span className="text-sm text-gray-300 whitespace-nowrap">
-            {getName(selectedCollateralType)}
-          </span>
-          {/* <ArrowDownIcon className={`ml-2.5 ${show ? " transform rotate-180" : ""}`} /> */}
+          <CollateralTypeName>
+            <span className="text-sm text-gray-300 whitespace-nowrap">
+              {getName(selectedCollateralType)}
+            </span>
+            <ArrowDownIcon className={`ml-2.5 ${show ? " transform rotate-180" : ""}`} />
+          </CollateralTypeName>
         </div>
       </div>
       {/* list */}
