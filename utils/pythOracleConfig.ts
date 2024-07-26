@@ -73,16 +73,27 @@ const MainnetCoins = {
 const COINS_ENV = {
   testnet: TestnetCoins,
   mainnet: MainnetCoins,
+  privateMainnet: MainnetCoins,
 };
 const NEARX_TOKEN_ENV = {
   testnet: "v2-nearx.staderlabs.testnet",
   mainnet: "v2-nearx.stader-labs.near",
+  privateMainnet: "v2-nearx.stader-labs.near",
 };
-const LINEAR_TOKEN_ENV = { testnet: "linear-protocol.testnet", mainnet: "linear-protocol.near" };
-const STNEAR_TOKEN_ENV = { testnet: "meta-v2.pool.testnet", mainnet: "meta-pool.near" };
+const LINEAR_TOKEN_ENV = {
+  testnet: "linear-protocol.testnet",
+  mainnet: "linear-protocol.near",
+  privateMainnet: "linear-protocol.near",
+};
+const STNEAR_TOKEN_ENV = {
+  testnet: "meta-v2.pool.testnet",
+  mainnet: "meta-pool.near",
+  privateMainnet: "meta-pool.near",
+};
 const SFRAX_TOKEN_ENV = {
   testnet: "a663b0.fakes.testnet",
   mainnet: "a663b02cf0a4b149d2ad41910cb81e23e1c41c32.factory.bridge.near",
+  privateMainnet: "a663b02cf0a4b149d2ad41910cb81e23e1c41c32.factory.bridge.near",
 };
 const COINS = COINS_ENV[defaultNetwork];
 const NEARX_TOKEN = NEARX_TOKEN_ENV[defaultNetwork];
