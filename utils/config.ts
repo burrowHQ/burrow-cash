@@ -11,8 +11,16 @@ export const defaultNetwork = (process.env.NEXT_PUBLIC_DEFAULT_NETWORK ||
   process.env.NODE_ENV ||
   "development") as any;
 
-const META_TOKEN = { testnet: undefined, mainnet: "meta-token.near" };
-const REF_TOKEN = { testnet: "ref.fakes.testnet", mainnet: "token.v2.ref-finance.near" };
+const META_TOKEN = {
+  testnet: undefined,
+  mainnet: "meta-token.near",
+  privateMainnet: "meta-token.near",
+};
+const REF_TOKEN = {
+  testnet: "ref.fakes.testnet",
+  mainnet: "token.v2.ref-finance.near",
+  privateMainnet: "token.v2.ref-finance.near",
+};
 export const STABLE_POOL_IDS = [
   "4179",
   "3514",
@@ -28,11 +36,13 @@ export const DEFAULT_POSITION = "REGULAR";
 export const BRRR_TOKEN = {
   testnet: "test_brrr.1638481328.burrow.testnet",
   mainnet: "token.burrow.near",
+  privateMainnet: "token.burrow.near",
 };
 // for pubtestnet env todo
 export const BRRR_LABS_TOKEN = {
   testnet: "brrr.ft.ref-labs.testnet",
   mainnet: "brrr.ft.ref-labs.testnet",
+  privateMainnet: "brrr.ft.ref-labs.testnet",
 };
 
 export const WALLET_CONNECT_ID =

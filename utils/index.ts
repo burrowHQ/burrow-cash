@@ -52,6 +52,7 @@ export const nearNativeTokens = ["wrap.near", "wrap.testnet"];
 
 const nearTokenIds = {
   mainnet: "wrap.near",
+  privateMainnet: "wrap.near",
   testnet: "wrap.testnet",
 };
 
