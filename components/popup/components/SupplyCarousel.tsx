@@ -48,7 +48,7 @@ const SupplyCarousel = () => {
       <div className="absolute flex items-center content lg:top-[96px] lg:left-[136px] xsm:top-[68px] xsm:left-[142px]">
         <img style={{ width: "22px", marginRight: "4px" }} alt="" src={USDNIcon} />
         <img style={{ width: "22px", marginRight: "4px" }} alt="" src={USDTIcon} />
-        <img style={{ width: "22px", marginRight: "6px" }} alt="" src={ETHIcon} />
+        {/* <img style={{ width: "22px", marginRight: "6px" }} alt="" src={ETHIcon} /> */}
         <img style={{ width: "22px" }} alt="" src={FRAXIcon} />
       </div>
       <div className="absolute content w-[340px] h-[200px] lg:top-[50px] xsm:top-[25px] left-[20px] lg:pl-[22px] pr-[36px] xsm:pl-[22px] xsm:left-[25px]">
@@ -57,7 +57,7 @@ const SupplyCarousel = () => {
             If you have contributed liquidity to native{" "}
             <span className="text-white font-bold">USDC</span>,{" "}
             <span className="text-white font-bold">USDT</span>,{" "}
-            <span className="text-white font-bold">ETH</span>, or{" "}
+            {/* <span className="text-white font-bold">ETH</span>, or{" "} */}
             <span className="text-white font-bold">FRAX</span>, please click “Claim & Join” to join
             the new incentives for these assets.
           </p>
@@ -66,7 +66,7 @@ const SupplyCarousel = () => {
             You can participate in the incentive program by supplying native{" "}
             <span className="text-white font-bold">USDC</span>,{" "}
             <span className="text-white font-bold">USDT</span>,{" "}
-            <span className="text-white font-bold">ETH</span>, or{" "}
+            {/* <span className="text-white font-bold">ETH</span>, or{" "} */}
             <span className="text-white font-bold">FRAX</span>.
           </p>
         )}
@@ -91,14 +91,14 @@ const SupplyCarousel = () => {
               >
                 USDT
               </Button>
-              <Button
+              {/* <Button
                 classInfo="text-black bg-gray-1050 cursor-pointer border-2 border-dark-1100"
                 onClick={() => {
                   jump(incentiveTokens[3]);
                 }}
               >
                 ETH
-              </Button>
+              </Button> */}
               <Button
                 classInfo="text-white bg-gray-1000 cursor-pointer"
                 onClick={() => {
