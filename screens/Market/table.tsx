@@ -56,11 +56,11 @@ function TableHead({ sorting }) {
         <div
           className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
           onClick={() => {
-            dispatch_sort_action("totalSupply");
+            dispatch_sort_action("totalSupplyMoney");
           }}
         >
           Total Supplied
-          <SortButton sort={getCurColumnSort("totalSupply")} />
+          <SortButton sort={getCurColumnSort("totalSupplyMoney")} />
         </div>
         <div
           className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
@@ -75,10 +75,10 @@ function TableHead({ sorting }) {
         <div
           className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
           onClick={() => {
-            dispatch_sort_action("totalBorrowed");
+            dispatch_sort_action("totalBorrowedMoney");
           }}
         >
-          Total Borrowed <SortButton sort={getCurColumnSort("totalBorrowed")} />
+          Total Borrowed <SortButton sort={getCurColumnSort("totalBorrowedMoney")} />
         </div>
         <div
           className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
@@ -92,11 +92,11 @@ function TableHead({ sorting }) {
       <div
         className="col-span-1 bg-gray-300 rounded-t-2xl flex items-center text-sm text-black cursor-pointer pl-4 xl:pl-8 whitespace-nowrap"
         onClick={() => {
-          dispatch_sort_action("availableLiquidity");
+          dispatch_sort_action("availableLiquidityMoney");
         }}
       >
         Available Liquidity
-        <SortButton sort={getCurColumnSort("availableLiquidity")} />
+        <SortButton sort={getCurColumnSort("availableLiquidityMoney")} />
       </div>
     </div>
   );
@@ -104,10 +104,10 @@ function TableHead({ sorting }) {
 function HeadMobile({ sorting }) {
   const [showSelectBox, setShowSelectBox] = useState(false);
   const sortList = {
-    availableLiquidity: "Available Liquidity",
-    totalSupply: "Total Supplied",
+    availableLiquidityMoney: "Available Liquidity",
+    totalSupplyMoney: "Total Supplied",
     depositApy: "Supply APY",
-    totalBorrowed: "Total Borrowed",
+    totalBorrowedMoney: "Total Borrowed",
     borrowApy: "Borrow APY",
     price: "Price",
   };
