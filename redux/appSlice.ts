@@ -104,7 +104,7 @@ export const initialState: AppState = {
   },
   tableSorting: {
     market: {
-      property: "totalSupply",
+      property: "totalSupplyMoney",
       order: "desc" as IOrder,
     },
     portfolioDeposited: {
