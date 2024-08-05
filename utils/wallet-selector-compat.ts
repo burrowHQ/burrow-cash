@@ -15,6 +15,7 @@ import type { WalletSelectorModal } from "@near-wallet-selector/modal-ui";
 import { Near } from "near-api-js/lib/near";
 import { Account } from "near-api-js/lib/account";
 import { BrowserLocalStorageKeyStore } from "near-api-js/lib/key_stores";
+import { setupCoin98Wallet } from "@near-wallet-selector/coin98-wallet";
 import BN from "bn.js";
 import { map, distinctUntilChanged } from "rxjs";
 import { setupKeypom } from "@keypom/selector";
@@ -134,6 +135,7 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         contractId: LOGIC_CONTRACT_NAME,
         deprecated: false,
       }),
+      setupCoin98Wallet({}),
     ],
     network: {
       networkId: defaultNetwork,
