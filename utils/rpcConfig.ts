@@ -24,12 +24,12 @@ export function getExtendConfig(
       return {
         RPC_LIST: {
           defaultRpc: {
-            url: "https://rpc.mainnet.near.org",
-            simpleName: "official rpc",
-          },
-          lavaRpc: {
             url: "https://near.lava.build",
             simpleName: "lava rpc",
+          },
+          officialRpc: {
+            url: "https://rpc.mainnet.near.org",
+            simpleName: "official rpc",
           },
           betaRpc: {
             url: "https://beta.rpc.mainnet.near.org",
