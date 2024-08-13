@@ -58,7 +58,7 @@ const Links = () => {
         <TwitterIcon />
       </Link>
       <Link
-        href="https://discord.gg/reffinance"
+        href="https://discord.gg/rsMyJfHQx9"
         title="Discord"
         target="_blank"
         color={theme.custom.footerIcon}
