@@ -1,25 +1,30 @@
 import { useState } from "react";
+import Decimal from "decimal.js";
 import { Box, Typography, Stack, useTheme } from "@mui/material";
-
+import { useRouter } from "next/router";
 import HtmlTooltip from "../../components/common/html-tooltip";
 import TokenIcon from "../../components/TokenIcon";
 import { useExtraAPY } from "../../hooks/useExtraAPY";
 import { useAPY } from "../../hooks/useAPY";
 import { format_apy } from "../../utils/uiNumber";
+import { standardizeAsset } from "../../utils/index";
 import { getAssets } from "../../redux/assetsSelectors";
 import { useAppSelector } from "../../redux/hooks";
+import { getProtocolRewards } from "../../redux/selectors/getProtocolRewards";
 
 export const APYCell = ({
   baseAPY,
-  rewards: list,
+  rewards,
   page,
   tokenId,
   isStaking = false,
   onlyMarket = false,
   excludeNetApy = false,
 }) => {
+  // Filter out the ones rewards sent out
+  const list = rewards.filter((reward) => reward.rewards.remaining_rewards !== "0");
   const isBorrow = page === "borrow";
-  const boostedAPY = useAPY({
+  const [boostedAPY, stakeBoostedAPY] = useAPY({
     baseAPY,
     rewards: list,
     tokenId,
@@ -27,6 +32,7 @@ export const APYCell = ({
     onlyMarket,
     excludeNetApy,
   });
+  const stakeBooster = new Decimal(stakeBoostedAPY).gt(boostedAPY);
   return (
     <ToolTip
       tokenId={tokenId}
@@ -37,8 +43,12 @@ export const APYCell = ({
       onlyMarket={onlyMarket}
       excludeNetApy={excludeNetApy}
     >
-      <span className="border-b border-dashed border-dark-800 pb-0.5">
-        {format_apy(boostedAPY)}
+      <span
+        className={`border-b border-dashed border-dark-800 pb-0.5 whitespace-nowrap ${
+          stakeBooster ? "text-primary" : ""
+        }`}
+      >
+        {format_apy(boostedAPY)} {stakeBooster ? `~ ${format_apy(stakeBoostedAPY)}` : ""}
       </span>
     </ToolTip>
   );
@@ -56,19 +66,30 @@ const ToolTip = ({
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const assets = useAppSelector(getAssets);
+  const router = useRouter();
   // suppose only one reward
   const netTvlFarmTokenId = (Object.keys(assets?.netTvlFarm || {}) || [])[0];
-  const { computeRewardAPY, computeStakingRewardAPY, netLiquidityAPY, netTvlMultiplier } =
-    useExtraAPY({
-      tokenId,
-      isBorrow,
-      onlyMarket,
-    });
+  const {
+    computeRewardAPY,
+    computeStakingRewardAPY,
+    netLiquidityAPY,
+    netTvlMultiplier,
+    computeTokenNetRewardAPY,
+  } = useExtraAPY({
+    tokenId,
+    isBorrow,
+    onlyMarket,
+  });
+  const netTvlRewards = useAppSelector(getProtocolRewards);
   function getNetTvlFarmRewardIcon() {
     const asset = assets.data[netTvlFarmTokenId];
     const icon = asset?.metadata?.icon;
     return icon;
   }
+  const assetMetadata = standardizeAsset(
+    JSON.parse(JSON.stringify(assets?.data?.[tokenId]?.metadata || {})),
+  );
+  const { apy, tokenNetRewards } = computeTokenNetRewardAPY();
   return (
     <HtmlTooltip
       open={showTooltip}
@@ -81,7 +102,8 @@ const ToolTip = ({
             {format_apy(baseAPY)}
           </Typography>
           {!isBorrow &&
-            !excludeNetApy && [
+            !excludeNetApy &&
+            netTvlRewards?.length > 0 && [
               <Typography fontSize="0.75rem" key={0}>
                 Net Liquidity APY
               </Typography>,
@@ -92,15 +114,52 @@ const ToolTip = ({
                 </div>
               </Typography>,
             ]}
+          {!isBorrow && tokenNetRewards.length > 0
+            ? [
+                <Typography fontSize="0.75rem" key={6}>
+                  <span className="whitespace-nowrap">
+                    {assetMetadata?.symbol} Net Liquidity Reward APY
+                  </span>
+                </Typography>,
+                <Typography fontSize="0.75rem" color="#fff" textAlign="right" key={7}>
+                  <div className="flex items-center justify-end gap-1.5 whitespace-nowrap">
+                    <div className="flex items-center flex-shrink-0">
+                      {tokenNetRewards.map((reward, index) => {
+                        return (
+                          <img
+                            key={reward.token_id}
+                            className={`w-4 h-4 rounded-full flex-shrink-0 ${
+                              index > 0 ? "-ml-1.5" : ""
+                            }`}
+                            alt=""
+                            src={reward.icon}
+                          />
+                        );
+                      })}
+                    </div>
+                    {format_apy(apy)} ~ {format_apy(Number(apy || 0) * 1.5)}
+                  </div>
+                </Typography>,
+                <div className="flex items-center whitespace-nowrap gap-1 text-xs" key={8}>
+                  Max Boost <span className="text-white font-extrabold">1.5X</span> by{" "}
+                  <span
+                    className="text-xs text-primary underline cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push("/staking");
+                    }}
+                  >
+                    staking BRRR🔥
+                  </span>
+                </div>,
+              ]
+            : null}
           {list.map(({ rewards, metadata, price, config }) => {
             const { symbol, icon } = metadata;
-
-            const rewardAPY = computeRewardAPY(
-              metadata.token_id,
-              rewards.reward_per_day,
-              metadata.decimals + config.extra_decimals,
-              price || 0,
-            );
+            const rewardAPY = computeRewardAPY({
+              rewardTokenId: metadata.token_id,
+              rewardData: rewards,
+            });
 
             const stakingRewardAPY = computeStakingRewardAPY(metadata.token_id);
 

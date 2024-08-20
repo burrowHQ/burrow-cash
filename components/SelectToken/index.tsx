@@ -12,6 +12,9 @@ import { getModalData } from "../../redux/appSelectors";
 import { isMobileDevice } from "../../helpers/helpers";
 import { CloseIcon } from "../Modal/svg";
 import { toggleUseAsCollateral } from "../../redux/appSlice";
+import { IToken } from "../../interfaces/asset";
+import { DEFAULT_POSITION } from "../../utils/config";
+import { ModalContext } from "../Modal/index";
 
 export type IAssetType = "borrow" | "supply";
 type IBalance = { supply_balance?: string; borrow_balance?: string };
@@ -38,7 +41,7 @@ export default function SelectToken({
       list.sort(sortByBalance);
       setAssetList(list);
     }
-  }, [Object.keys(updateAsset)?.length, rows?.length]);
+  }, [JSON.stringify(updateAsset), Object.keys(updateAsset)?.length, rows?.length]);
 
   const sortByBalance = assetType === "supply" ? sortBySupplyBalance : sortByBorrowBalance;
   function sortBySupplyBalance(b: IUIAsset, a: IUIAsset) {
@@ -108,7 +111,16 @@ function TokenRow({
   onClose: any;
   selectRef: any;
 }) {
-  const { symbol, supply_balance, borrow_balance, icon, tokenId, canUseAsCollateral } = asset;
+  const {
+    symbol,
+    supply_balance,
+    borrow_balance,
+    icon,
+    tokenId,
+    canUseAsCollateral,
+    isLpToken,
+    tokens,
+  } = asset;
   const handleSupplyClick = useSupplyTrigger(tokenId);
   const handleBorrowClick = useBorrowTrigger(tokenId);
   const selected = useAppSelector(getModalData);
@@ -125,14 +137,54 @@ function TokenRow({
     onClose();
   }
   const is_checked = selected?.tokenId === asset.tokenId;
+  function getIcons() {
+    return (
+      <div className="flex items-center justify-center flex-wrap w-[34px] flex-shrink-0">
+        {isLpToken ? (
+          tokens.map((token: IToken, index) => {
+            return (
+              <img
+                key={token.token_id}
+                src={token.metadata?.icon}
+                alt=""
+                className={`w-[16px] h-[16px] rounded-full relative ${
+                  index !== 0 && index !== 2 ? "-ml-1.5" : ""
+                } ${index > 1 ? "-mt-1.5" : "z-10"}`}
+              />
+            );
+          })
+        ) : (
+          <img src={icon} alt="" className="w-[22px] h-[22px] rounded-full" />
+        )}
+      </div>
+    );
+  }
+  function getSymbols() {
+    return (
+      <div className="flex items-center flex-wrap max-w-[146px] flex-shrink-0">
+        {isLpToken ? (
+          tokens.map((token: IToken, index) => {
+            return (
+              <span className="text-sm text-white" key={token.token_id}>
+                {token?.metadata?.symbol}
+                {index === tokens.length - 1 ? "" : "-"}
+              </span>
+            );
+          })
+        ) : (
+          <span className="text-sm text-white">{symbol}</span>
+        )}
+      </div>
+    );
+  }
   return (
     <div
       onClick={selectToken}
-      className="flex items-center justify-between h-[42px] cursor-pointer px-5 hover:bg-dark-600"
+      className="flex items-center justify-between h-[46px] cursor-pointer px-5 hover:bg-dark-600"
     >
       <div className="flex items-center gap-2.5">
-        <img src={icon} alt="" className="w-[22px] h-[22px] rounded-full" />
-        <span className="text-sm text-white">{symbol}</span>
+        {getIcons()}
+        {getSymbols()}
         <CheckedIcon className={`ml-2 ${is_checked ? "" : "hidden"}`} />
       </div>
       <span className="text-sm text-white">
@@ -147,14 +199,18 @@ function GetBalance({
   asset,
   updateAsset,
   setUpdateAsset,
+  position,
 }: {
   asset: IUIAsset;
   updateAsset: Record<string, IUIAsset>;
   setUpdateAsset: any;
+  position: string;
 }) {
   const { symbol, tokenId } = asset;
   const isWrappedNear = symbol === "NEAR";
-  const { supplyBalance, borrowBalance } = useUserBalance(tokenId, isWrappedNear);
+  const { supplyBalance, maxBorrowAmountPositions } = useUserBalance(tokenId, isWrappedNear);
+  const borrowBalance =
+    maxBorrowAmountPositions[position || DEFAULT_POSITION]?.maxBorrowAmount?.toString();
   updateAsset[tokenId] = {
     ...asset,
     supply_balance: supplyBalance,
@@ -169,14 +225,16 @@ function GetBalance({
 function TokenList() {
   const { rows, updateAsset, setUpdateAsset, assetList, assetType, handleClose, selectRef } =
     useContext(SelectTokenData) as any;
+  const { position } = useContext(ModalContext) as any;
   return (
     <>
       {rows.map((asset: IUIAsset) => (
         <GetBalance
-          key={asset.symbol}
+          key={asset.tokenId}
           asset={asset}
           updateAsset={updateAsset}
           setUpdateAsset={setUpdateAsset}
+          position={position}
         />
       ))}
       {assetList.map((asset: IUIAsset) => (

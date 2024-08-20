@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { twMerge } from "tailwind-merge";
 import CustomPagination from "./CustomPagination";
 import CustomTableMobile from "./CustomTableMobile";
@@ -11,6 +11,8 @@ type columnType = {
   accessorKey?: string;
   cell?: any;
   size?: number;
+  minSize?: number;
+  maxSize?: number;
 };
 
 interface Props {
@@ -47,6 +49,24 @@ const CustomTable = ({
   selectedRowIndex,
 }: Props) => {
   const isMobile = isMobileDevice();
+  const headersRef = useRef<any>([]);
+  const [dimensions, setDimensions] = React.useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  const handleResize = () => {
+    setDimensions({
+      width: window.innerWidth,
+      height: window.innerHeight,
+    });
+  };
+
+  React.useEffect(() => {
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   if (isMobile) {
     return (
@@ -101,12 +121,6 @@ const CustomTable = ({
     }
   };
 
-  const handleRowLeave = () => {
-    if (typeof onSelectRow === "function") {
-      onSelectRow(null, null);
-    }
-  };
-
   const headers = columns?.map((d) => {
     let text;
     if (typeof d.header === "function") {
@@ -114,31 +128,41 @@ const CustomTable = ({
     } else {
       text = d.header;
     }
-    return { text, size: d.size };
+    return { text, size: d.size, minSize: d.minSize, maxSize: d.maxSize };
   });
+
+  const headersWidth = headersRef.current.map((d) => d.getBoundingClientRect().width);
   const headerNode = (
-    <div className="custom-table-thead">
-      <div className="custom-table-tr">
-        {headers?.map((d, i) => {
-          const styles: { flex?: string } = {};
-          if (d.size) {
-            styles.flex = `0 0 ${d.size}px`;
-          }
-          const keyId = typeof d.text === "string" ? d.text : i;
-          return (
-            <div key={keyId} className="custom-table-th text-gray-400" style={styles}>
-              {d.text}
-            </div>
-          );
-        })}
-      </div>
+    <div className="custom-table-tr custom-table-header-row">
+      {headers?.map((d, i) => {
+        const styles: { flex?: string; maxWidth?: string; minWidth?: string } = {};
+        if (d.size) {
+          styles.flex = `0 0 ${d.size}px`;
+        }
+        if (d.minSize) {
+          styles.minWidth = `${d.minSize}px`;
+        }
+        if (d.maxSize) {
+          styles.maxWidth = `${d.maxSize}px`;
+        }
+        const keyId = typeof d.text === "string" ? d.text : i;
+
+        const assignRef = (el) => {
+          headersRef.current[i] = el;
+        };
+        return (
+          <div key={keyId} className="custom-table-th text-gray-400" style={styles} ref={assignRef}>
+            {d.text}
+          </div>
+        );
+      })}
     </div>
   );
 
   let bodyNodes;
   if (data?.length) {
     bodyNodes = data?.map((d, i) => {
-      const tdNode = columns?.map((col) => {
+      const tdNode = columns?.map((col, colIndex) => {
         let content = null;
         if (typeof col.cell === "function") {
           content = col.cell({
@@ -148,8 +172,9 @@ const CustomTable = ({
           content = d[col.accessorKey];
         }
         const styles: { flex?: string } = {};
-        if (col.size) {
-          styles.flex = `0 0 ${col.size}px`;
+        const colSize = headersWidth[colIndex];
+        if (colSize) {
+          styles.flex = `0 0 ${colSize}px`;
         }
         return (
           <div className="custom-table-td" key={col.id || col.header} style={styles}>
@@ -228,9 +253,6 @@ const StyledTable = styled.div`
   .custom-table-td {
     flex: 1;
     word-break: break-word;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
   }
 
   .custom-table-thead {
@@ -238,7 +260,7 @@ const StyledTable = styled.div`
 
     .custom-table-th {
       text-align: left;
-      padding: 10px 5px;
+      padding: 10px 5px 10px 0;
     }
   }
 
@@ -246,7 +268,7 @@ const StyledTable = styled.div`
     min-height: 85px;
 
     .custom-table-td {
-      padding: 15px 5px;
+      padding: 15px 5px 15px 0;
       justify-content: center;
       display: flex;
       flex-direction: column;

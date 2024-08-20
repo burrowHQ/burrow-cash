@@ -2,6 +2,7 @@ import { Contract } from "near-api-js";
 import BN from "bn.js";
 import Decimal from "decimal.js";
 
+import { isEmpty } from "lodash";
 import getConfig, { defaultNetwork, LOGIC_CONTRACT_NAME } from "./config";
 import { nearMetadata, wooMetadata, sfraxMetadata, fraxMetadata } from "../components/Assets";
 
@@ -10,6 +11,8 @@ import {
   ChangeMethodsOracle,
   ViewMethodsLogic,
   ViewMethodsOracle,
+  ViewMethodsREFV1,
+  ChangeMethodsREFV1,
   ViewMethodsPyth,
   ChangeMethodsPyth,
 } from "../interfaces/contract-methods";
@@ -17,6 +20,10 @@ import { IBurrow, IConfig } from "../interfaces/burrow";
 import { getContract } from "../store";
 
 import { getWalletSelector, getAccount, functionCall } from "./wallet-selector-compat";
+import { IAssetFarmReward } from "../interfaces/asset";
+import { FarmData, Portfolio, Farm } from "../redux/accountState";
+// eslint-disable-next-line import/no-cycle
+import { IPortfolioReward } from "../redux/selectors/getAccountRewards";
 
 export const getViewAs = () => {
   if (window.location.href.includes("#instant-url")) {
@@ -124,7 +131,7 @@ export const getBurrow = async ({
     deposit = "1",
   ) => {
     const { contractId } = contract;
-    const gas = new BN(50000000000000);
+    const gas = new BN(300000000000000);
     const attachedDeposit = new BN(deposit);
 
     return functionCall({
@@ -142,7 +149,6 @@ export const getBurrow = async ({
     ViewMethodsLogic,
     ChangeMethodsLogic,
   );
-
   // get oracle address from
   const config = (await view(
     logicContract,
@@ -154,6 +160,12 @@ export const getBurrow = async ({
     config.oracle_account_id,
     ViewMethodsOracle,
     ChangeMethodsOracle,
+  );
+  const refv1Contract: Contract = await getContract(
+    account,
+    config.ref_exchange_id,
+    ViewMethodsREFV1,
+    ChangeMethodsREFV1,
   );
   const pythContract: Contract = await getContract(
     account,
@@ -181,6 +193,7 @@ export const getBurrow = async ({
     account,
     logicContract,
     oracleContract,
+    refv1Contract,
     pythContract,
     view,
     call,
@@ -241,4 +254,82 @@ export function standardizeAsset(asset) {
     asset.icon = fraxMetadata.icon;
   }
   return asset;
+}
+
+interface IAssetFarmRewards {
+  [token: string]: IAssetFarmReward;
+}
+interface IAccountFarmRewards {
+  [token: string]: FarmData;
+}
+export function filterSentOutFarms(FarmsPending: IAssetFarmRewards) {
+  // Filter out the ones rewards sent out
+  const tokenNetFarms = Object.entries(FarmsPending).reduce((acc, cur) => {
+    const [rewardTokenId, farmData] = cur;
+    if (farmData.remaining_rewards !== "0") {
+      return {
+        ...acc,
+        [rewardTokenId]: farmData,
+      };
+    }
+    return acc;
+  }, {}) as IAssetFarmRewards;
+  return tokenNetFarms;
+}
+export function filterAccountSentOutFarms(FarmsPending: IAccountFarmRewards) {
+  // Filter out the ones rewards sent out
+  const accountTokenNetFarms = Object.entries(FarmsPending).reduce((acc, cur) => {
+    const [rewardTokenId, farmData] = cur;
+    if (farmData.asset_farm_reward.remaining_rewards !== "0") {
+      return {
+        ...acc,
+        [rewardTokenId]: farmData,
+      };
+    }
+    return acc;
+  }, {}) as IAccountFarmRewards;
+  return accountTokenNetFarms;
+}
+export function filterAccountSentOutRewards(RewardsPending: any) {
+  // Filter out the ones rewards sent out
+  const accountTokenNetFarms = Object.entries(RewardsPending).reduce((acc, cur) => {
+    const [rewardTokenId, rewardData] = cur as any;
+    if (rewardData.remaining_rewards !== "0") {
+      return {
+        ...acc,
+        [rewardTokenId]: rewardData,
+      };
+    }
+    return acc;
+  }, {}) as IPortfolioReward;
+  return accountTokenNetFarms;
+}
+export function filterAccountAllSentOutFarms(portfolio: Portfolio) {
+  // Filter out the ones rewards sent out
+  const { supplied, borrowed, netTvl, tokennetbalance } = portfolio.farms;
+  const newSupplied = filterTypeFarms(supplied);
+  const newBorrowed = filterTypeFarms(borrowed);
+  const newTokennetbalance = filterTypeFarms(tokennetbalance);
+  const newNetTvl = filterAccountSentOutFarms(netTvl);
+  return {
+    supplied: newSupplied,
+    borrowed: newBorrowed,
+    tokennetbalance: newTokennetbalance,
+    netTvl: newNetTvl,
+  };
+}
+function filterTypeFarms(typeFarmData): IFarms {
+  const newTypeFarmData = Object.entries(typeFarmData).reduce((acc, [tokenId, farm]: any) => {
+    const newFarm = JSON.parse(JSON.stringify(filterAccountSentOutFarms(farm)));
+    if (isEmpty(newFarm)) return acc;
+    return {
+      ...acc,
+      [tokenId]: newFarm,
+    };
+  }, {});
+  return newTypeFarmData;
+}
+
+interface IFarms {
+  [tokenId: string]: Farm;
 }

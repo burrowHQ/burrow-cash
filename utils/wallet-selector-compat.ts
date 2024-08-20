@@ -1,5 +1,5 @@
 import { setupWalletSelector } from "@near-wallet-selector/core";
-import type { WalletSelector } from "@near-wallet-selector/core";
+import type { WalletSelector, Network } from "@near-wallet-selector/core";
 import { setupSender } from "@near-wallet-selector/sender";
 import { setupHereWallet } from "@near-wallet-selector/here-wallet";
 import { setupNightly } from "@near-wallet-selector/nightly";
@@ -10,6 +10,7 @@ import { setupNeth } from "@near-wallet-selector/neth";
 import { setupNearMobileWallet } from "@near-wallet-selector/near-mobile-wallet";
 import { setupModal } from "@near-wallet-selector/modal-ui";
 import { setupLedger } from "@near-wallet-selector/ledger";
+import { setupMintbaseWallet } from "@near-wallet-selector/mintbase-wallet";
 import type { WalletSelectorModal } from "@near-wallet-selector/modal-ui";
 import { Near } from "near-api-js/lib/near";
 import { Account } from "near-api-js/lib/account";
@@ -17,6 +18,8 @@ import { BrowserLocalStorageKeyStore } from "near-api-js/lib/key_stores";
 import BN from "bn.js";
 import { map, distinctUntilChanged } from "rxjs";
 import { setupKeypom } from "@keypom/selector";
+import { setupOKXWallet } from "@near-wallet-selector/okx-wallet";
+import { getRpcList } from "../components/Rpc/tool";
 
 import getConfig, {
   defaultNetwork,
@@ -86,16 +89,25 @@ const KEYPOM_OPTIONS = {
 export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorArgs) => {
   if (init) return selector;
   init = true;
-
+  const RPC_LIST = getRpcList();
+  let endPoint = "defaultRpc";
+  try {
+    endPoint = window.localStorage.getItem("endPoint") || endPoint;
+    if (!RPC_LIST[endPoint]) {
+      endPoint = "defaultRpc";
+      localStorage.removeItem("endPoint");
+    }
+  } catch (error) {}
   selector = await setupWalletSelector({
     modules: [
+      setupOKXWallet({}),
       myNearWallet,
       setupSender() as any,
       setupMeteorWallet(),
       walletConnect,
       setupNearMobileWallet({
         dAppMetadata: {
-          logoUrl: "https://ref-finance-images.s3.amazonaws.com/images/burrowIcon.png",
+          logoUrl: "https://ref-finance-images-v2.s3.amazonaws.com/images/burrowIcon.png",
           name: "NEAR Wallet Selector",
         },
       }),
@@ -117,8 +129,16 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         },
       }),
       setupLedger(),
+      setupMintbaseWallet({
+        walletUrl: "https://wallet.mintbase.xyz",
+        contractId: LOGIC_CONTRACT_NAME,
+        deprecated: false,
+      }),
     ],
-    network: defaultNetwork,
+    network: {
+      networkId: defaultNetwork,
+      nodeUrl: RPC_LIST[endPoint].url,
+    } as Network,
     debug: !!isTestnet,
     optimizeWalletOrder: false,
   });

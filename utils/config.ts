@@ -13,19 +13,37 @@ export const defaultNetwork = (process.env.NEXT_PUBLIC_DEFAULT_NETWORK ||
 
 const META_TOKEN = { testnet: undefined, mainnet: "meta-token.near" };
 const REF_TOKEN = { testnet: "ref.fakes.testnet", mainnet: "token.v2.ref-finance.near" };
+export const STABLE_POOL_IDS = [
+  "4179",
+  "3514",
+  "3515",
+  "1910",
+  "3020",
+  "3364",
+  "3688",
+  "3433",
+  "3689",
+];
+export const DEFAULT_POSITION = "REGULAR";
 export const BRRR_TOKEN = {
   testnet: "test_brrr.1638481328.burrow.testnet",
   mainnet: "token.burrow.near",
+};
+// for pubtestnet env todo
+export const BRRR_LABS_TOKEN = {
+  testnet: "brrr.ft.ref-labs.testnet",
+  mainnet: "brrr.ft.ref-labs.testnet",
 };
 
 export const WALLET_CONNECT_ID =
   process.env.NEXT_PUBLIC_WALLET_CONNECT_ID || ("87e549918631f833447b56c15354e450" as string);
 
-export const missingPriceTokens = [REF_TOKEN, META_TOKEN, BRRR_TOKEN];
+export const missingPriceTokens = [REF_TOKEN, META_TOKEN, BRRR_TOKEN, BRRR_LABS_TOKEN];
 export const incentiveTokens = [
   "853d955acef822db058eb8505911ed77f175b99e.factory.bridge.near",
   "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
   "usdt.tether-token.near",
+  // "aurora",
 ];
 const getConfig = (env: string = defaultNetwork) => {
   const RPC_LIST = getRpcList();
@@ -62,9 +80,13 @@ const getConfig = (env: string = defaultNetwork) => {
           "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
           "853d955acef822db058eb8505911ed77f175b99e.factory.bridge.near",
           "a663b02cf0a4b149d2ad41910cb81e23e1c41c32.factory.bridge.near",
+          "shadow_ref_v1-4179",
+          // "aurora",
         ],
         PYTH_ORACLE_CONTRACT_ID: "pyth-oracle.near",
+        REF_FI_CONTRACT_ID: "v2.ref-finance.near",
       } as unknown as ConnectConfig & {
+        REF_FI_CONTRACT_ID: string;
         PYTH_ORACLE_CONTRACT_ID: string;
         recordsUrl: string;
       };
@@ -84,9 +106,11 @@ const getConfig = (env: string = defaultNetwork) => {
           "3e2210e1184b45b64c8a434c0a7e7b23cc04ea7eb7a6c3c32520d03d4afcb8af",
         ],
         NATIVE_TOKENS: ["usdc.fakes.testnet"],
-        NEW_TOKENS: ["usdc.fakes.testnet"],
+        NEW_TOKENS: ["usdc.fakes.testnet", "shadow_ref_v1-0", "shadow_ref_v1-2"],
+        REF_FI_CONTRACT_ID: "exchange.ref-dev.testnet",
         PYTH_ORACLE_CONTRACT_ID: "pyth-oracle.testnet",
       } as unknown as ConnectConfig & {
+        REF_FI_CONTRACT_ID: string;
         PYTH_ORACLE_CONTRACT_ID: string;
         recordsUrl: string;
       };
@@ -99,6 +123,7 @@ const getConfig = (env: string = defaultNetwork) => {
         explorerUrl: "https://explorer.betanet.near.org",
         SPECIAL_REGISTRATION_TOKEN_IDS: [],
       } as unknown as ConnectConfig & {
+        REF_FI_CONTRACT_ID: string;
         PYTH_ORACLE_CONTRACT_ID: string;
         recordsUrl: string;
       };
@@ -108,7 +133,8 @@ const getConfig = (env: string = defaultNetwork) => {
         nodeUrl: RPC_LIST[endPoint].url,
         keyPath: `${process.env.HOME}/.near/validator_key.json`,
         walletUrl: "http://localhost:4000/wallet",
-      } as ConnectConfig & {
+      } as unknown as ConnectConfig & {
+        REF_FI_CONTRACT_ID: string;
         PYTH_ORACLE_CONTRACT_ID: string;
         recordsUrl: string;
       };
@@ -118,7 +144,8 @@ const getConfig = (env: string = defaultNetwork) => {
         networkId: "shared-test",
         nodeUrl: RPC_LIST[endPoint].url,
         masterAccount: "test.near",
-      } as ConnectConfig & {
+      } as unknown as ConnectConfig & {
+        REF_FI_CONTRACT_ID: string;
         PYTH_ORACLE_CONTRACT_ID: string;
         recordsUrl: string;
       };
@@ -127,7 +154,8 @@ const getConfig = (env: string = defaultNetwork) => {
         networkId: "shared-test-staging",
         nodeUrl: RPC_LIST[endPoint].url,
         masterAccount: "test.near",
-      } as ConnectConfig & {
+      } as unknown as ConnectConfig & {
+        REF_FI_CONTRACT_ID: string;
         PYTH_ORACLE_CONTRACT_ID: string;
         recordsUrl: string;
       };
@@ -137,5 +165,6 @@ const getConfig = (env: string = defaultNetwork) => {
 };
 
 export const isTestnet = getConfig(defaultNetwork).networkId === "testnet";
+export const REFV1_CONTRACT_NAME = getConfig().REF_FI_CONTRACT_ID;
 
 export default getConfig;

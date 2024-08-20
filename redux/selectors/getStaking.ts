@@ -1,4 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
+import { DateTime } from "luxon";
 import { shrinkToken } from "../../store";
 import { RootState } from "../store";
 
@@ -8,7 +9,6 @@ export const getStaking = createSelector(
   (account, app) => {
     const { config } = app;
     const { amount, months } = app.staking;
-
     const BRRR = Number(
       shrinkToken(account.portfolio.staking["staked_booster_amount"], app.config.booster_decimals),
     );
@@ -23,14 +23,18 @@ export const getStaking = createSelector(
       ((months * config.minimum_staking_duration_sec - config.minimum_staking_duration_sec) /
         (config.maximum_staking_duration_sec - config.minimum_staking_duration_sec)) *
         (config.x_booster_multiplier_at_maximum_staking_duration / 10000 - 1);
-
-    const totalXBRRR = Math.max(
-      xBRRR + amount * xBRRRMultiplier,
-      (BRRR + amount) * xBRRRMultiplier,
+    const maxMonths = config.maximum_staking_duration_sec / (30 * 24 * 60 * 60);
+    const unstakeDate = DateTime.fromMillis(stakingTimestamp / 1e6);
+    const selectedMonths = stakingTimestamp
+      ? Math.round(unstakeDate.diffNow().as("months"))
+      : months;
+    const compare = selectedMonths > maxMonths ? Math.min : Math.max;
+    const totalXBRRR = compare(
+      xBRRR + Number(amount) * xBRRRMultiplier,
+      (BRRR + Number(amount)) * xBRRRMultiplier,
     );
-
     const extraXBRRRAmount = totalXBRRR - xBRRR;
-
+    const totalXBRRRStaked = compare(xBRRR, BRRR);
     return {
       BRRR,
       xBRRR,
@@ -39,6 +43,7 @@ export const getStaking = createSelector(
       stakingTimestamp,
       amount,
       months,
+      totalXBRRRStaked,
     };
   },
 );

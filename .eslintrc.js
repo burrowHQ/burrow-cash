@@ -36,7 +36,7 @@ module.exports = {
     "no-nested-ternary": 0,
     "no-use-before-define": "off",
     "max-classes-per-file": ["error", 2],
-    "no-underscore-dangle": ["error", { allowAfterSuper: true, allowAfterThis: true }],
+    // "no-underscore-dangle": ["error", { allowAfterSuper: true, allowAfterThis: true }],
     "dot-notation": 0,
     "no-restricted-syntax": 1,
     "no-unused-expressions": [1, { allowShortCircuit: false, allowTernary: false }],
@@ -64,6 +64,10 @@ module.exports = {
     "react/jsx-no-bind": "off",
     "jsx-a11y/no-noninteractive-tabindex": "off",
     "@typescript-eslint/no-explicit-any": ["off"],
+    "react/destructuring-assignment": ["off"],
+    "@typescript-eslint/no-inferrable-types": ["off"],
+    "no-underscore-dangle": "off",
+    "react/no-unused-prop-types": "off",
   },
   settings: {
     react: {

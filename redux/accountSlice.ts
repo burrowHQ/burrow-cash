@@ -19,7 +19,6 @@ export const farmClaimAll = createAsyncThunk("account/farmClaimAll", async () =>
 
 export const fetchAccount = createAsyncThunk("account/fetchAccount", async () => {
   const account = await getAccount().then(transformAccount);
-
   if (account?.accountId) {
     const wallet = JSON.parse(
       localStorage.getItem("near-wallet-selector:selectedWalletId") || `"undefined"`,

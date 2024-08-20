@@ -185,37 +185,45 @@ const Links = () => {
       lineHeight="0"
       sx={{ gap: "48px" }}
     >
-      <Link
+      <a
         href="https://twitter.com/burrow_finance"
         title="Twitter"
         target="_blank"
-        color={theme.custom.footerIcon}
+        rel="noopener noreferrer"
+        style={{ color: theme.custom.footerIcon }}
       >
         <TwitterIcon />
-      </Link>
-      <Link
-        href="https://discord.gg/gUWBKy9Vur"
+      </a>
+      <a
+        href="https://discord.gg/rsMyJfHQx9"
         title="Discord"
         target="_blank"
-        color={theme.custom.footerIcon}
+        rel="noopener noreferrer"
+        style={{ color: theme.custom.footerIcon }}
       >
         <DiscordIcon />
-      </Link>
-      <Link
+      </a>
+      <a
         href="https://burrowfinance.medium.com/"
         title="Medium"
         target="_blank"
-        color={theme.custom.footerIcon}
+        rel="noopener noreferrer"
+        style={{ color: theme.custom.footerIcon }}
       >
         <MediumIcon />
-      </Link>
+      </a>
     </Box>
   );
 };
 const BugBounty = () => {
   const isMobile = isMobileDevice();
   return (
-    <Link href="https://immunefi.com/bounty/burrow/" title="Bug Bounty" target="_blank">
+    <a
+      href="https://immunefi.com/bounty/burrow/"
+      title="Bug Bounty"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       <Typography
         fontSize="14px"
         lineHeight="16px"
@@ -223,14 +231,14 @@ const BugBounty = () => {
       >
         Bug Bounty
       </Typography>
-    </Link>
+    </a>
   );
 };
 
 const Github = () => {
   const isMobile = isMobileDevice();
   return (
-    <Link href="https://github.com/burrowHQ/" title="Github" target="_blank">
+    <a href="https://github.com/burrowHQ/" title="Github" target="_blank" rel="noopener noreferrer">
       <Typography
         fontSize="14px"
         lineHeight="46px"
@@ -238,6 +246,6 @@ const Github = () => {
       >
         Github
       </Typography>
-    </Link>
+    </a>
   );
 };

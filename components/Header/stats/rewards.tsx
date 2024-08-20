@@ -9,6 +9,7 @@ import {
   toInternationalCurrencySystem_usd,
   toInternationalCurrencySystem_number,
 } from "../../../utils/uiNumber";
+import { ThreeDotIcon } from "../../Icons/IconsV2";
 
 const transformAssetReward = (r, text) => ({
   value: r.dailyAmount.toLocaleString(undefined, TOKEN_FORMAT),
@@ -25,6 +26,7 @@ export const UserDailyRewards = () => {
     baseBorrowedUsdDaily,
     farmSuppliedUsdDaily,
     farmBorrowedUsdDaily,
+    farmTokenNetUsdDaily,
     farmNetTvlUsdDaily,
     farmTotalUsdDaily,
     totalUsdDaily,
@@ -52,6 +54,7 @@ export const UserDailyRewards = () => {
             farmSuppliedUsdDaily={farmSuppliedUsdDaily}
             farmBorrowedUsdDaily={farmBorrowedUsdDaily}
             farmNetTvlUsdDaily={farmNetTvlUsdDaily}
+            farmTokenNetUsdDaily={farmTokenNetUsdDaily}
           />
         ),
       },
@@ -107,9 +110,15 @@ export const ProtocolDailyRewards = () => {
   );
 };
 
-const IncentiveMore = ({ farmSuppliedUsdDaily, farmBorrowedUsdDaily, farmNetTvlUsdDaily }) => {
+const IncentiveMore = ({
+  farmSuppliedUsdDaily,
+  farmBorrowedUsdDaily,
+  farmNetTvlUsdDaily,
+  farmTokenNetUsdDaily,
+}) => {
   const [showTooltip, setShowTooltip] = useState(false);
-  const empty = !farmSuppliedUsdDaily && !farmBorrowedUsdDaily && !farmNetTvlUsdDaily;
+  const empty =
+    !farmSuppliedUsdDaily && !farmBorrowedUsdDaily && !farmNetTvlUsdDaily && !farmTokenNetUsdDaily;
   if (empty) return null;
   return (
     <HtmlTooltip
@@ -146,6 +155,16 @@ const IncentiveMore = ({ farmSuppliedUsdDaily, farmBorrowedUsdDaily, farmNetTvlU
             <span className="text-gray-300 font-normal">Net Liquidity</span>
             <span className="text-white font-normal">
               {toInternationalCurrencySystem_usd(farmNetTvlUsdDaily)}
+            </span>
+          </div>
+          <div
+            className={`flex items-center justify-between text-xs gap-6 ${
+              farmTokenNetUsdDaily ? "" : "hidden"
+            }`}
+          >
+            <span className="text-gray-300 font-normal">Net Liquidity</span>
+            <span className="text-white font-normal">
+              {toInternationalCurrencySystem_usd(farmTokenNetUsdDaily)}
             </span>
           </div>
         </div>
@@ -231,20 +250,7 @@ const IconsDisplay = ({ icons }) => (
     ))}
     {icons.length > 5 && (
       <div className="w-5 h-5 rounded-3xl border-2 border-gray-800 bg-dark-100 flex items-center justify-center -ml-2.5 z-50">
-        <svg
-          width="12"
-          height="4"
-          viewBox="0 0 12 4"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            fillRule="evenodd"
-            clipRule="evenodd"
-            d="M3.20005 1.9998C3.20005 2.66255 2.66279 3.1998 2.00005 3.1998C1.33731 3.1998 0.800049 2.66255 0.800049 1.9998C0.800049 1.33706 1.33731 0.799805 2.00005 0.799805C2.66279 0.799805 3.20005 1.33706 3.20005 1.9998ZM7.20005 1.9998C7.20005 2.66255 6.66279 3.1998 6.00005 3.1998C5.33731 3.1998 4.80005 2.66255 4.80005 1.9998C4.80005 1.33706 5.33731 0.799805 6.00005 0.799805C6.66279 0.799805 7.20005 1.33706 7.20005 1.9998ZM10 3.1998C10.6628 3.1998 11.2 2.66255 11.2 1.9998C11.2 1.33706 10.6628 0.799805 10 0.799805C9.33731 0.799805 8.80005 1.33706 8.80005 1.9998C8.80005 2.66255 9.33731 3.1998 10 3.1998Z"
-            fill="#C0C4E9"
-          />
-        </svg>
+        <ThreeDotIcon />
       </div>
     )}
   </div>
