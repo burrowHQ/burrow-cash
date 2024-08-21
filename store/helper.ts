@@ -27,6 +27,7 @@ import {
 // eslint-disable-next-line import/no-cycle
 import { getTokenContract } from "./tokens";
 import getConfig from "../utils/config";
+import { getAuthenticationHeaders } from "../utils/signature";
 
 Decimal.set({ precision: DEFAULT_PRECISION });
 
@@ -169,9 +170,12 @@ const getPythPrices = async () => {
       };
     }
     try {
-      const listTokenPrice = await fetch(`${getConfig().recordsUrl}/list-token-price`).then((r) =>
-        r.json(),
-      );
+      const listTokenPrice = await fetch(`${getConfig().recordsUrl}/list-token-price`, {
+        method: "GET",
+        headers: {
+          Authentication: getAuthenticationHeaders("/list-token-price"),
+        },
+      }).then((r) => r.json());
       if (listTokenPrice?.[SFRAX_TOKEN]?.price) {
         format_price_map[SFRAX_TOKEN] = {
           asset_id: SFRAX_TOKEN,
