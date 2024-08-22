@@ -11,6 +11,7 @@ import { setupNearMobileWallet } from "@near-wallet-selector/near-mobile-wallet"
 import { setupModal } from "@near-wallet-selector/modal-ui";
 import { setupLedger } from "@near-wallet-selector/ledger";
 import { setupMintbaseWallet } from "@near-wallet-selector/mintbase-wallet";
+import { setupBitgetWallet } from "@near-wallet-selector/bitget-wallet";
 import type { WalletSelectorModal } from "@near-wallet-selector/modal-ui";
 import { Near } from "near-api-js/lib/near";
 import { Account } from "near-api-js/lib/account";
@@ -134,6 +135,7 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         contractId: LOGIC_CONTRACT_NAME,
         deprecated: false,
       }),
+      setupBitgetWallet({}),
     ],
     network: {
       networkId: defaultNetwork,
