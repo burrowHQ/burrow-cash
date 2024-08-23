@@ -33,13 +33,15 @@ const Bridge = () => {
                 style={{
                   minWidth: "200px",
                 }}
-                className="flex flex-col items-start whitespace-nowrap hover:bg-gray-500 px-2 py-2.5 rounded-md bg-opacity-30 cursor-pointer mb-1"
+                className="flex flex-col items-start w-[230px] hover:bg-gray-500 px-2 py-2.5 rounded-md bg-opacity-30 cursor-pointer mb-1"
               >
                 <div className="flex items-center justify-between w-full">
                   <span className="text-base text-white">{title}</span>
                   <ArrowRight />
                 </div>
-                <span className="text-base text-gray-300 mt-1">{subTitle}</span>
+                <span className="flex items-center flex-wrap text-base text-gray-300 mt-1">
+                  {subTitle}
+                </span>
               </div>
             );
           })}
@@ -54,11 +56,16 @@ export const bridgeList: IBridge[] = [
     subTitle: "Ethereum | Aurora",
     link: "https://rainbowbridge.app/",
   },
-  // {
-  //   title: "Allbridge",
-  //   subTitle: "Solana | Terra | Celo",
-  //   link: "https://app.allbridge.io/bridge",
-  // },
+  {
+    title: "Aggregate Bridge",
+    subTitle: "Arbitrum | Ethereum | Base Optimism | Scroll",
+    link: "https://app.ref.finance/bridge",
+  },
+  {
+    title: "Token Bridge",
+    subTitle: "Ethereum | Near | Solana",
+    link: "https://tokenbridge.app",
+  },
   // {
   //   title: "Electron Labs",
   //   subTitle: "Ethereum",

@@ -186,13 +186,13 @@ const BridgeSubMenuItem = ({ title, pathname, subTitle, onClose }: PropsSubMenu)
     onClose();
   }
   return (
-    <div onClick={handleUrl} className="flex items-center justify-between h-[70px] px-6">
+    <div onClick={handleUrl} className="flex items-center justify-between h-[70px] w-[320px] px-6">
       <div className="pl-[56px] flex flex-col">
         <span className="text-sm text-white">{title}</span>
         <span className="text-sm text-gray-300">{subTitle}</span>
       </div>
 
-      <ArrowTopRightIcon className="relative -top-3" />
+      <ArrowTopRightIcon className="relative -top-3 flex-shrink-0" />
     </div>
   );
 };
@@ -257,7 +257,7 @@ const Links = () => {
         <TwitterIcon fill="#979ABE" />
       </a>
       <a
-        href="https://discord.gg/reffinance"
+        href="https://discord.gg/rsMyJfHQx9"
         title="Discord"
         target="_blank"
         rel="noopener noreferrer"
