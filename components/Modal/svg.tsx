@@ -101,3 +101,110 @@ export function JumpTipIcon(props) {
     </svg>
   );
 }
+
+export function Star(props: any) {
+  return (
+    <svg
+      {...props}
+      width="14"
+      height="14"
+      viewBox="0 0 14 14"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <g filter="url(#filter0_i_5718_2044)">
+        <path
+          d="M6.29062 0.842911C6.43009 0.522377 6.8847 0.522377 7.02418 0.842912L8.56241 4.37798L12.3998 4.74853C12.7477 4.78212 12.8882 5.21448 12.6265 5.44618L9.73977 8.00152L10.5732 11.7656C10.6487 12.1069 10.281 12.3741 9.97971 12.1968L6.6574 10.241L3.33508 12.1968C3.03384 12.3741 2.66605 12.1069 2.74162 11.7656L3.57502 8.00152L0.688315 5.44618C0.426569 5.21448 0.567052 4.78212 0.914998 4.74853L4.75238 4.37798L6.29062 0.842911Z"
+          fill="#FFE600"
+        />
+      </g>
+      <path
+        d="M4.46907 3.77083C4.51857 3.93882 4.34356 4.08479 4.18719 4.00594L2.15158 2.97963C1.89458 2.85006 1.85443 2.49963 2.07545 2.31528L3.18487 1.38995C3.40589 1.2056 3.74342 1.308 3.82476 1.58408L4.46907 3.77083Z"
+        fill="url(#paint0_linear_5718_2044)"
+      />
+      <path
+        d="M8.81023 3.77108C8.76073 3.93906 8.93574 4.08503 9.09211 4.00619L11.1277 2.97987C11.3847 2.8503 11.4249 2.49987 11.2038 2.31552L10.0944 1.3902C9.87341 1.20585 9.53588 1.30825 9.45453 1.58432L8.81023 3.77108Z"
+        fill="url(#paint1_linear_5718_2044)"
+      />
+      <path
+        d="M6.90973 10.9238C6.84014 10.7631 6.61225 10.7631 6.54266 10.9239L5.6368 13.0158C5.52244 13.28 5.71606 13.5748 6.00387 13.5748L7.44852 13.5748C7.73633 13.5748 7.92995 13.28 7.81559 13.0158L6.90973 10.9238Z"
+        fill="url(#paint2_linear_5718_2044)"
+      />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M2.97438 7.17817L1.37821 5.81632C1.10913 5.58674 1.24858 5.14653 1.60077 5.11375L4.94074 4.80289L6.29307 1.80743C6.43477 1.49355 6.8805 1.49355 7.02221 1.80743L8.37454 4.80289L11.7145 5.11375C12.0667 5.14653 12.2061 5.58674 11.9371 5.81632L10.3421 7.17711C9.27186 7.69879 8.00929 8 6.65717 8C5.30597 8 4.04419 7.6992 2.97438 7.17817Z"
+        fill="url(#paint3_linear_5718_2044)"
+      />
+      <defs>
+        <filter
+          id="filter0_i_5718_2044"
+          x="0.552734"
+          y="-0.397461"
+          width="12.209"
+          height="12.6506"
+          filterUnits="userSpaceOnUse"
+          colorInterpolationFilters="sRGB"
+        >
+          <feFlood floodOpacity="0" result="BackgroundImageFix" />
+          <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+          <feColorMatrix
+            in="SourceAlpha"
+            type="matrix"
+            values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+            result="hardAlpha"
+          />
+          <feOffset dy="-1" />
+          <feGaussianBlur stdDeviation="1" />
+          <feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1" />
+          <feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 0.54 0 0 0 0 0 0 0 0 1 0" />
+          <feBlend mode="normal" in2="shape" result="effect1_innerShadow_5718_2044" />
+        </filter>
+        <linearGradient
+          id="paint0_linear_5718_2044"
+          x1="2.63016"
+          y1="1.85262"
+          x2="4.59961"
+          y2="4.21388"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#FFDD00" />
+          <stop offset="1" stopColor="#FFB700" />
+        </linearGradient>
+        <linearGradient
+          id="paint1_linear_5718_2044"
+          x1="10.6491"
+          y1="1.85286"
+          x2="8.67969"
+          y2="4.21413"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#FFDA01" />
+          <stop offset="1" stopColor="#FFBF01" />
+        </linearGradient>
+        <linearGradient
+          id="paint2_linear_5718_2044"
+          x1="6.72619"
+          y1="10.5"
+          x2="6.72619"
+          y2="13.5748"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#FFBD01" />
+          <stop offset="1" stopColor="#FFDB01" />
+        </linearGradient>
+        <linearGradient
+          id="paint3_linear_5718_2044"
+          x1="6.65723"
+          y1="2.5"
+          x2="6.65723"
+          y2="8"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="white" />
+          <stop offset="1" stopColor="#FFFDF0" stopOpacity="0.33" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}

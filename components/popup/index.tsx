@@ -3,18 +3,20 @@ import "swiper/swiper.min.css";
 import SwiperCore, { Autoplay } from "swiper";
 import React, { useEffect, useMemo, useState, memo } from "react";
 import { twMerge } from "tailwind-merge";
+import { useRouter } from "next/router";
 import SupplyCarousel from "./components/SupplyCarousel";
 import StakeCarousel from "./components/StakeCarousel";
 import DeltaCarouse from "./components/DeltaCarouse";
+import LpTokenCarouse from "./components/LpToken";
 import { isMobileDevice } from "../../helpers/helpers";
 
 SwiperCore.use([Autoplay]);
 const Popup = ({ className }) => {
   const INCENTIVE_POPUP_STATUS = localStorage.getItem("INCENTIVE_POPUP_STATUS");
   const [show, setShow] = useState<boolean>(false);
-
+  const router = useRouter();
   useEffect(() => {
-    if (INCENTIVE_POPUP_STATUS === "6") {
+    if (INCENTIVE_POPUP_STATUS === "7") {
       setShow(false);
     } else {
       setShow(true);
@@ -23,7 +25,7 @@ const Popup = ({ className }) => {
 
   function closePopup() {
     setShow(false);
-    localStorage.setItem("INCENTIVE_POPUP_STATUS", "6");
+    localStorage.setItem("INCENTIVE_POPUP_STATUS", "7");
   }
   if (!show) return null;
   return (
@@ -47,13 +49,15 @@ const Popup = ({ className }) => {
             loop
           >
             <SwiperSlide>
-              <>
+              <div className="flex flex-col items-end pr-4">
                 <CloseButton
-                  className="absolute cursor-pointer top-4 right-10 xsm:right-8  z-50 xsm:top-3"
+                  className="cursor-pointer mr-4 xsm:right-4 z-50"
                   onClick={closePopup}
                 />
-                <SupplyCarousel />
-              </>
+                <div onClick={() => router.push(`/tokenDetail/shadow_ref_v1-4179/`)}>
+                  <LpTokenCarouse />
+                </div>
+              </div>
             </SwiperSlide>
             <SwiperSlide>
               <CloseButton
@@ -69,6 +73,15 @@ const Popup = ({ className }) => {
                   }}
                 />
               </div>
+            </SwiperSlide>
+            <SwiperSlide>
+              <>
+                <CloseButton
+                  className="absolute cursor-pointer top-4 right-10 xsm:right-8  z-50 xsm:top-3"
+                  onClick={closePopup}
+                />
+                <SupplyCarousel />
+              </>
             </SwiperSlide>
             <SwiperSlide>
               <CloseButton

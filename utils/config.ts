@@ -45,6 +45,7 @@ export const incentiveTokens = [
   "usdt.tether-token.near",
   // "aurora",
 ];
+export const topTokens = ["shadow_ref_v1-4179"];
 const getConfig = (env: string = defaultNetwork) => {
   const RPC_LIST = getRpcList();
   let endPoint = "defaultRpc";
