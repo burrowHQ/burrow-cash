@@ -83,7 +83,7 @@ const Staking = () => {
           <div className="h2 flex items-center gap-3 mb-4 md:mb-0">
             <BrrrLogo color="#D2FF3A" className="brrr-logo" />
             <div className="brrr-amount flex flex-col md:flex-row md:gap-4 md:items-center">
-              {totalAmount > 0 ? totalAmount.toLocaleString(undefined, TOKEN_FORMAT) : 0}
+              {totalAmount > 0 ? totalAmount.toLocaleString() : 0}
               <div className="text-gray-300 brrr-token">BRRR</div>
             </div>
           </div>
@@ -91,7 +91,7 @@ const Staking = () => {
         <div className="md:flex justify-center gap-4 md:gap-6">
           <StakingBox
             text1="💰 Available"
-            value1={Number(total || 0) > 0 ? total.toLocaleString(undefined, TOKEN_FORMAT) : 0}
+            value1={Number(total || 0) > 0 ? total.toLocaleString() : 0}
             text2="Your APY"
             value2={<YourAPY />}
             text3="WalletBalance"
@@ -130,7 +130,7 @@ const Staking = () => {
             logoIcon={disabledUnstake ? <LockIcon /> : <UnlockIcon />}
             disabled={BRRR === 0}
             text1="🔒 Staking"
-            value1={BRRR ? BRRR.toLocaleString(undefined, TOKEN_FORMAT) : 0}
+            value1={BRRR ? BRRR.toLocaleString() : 0}
             text2={BRRR ? "Due to" : ""}
             text4="Boost Ratio"
             value4={displayMultiplierStaked}

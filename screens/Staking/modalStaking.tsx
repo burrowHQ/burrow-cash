@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import _ from "lodash";
 import Decimal from "decimal.js";
 import { DateTime } from "luxon";
 import styled from "styled-components";
@@ -18,21 +19,15 @@ import { Alerts } from "../../components/Modal/components";
 import { ArrowRight } from "../../components/Icons/Icons";
 import Booster from "./booster";
 import { format_apy } from "../../utils/uiNumber";
+import { getAccountBoostRatioData } from "../../redux/selectors/getAccountRewards";
+import { getMarketRewardsData } from "../../redux/selectors/getMarketRewards";
 
 const ModalStaking = ({ isOpen, onClose }) => {
   const [total, totalUnclaim, totalToken] = useAppSelector(getTotalBRRR);
   const app = useAppSelector((state) => state.app);
   const [monthPercent, setMonthPercent] = useState(0);
   const [loadingStake, setLoadingStake] = useState(false);
-  const {
-    stakingTimestamp,
-    amount,
-    months,
-    setAmount,
-    setMonths,
-    stakingNetAPY,
-    stakingNetTvlAPY,
-  } = useStaking();
+  const { stakingTimestamp, amount, months, setAmount, setMonths } = useStaking();
   const [minMonth, maxMonth, monthList] = useMemo(() => {
     if (app?.config) {
       const { minimum_staking_duration_sec, maximum_staking_duration_sec } = app?.config || {};
@@ -53,6 +48,8 @@ const ModalStaking = ({ isOpen, onClose }) => {
   const disabledStake = !amount || invalidAmount || invalidMonths;
   const { avgStakeSupplyAPY, avgStakeBorrowAPY, avgStakeNetAPY, totalTokenNetMap } =
     useStakeRewardApy();
+  const [, , multiplier] = useAppSelector(getAccountBoostRatioData);
+  const { tokenNetBalance } = useAppSelector(getMarketRewardsData);
 
   const inputAmount = `${amount}`
     .replace(/[^0-9.-]/g, "")
@@ -65,7 +62,6 @@ const ModalStaking = ({ isOpen, onClose }) => {
     trackMaxStaking({ total: totalToken });
     setAmount(totalToken);
   };
-
   const handleInputChange = (e) => {
     let { value } = e?.target || {};
     const numRegex = /^([0-9]*\.?[0-9]*$)/;
@@ -73,16 +69,10 @@ const ModalStaking = ({ isOpen, onClose }) => {
       e.preventDefault();
       return;
     }
-
     if (Number(value) > Number(total)) {
       value = total;
     }
     setAmount(value);
-  };
-
-  const handleSliderChange = (e) => {
-    const { value: percent } = e.target;
-    setAmount((Number(total) * percent) / 100);
   };
 
   const handleRangeSliderChange = (percent) => {
@@ -93,17 +83,8 @@ const ModalStaking = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleMonthChange = (percent, v) => {
-    setMonths(v);
-    setMonthPercent(percent);
-  };
-
   const handleMonthSliderChange = (v) => {
     setMonths(v);
-  };
-
-  const handleFocus = (e) => {
-    e.target.select();
   };
 
   const handleStake = async () => {
@@ -138,7 +119,7 @@ const ModalStaking = ({ isOpen, onClose }) => {
       <div className="px-2">
         <div className="flex justify-between mb-2">
           <span className="h5 text-gray-300">Available</span>
-          <span className="h5 text-gray-300">{total.toLocaleString(undefined, TOKEN_FORMAT)}</span>
+          <span className="h5 text-gray-300">{total.toLocaleString()}</span>
         </div>
         <StyledRow className="custom-input-wrap relative gap-2">
           <BrrrLogo color="#D2FF3A" />
@@ -196,12 +177,13 @@ const ModalStaking = ({ isOpen, onClose }) => {
             <div className="h5 text-gray-300">Avg. NetLiquidity Reward APY</div>
             <div className="h5 text-primary">{format_apy(avgStakeNetAPY)}</div>
           </div>
-          {Object.values(totalTokenNetMap).map((tokenNetData) => {
-            const { asset, totalTokenNetPrincipal, dailyRewardsUsd, marketAPY } =
-              tokenNetData as any;
-            const apy = new Decimal(totalTokenNetPrincipal).gt(0)
-              ? new Decimal(dailyRewardsUsd).div(totalTokenNetPrincipal).mul(365).mul(100)
-              : new Decimal("0");
+          {_.orderBy(
+            Object.values(tokenNetBalance || {}),
+            (b) => Number(b.marketAPY || 0),
+            "desc",
+          ).map((tokenNetData) => {
+            const { asset, marketAPY } = tokenNetData as any;
+            const apy = new Decimal(multiplier || 0).mul(marketAPY || 0);
             return (
               <div
                 key={asset.token_id}

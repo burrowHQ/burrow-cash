@@ -13,7 +13,8 @@ import { getStaking } from "./getStaking";
 import { INetTvlFarmRewards } from "../../interfaces";
 import { hasAssets, toUsd, emptySuppliedAsset, emptyBorrowedAsset } from "../utils";
 import { cloneObj } from "../../helpers/helpers";
-import { lpTokenPrefix, DEFAULT_POSITION } from "../../utils/config";
+import { useAppSelector } from "../hooks";
+import { getMarketRewardsDataUtil } from "./getMarketRewards";
 import {
   standardizeAsset,
   filterAccountSentOutFarms,
@@ -590,7 +591,10 @@ export const getAccountBoostRatioData = createSelector(
   (state: RootState) => state.account,
   (state: RootState) => state.app,
   getStaking,
-  (account, app, staking) => {
+  (state: RootState) => state.assets,
+  (account, app, staking, assets) => {
+    const { booster_log_base: booster_log_base_only_tokenBalance } =
+      getMarketRewardsDataUtil(assets);
     const { totalXBRRR, BRRR, amount, totalXBRRRStaked } = staking;
     const xBRRRAmount = totalXBRRR;
     if (!app?.config?.boost_suppress_factor || !app?.config?.booster_decimals)
@@ -601,6 +605,10 @@ export const getAccountBoostRatioData = createSelector(
       booster_log_base = getBoosterLogBaseFromAccountFarms(supplied);
       if (!booster_log_base) {
         booster_log_base = getBoosterLogBaseFromAccountFarms(borrowed);
+        if (!booster_log_base) {
+          // for no supply situation but has tokenBalance farm on market
+          booster_log_base = booster_log_base_only_tokenBalance;
+        }
       }
     }
     if (booster_log_base) {

@@ -147,7 +147,6 @@ export function useStakeRewardApy() {
       return balance * (asset.price?.usd || 0);
     })
     .reduce((acc, cur) => acc + cur, 0);
-
   // tokennet
   const totalTokenNetMap = tokenNetRewards.reduce((acc, cur) => {
     const { tokenId, newDailyAmount, assetTokenId } = cur as any;
@@ -200,7 +199,7 @@ export function useStakeRewardApy() {
   };
 }
 
-function getTokennetMarketAPY(asset, assets) {
+export function getTokennetMarketAPY(asset, assets) {
   const assetDecimals = asset.metadata.decimals + asset.config.extra_decimals;
   const tokenNetFarmsPending = asset.farms.tokennetbalance || {};
   // Filter out the ones rewards sent out
