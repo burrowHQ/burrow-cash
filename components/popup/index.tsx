@@ -16,7 +16,7 @@ const Popup = ({ className }) => {
   const [show, setShow] = useState<boolean>(false);
   const router = useRouter();
   useEffect(() => {
-    if (INCENTIVE_POPUP_STATUS === "7") {
+    if (INCENTIVE_POPUP_STATUS === "8") {
       setShow(false);
     } else {
       setShow(true);
