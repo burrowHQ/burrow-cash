@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-// import TradingTable from "../../../Trading/components/Table";
+import TradingTable from "../../../Trading/components/Table";
 import { useMarginAccount } from "../../../../hooks/useMarginAccount";
 import { useMarginConfigToken } from "../../../../hooks/useMarginConfig";
 import { toInternationalCurrencySystem_number } from "../../../../utils/uiNumber";
@@ -120,7 +120,7 @@ const MyMarginTradingPage = () => {
           </div>
         </div>
       </div>
-      {/* <TradingTable positionsList={marginAccountList} /> */}
+      <TradingTable positionsList={marginAccountList} />
     </div>
   );
 };

@@ -20,6 +20,7 @@ import marginConfigReducer from "./marginConfigSlice";
 import appReducer from "./appSlice";
 import feedReducer from "./feedSlice";
 import { migrations } from "./migrations";
+import marginCategoryReducer from "./marginTrading";
 
 const persistConfig = {
   key: "root",
@@ -36,6 +37,7 @@ const rootReducer = combineReducers({
   marginConfig: marginConfigReducer,
   app: appReducer,
   feed: feedReducer,
+  category: marginCategoryReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
