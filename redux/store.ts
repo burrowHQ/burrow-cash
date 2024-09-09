@@ -15,6 +15,8 @@ import storage from "redux-persist/lib/storage";
 
 import assetsReducer from "./assetsSlice";
 import accountReducer from "./accountSlice";
+import marginAccountReducer from "./marginAccountSlice";
+import marginConfigReducer from "./marginConfigSlice";
 import appReducer from "./appSlice";
 import feedReducer from "./feedSlice";
 import { migrations } from "./migrations";
@@ -30,6 +32,8 @@ const persistConfig = {
 const rootReducer = combineReducers({
   assets: assetsReducer,
   account: accountReducer,
+  marginAccount: marginAccountReducer,
+  marginConfig: marginConfigReducer,
   app: appReducer,
   feed: feedReducer,
 });

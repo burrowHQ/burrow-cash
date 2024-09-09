@@ -19,6 +19,8 @@ import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { fetchAssets, fetchRefPrices } from "../redux/assetsSlice";
 import { fetchAccount, logoutAccount } from "../redux/accountSlice";
 import { fetchConfig } from "../redux/appSlice";
+import { fetchMarginAccount } from "../redux/marginAccountSlice";
+import { fetchMarginConfig } from "../redux/marginConfigSlice";
 import { ToastMessage } from "../components/ToastMessage";
 import Popup from "../components/popup";
 import RpcList from "../components/Rpc";
@@ -82,6 +84,8 @@ const Init = () => {
     dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
     dispatch(fetchAccount());
     dispatch(fetchConfig());
+    dispatch(fetchMarginAccount());
+    dispatch(fetchMarginConfig());
   };
   useEffect(fetchData, []);
   useInterval(fetchData, !isIdle ? REFETCH_INTERVAL : null);

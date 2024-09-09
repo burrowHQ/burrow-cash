@@ -13,6 +13,12 @@ export const mainMenuList: Imenu[] = [
     allLinks: ["/", "/markets", "/tokenDetail/[id]"],
     icon: <MarketIcon />,
   },
+  {
+    title: "Margin Trading",
+    link: "/marginTrading",
+    allLinks: ["/marginTrading", "/trading"],
+    icon: <MarketIcon />,
+  },
   { title: "Dashboard", link: "/dashboard", allLinks: ["/dashboard"], icon: <DashboardIcon /> },
   { title: "Staking", link: "/staking", allLinks: ["/staking"], icon: <StakeIcon /> },
 ];

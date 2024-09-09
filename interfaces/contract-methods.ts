@@ -3,12 +3,14 @@ export enum ViewMethodsLogic {
   get_account,
   get_accounts_paged,
   get_account_all_positions,
+  get_margin_account,
   // assets
   get_asset,
   get_assets,
   get_assets_paged,
   // config
   get_config,
+  get_margin_config,
   // farms
   get_asset_farm,
   get_asset_farms,
@@ -40,6 +42,8 @@ export enum ChangeMethodsLogic {
   account_stake_booster,
   account_unstake_booster,
   register_account,
+  // margin action
+  margin_execute_with_pyth,
 }
 
 export enum ViewMethodsOracle {

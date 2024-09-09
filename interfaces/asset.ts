@@ -12,13 +12,19 @@ export interface IAssetConfig {
   can_use_as_collateral: boolean;
   can_borrow: boolean;
   net_tvl_multiplier: number;
+  holding_position_fee_rate: string;
 }
 
 export interface IAssetEntry {
   token_id: string;
   supplied: { shares: string; string: string };
   borrowed: { shares: string; string: string };
+  margin_debt: { shares: string; string: string };
+  margin_pending_debt: string;
+  margin_position: string;
   reserved: string;
+  prot_fee: string;
+  unit_acc_hp_interest: string;
   last_update_timestamp: string;
   config: IAssetConfig;
 }
