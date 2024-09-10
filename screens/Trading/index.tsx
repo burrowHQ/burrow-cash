@@ -78,7 +78,7 @@ const Trading = () => {
           shrinkToken(margin_position, decimals + extra_decimals),
         ),
         toInternationalCurrencySystem_number(
-          shrinkToken(margin_debt.balance, decimals + extra_decimals),
+          shrinkToken(margin_debt?.balance, decimals + extra_decimals),
         ),
       ]);
     }
