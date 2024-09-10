@@ -78,6 +78,7 @@ const getConfig = (env: string = defaultNetwork) => {
         NEW_TOKENS: [
           "usdt.tether-token.near",
           "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
+          "shadow_ref_v1-4179",
           "853d955acef822db058eb8505911ed77f175b99e.factory.bridge.near",
           "a663b02cf0a4b149d2ad41910cb81e23e1c41c32.factory.bridge.near",
           "shadow_ref_v1-4179",

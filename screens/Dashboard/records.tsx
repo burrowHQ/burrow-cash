@@ -109,6 +109,7 @@ const Records = ({ isShow }) => {
 const getColumns = ({ showToast, handleTxClick, txLoadingStates }) => [
   {
     header: "Assets",
+    minSize: 220,
     cell: ({ originalData }) => {
       const { data } = originalData || {};
       const { metadata } = data || {};
@@ -172,9 +173,11 @@ const getColumns = ({ showToast, handleTxClick, txLoadingStates }) => [
   {
     header: "Type",
     accessorKey: "event",
+    maxSize: 180,
   },
   {
     header: "Amount",
+    maxSize: 180,
     cell: ({ originalData }) => {
       const { amount, data } = originalData || {};
       const { metadata, config } = data || {};

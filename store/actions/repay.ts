@@ -27,6 +27,7 @@ export async function repay({
   minRepay: string;
   interestChargedIn1min: string;
 }) {
+  // TODO repay from wallet
   const { account, logicContract } = await getBurrow();
   const tokenContract = await getTokenContract(tokenId);
   const { decimals } = (await getMetadata(tokenId))!;
@@ -61,7 +62,7 @@ export async function repay({
     functionCalls.push(...(await registerNearFnCall(account.accountId, tokenContract)));
     functionCalls.push({
       methodName: ChangeMethodsNearToken[ChangeMethodsNearToken.near_deposit],
-      gas: new BN("10000000000000"),
+      gas: new BN("100000000000000"),
       attachedDeposit: new BN(toWrapAmount.toFixed(0, 2)),
     });
   }

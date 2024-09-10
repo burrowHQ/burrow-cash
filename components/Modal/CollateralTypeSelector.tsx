@@ -6,6 +6,8 @@ import { digitalProcess } from "../../utils/uiNumber";
 import { UIAsset } from "../../interfaces";
 import { DEFAULT_POSITION } from "../../utils/config";
 import CollateralTypeName from "./CollateralTypeName";
+import { shrinkToken } from "../../store";
+import { Asset } from "../../redux/assetState";
 
 export function CollateralTypeSelectorBorrow({
   maxBorrowAmountPositions,

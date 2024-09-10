@@ -31,7 +31,6 @@ export async function adjustCollateral({
   const { decimals } = asset.metadata;
   const account = await getAccount().then(transformAccount);
   if (!account) return;
-
   const suppliedBalance = new Decimal(account.portfolio?.supplied[tokenId]?.balance || 0);
   const collateralBalance = new Decimal(
     asset.isLpToken

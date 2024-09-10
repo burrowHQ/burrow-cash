@@ -1,8 +1,8 @@
+LICENSE
+yarn.lock
+tsconfig.tsbuildinfo
 .env
 .gitignore
-.prettierrc
 .prettierignore
-tsconfig.tsbuildinfo
 yarn-error.log
-yarn.lock
-LICENSE
+.prettierrc

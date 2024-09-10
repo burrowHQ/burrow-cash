@@ -10,12 +10,11 @@ import {
 } from "../interfaces";
 import { getBurrow } from "../utils";
 import { DEFAULT_PRECISION } from "./constants";
-import { lpTokenPrefix } from "../utils/config";
 
 Decimal.set({ precision: DEFAULT_PRECISION });
 
 export const getAssets = async (): Promise<IAssetEntry[]> => {
-  const { view, logicContract } = await getBurrow();
+  const { view, logicContract, pythContract } = await getBurrow();
   return (
     (await view(logicContract, ViewMethodsLogic[ViewMethodsLogic.get_assets_paged])) as AssetEntry[]
   ).map(([token_id, asset]: AssetEntry) => ({

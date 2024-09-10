@@ -84,7 +84,8 @@ export const Stat = ({
   onClick?: () => void;
 }) => {
   return (
-    <div onClick={() => onClick && onClick()} style={{ minHeight: 81 }} className="md:w-[351px]">
+    <div onClick={() => onClick && onClick()} style={{ minHeight: 81 }}>
+      {/* <div onClick={() => onClick && onClick()} style={{ minHeight: 81 }} className="md:w-[351px]"> */}
       <div className="flex items-center gap-1">
         {typeof title === "string" ? <div className="h6 text-gray-300">{title}</div> : title}
         {titleTooltip && <TagToolTip title={titleTooltip} />}

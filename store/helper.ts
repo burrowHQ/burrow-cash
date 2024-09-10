@@ -239,6 +239,8 @@ export const shrinkToken = (
   decimals: string | number,
   fixed?: number,
 ): string => {
+  console.log(value, decimals, fixed, "......");
+  if (!value) return "";
   return new Decimal(value).div(new Decimal(10).pow(decimals)).toFixed(fixed);
 };
 

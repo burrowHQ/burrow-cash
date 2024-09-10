@@ -1,9 +1,33 @@
 /** @type {import("tailwindcss").Config} */
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const plugin = require("tailwindcss/plugin");
+
+const getStyleMapping = (max, min) => {
+  if (!max) {
+    return;
+  }
+  const maxArray = [...Array(max + 1).keys()];
+  return maxArray.reduce((pre, cur) => {
+    // eslint-disable-next-line no-unused-expressions
+    cur >= min && (pre[cur] = `${cur / 4}rem`);
+    return pre;
+  }, {});
+};
 module.exports = {
   content: [
     "./screens/**/*.{js,ts,jsx,tsx,mdx}",
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  plugins: [
+    plugin(function ({ addUtilities }) {
+      addUtilities({
+        ".fc": {
+          display: "flex",
+          alignItems: "center",
+        },
+      });
+    }),
   ],
   theme: {
     screens: {
@@ -26,6 +50,12 @@ module.exports = {
     },
     boxShadow: {},
     extend: {
+      width: {
+        ...getStyleMapping(1800, 0),
+      },
+      minWidth: {
+        ...getStyleMapping(1800, 0),
+      },
       boxShadow: {
         100: "0px 0px 2px 0px #00000080",
       },
@@ -84,6 +114,7 @@ module.exports = {
         red: {
           50: "#FF6BA9",
           100: "#FF68A7",
+          150: "#EA3F68",
         },
         yellow: {
           50: "#F3BA2F",
@@ -117,5 +148,4 @@ module.exports = {
     opacity: [],
     backgroundColor: ["responsive", "hover", "focus", "group-hover"],
   },
-  plugins: [],
 };

@@ -240,20 +240,34 @@ export function decimalMin(a: string | number | Decimal, b: string | number | De
 }
 
 export function standardizeAsset(asset) {
-  if (asset.symbol === "wNEAR") {
-    asset.symbol = nearMetadata.symbol;
-    asset.icon = nearMetadata.icon;
+  const serializationAsset = JSON.parse(JSON.stringify(asset || {}));
+  if (serializationAsset.symbol === "wNEAR") {
+    serializationAsset.symbol = nearMetadata.symbol;
+    serializationAsset.icon = nearMetadata.icon;
   }
-  if (asset.symbol === "WOO") {
-    asset.icon = wooMetadata.icon;
+  if (serializationAsset.metadata?.symbol === "wNEAR") {
+    serializationAsset.metadata.symbol = nearMetadata.symbol;
+    serializationAsset.metadata.icon = nearMetadata.icon;
   }
-  if (asset.symbol === "sFRAX") {
-    asset.icon = sfraxMetadata.icon;
+  if (serializationAsset.symbol === "WOO") {
+    serializationAsset.icon = wooMetadata.icon;
   }
-  if (asset.symbol === "FRAX") {
-    asset.icon = fraxMetadata.icon;
+  if (serializationAsset.metadata?.symbol === "WOO") {
+    serializationAsset.metadata.icon = wooMetadata.icon;
   }
-  return asset;
+  if (serializationAsset.symbol === "sFRAX") {
+    serializationAsset.icon = sfraxMetadata.icon;
+  }
+  if (serializationAsset.metadata?.symbol === "sFRAX") {
+    serializationAsset.metadata.icon = sfraxMetadata.icon;
+  }
+  if (serializationAsset.symbol === "FRAX") {
+    serializationAsset.icon = fraxMetadata.icon;
+  }
+  if (serializationAsset.metadata?.symbol === "FRAX") {
+    serializationAsset.metadata.icon = fraxMetadata.icon;
+  }
+  return serializationAsset;
 }
 
 interface IAssetFarmRewards {

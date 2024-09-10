@@ -20,6 +20,7 @@ import {
   filterAccountSentOutFarms,
   filterAccountAllSentOutFarms,
 } from "../../utils/index";
+import { lpTokenPrefix, DEFAULT_POSITION } from "../../utils/config";
 
 export interface IPortfolioReward {
   icon: string;
@@ -492,7 +493,6 @@ export const getAccountRewardsForApy = createSelector(
           const rewardAsset = assets.data[rewardTokenId];
           const rewardAssetDecimals =
             rewardAsset.metadata.decimals + rewardAsset.config.extra_decimals;
-
           const { icon, symbol, name } = rewardAsset.metadata;
 
           const unclaimedAmount = Number(

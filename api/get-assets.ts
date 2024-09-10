@@ -7,7 +7,7 @@ import { standardizeAsset } from "../utils";
 
 const getPrice = (tokenId, priceResponse, metadata) => {
   const price = priceResponse.prices.find((p) => p.asset_id === tokenId)?.price || undefined;
-  if (!price) return 0;
+  if (!price) return { usd: "0", decimals: metadata.decimals, multiplier: "0" };
   const usd = Number(price.multiplier) / 10 ** (price.decimals - metadata.decimals);
   return { ...price, usd };
 };
