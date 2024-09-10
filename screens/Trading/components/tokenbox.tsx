@@ -111,7 +111,7 @@ const TradingToken: React.FC<TradingTokenInter> = ({ tokenList, type, setOwnBanl
   return (
     <div className="relative cursor-pointer w-fit " onMouseLeave={handleMouseLeave}>
       <div
-        className="flex items-center justify-end hover:bg-gray-1050  p-1.5 rounded-md "
+        className="flex items-center justify-end hover:bg-gray-1250  p-1.5 rounded-md "
         onMouseEnter={handleMouseEnter}
       >
         <div className="w-6 h-6">

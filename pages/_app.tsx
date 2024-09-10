@@ -28,6 +28,7 @@ import PubTestModal from "../components/PubTestModal";
 import { getAccountId, getAccountPortfolio } from "../redux/accountSelectors";
 import { getAssets } from "../redux/assetsSelectors";
 import { getConfig } from "../redux/appSelectors";
+import "./slip.css";
 
 ModalReact.defaultStyles = {
   overlay: {
