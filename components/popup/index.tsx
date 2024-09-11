@@ -25,7 +25,7 @@ const Popup = ({ className }) => {
 
   function closePopup() {
     setShow(false);
-    localStorage.setItem("INCENTIVE_POPUP_STATUS", "7");
+    localStorage.setItem("INCENTIVE_POPUP_STATUS", "8");
   }
   if (!show) return null;
   return (

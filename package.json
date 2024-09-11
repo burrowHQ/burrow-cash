@@ -28,6 +28,7 @@
     "@mui/system": "^5.10.6",
     "@mui/utils": "^5.10.6",
     "@near-wallet-selector/bitte-wallet": "^8.9.12",
+    "@near-wallet-selector/coin98-wallet": "8.9.12",
     "@near-wallet-selector/core": "^8.9.7",
     "@near-wallet-selector/here-wallet": "^8.9.7",
     "@near-wallet-selector/ledger": "^8.9.7",
