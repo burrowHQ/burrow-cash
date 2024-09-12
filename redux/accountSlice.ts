@@ -60,7 +60,7 @@ export const accountSlice = createSlice({
       state.status = action.meta.requestStatus;
       state.fetchedAt = new Date().toString();
 
-      if (!action.payload?.accountId) return;
+      if (!action.payload?.accountId || !window.accountId) return;
 
       const { accountId, balances, portfolio } = action.payload;
 
