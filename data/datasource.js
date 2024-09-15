@@ -37,6 +37,7 @@ class DataSource {
       throw new Error("Failed to connect server");
     }
 
+    // eslint-disable-next-line no-useless-catch
     try {
       const json = await parseResponse(response);
       return json;
@@ -51,7 +52,7 @@ class DataSource {
       page_size: pageSize,
     };
     return this.callAPI(
-      `/burrow/get_liquidation_info/${account}`,
+      `/burrow/get_burrow_liquidate_records/${account}`,
       "GET",
       qryObj,
       null,
@@ -59,14 +60,11 @@ class DataSource {
     );
   }
 
-  markLiquidationRead(id, account) {
-    return this.callAPI(
-      `/burrow/set_liquidation_info/${account}/${id}`,
-      "POST",
-      null,
-      null,
-      config?.liquidationUrl,
-    );
+  markLiquidationRead(receipt_ids) {
+    const qryObj = {
+      receipt_ids,
+    };
+    return this.callAPI("/burrow/set_liquidation", "POST", null, qryObj, config?.liquidationUrl);
   }
 
   getRecords(accountId, pageNumber = 1, pageSize = 10) {
