@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
 import CustomTable from "../../components/CustomTable/CustomTable";
-import { useAccountId, useUnreadLiquidation } from "../../hooks/hooks";
 import { shrinkToken, TOKEN_FORMAT } from "../../store";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { getAssets } from "../../redux/assetsSelectors";
 import { formatTokenValueWithMilify, getDateString } from "../../helpers/helpers";
 import { getLiquidations } from "../../api/get-liquidations";
 import { setUnreadLiquidation } from "../../redux/appSlice";
+import { getAccountId } from "../../redux/accountSelectors";
 
-const Liquidations = ({ isShow }) => {
+const Liquidations = ({ isShow, setLiquidationPage }) => {
   const dispatch = useAppDispatch();
-  const accountId = useAccountId();
   const assets = useAppSelector(getAssets);
+  const accountId = useAppSelector(getAccountId);
   const [isLoading, setIsLoading] = useState(false);
   const [docs, setDocs] = useState([]);
   const [pagination, setPagination] = useState<{
@@ -21,12 +21,12 @@ const Liquidations = ({ isShow }) => {
   }>({
     page: 1,
   });
-
   useEffect(() => {
     if (isShow) {
       fetchData({
         page: pagination?.page,
       }).then();
+      setLiquidationPage(pagination?.page);
     }
   }, [isShow, pagination?.page]);
 
@@ -91,20 +91,20 @@ const columns = [
       return <div>{LiquidatedAssets?.[0]?.data?.isLpToken ? "LP token" : "Standard Token"}</div>;
     },
   },
-  {
-    header: () => (
-      <div style={{ whiteSpace: "normal" }}>
-        Health Factor<div>before Liquidate</div>
-      </div>
-    ),
-    cell: ({ originalData }) => {
-      const { healthFactor_before, liquidation_type } = originalData || {};
-      if (liquidation_type === "ForceClose") {
-        return "-";
-      }
-      return <div>{(Number(healthFactor_before) * 100).toFixed(2)}%</div>;
-    },
-  },
+  // {
+  //   header: () => (
+  //     <div style={{ whiteSpace: "normal" }}>
+  //       Health Factor<div>before Liquidate</div>
+  //     </div>
+  //   ),
+  //   cell: ({ originalData }) => {
+  //     const { healthFactor_before, liquidation_type } = originalData || {};
+  //     if (liquidation_type === "ForceClose") {
+  //       return "-";
+  //     }
+  //     return <div>{(Number(healthFactor_before) * 100).toFixed(2)}%</div>;
+  //   },
+  // },
   {
     header: () => (
       <div style={{ whiteSpace: "normal" }}>
@@ -181,19 +181,19 @@ const columns = [
       return <div>{node}</div>;
     },
   },
-  {
-    header: () => (
-      <div style={{ whiteSpace: "normal", textAlign: "right" }}>
-        Health Factor<div>after Liquidate</div>
-      </div>
-    ),
-    cell: ({ originalData }) => {
-      const { healthFactor_after } = originalData || {};
-      return (
-        <div style={{ textAlign: "right" }}>{(Number(healthFactor_after) * 100).toFixed(2)}%</div>
-      );
-    },
-  },
+  // {
+  //   header: () => (
+  //     <div style={{ whiteSpace: "normal", textAlign: "right" }}>
+  //       Health Factor<div>after Liquidate</div>
+  //     </div>
+  //   ),
+  //   cell: ({ originalData }) => {
+  //     const { healthFactor_after } = originalData || {};
+  //     return (
+  //       <div style={{ textAlign: "right" }}>{(Number(healthFactor_after) * 100).toFixed(2)}%</div>
+  //     );
+  //   },
+  // },
 ];
 
 export default Liquidations;
