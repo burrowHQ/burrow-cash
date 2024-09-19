@@ -80,7 +80,7 @@ export const getBurrow = async ({
     if (fetchData) fetchData(accountId);
   };
 
-  if (!selector) {
+  if (!selector && fetchData && signOut) {
     selector = await getWalletSelector({
       onAccountChange: changeAccount,
     });
