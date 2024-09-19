@@ -1,5 +1,4 @@
 import Datasource from "../data/datasource";
-import { nearNativeTokens, nearTokenId, standardizeAsset } from "../utils";
 
 type AssetsProps = {
   data: unknown;
@@ -16,7 +15,6 @@ export async function getLiquidations(
     page || 1,
     pageSize || 10,
   );
-  const nearTokens = [...nearNativeTokens, "meta-pool.near"];
   const unreadIds: Array<string> = [];
   liquidationData?.record_list?.forEach((d) => {
     d.RepaidAssets?.forEach((a) => {
@@ -31,7 +29,7 @@ export async function getLiquidations(
       a.data = asset;
     });
     if (d.isRead === false) {
-      unreadIds.push(d.id);
+      unreadIds.push(d.receipt_id);
     }
   });
 
