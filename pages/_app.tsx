@@ -26,6 +26,7 @@ import PubTestModal from "../components/PubTestModal";
 import { getAccountId, getAccountPortfolio } from "../redux/accountSelectors";
 import { getAssets } from "../redux/assetsSelectors";
 import { getConfig } from "../redux/appSelectors";
+import { get_blocked } from "../api/get-blocked";
 
 ModalReact.defaultStyles = {
   overlay: {
@@ -149,7 +150,15 @@ function Upgrade({ Component, pageProps }) {
 }
 export default function MyApp({ Component, pageProps }: AppProps) {
   const [progress, setProgress] = useState(0);
+  const [isBlocked, setIsBlocked] = useState(false);
   const router = useRouter();
+  useEffect(() => {
+    get_blocked().then((res) => {
+      if (res.blocked === true) {
+        setIsBlocked(true);
+      }
+    });
+  }, []);
   useEffect(() => {
     router.events.on("routeChangeStart", () => {
       setProgress(30);
@@ -175,6 +184,22 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           <Upgrade Component={Component} pageProps={pageProps} />
         </PersistGate>
       </Provider>
+      {isBlocked && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center"
+          style={{
+            zIndex: "999999999",
+            backdropFilter: "blur(6px)",
+            height: "100vh",
+            overflow: "hidden",
+          }}
+        >
+          <div className="text-white text-center bg-dark-100 p-6 rounded-lg">
+            <h2>You are prohibited from accessing app.burrow.finance</h2>
+            <p>due to your location or other infringement of the Terms of Services.</p>
+          </div>
+        </div>
+      )}
     </ErrorBoundary>
   );
 }
