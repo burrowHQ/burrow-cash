@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { getAvailableAssets, isAssetsLoading } from "../redux/assetsSelectors";
 import { getAccountId, getHasNonFarmedAssets, isAccountLoading } from "../redux/accountSelectors";
@@ -21,7 +20,6 @@ import {
 import { getViewAs } from "../utils";
 import { getWeightedAssets, getWeightedNetLiquidity } from "../redux/selectors/getAccountRewards";
 import { getLiquidations } from "../api/get-liquidations";
-import { useDidUpdateEffect } from "./useDidUpdateEffect";
 
 export function useLoading() {
   const isLoadingAssets = useAppSelector(isAssetsLoading);
@@ -97,14 +95,14 @@ export function useDarkMode() {
   return { toggle, theme, isDark: theme === "dark" };
 }
 
-export function useUnreadLiquidation() {
+export function useUnreadLiquidation(liquidationPage = 1) {
   const unreadLiquidation = useAppSelector(getUnreadLiquidation);
   const accountId = useAccountId();
   const dispatch = useAppDispatch();
 
   const fetchUnreadLiquidation = async () => {
     try {
-      const { liquidationData } = await getLiquidations(accountId, 1, 1);
+      const { liquidationData } = await getLiquidations(accountId, liquidationPage || 1, 10);
       if (liquidationData?.unread !== undefined) {
         dispatch(
           setUnreadLiquidation({
