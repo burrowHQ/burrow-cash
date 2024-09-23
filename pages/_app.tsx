@@ -156,7 +156,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
     if (blockFeatureEnabled) {
       get_blocked().then((res) => {
-        if (res.blocked === false) {
+        if (res.blocked === true) {
           setIsBlocked(true);
         }
       });
