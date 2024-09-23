@@ -15,7 +15,7 @@ const Market = () => {
   const { sorting, setSorting } = useTableSorting();
   useEffect(() => {
     if (router?.query?.vault === "true") {
-      setSorting("market", "borrowApy", "desc");
+      setSorting("market", "depositApy", "desc");
     }
   }, [router?.query]);
   const handleOnRowClick = ({ tokenId }) => {
