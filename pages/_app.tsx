@@ -151,14 +151,17 @@ function Upgrade({ Component, pageProps }) {
 export default function MyApp({ Component, pageProps }: AppProps) {
   const [progress, setProgress] = useState(0);
   const [isBlocked, setIsBlocked] = useState(false);
+  const blockFeatureEnabled = process.env.NEXT_PUBLIC_BLOCK_FEATURE === "true";
   const router = useRouter();
   useEffect(() => {
-    get_blocked().then((res) => {
-      if (res.blocked === true) {
-        setIsBlocked(true);
-      }
-    });
-  }, []);
+    if (blockFeatureEnabled) {
+      get_blocked().then((res) => {
+        if (res.blocked === false) {
+          setIsBlocked(true);
+        }
+      });
+    }
+  }, [blockFeatureEnabled]);
   useEffect(() => {
     router.events.on("routeChangeStart", () => {
       setProgress(30);
@@ -184,7 +187,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           <Upgrade Component={Component} pageProps={pageProps} />
         </PersistGate>
       </Provider>
-      {isBlocked && (
+      {isBlocked && blockFeatureEnabled && (
         <div
           className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center"
           style={{
@@ -194,9 +197,14 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             overflow: "hidden",
           }}
         >
-          <div className="text-white text-center bg-dark-100 p-6 rounded-lg">
-            <h2>You are prohibited from accessing app.burrow.finance</h2>
-            <p>due to your location or other infringement of the Terms of Services.</p>
+          <div
+            className="text-white text-center bg-dark-100 p-6 rounded-lg"
+            style={{ width: "400px" }}
+          >
+            <p className="text-base">
+              You are prohibited from accessing app.burrow.finance due to your location or other
+              infringement of the Terms of Services.
+            </p>
           </div>
         </div>
       )}
