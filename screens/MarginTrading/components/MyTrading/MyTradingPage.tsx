@@ -53,35 +53,43 @@ const MyMarginTradingPage = () => {
       setShowCollateralPopup(false);
     }, 200);
   };
+  function formatCurrency(value) {
+    return value === 0 ? (
+      <span className="text-gray-400">$0.00</span>
+    ) : (
+      `$${toInternationalCurrencySystem_number(value)}`
+    );
+  }
+  const hasCollateral = totalCollateral > 0;
   return (
     <div className="flex flex-col items-center justify-center w-full">
       <div className="flex justify-between items-center w-full h-[100px] border border-dark-50 bg-gray-800 rounded-md mb-7">
         <div className="flex flex-1 justify-center">
           <div>
             <p className="text-gray-300 text-sm">Long Open Interest</p>
-            <h2 className="text-h2">${toInternationalCurrencySystem_number(totalLongSizeValue)}</h2>
+            <h2 className="text-h2"> {formatCurrency(totalLongSizeValue)}</h2>
           </div>
         </div>
         <div className="flex flex-1 justify-center">
           <div>
             <p className="text-gray-300 text-sm">Short Open Interest</p>
-            <h2 className="text-h2">
-              ${toInternationalCurrencySystem_number(totalShortSizeValue)}
-            </h2>
+            <h2 className="text-h2">{formatCurrency(totalShortSizeValue)}</h2>
           </div>
         </div>
         <div className="flex flex-1 justify-center">
           <div>
             <p className="text-gray-300 text-sm">Collateral</p>
             <div
-              className="relative border-b border-dashed border-dark-800 cursor-pointer"
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
+              className={`relative ${
+                hasCollateral ? "border-b border-dashed border-dark-800 cursor-pointer" : ""
+              }`}
+              onMouseEnter={hasCollateral ? handleMouseEnter : undefined}
+              onMouseLeave={hasCollateral ? handleMouseLeave : undefined}
             >
               <div className="text-h2 " onMouseEnter={handleMouseEnter}>
-                ${toInternationalCurrencySystem_number(totalCollateral)}
+                {formatCurrency(totalCollateral)}
               </div>
-              {showCollateralPopup && (
+              {hasCollateral && showCollateralPopup && (
                 <div
                   className="absolute left-28 top-0 bg-dark-100 border border-dark-300 text-gray-30 pt-3 pl-3 pr-3 rounded-md rounded-md w-max"
                   onMouseEnter={handleMouseEnter}
@@ -116,7 +124,7 @@ const MyMarginTradingPage = () => {
         <div className="flex flex-1 justify-center">
           <div>
             <p className="text-gray-300 text-sm">PLN</p>
-            <h2 className="text-h2">-</h2>
+            <h2 className="text-h2">{formatCurrency(0)}</h2>
           </div>
         </div>
       </div>

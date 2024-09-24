@@ -87,7 +87,7 @@ const TradingTable = ({ positionsList }) => {
                 </tr>
               </thead>
               <tbody>
-                {positionsList &&
+                {positionsList && Object.keys(positionsList).length > 0 ? (
                   Object.entries(positionsList).map(([key, item], index) => (
                     <PositionRow
                       index={index}
@@ -104,7 +104,16 @@ const TradingTable = ({ positionsList }) => {
                       marginConfigTokens={marginConfigTokens}
                       assets={assets}
                     />
-                  ))}
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={100}>
+                      <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+                        Your open positions will appear here
+                      </div>
+                    </td>
+                  </tr>
+                )}
                 {isChangeCollateralMobileOpen && (
                   <ChangeCollateralMobile
                     open={isChangeCollateralMobileOpen}
