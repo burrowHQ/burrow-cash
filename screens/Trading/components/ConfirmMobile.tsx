@@ -147,7 +147,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
               <RightShoulder />
               <div className="text-center leading-3">
                 <p className="text-lg">
-                  {toInternationalCurrencySystem_number(confirmInfo.longOutput)}{" "}
+                  {(+confirmInfo.longOutput).toFixed(6)}{" "}
                   {confirmInfo.longOutputName?.metadata.symbol === "wNEAR"
                     ? "NEAR"
                     : confirmInfo.longOutputName?.metadata.symbol}

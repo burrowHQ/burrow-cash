@@ -202,7 +202,7 @@ const TradingOperate = () => {
   const inputPriceChange = _.debounce((newValue) => {
     // eslint-disable-next-line no-unused-expressions
     activeTab === "long" ? setLongInput(newValue) : setShortInput(newValue);
-  }, 100);
+  }, 50);
   let lastValue = "";
   const tokenChange = (value) => {
     if (value.includes(".") && !lastValue.includes(".")) {
@@ -321,8 +321,8 @@ const TradingOperate = () => {
 
   // end
 
-  function formatNumber(value) {
-    let formattedValue = value.toFixed(2); //
+  function formatNumber(value, len) {
+    let formattedValue = value.toFixed(len); //
     if (formattedValue.endsWith(".00")) {
       //
       formattedValue = formattedValue.substring(0, formattedValue.length - 3);
@@ -421,7 +421,7 @@ const TradingOperate = () => {
               <input
                 disabled
                 type="text"
-                value={longOutput && formatNumber(Number(longOutput))}
+                value={longOutput && formatNumber(Number(longOutput), 6)}
                 placeholder="0"
               />
               {/*  */}
@@ -429,7 +429,7 @@ const TradingOperate = () => {
                 <TradingToken tokenList={categoryAssets1} type="cate1" />
               </div>
               <p className="text-gray-300 mt-2 text-xs">
-                Long: ${longOutputUsd && formatNumber(Number(longOutputUsd))}
+                Long: ${longOutputUsd && formatNumber(Number(longOutputUsd), 2)}
               </p>
             </div>
             <RangeSlider defaultValue={rangeMount} action="Long" setRangeMount={setRangeMount} />
@@ -556,7 +556,7 @@ const TradingOperate = () => {
               <input
                 disabled
                 type="text"
-                value={shortOutput && formatNumber(Number(shortOutput))}
+                value={shortOutput && formatNumber(Number(shortOutput), 6)}
                 placeholder="0"
               />
               {/*  */}
@@ -564,7 +564,7 @@ const TradingOperate = () => {
                 <TradingToken tokenList={categoryAssets1} type="cate1" />
               </div>
               <p className="text-gray-300 mt-2 text-xs">
-                Short: ${shortOutputUsd && formatNumber(Number(shortOutputUsd))}
+                Short: ${shortOutputUsd && formatNumber(Number(shortOutputUsd), 2)}
               </p>
             </div>
             <RangeSlider defaultValue={rangeMount} action="Short" setRangeMount={setRangeMount} />
