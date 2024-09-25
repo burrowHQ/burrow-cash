@@ -58,6 +58,7 @@ class DataSource {
       qryObj,
       null,
       config?.liquidationUrl,
+      true,
     );
   }
 
@@ -65,7 +66,14 @@ class DataSource {
     const qryObj = {
       receipt_ids,
     };
-    return this.callAPI("/burrow/set_liquidation", "POST", null, qryObj, config?.liquidationUrl);
+    return this.callAPI(
+      "/burrow/set_liquidation",
+      "POST",
+      null,
+      qryObj,
+      config?.liquidationUrl,
+      true,
+    );
   }
 
   getRecords(accountId, pageNumber = 1, pageSize = 10) {
@@ -87,6 +95,7 @@ class DataSource {
       qryObj,
       null,
       config?.liquidationUrl,
+      true,
     );
   }
 
@@ -97,6 +106,7 @@ class DataSource {
       null,
       null,
       config?.liquidationUrl,
+      true,
     );
   }
 
