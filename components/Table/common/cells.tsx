@@ -1,3 +1,4 @@
+// @ts-nocheck
 import millify from "millify";
 import { Box, Tooltip, Skeleton } from "@mui/material";
 

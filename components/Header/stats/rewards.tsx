@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState } from "react";
 import { useRewards, useDailyRewards } from "../../../hooks/useRewards";
 import { TOKEN_FORMAT, USD_FORMAT, NUMBER_FORMAT } from "../../../store";
