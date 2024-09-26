@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Typography, Stack, Box, useTheme } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 

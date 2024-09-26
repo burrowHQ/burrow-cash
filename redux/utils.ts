@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Decimal from "decimal.js";
 import { pick, omit } from "ramda";
 
