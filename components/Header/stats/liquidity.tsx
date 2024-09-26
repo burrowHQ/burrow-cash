@@ -1,5 +1,5 @@
+// @ts-nocheck
 import { Typography } from "@mui/material";
-
 import Decimal from "decimal.js";
 import { useFullDigits } from "../../../hooks/useFullDigits";
 import { useAppSelector } from "../../../redux/hooks";

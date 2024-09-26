@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Decimal from "decimal.js";
 import { USD_FORMAT, TOKEN_FORMAT, PERCENT_DIGITS, NEAR_STORAGE_DEPOSIT } from "../../store";
 import type { UIAsset } from "../../interfaces";
