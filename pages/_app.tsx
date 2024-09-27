@@ -151,7 +151,8 @@ function Upgrade({ Component, pageProps }) {
 export default function MyApp({ Component, pageProps }: AppProps) {
   const [progress, setProgress] = useState(0);
   const [isBlocked, setIsBlocked] = useState(false);
-  const blockFeatureEnabled = process.env.NEXT_PUBLIC_BLOCK_FEATURE === "true";
+  const blockFeatureEnabled = true;
+  // const blockFeatureEnabled = false;
   const router = useRouter();
   useEffect(() => {
     if (blockFeatureEnabled) {
