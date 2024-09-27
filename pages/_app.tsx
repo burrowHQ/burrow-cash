@@ -199,7 +199,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         >
           <div
             className="text-white text-center bg-dark-100 p-6 rounded-lg"
-            style={{ width: "400px" }}
+            style={{ width: "250px" }}
           >
             <p className="text-base">
               You are prohibited from accessing app.burrow.finance due to your location or other
