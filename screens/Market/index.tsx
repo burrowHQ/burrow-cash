@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 import MarketsTable from "./table";
 import MarketsOverview from "./overview";
 import { useAppDispatch } from "../../redux/hooks";
@@ -7,9 +9,15 @@ import { useTableSorting } from "../../hooks/useTableSorting";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 
 const Market = () => {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const rows = useAvailableAssets();
   const { sorting, setSorting } = useTableSorting();
+  useEffect(() => {
+    if (router?.query?.vault === "true") {
+      setSorting("market", "depositApy", "desc");
+    }
+  }, [router?.query]);
   const handleOnRowClick = ({ tokenId }) => {
     dispatch(showModal({ action: "Supply", tokenId, amount: "0" }));
   };

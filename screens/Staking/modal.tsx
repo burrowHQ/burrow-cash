@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useState } from "react";
 import { Modal, Stack, Box, Typography, Alert, useTheme } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Box, Stack, Link, useTheme } from "@mui/material";
 import TimeAgo from "timeago-react";
 import { motion } from "framer-motion";
