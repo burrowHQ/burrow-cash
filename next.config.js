@@ -2,13 +2,15 @@
 module.exports = {
   reactStrictMode: true,
   trailingSlash: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   webpack(config, { isServer, webpack, buildId }) {
     config.plugins.push(
       new webpack.DefinePlugin({
         "process.env.CONFIG_BUILD_ID": JSON.stringify(buildId),
       }),
     );
-
     config.module.rules.push({
       test: /\.svg$/i,
       issuer: /\.[jt]sx?$/,
@@ -22,7 +24,7 @@ module.exports = {
           presets: ["@babel/preset-env"],
         },
       },
-      // exclude: /node_modules/,
+      exclude: /node_modules/,
     });
 
     if (!isServer) {

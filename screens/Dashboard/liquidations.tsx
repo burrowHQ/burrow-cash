@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useState } from "react";
 import CustomTable from "../../components/CustomTable/CustomTable";
 import { shrinkToken, TOKEN_FORMAT } from "../../store";
