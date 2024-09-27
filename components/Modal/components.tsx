@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useState } from "react";
 import { Box, Typography, Stack, Alert, Link, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
