@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState, createContext } from "react";
 import { fetchAllPools, getStablePools, init_env } from "@ref-finance/ref-sdk";
 import { useRouter } from "next/router";
+import TradingViewWidget, { Themes } from "react-tradingview-widget";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 import { ComeBackIcon, ShrinkArrow, TokenArrow } from "./components/TradingIcon";
@@ -262,7 +263,9 @@ const Trading = () => {
               </span>
             </div>
           </div>
-          <div style={{ height: "520px" }} />
+          <div style={{ height: "520px" }}>
+            {/* <TradingViewWidget symbol="NASDAQ:AAPL" theme={Themes.DARK} locale="en" autosize /> */}
+          </div>
         </div>
         {/* right tradingopts */}
         <div className="col-span-2 bg-gray-800 border border-dark-50 rounded-md">
