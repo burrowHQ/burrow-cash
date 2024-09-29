@@ -27,6 +27,28 @@ module.exports = {
       exclude: /node_modules/,
     });
 
+    // console.log(config.module.rules)
+
+    // config.module.rules.push({
+    //   test: /satoshi-wellet/,
+    //   use: [
+    //     {
+    //       loader: 'babel-loader',
+    //       options: {
+    //         "presets": ["next/babel"]
+    //       }
+    //     },
+    //     // {
+    //     //   loader: 'ts-loader',
+    //     //   options: {
+    //     //     compilerOptions: { noEmit: false },
+    //     //     onlyCompileBundledFiles: true,
+    //     //     allowTsInNodeModules: true,
+    //     //   },
+    //     // },
+    //   ],
+    // });
+
     if (!isServer) {
       config.resolve.fallback.fs = false;
     }

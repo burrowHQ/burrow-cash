@@ -1,6 +1,7 @@
+"use client";
+
 import { Box, ThemeProvider, useTheme } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
-
 import { useDarkMode, useViewAs } from "../../hooks/hooks";
 import { useTicker } from "../../hooks/useTicker";
 import CheckNewAppVersion from "../CheckNewAppVersion";
@@ -9,6 +10,8 @@ import Header from "../Header";
 import Ticker from "../Ticker";
 import Blocked from "../Blocked";
 import selectTheme from "../../utils/theme";
+import { BtcWalletSelectorContextProvider } from "./btc/btcWalletSelectorContext";
+import Hook from "./btc/Hook";
 
 export const Theme = ({ children }) => {
   const { theme: t } = useDarkMode();
@@ -41,17 +44,20 @@ const PageGrid = ({ children }) => {
 
 const Layout = ({ children }) => {
   const { hasTicker } = useTicker();
+
   return (
     <Theme>
-      <div className="md:pb-8">
-        <PageGrid>
-          <Header />
-          <main className="md:px-10" id="root">
-            {children}
-          </main>
-        </PageGrid>
-        {/* <Footer /> */}
-      </div>
+      <BtcWalletSelectorContextProvider>
+        <Hook />
+        <div className="md:pb-8">
+          <PageGrid>
+            <Header />
+            <main className="md:px-10" id="root">
+              {children}
+            </main>
+          </PageGrid>
+        </div>
+      </BtcWalletSelectorContextProvider>
     </Theme>
   );
 };

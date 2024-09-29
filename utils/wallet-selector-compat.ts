@@ -34,6 +34,8 @@ import { createWeb3Modal } from "@web3modal/wagmi";
 // @ts-nocheck
 import { getRpcList } from "../components/Rpc/tool";
 
+import { setupSatoshiWallet } from "../components/Layout/btc/index";
+
 import getConfig, {
   defaultNetwork,
   LOGIC_CONTRACT_NAME,
@@ -148,6 +150,7 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
       localStorage.removeItem("endPoint");
     }
   } catch (error) {}
+
   selector = await setupWalletSelector({
     modules: [
       setupOKXWallet({}),
@@ -195,6 +198,7 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         web3Modal,
         alwaysOnboardDuringSignIn: true,
       } as any),
+      setupSatoshiWallet({}),
     ],
     network: {
       networkId: defaultNetwork,
