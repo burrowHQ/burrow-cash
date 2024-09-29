@@ -34,6 +34,8 @@ import { createWeb3Modal } from "@web3modal/wagmi";
 // @ts-nocheck
 import { getRpcList } from "../components/Rpc/tool";
 
+import { setupSatoshiWallet } from '@particle-network/btc-connectkit'
+
 import getConfig, {
   defaultNetwork,
   LOGIC_CONTRACT_NAME,
@@ -195,6 +197,7 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         web3Modal,
         alwaysOnboardDuringSignIn: true,
       } as any),
+      setupSatoshiWallet({})
     ],
     network: {
       networkId: defaultNetwork,

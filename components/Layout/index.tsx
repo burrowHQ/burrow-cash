@@ -1,5 +1,7 @@
+// @ts-nocheck
 import { Box, ThemeProvider, useTheme } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
+import { BtcWalletSelectorContextProvider, useBtcWalletSelector } from '@particle-network/btc-connectkit'
 
 import { useDarkMode, useViewAs } from "../../hooks/hooks";
 import { useTicker } from "../../hooks/useTicker";
@@ -9,6 +11,8 @@ import Header from "../Header";
 import Ticker from "../Ticker";
 import Blocked from "../Blocked";
 import selectTheme from "../../utils/theme";
+
+
 
 export const Theme = ({ children }) => {
   const { theme: t } = useDarkMode();
