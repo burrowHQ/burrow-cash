@@ -150,6 +150,11 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
   } catch (error) {}
   selector = await setupWalletSelector({
     modules: [
+      setupEthereumWallets({
+        wagmiConfig,
+        web3Modal,
+        alwaysOnboardDuringSignIn: true,
+      } as any),
       setupOKXWallet({}),
       myNearWallet,
       setupSender() as any,
@@ -190,11 +195,6 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         deprecated: false,
       }),
       setupCoin98Wallet(),
-      setupEthereumWallets({
-        wagmiConfig,
-        web3Modal,
-        alwaysOnboardDuringSignIn: true,
-      } as any),
     ],
     network: {
       networkId: defaultNetwork,
