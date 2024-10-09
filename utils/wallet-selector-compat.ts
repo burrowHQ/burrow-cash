@@ -105,6 +105,7 @@ reconnect(wagmiConfig);
 const web3Modal = createWeb3Modal({
   wagmiConfig,
   projectId: WALLET_CONNECT_ID,
+  allowUnsupportedChain: true,
 });
 const walletConnect2 = setupWalletConnect({
   projectId: WALLET_CONNECT_ID,
@@ -150,6 +151,11 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
   } catch (error) {}
   selector = await setupWalletSelector({
     modules: [
+      setupEthereumWallets({
+        wagmiConfig,
+        web3Modal,
+        alwaysOnboardDuringSignIn: true,
+      } as any),
       setupOKXWallet({}),
       myNearWallet,
       setupSender() as any,
@@ -190,11 +196,6 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         deprecated: false,
       }),
       setupCoin98Wallet(),
-      setupEthereumWallets({
-        wagmiConfig,
-        web3Modal,
-        alwaysOnboardDuringSignIn: true,
-      } as any),
     ],
     network: {
       networkId: defaultNetwork,
