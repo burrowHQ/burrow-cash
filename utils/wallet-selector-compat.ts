@@ -105,6 +105,7 @@ reconnect(wagmiConfig);
 const web3Modal = createWeb3Modal({
   wagmiConfig,
   projectId: WALLET_CONNECT_ID,
+  allowUnsupportedChain: true,
 });
 const walletConnect2 = setupWalletConnect({
   projectId: WALLET_CONNECT_ID,
