@@ -218,20 +218,18 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           }}
         >
           <div
-            className="text-white text-center bg-dark-100 p-6 rounded-lg"
-            style={{ width: "250px" }}
+            className="text-white text-center bg-dark-100 px-5 pt-9 pb-7 rounded-md border border-dark-300"
+            style={{ width: "278px" }}
           >
-            <p className="text-base">
+            <p className="text-sm">
               You are prohibited from accessing app.burrow.finance due to your location or other
               infringement of the Terms of Services.
             </p>
-            <div className="flex items-center justify-center">
-              <div
-                onClick={handleBlockConfirmation}
-                className="mt-4 bg-primary p-2 rounded w-fit text-black text-base cursor-pointer"
-              >
-                Confirm
-              </div>
+            <div
+              onClick={handleBlockConfirmation}
+              className="mt-6 border border-primary h-9 flex items-center justify-center rounded-md text-sm text-black text-primary cursor-pointer ml-1.5 mr-1.5"
+            >
+              Confirm
             </div>
           </div>
         </div>
