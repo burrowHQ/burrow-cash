@@ -11,6 +11,7 @@ import {
   NEAR_STORAGE_DEPOSIT_MIN,
   NEAR_STORAGE_EXTRA_DEPOSIT,
 } from "./constants";
+// eslint-disable-next-line import/no-cycle
 import { expandToken, expandTokenDecimal, getContract, shrinkToken } from "./helper";
 import {
   ViewMethodsLogic,

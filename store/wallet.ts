@@ -48,6 +48,7 @@ export const executeMultipleTransactions = async (transactions) => {
     if (fetchData) fetchData(account.accountId);
   } catch (e: any) {
     if (/reject/.test(e)) {
+      // eslint-disable-next-line no-alert
       alert("Transaction was rejected in wallet. Please try again!");
       hideModal();
       return;
@@ -57,6 +58,7 @@ export const executeMultipleTransactions = async (transactions) => {
     }
     console.warn(e);
     signOut();
+    // eslint-disable-next-line no-alert
     alert(
       "No accounts available. Your wallet may be locked. You have been signed out. Please sign in again!",
     );

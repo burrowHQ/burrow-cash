@@ -71,8 +71,10 @@ export const bigNumberMilify = (
 export const removeUndefinedInObj = (obj, removeNull) => {
   Object.keys(obj).forEach((key) => {
     if (removeNull) {
+      // eslint-disable-next-line no-unused-expressions
       [undefined, null].includes(obj[key]) && delete obj[key];
     } else {
+      // eslint-disable-next-line no-unused-expressions
       obj[key] === undefined && delete obj[key];
     }
   });

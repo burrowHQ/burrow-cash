@@ -12,6 +12,12 @@ import ModalReact from "react-modal";
 import "../styles/global.css";
 import LoadingBar from "react-top-loading-bar";
 import { useRouter } from "next/router";
+import {
+  setupSatoshiWallet,
+  useBtcWalletSelector,
+  BtcWalletSelectorContextProvider,
+  InitContextHook,
+} from "satoshi-wallet";
 import { store, persistor } from "../redux/store";
 import { FallbackError, Layout, Modal } from "../components";
 import { posthog, isPostHogEnabled } from "../utils/telemetry";
@@ -123,6 +129,7 @@ function Upgrade({ Component, pageProps }) {
       await dispatch(logoutAccount());
     }
   }
+
   return (
     <div>
       {upgrading ? (
@@ -134,16 +141,19 @@ function Upgrade({ Component, pageProps }) {
           <RpcList />
         </div>
       ) : (
-        <Layout>
-          <Popup className="lg:hidden" />
-          <Init />
-          <Modal />
-          <ToastMessage />
-          <Component {...pageProps} />
-          <Popup className="xsm:hidden" />
-          <RpcList />
-          <PubTestModal />
-        </Layout>
+        <BtcWalletSelectorContextProvider>
+          <InitContextHook />
+          <Layout>
+            <Popup className="lg:hidden" />
+            <Init />
+            <Modal />
+            <ToastMessage />
+            <Component {...pageProps} />
+            <Popup className="xsm:hidden" />
+            <RpcList />
+            <PubTestModal />
+          </Layout>
+        </BtcWalletSelectorContextProvider>
       )}
     </div>
   );
@@ -152,8 +162,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   const [progress, setProgress] = useState(0);
   const [isBlocked, setIsBlocked] = useState(false);
   const blockFeatureEnabled = true;
-  // const blockFeatureEnabled = false;
   const router = useRouter();
+
   useEffect(() => {
     if (blockFeatureEnabled) {
       get_blocked().then((res) => {

@@ -21,6 +21,13 @@ import BN from "bn.js";
 import { map, distinctUntilChanged } from "rxjs";
 import { setupKeypom } from "@keypom/selector";
 import { setupOKXWallet } from "@near-wallet-selector/okx-wallet";
+import {
+  setupSatoshiWallet,
+  useBtcWalletSelector,
+  BtcWalletSelectorContextProvider,
+  InitContextHook,
+} from "satoshi-wallet";
+import { useContext } from "react";
 // @ts-nocheck
 import type { Config } from "@wagmi/core";
 // @ts-nocheck
@@ -196,6 +203,7 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         deprecated: false,
       }),
       setupCoin98Wallet(),
+      setupSatoshiWallet({}),
     ],
     network: {
       networkId: defaultNetwork,

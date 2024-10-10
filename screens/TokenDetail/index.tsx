@@ -63,12 +63,14 @@ import { IToken } from "../../interfaces/asset";
 import LPTokenCell from "./LPTokenCell";
 import AvailableBorrowCell from "./AvailableBorrowCell";
 import { useAppDispatch } from "../../redux/hooks";
+import { useBtcAction } from "../../hooks/useBtcBalance";
 
 const DetailData = createContext(null) as any;
 const TokenDetail = () => {
   const router = useRouter();
   const rows = useAvailableAssets();
   const { id } = router.query;
+  const btc = useBtcAction({ updater: 1 });
   const tokenRow = rows.find((row: UIAsset) => {
     return row.tokenId === id;
   });
