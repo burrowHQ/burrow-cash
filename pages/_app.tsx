@@ -156,11 +156,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
   useEffect(() => {
     if (blockFeatureEnabled) {
-      get_blocked().then((res) => {
-        if (res.blocked === true) {
-          setIsBlocked(true);
-        }
-      });
+      checkBlockedStatus();
     }
   }, [blockFeatureEnabled]);
   useEffect(() => {
@@ -171,6 +167,29 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       setProgress(100);
     });
   }, []);
+  function checkBlockedStatus() {
+    get_blocked().then((res) => {
+      if (res.blocked === true) {
+        const blockConfirmationTime = localStorage.getItem("blockConfirmationTime");
+        if (blockConfirmationTime) {
+          const currentTime = new Date().getTime();
+          const weekInMilliseconds = 7 * 24 * 60 * 60 * 1000;
+          if (currentTime - parseInt(blockConfirmationTime, 10) < weekInMilliseconds) {
+            setIsBlocked(false);
+          } else {
+            setIsBlocked(true);
+          }
+        } else {
+          setIsBlocked(true);
+        }
+      }
+    });
+  }
+  function handleBlockConfirmation() {
+    const currentTime = new Date().getTime();
+    localStorage.setItem("blockConfirmationTime", currentTime.toString());
+    setIsBlocked(false);
+  }
   return (
     <ErrorBoundary fallback={FallbackError}>
       <LoadingBar
@@ -206,6 +225,14 @@ export default function MyApp({ Component, pageProps }: AppProps) {
               You are prohibited from accessing app.burrow.finance due to your location or other
               infringement of the Terms of Services.
             </p>
+            <div className="flex items-center justify-center">
+              <div
+                onClick={handleBlockConfirmation}
+                className="mt-4 bg-primary p-2 rounded w-fit text-black text-base cursor-pointer"
+              >
+                Confirm
+              </div>
+            </div>
           </div>
         </div>
       )}
