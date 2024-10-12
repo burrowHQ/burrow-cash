@@ -8,12 +8,12 @@ import { setupMeteorWallet } from "@near-wallet-selector/meteor-wallet";
 import { setupWalletConnect } from "@near-wallet-selector/wallet-connect";
 import { setupNeth } from "@near-wallet-selector/neth";
 import { setupNearMobileWallet } from "@near-wallet-selector/near-mobile-wallet";
-import { setupModal } from "@near-wallet-selector/modal-ui";
+import { setupModal } from "ref-modal-ui";
 import { setupLedger } from "@near-wallet-selector/ledger";
 import { setupMintbaseWallet } from "@near-wallet-selector/mintbase-wallet";
 import { setupBitteWallet } from "@near-wallet-selector/bitte-wallet";
 import { setupCoin98Wallet } from "@near-wallet-selector/coin98-wallet";
-import type { WalletSelectorModal } from "@near-wallet-selector/modal-ui";
+import type { WalletSelectorModal } from "ref-modal-ui";
 import { Near } from "near-api-js/lib/near";
 import { Account } from "near-api-js/lib/account";
 import { BrowserLocalStorageKeyStore } from "near-api-js/lib/key_stores";
@@ -220,7 +220,24 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
       }
     });
 
-  const modal = setupModal(selector, { contractId: LOGIC_CONTRACT_NAME });
+  const modal = setupModal(selector as any, {
+    contractId: LOGIC_CONTRACT_NAME,
+    blockFunctionKeyWallets: [
+      "okx-wallet",
+      "my-near-wallet",
+      "meteor-wallet",
+      "neth",
+      "nightly",
+      "ledger",
+      "wallet-connect",
+      "keypom",
+      "mintbase-wallet",
+      "bitte-wallet",
+      "ethereum-wallets",
+      "sender",
+      "coin98-wallet",
+    ],
+  });
   window.modal = modal;
   window.selectorSubscription = subscription;
 
