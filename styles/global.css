@@ -1,7 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import "../node_modules/@near-wallet-selector/modal-ui/styles.css";
+@import "../node_modules/ref-modal-ui/styles.css";
 @font-face {
   font-family: "work-sans";
   src: url("./work-sans/WorkSans-Regular.otf");
@@ -470,7 +470,9 @@ body,
     border-radius: 0;
   }
 }
-
+.nws-modal-wrapper .nws-modal .modal-left .modal-left-title {
+  background: #2e304b;
+}
 input {
   margin: 0;
   background-color: transparent;
