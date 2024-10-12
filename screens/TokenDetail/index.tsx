@@ -64,21 +64,36 @@ import LPTokenCell from "./LPTokenCell";
 import AvailableBorrowCell from "./AvailableBorrowCell";
 import { useAppDispatch } from "../../redux/hooks";
 import { useBtcAction } from "../../hooks/useBtcBalance";
+import { SatoshiIcon, BtcChainIcon } from "../../components/Icons/Icons";
 
 const DetailData = createContext(null) as any;
 const TokenDetail = () => {
   const router = useRouter();
   const rows = useAvailableAssets();
   const { id } = router.query;
-  const btc = useBtcAction({ updater: 1 });
+  const [updaterCounter, setUpDaterCounter] = useState(1);
+  const btcChainDetail = useBtcAction({ updater: updaterCounter });
+
+  setInterval(() => {
+    setUpDaterCounter((pre) => pre + 1);
+  }, 60000);
+
   const tokenRow = rows.find((row: UIAsset) => {
     return row.tokenId === id;
   });
   if (!tokenRow) return null;
-  return <TokenDetailView tokenRow={tokenRow} assets={rows} />;
+  return <TokenDetailView tokenRow={tokenRow} assets={rows} btcChainDetail={btcChainDetail} />;
 };
 
-function TokenDetailView({ tokenRow, assets }: { tokenRow: UIAsset; assets: UIAsset[] }) {
+function TokenDetailView({
+  tokenRow,
+  assets,
+  btcChainDetail,
+}: {
+  tokenRow: UIAsset;
+  assets: UIAsset[];
+  btcChainDetail: any;
+}) {
   const [suppliers_number, set_suppliers_number] = useState<number>();
   const [borrowers_number, set_borrowers_number] = useState<number>();
   const isMobile = isMobileDevice();
@@ -237,6 +252,7 @@ function TokenDetailView({ tokenRow, assets }: { tokenRow: UIAsset; assets: UIAs
         assets,
         getIcons,
         getSymbols,
+        btcChainDetail,
       }}
     >
       {isMobile ? (
@@ -402,7 +418,7 @@ function MarketInfo({ className, tokenDetails, handlePeriodClick }) {
 }
 
 function YourInfo({ className }) {
-  const { supplied, borrowed, tokenRow } = useContext(DetailData) as any;
+  const { supplied, borrowed, tokenRow, btcChainDetail } = useContext(DetailData) as any;
   return (
     <div className={`${className}`}>
       <TokenUserInfo />
@@ -885,7 +901,7 @@ function TokenRateModeChart({
 }
 
 function TokenUserInfo() {
-  const { tokenRow } = useContext(DetailData) as any;
+  const { tokenRow, btcChainDetail } = useContext(DetailData) as any;
   const { tokenId, tokens, isLpToken, price } = tokenRow;
   const accountId = useAccountId();
   const isWrappedNear = tokenRow.symbol === "NEAR";
@@ -922,20 +938,71 @@ function TokenUserInfo() {
     (acc, { maxBorrowAmount }) => acc + maxBorrowAmount,
     0,
   );
+
+  const router: any = useRouter();
+  const [isNBTC, setIsNBTC] = useState(false);
+  useEffect(() => {
+    if (router?.query?.id.indexOf("nbtc") !== -1) {
+      setIsNBTC(true);
+    }
+  }, [router, accountId]);
+
   return (
     <UserBox className="mb-[29px] xsm:mb-2.5">
       <span className="text-lg text-white font-bold">Your Info</span>
-      <div className="flex items-center justify-between my-[25px]">
-        <span className="text-sm text-gray-300">Available to Supply</span>
-        <div className="flex items-center]">
-          <span className="text-sm text-white mr-2.5">
-            {accountId ? formatWithCommas_number(supplyBalance) : "-"}
-          </span>
-          <LPTokenCell asset={tokenRow} balance={supplyBalance}>
-            {getIcons()}
-          </LPTokenCell>
+      {!isNBTC ? (
+        <div className="flex items-center justify-between my-[25px]">
+          <span className="text-sm text-gray-300">Available to Supply</span>
+          <div className="flex items-center]">
+            <span className="text-sm text-white mr-2.5">
+              {accountId ? formatWithCommas_number(supplyBalance) : "-"}
+            </span>
+            <LPTokenCell asset={tokenRow} balance={supplyBalance}>
+              {getIcons()}
+            </LPTokenCell>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="my-[25px]">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-300">Available to Supply</span>
+            <span className="flex items-center">
+              <span
+                className="text-toolTipBoxBorderColor text-xs hover:cursor-pointer underline mr-[4px]"
+                onClick={() => {
+                  window.open("https://dev.satoshibridge.top/", "_blank");
+                }}
+              >
+                BTC Bridge
+              </span>
+              <SatoshiIcon />
+            </span>
+          </div>
+          {/* <div className="flex items-center]">
+            <span className="text-sm text-white mr-2.5">
+              {accountId ? formatWithCommas_number(supplyBalance) : "-"}
+            </span>
+            <LPTokenCell asset={tokenRow} balance={supplyBalance}>
+              {getIcons()}
+            </LPTokenCell>
+          </div> */}
+          <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
+            <span className="text-gray-300">NEAR Chain</span>
+            <span className="flex items-center">
+              <span className="mr-[6px] text-sm">{accountId ? supplyBalance : "-"}</span>
+              <BtcChainIcon />
+            </span>
+          </div>
+          <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
+            <span className="text-gray-300">BTC Chain</span>
+            <span className="flex items-center">
+              <span className="mr-[6px] text-sm">{accountId ? btcChainDetail.balance : "-"}</span>
+              <BtcChainIcon />
+            </span>
+          </div>
+        </div>
+      )}
+
       <div
         className={`flex justify-between ${
           !isLpToken && accountId && tokenRow?.can_borrow ? "items-start" : "items-center "

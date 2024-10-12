@@ -18,6 +18,15 @@ import {
   BtcWalletSelectorContextProvider,
   InitContextHook,
 } from "satoshi-wallet";
+import {
+  ConnectProvider as BTCConnectProvider,
+  OKXConnector,
+  UnisatConnector,
+  BitgetConnector,
+  useETHProvider,
+  useBTCProvider,
+  useConnectModal,
+} from "@particle-network/btc-connectkit";
 import { store, persistor } from "../redux/store";
 import { FallbackError, Layout, Modal } from "../components";
 import { posthog, isPostHogEnabled } from "../utils/telemetry";
@@ -129,7 +138,18 @@ function Upgrade({ Component, pageProps }) {
       await dispatch(logoutAccount());
     }
   }
+  // const router = useRouter();
+  // console.info(router);
 
+  // for satoshi wallet
+  useEffect(() => {
+    // if (router.pathname.indexOf("/tokenDetail") !== -1) {
+    setUpgrading(true);
+    setTimeout(() => {
+      setUpgrading(false);
+    }, 50);
+    // }
+  }, [accountId]);
   return (
     <div>
       {upgrading ? (
@@ -142,17 +162,39 @@ function Upgrade({ Component, pageProps }) {
         </div>
       ) : (
         <BtcWalletSelectorContextProvider>
-          <InitContextHook />
-          <Layout>
-            <Popup className="lg:hidden" />
-            <Init />
-            <Modal />
-            <ToastMessage />
-            <Component {...pageProps} />
-            <Popup className="xsm:hidden" />
-            <RpcList />
-            <PubTestModal />
-          </Layout>
+          <BTCConnectProvider
+            options={{
+              projectId: "btc",
+              clientKey: "btc",
+              appId: "btc",
+              aaOptions: {
+                accountContracts: {
+                  BTC: [
+                    {
+                      chainIds: [686868],
+                      version: "1.0.0",
+                    },
+                  ],
+                },
+              },
+              walletOptions: {
+                visible: true,
+              },
+            }}
+            connectors={[new UnisatConnector()]}
+          >
+            <InitContextHook />
+            <Layout>
+              <Popup className="lg:hidden" />
+              <Init />
+              <Modal />
+              <ToastMessage />
+              <Component {...pageProps} />
+              <Popup className="xsm:hidden" />
+              <RpcList />
+              <PubTestModal />
+            </Layout>
+          </BTCConnectProvider>
         </BtcWalletSelectorContextProvider>
       )}
     </div>

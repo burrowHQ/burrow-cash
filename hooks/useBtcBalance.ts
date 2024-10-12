@@ -34,17 +34,17 @@ export function useBtcAction({ updater }: Props) {
   const { accounts, sendBitcoin, provider, getPublicKey, signMessage } = useBTCProvider();
   const { connectors } = useConnector();
 
-  const receiveDepositMsg = useCallback(async (args: any) => {
-    const res = await fetch(`${base_url}/receiveDepositMsg`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(args),
-    }).then((response) => response.json());
+  // const receiveDepositMsg = useCallback(async (args: any) => {
+  //   const res = await fetch(`${base_url}/receiveDepositMsg`, {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify(args),
+  //   }).then((response) => response.json());
 
-    return res;
-  }, []);
+  //   return res;
+  // }, []);
 
   // console.log('accounts:', accounts, provider, connectors)
 
@@ -157,7 +157,7 @@ export function useBtcAction({ updater }: Props) {
   return {
     balance,
     sendBitcoin,
-    receiveDepositMsg,
+    // receiveDepositMsg,
     getUtxo,
     estimateGas,
     btcPublicKey,
