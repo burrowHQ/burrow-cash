@@ -14416,6 +14416,15 @@ qrcode@1.5.3:
     pngjs "^5.0.0"
     yargs "^15.3.1"
 
+qrcode@1.5.4:
+  version "1.5.4"
+  resolved "https://registry.yarnpkg.com/qrcode/-/qrcode-1.5.4.tgz#5cb81d86eb57c675febb08cf007fff963405da88"
+  integrity sha512-1ca71Zgiu6ORjHqFBDpnSMTR2ReToX4l1Au1VFLyVeBTFavzQnv5JxMFr3ukHVKpSrSA2MCk0lNJSykjUfz7Zg==
+  dependencies:
+    dijkstrajs "^1.0.1"
+    pngjs "^5.0.0"
+    yargs "^15.3.1"
+
 qrcode@^1.4.4:
   version "1.5.1"
   resolved "https://registry.npmjs.org/qrcode/-/qrcode-1.5.1.tgz"
@@ -14918,6 +14927,17 @@ redux@^4.0.0, redux@^4.1.2, redux@^4.2.0:
   integrity sha512-oSBmcKKIuIR4ME29/AeNUnl5L+hvBq7OaJWzaptTQJAntaPvxIJqfnjbaEiCzzaIz+XmVILfqAM3Ob0aXLPfjA==
   dependencies:
     "@babel/runtime" "^7.9.2"
+
+ref-modal-ui@^8.9.13:
+  version "8.9.13"
+  resolved "https://registry.yarnpkg.com/ref-modal-ui/-/ref-modal-ui-8.9.13.tgz#be0e81e1b6eb1d6e547639957dcf54ea1dbbf206"
+  integrity sha512-qelBsqRNl82TCIi4dgWXu+EYFakDfUwRudZMSLVPlvDtV6OpSe0xaEvCg1yCNxRficM0eMwt9yq5kGpcX1hjpw==
+  dependencies:
+    "@near-wallet-selector/core" "8.9.13"
+    copy-to-clipboard "3.3.3"
+    qrcode "1.5.4"
+    react "18.2.0"
+    react-dom "18.2.0"
 
 regenerate-unicode-properties@^10.1.0:
   version "10.1.0"
