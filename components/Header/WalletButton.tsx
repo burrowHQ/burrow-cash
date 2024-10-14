@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import type { WalletSelector } from "@near-wallet-selector/core";
 import { BeatLoader } from "react-spinners";
+import { useDebounce } from "react-use";
 import { fetchAssets, fetchRefPrices } from "../../redux/assetsSlice";
 import { logoutAccount, fetchAccount, setAccountId } from "../../redux/accountSlice";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
@@ -85,9 +86,13 @@ const WalletButton = () => {
     }
   };
 
-  useEffect(() => {
-    onMount();
-  }, [accountId]);
+  useDebounce(
+    () => {
+      onMount();
+    },
+    500,
+    [accountId],
+  );
 
   const onWalletButtonClick = async () => {
     if (!hasAgreedDisclaimer) {

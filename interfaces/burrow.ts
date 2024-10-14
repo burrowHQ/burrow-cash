@@ -64,6 +64,7 @@ export interface IBurrow {
     | NetTvlFarm
     | string
     | boolean
+    | IAssetDetailed[]
   >;
   call: (
     contract: Contract,

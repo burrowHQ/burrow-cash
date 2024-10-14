@@ -99,7 +99,7 @@
     "ref-modal-ui": "^8.9.13",
     "remark-gfm": "^3.0.1",
     "rxjs": "^7.8.1",
-    "satoshi-wallet": "1.1.8",
+    "satoshi-wallet": "1.2.1",
     "serve": "^14.0.1",
     "styled-components": "^6.0.7",
     "swiper": "8.4.7",

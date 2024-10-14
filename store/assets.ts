@@ -23,6 +23,13 @@ export const getAssets = async (): Promise<IAssetEntry[]> => {
     token_id,
   }));
 };
+export const getAssetDetaileds = async (): Promise<IAssetDetailed[]> => {
+  const { view, logicContract } = await getBurrow();
+  return (await view(
+    logicContract,
+    ViewMethodsLogic[ViewMethodsLogic.get_assets_paged_detailed],
+  )) as IAssetDetailed[];
+};
 
 export const getAssetDetailed = async (token_id: string): Promise<IAssetDetailed> => {
   const { view, logicContract } = await getBurrow();
@@ -37,9 +44,11 @@ export const getAssetDetailed = async (token_id: string): Promise<IAssetDetailed
   return assetDetails;
 };
 
+// TODO REPEAT
 export const getAssetsDetailed = async (): Promise<IAssetDetailed[]> => {
-  const assets: IAssetEntry[] = await getAssets();
-  const detailedAssets = await Promise.all(assets.map((asset) => getAssetDetailed(asset.token_id)));
+  // const assets: IAssetEntry[] = await getAssets();
+  // const detailedAssets = await Promise.all(assets.map((asset) => getAssetDetailed(asset.token_id)));
+  const detailedAssets = await getAssetDetaileds();
   return detailedAssets;
 };
 
