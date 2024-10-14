@@ -2,7 +2,7 @@
 import Decimal from "decimal.js";
 import { pick, omit } from "ramda";
 
-import { shrinkToken, USD_FORMAT, TOKEN_FORMAT } from "../store";
+import { shrinkToken, USD_FORMAT, TOKEN_FORMAT, TOKEN_FORMAT_BTC } from "../store";
 import type { Asset, Assets, AssetsState } from "./assetState";
 import type { AccountState } from "./accountState";
 import type { AppState } from "./appSlice";
@@ -38,11 +38,14 @@ export const emptySuppliedAsset2 = (asset: { supplied: number; collateral: numbe
       (0).toLocaleString(undefined, TOKEN_FORMAT)
   );
 
-export const emptyBorrowedAsset = (asset: { borrowed: number }): boolean =>
-  !(
-    asset.borrowed.toLocaleString(undefined, TOKEN_FORMAT) ===
-    (0).toLocaleString(undefined, TOKEN_FORMAT)
+export const emptyBorrowedAsset = (asset: { borrowed: number }): boolean => {
+  return !(
+    asset.borrowed.toLocaleString(
+      undefined,
+      asset.tokenId === "nbtc1-nsp.testnet" ? TOKEN_FORMAT_BTC : TOKEN_FORMAT,
+    ) === (0).toLocaleString(undefined, TOKEN_FORMAT)
   );
+};
 
 export const hasZeroSharesFarmRewards = (farms): boolean => {
   return farms.some((farm) => farm["rewards"].some((reward) => reward["boosted_shares"] === "0"));
