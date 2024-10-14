@@ -15,6 +15,7 @@ import {
   YellowSolidSubmitButton as YellowSolidButton,
   RedSolidSubmitButton as RedSolidButton,
 } from "../../../components/Modal/button";
+import { shrinkToken } from "../../../store";
 
 export const ModalContext = createContext(null) as any;
 const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
@@ -158,6 +159,16 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
               </div>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
+              <div className="text-gray-300">Entry Price</div>
+              {/* <div>${confirmInfo.entryPrice || "-"}</div> */}
+              <div>
+                $
+                {confirmInfo.tokenInAmount /
+                  Number(shrinkToken(confirmInfo.estimateData?.min_amount_out, decimalsP))}
+              </div>
+            </div>
+
+            {/* <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Index Price</div>
               <div>${confirmInfo.indexPrice}</div>
             </div>
@@ -165,7 +176,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Leverage</div>
               <div>{confirmInfo.rangeMount}X</div>
-            </div>
+            </div> */}
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Collateral</div>
               <div className="text-right flex">

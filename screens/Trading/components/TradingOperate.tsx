@@ -168,6 +168,7 @@ const TradingOperate = () => {
   // get cate1 amount start
   const [tokenInAmount, setTokenInAmount] = useState(0);
   const [LiqPrice, setLiqPrice] = useState(0);
+  const [entryPrice, setEntryPrice] = useState(0);
   const estimateData = useEstimateSwap({
     tokenIn_id:
       activeTab === "long" ? ReduxcategoryAssets2?.token_id : ReduxcategoryAssets1?.token_id,
@@ -248,6 +249,30 @@ const TradingOperate = () => {
       const { price: priceD, decimals: decimalsD } = getAssetDetails(assetD);
       const { price: priceC, decimals: decimalsC } = getAssetDetails(assetC);
       const { price: priceP, decimals: decimalsP } = getAssetDetails(assetP);
+
+      // console.log(
+      //   longInput,
+      //   "longInput",
+      //   tokenInAmount / Number(shrinkToken(estimateData?.min_amount_out, decimalsP)),
+      //   estimateData,
+      //   decimalsC,
+      //   decimalsD,
+      //   decimalsP,
+      //   assetC,
+      //   assetD,
+      //   assetP,
+      // );
+
+      // input validate
+      // const isValidate =
+      //   parseTokenValue(estimateData.min_amount_out, decimalsP) >
+      //   tokenInAmount /
+      //     ((assets.data[ReduxcategoryAssets1["token_id"]]?.price?.usd || 0) *
+      //       (1 - marginConfigTokens.max_slippage_rate / 10000));
+
+      // if (!isValidate) {
+      //   setIsDisabled(false);
+      // }
 
       let liqPriceX = 0;
       if (rangeMount > 1) {

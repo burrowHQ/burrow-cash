@@ -38,6 +38,7 @@ const Trading = () => {
   const assets = useAppSelector(getAssets);
   const [showPopupCate1, setShowPopup1] = useState(false);
   const [showPopupCate2, setShowPopup2] = useState(false);
+  const [currentPair, setCurrentPair] = useState("");
 
   //
   const [currentTokenCate1, setCurrentTokenCate1] = useState<any>({});
