@@ -1,8 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
-import { Box, Typography, Switch, Tooltip, Alert, useTheme } from "@mui/material";
-import LoadingButton from "@mui/lab/LoadingButton";
 import Decimal from "decimal.js";
-import { FcInfo } from "@react-icons/all-files/fc/FcInfo";
+import { useBtcWalletSelector } from "btc-wallet";
 import { nearTokenId } from "../../utils";
 import { toggleUseAsCollateral, hideModal } from "../../redux/appSlice";
 import { getModalData } from "./utils";
@@ -18,8 +16,7 @@ import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { getSelectedValues, getAssetData, getConfig } from "../../redux/appSelectors";
 import { trackActionButton } from "../../utils/telemetry";
 import { useDegenMode } from "../../hooks/hooks";
-import { SubmitButton, AlertWarning } from "./components";
-import { getAccountPortfolio } from "../../redux/accountSelectors";
+import { SubmitButton } from "./components";
 import getShadowRecords from "../../api/get-shadows";
 import { expandToken, shrinkToken } from "../../store";
 
@@ -27,8 +24,10 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
   const [loading, setLoading] = useState(false);
   const { amount, useAsCollateral, isMax } = useAppSelector(getSelectedValues);
   const { enable_pyth_oracle } = useAppSelector(getConfig);
+  const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
   const dispatch = useAppDispatch();
   const asset = useAppSelector(getAssetData);
+  const { account, autoConnect } = useBtcWalletSelector();
   const { action = "Deposit", tokenId, borrowApy, price, portfolio, isLpToken, position } = asset;
   const { isRepayFromDeposits } = useDegenMode();
   const { available, canUseAsCollateral, extraDecimals, collateral, disabled, decimals } =
@@ -50,6 +49,10 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
   }, [useAsCollateral]);
 
   const handleActionButtonClick = async () => {
+    if (!account && selectedWalletId === "btc-wallet") {
+      autoConnect();
+      return;
+    }
     setLoading(true);
     trackActionButton(action, {
       tokenId,

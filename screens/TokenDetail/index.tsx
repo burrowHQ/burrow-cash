@@ -3,6 +3,7 @@ import Decimal from "decimal.js";
 import { useEffect, useState, createContext, useContext, useMemo } from "react";
 import { Modal as MUIModal } from "@mui/material";
 import { twMerge } from "tailwind-merge";
+import { useBtcWalletSelector } from "btc-wallet";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 import { updatePosition } from "../../redux/appSlice";
 import {
@@ -70,10 +71,13 @@ const DetailData = createContext(null) as any;
 const TokenDetail = () => {
   const router = useRouter();
   const rows = useAvailableAssets();
+  const { account, autoConnect } = useBtcWalletSelector();
   const { id } = router.query;
   const [updaterCounter, setUpDaterCounter] = useState(1);
   const isNBTC = NBTCTokenId === id;
   const btcChainDetail = useBtcAction({ updater: updaterCounter });
+  const accountId = useAccountId();
+  const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
   useEffect(() => {
     const t = setInterval(() => {
       setUpDaterCounter((pre) => {
@@ -87,6 +91,12 @@ const TokenDetail = () => {
       clearInterval(t);
     };
   }, [isNBTC]);
+  // connect btc wallet to get btc balance;
+  useEffect(() => {
+    if (accountId && isNBTC && selectedWalletId === "btc-wallet" && !account) {
+      autoConnect();
+    }
+  }, [isNBTC, account, accountId, selectedWalletId]);
   const tokenRow = rows.find((row: UIAsset) => {
     return row.tokenId === id;
   });
