@@ -1,6 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 
-import { shrinkToken, PERCENT_DIGITS } from "../../store";
+import { shrinkToken, PERCENT_DIGITS, PERCENT_DIGITS_BTC } from "../../store";
 import { RootState } from "../store";
 import { hasAssets } from "../utils";
 import { toDecimal } from "../../utils/uiNumber";
@@ -20,7 +20,7 @@ export const getCollateralAmount = (tokenId: string) =>
         shrinkToken(
           collateral.balance || 0,
           metadata.decimals + config.extra_decimals,
-          PERCENT_DIGITS,
+          tokenId.indexOf("nbtc") > -1 ? PERCENT_DIGITS_BTC : PERCENT_DIGITS,
         ),
       );
     },
