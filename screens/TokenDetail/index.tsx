@@ -2,7 +2,6 @@ import { useRouter } from "next/router";
 import Decimal from "decimal.js";
 import { useEffect, useState, createContext, useContext, useMemo } from "react";
 import { Modal as MUIModal } from "@mui/material";
-import { useBtcWalletSelector } from "btc-wallet";
 import { twMerge } from "tailwind-merge";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 import { updatePosition } from "../../redux/appSlice";
@@ -55,7 +54,7 @@ import getConfig, {
   DEFAULT_POSITION,
   lpTokenPrefix,
   STABLE_POOL_IDS,
-  incentiveTokens,
+  NBTCTokenId,
 } from "../../utils/config";
 import InterestRateChart, { LabelText } from "./interestRateChart";
 import TokenBorrowSuppliesChart from "./tokenBorrowSuppliesChart";
@@ -73,16 +72,21 @@ const TokenDetail = () => {
   const rows = useAvailableAssets();
   const { id } = router.query;
   const [updaterCounter, setUpDaterCounter] = useState(1);
-  // TODOXXX
+  const isNBTC = NBTCTokenId === id;
   const btcChainDetail = useBtcAction({ updater: updaterCounter });
-  // useEffect(() => {
-  //   const t = setInterval(() => {
-  //     setUpDaterCounter((pre) => pre + 1);
-  //   }, 60000);
-  //   return () => {
-  //     clearInterval(t);
-  //   };
-  // }, []);
+  useEffect(() => {
+    const t = setInterval(() => {
+      setUpDaterCounter((pre) => {
+        return pre + 1;
+      });
+    }, 60000);
+    if (!id || !isNBTC) {
+      clearInterval(t);
+    }
+    return () => {
+      clearInterval(t);
+    };
+  }, [isNBTC]);
   const tokenRow = rows.find((row: UIAsset) => {
     return row.tokenId === id;
   });
@@ -423,7 +427,7 @@ function MarketInfo({ className, tokenDetails, handlePeriodClick }) {
 }
 
 function YourInfo({ className }) {
-  const { supplied, borrowed, tokenRow, btcChainDetail } = useContext(DetailData) as any;
+  const { tokenRow } = useContext(DetailData) as any;
   return (
     <div className={`${className}`}>
       <TokenUserInfo />
@@ -943,14 +947,7 @@ function TokenUserInfo() {
     (acc, { maxBorrowAmount }) => acc + maxBorrowAmount,
     0,
   );
-
-  const router: any = useRouter();
-  const [isNBTC, setIsNBTC] = useState(false);
-  useEffect(() => {
-    if (router?.query?.id.indexOf("nbtc") !== -1) {
-      setIsNBTC(true);
-    }
-  }, [router, accountId]);
+  const isNBTC = NBTCTokenId === tokenId;
 
   return (
     <UserBox className="mb-[29px] xsm:mb-2.5">
