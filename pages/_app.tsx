@@ -13,11 +13,10 @@ import "../styles/global.css";
 import LoadingBar from "react-top-loading-bar";
 import { useRouter } from "next/router";
 import {
-  setupSatoshiWallet,
   useBtcWalletSelector,
   BtcWalletSelectorContextProvider,
   InitContextHook,
-} from "satoshi-wallet";
+} from "btc-wallet";
 import {
   ConnectProvider as BTCConnectProvider,
   OKXConnector,

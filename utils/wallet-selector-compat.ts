@@ -22,11 +22,11 @@ import { map, distinctUntilChanged } from "rxjs";
 import { setupKeypom } from "@keypom/selector";
 import { setupOKXWallet } from "@near-wallet-selector/okx-wallet";
 import {
-  setupSatoshiWallet,
+  setupBTCWallet,
   useBtcWalletSelector,
   BtcWalletSelectorContextProvider,
   InitContextHook,
-} from "satoshi-wallet";
+} from "btc-wallet";
 import { useContext } from "react";
 // @ts-nocheck
 import type { Config } from "@wagmi/core";
@@ -203,7 +203,7 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         deprecated: false,
       }),
       setupCoin98Wallet(),
-      setupSatoshiWallet({}),
+      setupBTCWallet({}),
     ],
     network: {
       networkId: defaultNetwork,
