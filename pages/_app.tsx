@@ -73,8 +73,8 @@ init({
   release: "v1",
 });
 
-const IDLE_INTERVAL = 90e3;
-const REFETCH_INTERVAL = 60e3;
+const IDLE_INTERVAL = 400e3;
+const REFETCH_INTERVAL = 300e3;
 
 const Init = () => {
   const isIdle = useIdle(IDLE_INTERVAL);
