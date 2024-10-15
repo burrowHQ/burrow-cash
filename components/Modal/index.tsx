@@ -134,6 +134,9 @@ const Modal = () => {
             backgroundColor: theme.custom.scrollbarBg,
           },
         }}
+        style={{
+          overflowY: "auto",
+        }}
       >
         <ModalContext.Provider
           value={{
