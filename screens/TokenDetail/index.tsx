@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import Decimal from "decimal.js";
 import { useEffect, useState, createContext, useContext, useMemo } from "react";
 import { Modal as MUIModal } from "@mui/material";
+import { useBtcWalletSelector } from "btc-wallet";
 import { twMerge } from "tailwind-merge";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 import { updatePosition } from "../../redux/appSlice";
@@ -72,12 +73,16 @@ const TokenDetail = () => {
   const rows = useAvailableAssets();
   const { id } = router.query;
   const [updaterCounter, setUpDaterCounter] = useState(1);
+  // TODOXXX
   const btcChainDetail = useBtcAction({ updater: updaterCounter });
-
-  setInterval(() => {
-    setUpDaterCounter((pre) => pre + 1);
-  }, 60000);
-
+  // useEffect(() => {
+  //   const t = setInterval(() => {
+  //     setUpDaterCounter((pre) => pre + 1);
+  //   }, 60000);
+  //   return () => {
+  //     clearInterval(t);
+  //   };
+  // }, []);
   const tokenRow = rows.find((row: UIAsset) => {
     return row.tokenId === id;
   });
@@ -978,14 +983,6 @@ function TokenUserInfo() {
               <SatoshiIcon />
             </span>
           </div>
-          {/* <div className="flex items-center]">
-            <span className="text-sm text-white mr-2.5">
-              {accountId ? formatWithCommas_number(supplyBalance) : "-"}
-            </span>
-            <LPTokenCell asset={tokenRow} balance={supplyBalance}>
-              {getIcons()}
-            </LPTokenCell>
-          </div> */}
           <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
             <span className="text-gray-300">NEAR Chain</span>
             <span className="flex items-center">

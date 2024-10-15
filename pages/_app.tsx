@@ -12,20 +12,7 @@ import ModalReact from "react-modal";
 import "../styles/global.css";
 import LoadingBar from "react-top-loading-bar";
 import { useRouter } from "next/router";
-import {
-  useBtcWalletSelector,
-  BtcWalletSelectorContextProvider,
-  InitContextHook,
-} from "btc-wallet";
-import {
-  ConnectProvider as BTCConnectProvider,
-  OKXConnector,
-  UnisatConnector,
-  BitgetConnector,
-  useETHProvider,
-  useBTCProvider,
-  useConnectModal,
-} from "@particle-network/btc-connectkit";
+import { BtcWalletSelectorContextProvider } from "btc-wallet";
 import { store, persistor } from "../redux/store";
 import { FallbackError, Layout, Modal } from "../components";
 import { posthog, isPostHogEnabled } from "../utils/telemetry";
@@ -137,18 +124,6 @@ function Upgrade({ Component, pageProps }) {
       await dispatch(logoutAccount());
     }
   }
-  // const router = useRouter();
-  // console.info(router);
-
-  // for satoshi wallet
-  useEffect(() => {
-    // if (router.pathname.indexOf("/tokenDetail") !== -1) {
-    setUpgrading(true);
-    setTimeout(() => {
-      setUpgrading(false);
-    }, 50);
-    // }
-  }, [accountId]);
   return (
     <div>
       {upgrading ? (
@@ -160,41 +135,16 @@ function Upgrade({ Component, pageProps }) {
           <RpcList />
         </div>
       ) : (
-        <BtcWalletSelectorContextProvider>
-          <BTCConnectProvider
-            options={{
-              projectId: "btc",
-              clientKey: "btc",
-              appId: "btc",
-              aaOptions: {
-                accountContracts: {
-                  BTC: [
-                    {
-                      chainIds: [686868],
-                      version: "1.0.0",
-                    },
-                  ],
-                },
-              },
-              walletOptions: {
-                visible: true,
-              },
-            }}
-            connectors={[new UnisatConnector()]}
-          >
-            <InitContextHook />
-            <Layout>
-              <Popup className="lg:hidden" />
-              <Init />
-              <Modal />
-              <ToastMessage />
-              <Component {...pageProps} />
-              <Popup className="xsm:hidden" />
-              <RpcList />
-              <PubTestModal />
-            </Layout>
-          </BTCConnectProvider>
-        </BtcWalletSelectorContextProvider>
+        <Layout>
+          <Popup className="lg:hidden" />
+          <Init />
+          <Modal />
+          <ToastMessage />
+          <Component {...pageProps} />
+          <Popup className="xsm:hidden" />
+          <RpcList />
+          <PubTestModal />
+        </Layout>
       )}
     </div>
   );
@@ -249,42 +199,44 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         progress={progress}
         onLoaderFinished={() => setProgress(0)}
       />
-      <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <Head>
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <title>Burrow Finance</title>
-          </Head>
-          <Upgrade Component={Component} pageProps={pageProps} />
-        </PersistGate>
-      </Provider>
-      {isBlocked && blockFeatureEnabled && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center"
-          style={{
-            zIndex: "999999999",
-            backdropFilter: "blur(6px)",
-            height: "100vh",
-            overflow: "hidden",
-          }}
-        >
+      <BtcWalletSelectorContextProvider>
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
+            <Head>
+              <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <title>Burrow Finance</title>
+            </Head>
+            <Upgrade Component={Component} pageProps={pageProps} />
+          </PersistGate>
+        </Provider>
+        {isBlocked && blockFeatureEnabled && (
           <div
-            className="text-white text-center bg-dark-100 px-5 pt-9 pb-7 rounded-md border border-dark-300"
-            style={{ width: "278px" }}
+            className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center"
+            style={{
+              zIndex: "999999999",
+              backdropFilter: "blur(6px)",
+              height: "100vh",
+              overflow: "hidden",
+            }}
           >
-            <p className="text-sm">
-              You are prohibited from accessing app.burrow.finance due to your location or other
-              infringement of the Terms of Services.
-            </p>
             <div
-              onClick={handleBlockConfirmation}
-              className="mt-6 border border-primary h-9 flex items-center justify-center rounded-md text-sm text-black text-primary cursor-pointer ml-1.5 mr-1.5"
+              className="text-white text-center bg-dark-100 px-5 pt-9 pb-7 rounded-md border border-dark-300"
+              style={{ width: "278px" }}
             >
-              Confirm
+              <p className="text-sm">
+                You are prohibited from accessing app.burrow.finance due to your location or other
+                infringement of the Terms of Services.
+              </p>
+              <div
+                onClick={handleBlockConfirmation}
+                className="mt-6 border border-primary h-9 flex items-center justify-center rounded-md text-sm text-black text-primary cursor-pointer ml-1.5 mr-1.5"
+              >
+                Confirm
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </BtcWalletSelectorContextProvider>
     </ErrorBoundary>
   );
 }
