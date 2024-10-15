@@ -8,9 +8,8 @@ export function useBtcAction({ updater }: any) {
   useEffect(() => {
     if (btcSelector?.account) {
       btcSelector.getBalance().then((res) => {
-        const _balance = new Decimal(res.total).div(10 ** 8).toString();
+        const _balance = new Decimal(res).div(10 ** 8).toString();
         setBalance(_balance);
-        // console.log('0000000000000-', res);
       });
     }
   }, [btcSelector?.account]);
