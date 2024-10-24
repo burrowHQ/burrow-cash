@@ -45,7 +45,7 @@ const ModalStaking = ({ isOpen, onClose }) => {
   const selectedMonths = stakingTimestamp ? Math.round(unstakeDate.diffNow().as("months")) : months;
   const invalidAmount = +amount > +total;
   const invalidMonths = months === maxMonth ? false : months < selectedMonths;
-  const disabledStake = !amount || invalidAmount || invalidMonths;
+  const disabledStake = !amount || invalidAmount || invalidMonths || Number(amount) === 0;
   const { avgStakeSupplyAPY, avgStakeBorrowAPY, avgStakeNetAPY, totalTokenNetMap } =
     useStakeRewardApy();
   const [, , multiplier] = useAppSelector(getAccountBoostRatioData);
