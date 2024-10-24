@@ -56,30 +56,34 @@ const ModalStaking = ({ isOpen, onClose }) => {
     .replace(/(?!^)-/g, "")
     .replace(/^0+(\d)/gm, "$1");
 
-  const sliderValue = Math.round((amount * 100) / Number(total)) || 0;
+  const sliderValue = useMemo(() => {
+    if (Number(amount) > Number(total)) {
+      return 100;
+    }
+    return Math.round((Number(amount) * 100) / Number(total)) || 0;
+  }, [amount, total]);
 
   const handleMaxClick = () => {
     trackMaxStaking({ total: totalToken });
     setAmount(totalToken);
   };
   const handleInputChange = (e) => {
-    let { value } = e?.target || {};
+    const { value } = e?.target || {};
     const numRegex = /^([0-9]*\.?[0-9]*$)/;
     if (!numRegex.test(value)) {
       e.preventDefault();
       return;
     }
-    if (Number(value) > Number(total)) {
-      value = total;
-    }
     setAmount(value);
   };
 
   const handleRangeSliderChange = (percent) => {
-    if (Number(percent) >= 99.7) {
+    if (percent >= 100) {
+      setAmount(String(Number(total) * 1.01));
+    } else if (Number(percent) >= 99.7) {
       setAmount(totalToken);
     } else {
-      setAmount((Number(total) * percent) / 100);
+      setAmount(((Number(total) * percent) / 100).toFixed(8));
     }
   };
 
@@ -208,7 +212,7 @@ const ModalStaking = ({ isOpen, onClose }) => {
           isLoading={loadingStake}
           className="w-full mt-2 mb-4"
         >
-          Stake
+          {Number(amount) > Number(total) ? "Insufficient Balance" : "Stake"}
         </CustomButton>
 
         <div className="text-primary h5 mb-4 text-center">
