@@ -78,12 +78,15 @@ const ModalStaking = ({ isOpen, onClose }) => {
   };
 
   const handleRangeSliderChange = (percent) => {
-    if (percent >= 100) {
-      setAmount(String(Number(total) * 1.01));
+    if (Number(total) === 0) {
+      setAmount("0");
+    } else if (percent >= 100) {
+      setAmount(totalToken);
     } else if (Number(percent) >= 99.7) {
       setAmount(totalToken);
     } else {
-      setAmount(((Number(total) * percent) / 100).toFixed(8));
+      const calculatedAmount = (Number(total) * percent) / 100;
+      setAmount(Number(calculatedAmount) === 0 ? "0" : calculatedAmount);
     }
   };
 
