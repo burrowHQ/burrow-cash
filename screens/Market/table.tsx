@@ -24,10 +24,19 @@ import { APYCell } from "./APYCell";
 import getConfig, { incentiveTokens, topTokens } from "../../utils/config";
 
 function MarketsTable({ rows, sorting }: TableProps) {
+  const allowedTokenIds = [
+    "wbtc.fakes.testnet",
+    "nbtc1-nsp.testnet",
+    "eth.fakes.testnet",
+    "usdcc.fakes.testnet",
+    "usdtt.fakes.testnet",
+    "853d95.fakes.testnet",
+  ];
+  const filteredRows = rows.filter((row) => allowedTokenIds.includes(row.tokenId));
   return (
     <div className="w-full xsm:p-4">
       <TableHead sorting={sorting} />
-      <TableBody rows={rows} sorting={sorting} />
+      <TableBody rows={filteredRows} sorting={sorting} />
     </div>
   );
 }
