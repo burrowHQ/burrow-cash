@@ -997,7 +997,7 @@ function TokenUserInfo() {
               <span
                 className="text-toolTipBoxBorderColor text-xs hover:cursor-pointer underline mr-[4px]"
                 onClick={() => {
-                  window.open("https://dev.satoshibridge.top/", "_blank");
+                  window.open("https://testnet.bridge.satos.network/", "_blank");
                 }}
               >
                 BTC Bridge
