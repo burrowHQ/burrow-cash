@@ -42,7 +42,7 @@ export const emptyBorrowedAsset = (asset: { borrowed: number }): boolean => {
   return !(
     asset.borrowed.toLocaleString(
       undefined,
-      asset.tokenId === "nbtc1-nsp.testnet" ? TOKEN_FORMAT_BTC : TOKEN_FORMAT,
+      asset.tokenId === "nbtc2-nsp.testnet" ? TOKEN_FORMAT_BTC : TOKEN_FORMAT,
     ) === (0).toLocaleString(undefined, TOKEN_FORMAT)
   );
 };

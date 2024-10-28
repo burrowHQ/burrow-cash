@@ -47,7 +47,7 @@ export const incentiveTokens = [
 ];
 export const topTokens = ["shadow_ref_v1-4179"];
 export const NBTCTokenId = {
-  testnet: "nbtc1-nsp.testnet",
+  testnet: "nbtc2-nsp.testnet",
   mainnet: "",
 }[defaultNetwork];
 const getConfig = (env: string = defaultNetwork) => {
