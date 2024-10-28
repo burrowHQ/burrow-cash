@@ -25,12 +25,12 @@ import getConfig, { incentiveTokens, topTokens } from "../../utils/config";
 
 function MarketsTable({ rows, sorting }: TableProps) {
   const allowedTokenIds = [
-    "wbtc.fakes.testnet",
-    "nbtc1-nsp.testnet",
-    "eth.fakes.testnet",
-    "usdcc.fakes.testnet",
-    "usdtt.fakes.testnet",
-    "853d95.fakes.testnet",
+    "wbtc.ft.ref-labs.testnet",
+    "nbtc2-nsp.testnet",
+    "eth.ft.ref-labs.testnet",
+    "usdcc.ft.ref-labs.testnet",
+    "usdtt.ft.ref-labs.testnet",
+    "frax.ft.ref-labs.testnet",
   ];
   const filteredRows = rows.filter((row) => allowedTokenIds.includes(row.tokenId));
   return (

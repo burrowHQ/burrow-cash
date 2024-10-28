@@ -49,18 +49,7 @@ export const getAssetsDetailed = async (): Promise<IAssetDetailed[]> => {
   // const assets: IAssetEntry[] = await getAssets();
   // const detailedAssets = await Promise.all(assets.map((asset) => getAssetDetailed(asset.token_id)));
   const detailedAssets = await getAssetDetaileds();
-  const allowedTokenIds = [
-    "wbtc.fakes.testnet",
-    "nbtc1-nsp.testnet",
-    "eth.fakes.testnet",
-    "usdcc.fakes.testnet",
-    "usdtt.fakes.testnet",
-    "853d95.fakes.testnet",
-    "token.dev-burrow.testnet",
-    "dai.fakes.testnet",
-  ];
-  const filteredRows = detailedAssets.filter((row) => allowedTokenIds.includes(row.token_id));
-  return filteredRows;
+  return detailedAssets;
 };
 
 export const getUnitLptAssets = async (pool_ids: number[]): Promise<IUnitLptAsset> => {
