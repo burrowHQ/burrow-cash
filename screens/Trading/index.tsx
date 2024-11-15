@@ -21,11 +21,13 @@ import { useMarginConfigToken } from "../../hooks/useMarginConfig";
 import { setCategoryAssets1, setCategoryAssets2 } from "../../redux/marginTrading";
 import { useMarginAccount } from "../../hooks/useMarginAccount";
 import { useAccountId, usePortfolioAssets } from "../../hooks/hooks";
-import ModalWithCountdown from "./components/positionResultTips";
+import { useRouterQuery, getTransactionResult } from "../../utils/txhashContract";
+import { showPositionResult } from "../../components/HashResultModal";
 
 init_env("dev");
 
 const Trading = () => {
+  const { query } = useRouterQuery();
   const accountId = useAccountId();
   const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
   const { categoryAssets1, categoryAssets2 } = useMarginConfigToken();
@@ -54,7 +56,21 @@ const Trading = () => {
   //
   useEffect(() => {
     if (router.query.transactionHashes) {
-      setShowModal(true);
+      //
+      showPositionResult({
+        title: "Open Position",
+        type: "Long", // optional，"Long" 或 "Short"
+        price: "100", // optional，
+        transactionHashes: Array.isArray(router.query.transactionHashes)
+          ? router.query.transactionHashes[0]
+          : (router.query.transactionHashes as string),
+        positionSize: {
+          // optional，
+          amount: "10",
+          symbol: "NEAR",
+          usdValue: "1000",
+        },
+      });
     }
   }, [router]);
 
@@ -137,6 +153,30 @@ const Trading = () => {
         setShowPopup2(false);
       }
     }, 200);
+  };
+
+  useEffect(() => {
+    handleTransactions();
+  }, [query?.transactionHashes]);
+
+  const handleTransactions = async () => {
+    if (query?.transactionHashes) {
+      try {
+        const txhash = Array.isArray(query?.transactionHashes)
+          ? query?.transactionHashes
+          : (query?.transactionHashes as string).split(",");
+        const results = await Promise.all(
+          txhash.map(async (txHash: string) => {
+            const result: any = await getTransactionResult(txHash);
+            console.log(result);
+            return { txHash };
+          }),
+        );
+        console.log(results, ";rrrr");
+      } catch (error) {
+        console.error("Error processing transactions:", error);
+      }
+    }
   };
 
   //
@@ -270,8 +310,6 @@ const Trading = () => {
         </div>
       </div>
       {accountId && <TradingTable positionsList={marginAccountList} />}
-
-      <ModalWithCountdown show={showModal} onClose={handleClose} />
     </LayoutBox>
   );
 };
