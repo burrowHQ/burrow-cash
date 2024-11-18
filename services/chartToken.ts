@@ -205,7 +205,6 @@ export function generateUrl(
 }
 
 async function mockData(params: { symbol: string; resolution: string; from: number; to: number }) {
-  console.log(params,'params')
   if (params.symbol) {
     const [base, quote] = params.symbol.includes("_")
       ? params.symbol.split("_")
