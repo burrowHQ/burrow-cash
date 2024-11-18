@@ -4,7 +4,7 @@ export interface IMarginConfig {
   max_leverage_rate: number;
   pending_debt_scale: number;
   max_slippage_rate: number;
-  min_safty_buffer: number;
+  min_safety_buffer: number;
   margin_debt_discount_rate: number;
   open_position_fee_rate: number;
   registered_dexes: { [dexId: string]: number };

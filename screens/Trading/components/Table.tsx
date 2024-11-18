@@ -234,14 +234,14 @@ const PositionRow = ({
   const total_debt = leverageD * priceD;
   const total_hp_fee =
     (item.debt_cap * ((debt_assets_d?.unit_acc_hp_interest ?? 0) - item.uahpi_at_open)) / 10 ** 18;
-  // const decrease_cap = total_cap * (marginConfigTokens.min_safty_buffer / 10000);
-  const denominator = sizeValueLong * (1 - marginConfigTokens.min_safty_buffer / 10000);
+  // const decrease_cap = total_cap * (marginConfigTokens.min_safety_buffer / 10000);
+  const denominator = sizeValueLong * (1 - marginConfigTokens.min_safety_buffer / 10000);
   // total_cap - decrease_cap === total_debt + total_hp_fee;
   const LiqPrice =
     denominator !== 0
       ? (total_debt +
           total_hp_fee +
-          (priceC * leverageC * marginConfigTokens.min_safty_buffer) / 10000 -
+          (priceC * leverageC * marginConfigTokens.min_safety_buffer) / 10000 -
           priceC * leverageC) /
         denominator
       : 0;
