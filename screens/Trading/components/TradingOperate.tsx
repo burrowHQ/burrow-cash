@@ -48,8 +48,8 @@ const TradingOperate = () => {
   const [isDisabled, setIsDisabled] = useState(false);
 
   //
-  const [longInput, setLongInput] = useState(0);
-  const [shortInput, setShortInput] = useState(0);
+  const [longInput, setLongInput] = useState("");
+  const [shortInput, setShortInput] = useState("");
   const [longOutput, setLongOutput] = useState(0);
   const [shortOutput, setShortOutput] = useState(0);
 
@@ -79,12 +79,12 @@ const TradingOperate = () => {
     setLiqPrice(0);
     setRangeMount(1);
     if (tabString == "long") {
-      setShortInput(0);
+      setShortInput("");
       setShortInputUsd(0);
       setShortOutput(0);
       setShortOutputUsd(0);
     } else {
-      setLongInput(0);
+      setLongInput("");
       setLongInputUsd(0);
       setLongOutput(0);
       setLongOutputUsd(0);
@@ -252,9 +252,9 @@ const TradingOperate = () => {
       let liqPriceX = 0;
       if (rangeMount > 1) {
         if (activeTab == "long") {
-          const k1 = longInput * rangeMount * (getAssetPrice(ReduxcategoryAssets2) as any);
+          const k1 = Number(longInput) * rangeMount * (getAssetPrice(ReduxcategoryAssets2) as any);
           const k2 = 1 - marginConfigTokens.min_safty_buffer / 10000;
-          liqPriceX = (k1 / k2 - longInput) / longOutput;
+          liqPriceX = (k1 / k2 - Number(longInput)) / longOutput;
         } else {
           liqPriceX =
             (((Number(shortInput) +
