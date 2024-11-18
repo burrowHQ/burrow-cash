@@ -1,8 +1,32 @@
 import React, { useState, useEffect } from "react";
-import { NearIcon, NearIconMini } from "../../MarginTrading/components/Icon";
-import { CloseIcon } from "../../../components/Icons/Icons";
+import { NearIcon, NearIconMini } from "../../screens/MarginTrading/components/Icon";
+import { CloseIcon } from "../Icons/Icons";
 
-const ModalWithCountdown = ({ show, onClose }) => {
+interface PositionResultProps {
+  show: boolean;
+  onClose: () => void;
+  title?: string;
+  type?: "Long" | "Short";
+  price?: string;
+  positionSize?: {
+    amount: string;
+    symbol: string;
+    usdValue: string;
+  };
+}
+
+const ModalWithCountdown = ({
+  show,
+  onClose,
+  title = "Open Position",
+  type = "Long",
+  price = "$0.00",
+  positionSize = {
+    amount: "0",
+    symbol: "NEAR",
+    usdValue: "$0.00",
+  },
+}: PositionResultProps) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [countdown, setCountdown] = useState(10);
   const [progress, setProgress] = useState(100);
@@ -47,7 +71,11 @@ const ModalWithCountdown = ({ show, onClose }) => {
   const renderProgressBar = () => (
     <div
       className="rounded-sm"
-      style={{ width: `${progress}%`, backgroundColor: "#D2FF3A", height: "3px" }}
+      style={{
+        width: `${progress}%`,
+        backgroundColor: type == "Long" ? "#D2FF3A" : "#ff6ba9",
+        height: "3px",
+      }}
     />
   );
 
@@ -62,25 +90,29 @@ const ModalWithCountdown = ({ show, onClose }) => {
             <div className="fc">
               <div className="fc">
                 <NearIconMini />
-                <span className="font-normal text-base px-2">Open Position</span>
+                <span className="font-normal text-base px-2">{title}</span>
                 <div
-                  className="text-sm text-toolTipBoxBorderColor rounded-sm p-1"
+                  className={`text-sm ${
+                    type == "Long" ? "text-toolTipBoxBorderColor" : "text-red-50"
+                  } rounded-sm p-1`}
                   style={{ backgroundColor: "rgba(210, 255, 58, 0.1)" }}
                 >
-                  Long Near
+                  {type} {positionSize.symbol}
                 </div>
               </div>
               <div className="text-gray-1000 text-sm ml-auto">Filled</div>
             </div>
             <div className="fc justify-between text-sm font-normal">
               <span className="text-gray-300">Price</span>
-              <span>$3.34</span>
+              <span>{price}</span>
             </div>
             <div className="fc justify-between text-sm font-normal">
               <span className="text-gray-300">Position Size</span>
               <span>
-                45.2435 NEAR
-                <span className="text-xs text-gray-300">($149.35)</span>
+                {positionSize.amount} {positionSize.symbol}
+                <span className="text-xs text-gray-300">
+                  ({(Number(positionSize.amount) * Number(price)).toFixed(6)})
+                </span>
               </span>
             </div>
             <div className="absolute bottom-0 z-50 w-full left-0">{renderProgressBar()}</div>

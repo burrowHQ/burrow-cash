@@ -48,8 +48,8 @@ const TradingOperate = () => {
   const [isDisabled, setIsDisabled] = useState(false);
 
   //
-  const [longInput, setLongInput] = useState(0);
-  const [shortInput, setShortInput] = useState(0);
+  const [longInput, setLongInput] = useState("");
+  const [shortInput, setShortInput] = useState("");
   const [longOutput, setLongOutput] = useState(0);
   const [shortOutput, setShortOutput] = useState(0);
 
@@ -78,13 +78,13 @@ const TradingOperate = () => {
   const initCateState = (tabString) => {
     setLiqPrice(0);
     setRangeMount(1);
-    if (tabString === "long") {
-      setShortInput(0);
+    if (tabString == "long") {
+      setShortInput("");
       setShortInputUsd(0);
       setShortOutput(0);
       setShortOutputUsd(0);
     } else {
-      setLongInput(0);
+      setLongInput("");
       setLongInputUsd(0);
       setLongOutput(0);
       setLongOutputUsd(0);
@@ -276,24 +276,50 @@ const TradingOperate = () => {
 
       let liqPriceX = 0;
       if (rangeMount > 1) {
-        if (activeTab === "long") {
-          const k1 = longInput * rangeMount * (getAssetPrice(ReduxcategoryAssets2) as any);
-          const k2 = 1 - marginConfigTokens.min_safty_buffer / 10000;
-          liqPriceX = (k1 / k2 - longInput) / longOutput;
+        if (activeTab == "long") {
+          const k1 = Number(longInput) * rangeMount * (getAssetPrice(ReduxcategoryAssets2) as any);
+          const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
+          liqPriceX = (k1 / k2 - Number(longInput)) / longOutput;
         } else {
           liqPriceX =
             (((Number(shortInput) +
               Number(shrinkToken(estimateData?.min_amount_out, decimalsC))) as any) *
               rangeMount *
               (getAssetPrice(ReduxcategoryAssets2) as any) *
-              (1 - marginConfigTokens.min_safty_buffer / 10000)) /
+              (1 - marginConfigTokens.min_safety_buffer / 10000)) /
             shortOutput;
         }
       }
 
+      // const total_debt =
+      //   (shrinkToken(ReduxcategoryAssets2.margin_debt.balance, decimalsD) as any) * priceD;
+      // const total_hp_fee =
+      //   (ReduxcategoryAssets2.margin_debt.debt_cap * (unit_acc_hp_interest - uahpi_at_open)) /
+      //   10 ** 18;
+
+      // const numerator =
+      //   total_debt +
+      //   total_hp_fee -
+      //   (shrinkToken(ReduxcategoryAssets1.margin_debt.balance, decimalsD) as any) *
+      //     priceC *
+      //     (1 - marginConfigTokens.min_safety_buffer / 10000);
+
+      // const denominator =
+      //   estimateData?.min_amount_out * (1 - marginConfigTokens.min_safety_buffer / 10000);
+
+      console.log(marginConfigTokens, ReduxcategoryAssets2, ReduxcategoryAssets1);
+
       setLiqPrice(liqPriceX);
     }
   }, [longOutput, shortOutput]);
+
+  const Fee = useMemo(() => {
+    console.log(ReduxcategoryAssets1, ReduxcategoryAssets2);
+    return {
+      fee: (Number(longInput || shortInput) * config.open_position_fee_rate) / 10000,
+      price: getAssetPrice(ReduxcategoryAssets1),
+    };
+  }, [longInput, shortInput, ReduxcategoryAssets1]);
 
   function getAssetPrice(categoryId) {
     return categoryId ? assets.data[categoryId["token_id"]].price?.usd : 0;
@@ -460,6 +486,14 @@ const TradingOperate = () => {
             <RangeSlider defaultValue={rangeMount} action="Long" setRangeMount={setRangeMount} />
             <div className="mt-5">
               <div className="flex items-center justify-between text-sm mb-4">
+                <div className="text-gray-300">Minimum received</div>
+                <div className="text-right">
+                  {Number(toInternationalCurrencySystem_number(longOutput)) *
+                    (1 - slippageTolerance / 100)}{" "}
+                  NEAR
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Position Size</div>
                 <div className="text-right">
                   {toInternationalCurrencySystem_number(longOutput)} NEAR
@@ -475,9 +509,11 @@ const TradingOperate = () => {
               <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Fee</div>
                 <div className="flex items-center justify-center">
-                  <p className="border-b border-dashed border-dark-800">0.26</p>
+                  <p className="border-b border-dashed border-dark-800">{Fee.fee}</p>
                   NEAR
-                  <span className="text-xs text-gray-300 ml-1.5">($0.89)</span>
+                  <span className="text-xs text-gray-300 ml-1.5">
+                    (${Fee.fee * (Fee.price || 0)})
+                  </span>
                 </div>
               </div>
               <div className="flex items-baseline justify-between text-sm mb-4">
@@ -595,6 +631,14 @@ const TradingOperate = () => {
             <RangeSlider defaultValue={rangeMount} action="Short" setRangeMount={setRangeMount} />
             <div className="mt-5">
               <div className="flex items-center justify-between text-sm mb-4">
+                <div className="text-gray-300">Minimum received</div>
+                <div className="text-right">
+                  {Number(toInternationalCurrencySystem_number(shortOutput)) *
+                    (1 - slippageTolerance / 100)}{" "}
+                  NEAR
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Position Size</div>
                 <div>
                   {toInternationalCurrencySystem_number(shortOutput)} NEAR
@@ -610,9 +654,11 @@ const TradingOperate = () => {
               <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Fee</div>
                 <div className="flex items-center justify-center">
-                  <p className="border-b border-dashed border-dark-800">0.26</p>
+                  <p className="border-b border-dashed border-dark-800">{Fee.fee}</p>
                   NEAR
-                  <span className="text-xs text-gray-300 ml-1.5">($0.89)</span>
+                  <span className="text-xs text-gray-300 ml-1.5">
+                    (${Fee.fee * (Fee.price || 0)})
+                  </span>
                 </div>
               </div>
               <div className="flex items-baseline justify-between text-sm mb-4">
