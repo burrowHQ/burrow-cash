@@ -10,6 +10,7 @@ export interface IMarginConfigState {
   registered_tokens: Record<string, number>;
   status: Status;
   fetchedAt: string | undefined;
+  max_active_user_margin_position: number;
 }
 
 export const initialState: IMarginConfigState = {
@@ -23,4 +24,5 @@ export const initialState: IMarginConfigState = {
   registered_tokens: {},
   status: undefined,
   fetchedAt: undefined,
+  max_active_user_margin_position: 0,
 };

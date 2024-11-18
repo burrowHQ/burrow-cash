@@ -73,3 +73,9 @@ export function useRouterQuery() {
 
   return { query, replaceQuery };
 }
+
+export const parsedArgs = (res: any) => {
+  const buff = Buffer.from(res, "base64");
+  const parsedData = buff.toString("ascii");
+  return parsedData;
+};

@@ -71,7 +71,11 @@ const ModalWithCountdown = ({
   const renderProgressBar = () => (
     <div
       className="rounded-sm"
-      style={{ width: `${progress}%`, backgroundColor: "#D2FF3A", height: "3px" }}
+      style={{
+        width: `${progress}%`,
+        backgroundColor: type == "Long" ? "#D2FF3A" : "#ff6ba9",
+        height: "3px",
+      }}
     />
   );
 
@@ -88,7 +92,9 @@ const ModalWithCountdown = ({
                 <NearIconMini />
                 <span className="font-normal text-base px-2">{title}</span>
                 <div
-                  className="text-sm text-toolTipBoxBorderColor rounded-sm p-1"
+                  className={`text-sm ${
+                    type == "Long" ? "text-toolTipBoxBorderColor" : "text-red-50"
+                  } rounded-sm p-1`}
                   style={{ backgroundColor: "rgba(210, 255, 58, 0.1)" }}
                 >
                   {type} {positionSize.symbol}
@@ -104,7 +110,9 @@ const ModalWithCountdown = ({
               <span className="text-gray-300">Position Size</span>
               <span>
                 {positionSize.amount} {positionSize.symbol}
-                <span className="text-xs text-gray-300">({positionSize.usdValue})</span>
+                <span className="text-xs text-gray-300">
+                  ({(Number(positionSize.amount) * Number(price)).toFixed(6)})
+                </span>
               </span>
             </div>
             <div className="absolute bottom-0 z-50 w-full left-0">{renderProgressBar()}</div>

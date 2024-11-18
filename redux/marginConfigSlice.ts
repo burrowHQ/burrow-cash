@@ -33,6 +33,7 @@ export const marginConfigSlice = createSlice({
         open_position_fee_rate,
         registered_dexes,
         registered_tokens,
+        max_active_user_margin_position,
       } = action.payload;
       state.max_leverage_rate = max_leverage_rate;
       state.pending_debt_scale = pending_debt_scale;
@@ -42,6 +43,7 @@ export const marginConfigSlice = createSlice({
       state.open_position_fee_rate = open_position_fee_rate;
       state.registered_dexes = registered_dexes;
       state.registered_tokens = registered_tokens;
+      state.max_active_user_margin_position = max_active_user_margin_position;
     });
   },
 });

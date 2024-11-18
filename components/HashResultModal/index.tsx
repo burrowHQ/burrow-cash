@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import ModalWithCountdown from "./ModalWithCountdown";
 
 interface ShowPositionResultParams {
@@ -15,6 +15,7 @@ interface ShowPositionResultParams {
 }
 
 let container: HTMLDivElement | null = null;
+let root: ReturnType<typeof createRoot> | null = null;
 
 export const showPositionResult = (params: ShowPositionResultParams) => {
   if (params.transactionHashes) {
@@ -36,15 +37,19 @@ export const showPositionResult = (params: ShowPositionResultParams) => {
     container = document.createElement("div");
     container.id = "position-result-container";
     document.body.appendChild(container);
+    root = createRoot(container);
   }
 
   const handleClose = () => {
+    if (root) {
+      root.unmount();
+    }
     if (container) {
-      ReactDOM.unmountComponentAtNode(container);
       container.remove();
       container = null;
+      root = null;
     }
   };
 
-  ReactDOM.render(<ModalWithCountdown show onClose={handleClose} {...params} />, container);
+  root?.render(<ModalWithCountdown show onClose={handleClose} {...params} />);
 };

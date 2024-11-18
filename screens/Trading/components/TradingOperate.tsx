@@ -435,6 +435,14 @@ const TradingOperate = () => {
             <RangeSlider defaultValue={rangeMount} action="Long" setRangeMount={setRangeMount} />
             <div className="mt-5">
               <div className="flex items-center justify-between text-sm mb-4">
+                <div className="text-gray-300">Minimum received</div>
+                <div className="text-right">
+                  {Number(toInternationalCurrencySystem_number(longOutput)) *
+                    (1 - slippageTolerance / 100)}{" "}
+                  NEAR
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Position Size</div>
                 <div className="text-right">
                   {toInternationalCurrencySystem_number(longOutput)} NEAR
@@ -569,6 +577,14 @@ const TradingOperate = () => {
             </div>
             <RangeSlider defaultValue={rangeMount} action="Short" setRangeMount={setRangeMount} />
             <div className="mt-5">
+              <div className="flex items-center justify-between text-sm mb-4">
+                <div className="text-gray-300">Minimum received</div>
+                <div className="text-right">
+                  {Number(toInternationalCurrencySystem_number(longOutput)) *
+                    (1 - slippageTolerance / 100)}{" "}
+                  NEAR
+                </div>
+              </div>
               <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Position Size</div>
                 <div>
