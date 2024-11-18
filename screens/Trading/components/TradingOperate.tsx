@@ -314,12 +314,13 @@ const TradingOperate = () => {
   }, [longOutput, shortOutput]);
 
   const Fee = useMemo(() => {
-    console.log(ReduxcategoryAssets1, ReduxcategoryAssets2);
     return {
-      fee: (Number(longInput || shortInput) * config.open_position_fee_rate) / 10000,
+      fee:
+        (Number(longInput || shortInput) * config.open_position_fee_rate) / 10000 +
+        (estimateData?.fee ?? 0) / 10000,
       price: getAssetPrice(ReduxcategoryAssets1),
     };
-  }, [longInput, shortInput, ReduxcategoryAssets1]);
+  }, [longInput, shortInput, ReduxcategoryAssets1, estimateData]);
 
   function getAssetPrice(categoryId) {
     return categoryId ? assets.data[categoryId["token_id"]].price?.usd : 0;
@@ -509,10 +510,10 @@ const TradingOperate = () => {
               <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Fee</div>
                 <div className="flex items-center justify-center">
-                  <p className="border-b border-dashed border-dark-800">{Fee.fee}</p>
+                  <p className="border-b border-dashed border-dark-800">{Fee.fee.toFixed(6)}</p>
                   NEAR
                   <span className="text-xs text-gray-300 ml-1.5">
-                    (${Fee.fee * (Fee.price || 0)})
+                    (${(Fee.fee * (Fee.price || 0)).toFixed(6)})
                   </span>
                 </div>
               </div>
