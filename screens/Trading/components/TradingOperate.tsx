@@ -273,7 +273,6 @@ const TradingOperate = () => {
       // if (!isValidate) {
       //   setIsDisabled(false);
       // }
-
       let liqPriceX = 0;
       if (rangeMount > 1) {
         if (activeTab == "long") {
@@ -284,13 +283,12 @@ const TradingOperate = () => {
           liqPriceX =
             (((Number(shortInput) +
               Number(shrinkToken(estimateData?.min_amount_out, decimalsC))) as any) *
-              rangeMount *
               (getAssetPrice(ReduxcategoryAssets2) as any) *
               (1 - marginConfigTokens.min_safety_buffer / 10000)) /
             shortOutput;
         }
       }
-
+      console.log(Number(shrinkToken(estimateData?.min_amount_out, decimalsC)));
       // const total_debt =
       //   (shrinkToken(ReduxcategoryAssets2.margin_debt.balance, decimalsD) as any) * priceD;
       // const total_hp_fee =
@@ -655,10 +653,10 @@ const TradingOperate = () => {
               <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Fee</div>
                 <div className="flex items-center justify-center">
-                  <p className="border-b border-dashed border-dark-800">{Fee.fee}</p>
+                  <p className="border-b border-dashed border-dark-800">{Fee.fee.toFixed(6)}</p>
                   NEAR
                   <span className="text-xs text-gray-300 ml-1.5">
-                    (${Fee.fee * (Fee.price || 0)})
+                    (${(Fee.fee * (Fee.price || 0)).toFixed(6)})
                   </span>
                 </div>
               </div>
