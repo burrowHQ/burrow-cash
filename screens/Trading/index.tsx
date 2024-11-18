@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useEffect, useMemo, useState, createContext } from "react";
+import { useEffect, useMemo, useState, createContext, useRef } from "react";
 import { fetchAllPools, getStablePools, init_env } from "@ref-finance/ref-sdk";
 import { useRouter } from "next/router";
 import TradingViewWidget, { Themes } from "react-tradingview-widget";
@@ -23,6 +23,7 @@ import { setCategoryAssets1, setCategoryAssets2 } from "../../redux/marginTradin
 import { useMarginAccount } from "../../hooks/useMarginAccount";
 import { useAccountId, usePortfolioAssets } from "../../hooks/hooks";
 import ModalWithCountdown from "./components/positionResultTips";
+import TradingViewChart, { TradingViewChartExposes } from "./chart/TradingViewChart";
 
 init_env("dev");
 
@@ -140,6 +141,11 @@ const Trading = () => {
       }
     }, 200);
   };
+
+  const tvRef = useRef<1>();
+  function handleTradingViewLoaded() {
+    console.log("图表");
+  }
 
   //
   return (
@@ -265,7 +271,11 @@ const Trading = () => {
             </div>
           </div>
           <div style={{ height: "520px" }}>
-            {/* <TradingViewWidget symbol="NASDAQ:AAPL" theme={Themes.DARK} locale="en" autosize /> */}
+            <TradingViewChart
+              symbol="Near_USDC"
+              onLoaded={handleTradingViewLoaded}
+              className="h-full"
+            />
           </div>
         </div>
         {/* right tradingopts */}
