@@ -37,6 +37,7 @@ class DataSource {
       throw new Error("Failed to connect server");
     }
 
+    // eslint-disable-next-line no-useless-catch
     try {
       const json = await parseResponse(response);
       return json;
@@ -103,6 +104,16 @@ class DataSource {
 
   getTxId(receipt_id) {
     return this.callAPI(`/v1/search/?keyword=${receipt_id}`, "GET", null, null, config?.txIdApiUrl);
+  }
+
+  getMarginTradingPosition(params) {
+    return this.callAPI(
+      `/v3/margin-trading/position`,
+      "POST",
+      null,
+      params,
+      config?.marginTradingUrl,
+    );
   }
 }
 
