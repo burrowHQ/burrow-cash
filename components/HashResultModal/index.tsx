@@ -1,6 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import ModalWithCountdown from "./ModalWithCountdown";
+import ModalWithFailure from "./ModalWithFailure";
 
 interface ShowPositionResultParams {
   title?: string;
@@ -52,4 +53,32 @@ export const showPositionResult = (params: ShowPositionResultParams) => {
   };
 
   root?.render(<ModalWithCountdown show onClose={handleClose} {...params} />);
+};
+
+// ... existing code ...
+
+export const showPositionFailure = (params: {
+  title?: string;
+  errorMessage?: string;
+  type?: "Long" | "Short";
+}) => {
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "position-result-container";
+    document.body.appendChild(container);
+    root = createRoot(container);
+  }
+
+  const handleClose = () => {
+    if (root) {
+      root.unmount();
+    }
+    if (container) {
+      container.remove();
+      container = null;
+      root = null;
+    }
+  };
+
+  root?.render(<ModalWithFailure show onClose={handleClose} {...params} />);
 };

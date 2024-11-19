@@ -383,6 +383,12 @@ const TradingOperate = () => {
     return formattedValue;
   }
 
+  const formatDecimal = (value: number) => {
+    if (!value) return "0";
+    // 移除末尾的0和不必要的小数点
+    return value.toFixed(6).replace(/\.?0+$/, "");
+  };
+
   return (
     <div className="w-full pt-4 px-4 pb-9">
       <div className="flex justify-between items-center">
@@ -508,10 +514,10 @@ const TradingOperate = () => {
               <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Fee</div>
                 <div className="flex items-center justify-center">
-                  <p className="border-b border-dashed border-dark-800">{Fee.fee.toFixed(6)}</p>
+                  <p className="border-b border-dashed border-dark-800">{formatDecimal(Fee.fee)}</p>
                   NEAR
                   <span className="text-xs text-gray-300 ml-1.5">
-                    (${(Fee.fee * (Fee.price || 0)).toFixed(6)})
+                    (${formatDecimal(Fee.fee * (Fee.price || 0))})
                   </span>
                 </div>
               </div>
@@ -653,10 +659,10 @@ const TradingOperate = () => {
               <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Fee</div>
                 <div className="flex items-center justify-center">
-                  <p className="border-b border-dashed border-dark-800">{Fee.fee.toFixed(6)}</p>
+                  <p className="border-b border-dashed border-dark-800">{formatDecimal(Fee.fee)}</p>
                   NEAR
                   <span className="text-xs text-gray-300 ml-1.5">
-                    (${(Fee.fee * (Fee.price || 0)).toFixed(6)})
+                    (${formatDecimal(Fee.fee * (Fee.price || 0))})
                   </span>
                 </div>
               </div>

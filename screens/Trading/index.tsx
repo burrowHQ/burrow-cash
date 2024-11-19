@@ -23,7 +23,7 @@ import { setCategoryAssets1, setCategoryAssets2 } from "../../redux/marginTradin
 import { useMarginAccount } from "../../hooks/useMarginAccount";
 import { useAccountId, usePortfolioAssets } from "../../hooks/hooks";
 import { useRouterQuery, getTransactionResult, parsedArgs } from "../../utils/txhashContract";
-import { showPositionResult } from "../../components/HashResultModal";
+import { showPositionResult, showPositionFailure } from "../../components/HashResultModal";
 
 init_env("dev");
 
@@ -139,7 +139,7 @@ const Trading = () => {
 
   useEffect(() => {
     handleTransactions();
-  }, [query?.transactionHashes]);
+  }, [query?.transactionHashes, query?.errorMessage]);
 
   const handleTransactions = async () => {
     if (query?.transactionHashes) {
@@ -205,6 +205,12 @@ const Trading = () => {
       } catch (error) {
         console.error("Error processing transactions:", error);
       }
+    }
+    if (query?.errorMessage) {
+      showPositionFailure({
+        title: "Open Position",
+        errorMessage: decodeURIComponent(query.errorMessage as string),
+      });
     }
   };
 
