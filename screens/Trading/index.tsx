@@ -23,7 +23,12 @@ import { setCategoryAssets1, setCategoryAssets2 } from "../../redux/marginTradin
 import { useMarginAccount } from "../../hooks/useMarginAccount";
 import { useAccountId, usePortfolioAssets } from "../../hooks/hooks";
 import { useRouterQuery, getTransactionResult, parsedArgs } from "../../utils/txhashContract";
-import { showPositionResult, showPositionFailure } from "../../components/HashResultModal";
+import {
+  showPositionResult,
+  showPositionFailure,
+  showPositionClose,
+} from "../../components/HashResultModal";
+import { handleTransactionResults } from "../../services/transaction";
 
 init_env("dev");
 
@@ -138,81 +143,8 @@ const Trading = () => {
   };
 
   useEffect(() => {
-    handleTransactions();
+    handleTransactionResults(query?.transactionHashes, query?.errorMessage);
   }, [query?.transactionHashes, query?.errorMessage]);
-
-  const handleTransactions = async () => {
-    if (query?.transactionHashes) {
-      try {
-        const txhash = Array.isArray(query?.transactionHashes)
-          ? query?.transactionHashes
-          : (query?.transactionHashes as string).split(",");
-        const results = await Promise.all(
-          txhash.map(async (txHash: string) => {
-            const result: any = await getTransactionResult(txHash);
-            const hasStorageDeposit = result.transaction.actions.some(
-              (action: any) => action?.FunctionCall?.method_name === "margin_execute_with_pyth",
-            );
-            return { txHash, result, hasStorageDeposit };
-          }),
-        );
-        results.forEach(({ txHash, result, hasStorageDeposit }: any) => {
-          if (hasStorageDeposit) {
-            // handleClaimTokenMobile({ level, count });
-            console.log(result);
-
-            const args = parsedArgs(result?.transaction?.actions?.[0]?.FunctionCall?.args || "");
-            const { actions } = JSON.parse(args || "");
-
-            // const ft_on_transfer_id = result?.receipts?.findIndex((r: any) =>
-            //   r?.receipt?.Action?.actions?.some(
-            //     (a: any) => a?.FunctionCall?.method_name === "margin_execute_with_pyth",
-            //   ),
-            // );
-
-            // const ft_on_transfer_logs =
-            //   result?.receipts_outcome?.[ft_on_transfer_id]?.outcome?.logs || "";
-            // const ft_on_transfer_log = ft_on_transfer_logs?.[ft_on_transfer_logs?.length - 1];
-            // const idx = ft_on_transfer_log?.indexOf("{");
-
-            // const parsed_ft_on_transfer_log = JSON.parse(ft_on_transfer_log.slice(idx) || "");
-            const isLong = actions[0]?.OpenPosition?.token_p_id == "wrap.testnet";
-            console.log(actions);
-            console.log(marginConfig);
-            showPositionResult({
-              title: "Open Position",
-              type: isLong ? "Long" : "Short",
-              price: (isLong
-                ? Number(shrinkToken(actions[0]?.OpenPosition?.token_d_amount, 18)) /
-                  Number(shrinkToken(actions[0]?.OpenPosition?.min_token_p_amount, 24))
-                : Number(shrinkToken(actions[0]?.OpenPosition?.min_token_p_amount, 18)) /
-                  Number(shrinkToken(actions[0]?.OpenPosition?.token_d_amount, 24))
-              ).toString(),
-              transactionHashes: Array.isArray(router.query.transactionHashes)
-                ? router.query.transactionHashes[0]
-                : (router.query.transactionHashes as string),
-              positionSize: {
-                // optional，
-                amount: isLong
-                  ? shrinkToken(actions[0]?.OpenPosition?.min_token_p_amount, 24, 6)
-                  : shrinkToken(actions[0]?.OpenPosition?.token_d_amount, 24, 6),
-                symbol: "NEAR",
-                usdValue: "1000",
-              },
-            });
-          }
-        });
-      } catch (error) {
-        console.error("Error processing transactions:", error);
-      }
-    }
-    if (query?.errorMessage) {
-      showPositionFailure({
-        title: "Open Position",
-        errorMessage: decodeURIComponent(query.errorMessage as string),
-      });
-    }
-  };
 
   //
   return (
