@@ -10,10 +10,10 @@ type Props = {
 
 const LayoutContainer = ({ children, className = "" }: Props) => {
   const router = useRouter();
-  const isStakPage = router.route.includes("staking");
+  const isSpecialPage = router.route.includes("staking") || router.route.includes("marginTrading");
   return (
     <StyledWrapper className={className}>
-      {!isStakPage && <NonFarmedAssets />}
+      {!isSpecialPage && <NonFarmedAssets />}
       {children}
     </StyledWrapper>
   );
@@ -35,13 +35,13 @@ LayoutContainer.displayName = "LayoutContainer";
 export default LayoutContainer;
 
 export const LayoutBox = ({ children, className = "" }: Props) => {
+  const router = useRouter();
+  const isSpecialPage = router.route.includes("staking") || router.route.includes("marginTrading");
   return (
     <div
       className={`mx-auto lg:min-w-[800px] xl:max-w-[1200px] xsm:w-full xsm:overflow-x-hidden ${className}`}
     >
-      <div className="xsm:hidden lg:w-full">
-        <NonFarmedAssets />
-      </div>
+      <div className="xsm:hidden lg:w-full">{!isSpecialPage && <NonFarmedAssets />}</div>
       {children}
     </div>
   );

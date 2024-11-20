@@ -155,14 +155,16 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
       return;
     }
     setSelectedLever(value);
+    let newInputValue;
     if (value === "Max") {
       const maxPercentage = Number(balance) / priceC;
-      setInputValue(Number(maxPercentage));
+      newInputValue = Number(maxPercentage);
     } else {
       const percentage = parseFloat(value);
-      const selectedPercentage = (Number(balance) * percentage) / 100 / priceC;
-      setInputValue(Number(selectedPercentage));
+      newInputValue = (Number(balance) * percentage) / 100 / priceC;
     }
+    setInputValue(newInputValue);
+    handleCollateralChange({ target: { value: newInputValue } }, true);
   };
   const handleLeverDeleteClick = (value) => {
     if (selectedLever === value) {
@@ -171,14 +173,16 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
       return;
     }
     setSelectedLever(value);
+    let newInputValue;
     if (value === "Max") {
       const maxPercentage = collateralTotal / priceC;
-      setInputValue(Number(maxPercentage));
+      newInputValue = Number(maxPercentage);
     } else {
       const percentage = parseFloat(value);
-      const selectedPercentage = (collateralTotal * percentage) / 100 / priceC;
-      setInputValue(Number(selectedPercentage));
+      newInputValue = (collateralTotal * percentage) / 100 / priceC;
     }
+    setInputValue(newInputValue);
+    handleCollateralChange({ target: { value: newInputValue } }, false);
   };
 
   return (
