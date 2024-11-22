@@ -95,27 +95,52 @@ const MyMarginTradingPage = () => {
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
                 >
-                  {Object.values(marginAccountList).map((item, index) => {
-                    const assetC = getAssetById(item.token_c_info.token_id);
-                    const {
-                      icon: iconC,
-                      symbol: symbolC,
-                      decimals: decimalsC,
-                      price: priceC,
-                    } = getAssetDetails(assetC);
-                    const netValue =
-                      parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
+                  {(() => {
+                    interface MergedCollateralData {
+                      icon: string;
+                      symbol: string;
+                      totalValue: number;
+                    }
 
-                    return (
-                      <div key={index} className="flex items-center justify-center mb-3">
-                        <img src={iconC} alt="" className="w-4 h-4" />
-                        <p className="ml-2 mr-8 text-xs text-gray-300">{symbolC}</p>
+                    // 定义累加器对象的类型
+                    type CollateralAccumulator = {
+                      [tokenId: string]: MergedCollateralData;
+                    };
+
+                    const mergedCollateral = Object.values(
+                      marginAccountList,
+                    ).reduce<CollateralAccumulator>((acc, item) => {
+                      const assetC = getAssetById(item.token_c_info.token_id);
+                      const { decimals: decimalsC, price: priceC } = getAssetDetails(assetC);
+                      const tokenId = item.token_c_info.token_id;
+
+                      const netValue =
+                        parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
+
+                      if (!acc[tokenId]) {
+                        const { icon: iconC, symbol: symbolC } = getAssetDetails(assetC);
+                        acc[tokenId] = {
+                          icon: iconC,
+                          symbol: symbolC,
+                          totalValue: netValue,
+                        };
+                      } else {
+                        acc[tokenId].totalValue += netValue;
+                      }
+
+                      return acc;
+                    }, {});
+
+                    return Object.entries(mergedCollateral).map(([tokenId, data], index) => (
+                      <div key={tokenId} className="flex items-center justify-center mb-3">
+                        <img src={data.icon} alt="" className="w-4 h-4" />
+                        <p className="ml-2 mr-8 text-xs text-gray-300">{data.symbol}</p>
                         <div className="text-xs ml-auto">
-                          ${toInternationalCurrencySystem_number(netValue)}
+                          ${toInternationalCurrencySystem_number(data.totalValue)}
                         </div>
                       </div>
-                    );
-                  })}
+                    ));
+                  })()}
                 </div>
               )}
             </div>

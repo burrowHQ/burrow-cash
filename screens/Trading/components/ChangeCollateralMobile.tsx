@@ -73,15 +73,66 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
       setAddLeverage(0);
     }
   };
+  const handleInputValidation = (value: string) => {
+    if (value.startsWith("-")) return false;
+    if (!/^\d*\.?\d*$/.test(value)) return false;
+    if (value.includes(".")) {
+      const decimals = value.split(".")[1];
+      if (decimals.length > 8) return false;
+    }
+    return true;
+  };
 
   const handleAddChange = (event) => {
+    const { value } = event.target;
+    if (value === "" || value === ".") {
+      setInputValue(NaN);
+      setAddedValue(0);
+      setAddLeverage(0);
+      return;
+    }
+    if (!handleInputValidation(value)) {
+      return;
+    }
+    const numValue = parseFloat(value);
+    const maxAmount = getMaxAvailableAmount();
+    if (numValue > maxAmount) {
+      setInputValue(maxAmount);
+      const syntheticEvent = {
+        target: { value: String(maxAmount) },
+      };
+      handleCollateralChange(syntheticEvent, true);
+      return;
+    }
+    setInputValue(numValue);
     handleCollateralChange(event, true);
   };
-
   const handleDeleteChange = (event) => {
+    const { value } = event.target;
+    if (value === "" || value === ".") {
+      setInputValue(NaN);
+      setAddedValue(0);
+      setAddLeverage(0);
+      return;
+    }
+    if (!handleInputValidation(value)) {
+      return;
+    }
+    const numValue = parseFloat(value);
+    const tokenCInfoBalance = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
+    const maxRemovable = calculateMaxRemovable();
+    const actualMaxRemovable = Math.min(tokenCInfoBalance, maxRemovable);
+    if (numValue > actualMaxRemovable) {
+      setInputValue(actualMaxRemovable);
+      const syntheticEvent = {
+        target: { value: String(actualMaxRemovable) },
+      };
+      handleCollateralChange(syntheticEvent, false);
+      return;
+    }
+    setInputValue(numValue);
     handleCollateralChange(event, false);
   };
-
   const assetD = getAssetById(rowData.data.token_d_info.token_id);
   const assetC = getAssetById(rowData.data.token_c_info.token_id);
   const assetP = getAssetById(rowData.data.token_p_id);
@@ -137,6 +188,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
   const handleAddCollateralClick = async () => {
     try {
       await increaseCollateral({ pos_id, token_c_id, amount, assets });
+      localStorage.setItem("marginTradingTab", "my");
     } catch (error) {
       console.error("Error adding collateral:", error);
     }
@@ -144,10 +196,66 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
   const handleDeleteCollateralClick = async () => {
     try {
       await decreaseCollateral({ pos_id, token_c_id, amount, assets });
+      localStorage.setItem("marginTradingTab", "my");
     } catch (error) {
       console.error("Error deleted collateral:", error);
     }
   };
+  const getMaxAvailableAmount = () => {
+    const currentLeverage = leverage || 1;
+    const targetMinLeverage = 1;
+    const rawMaxAmount = Number(balance) / priceC;
+    const getNewLeverageAfterAdd = (addAmount: number) => {
+      const tokenCInfoBalance = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
+      const tokenDInfoBalance = parseTokenValue(rowData.data.token_d_info.balance, decimalsD);
+      const newCollateral = tokenCInfoBalance + addAmount;
+      return calculateLeverage(tokenDInfoBalance, priceD, newCollateral, priceC);
+    };
+    let left = 0;
+    let right = rawMaxAmount;
+    let result = 0;
+    while (left <= right) {
+      const mid = (left + right) / 2;
+      const newLeverage = getNewLeverageAfterAdd(mid);
+      if (newLeverage >= targetMinLeverage) {
+        result = mid;
+        left = mid + 0.0001; // 增加精度
+      } else {
+        right = mid - 0.0001;
+      }
+    }
+    return Math.min(rawMaxAmount, result);
+  };
+  const calculateMaxRemovable = () => {
+    const tokenCInfoBalance = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
+    const tokenDInfoBalance = parseTokenValue(rowData.data.token_d_info.balance, decimalsD);
+    const maxLeverage = 10;
+    let left = 0;
+    let right = tokenCInfoBalance;
+    let result = 0;
+    while (left <= right) {
+      const mid = (left + right) / 2;
+      const remainingCollateral = tokenCInfoBalance - mid;
+      const newLeverage = calculateLeverage(tokenDInfoBalance, priceD, remainingCollateral, priceC);
+      if (newLeverage <= maxLeverage) {
+        result = mid;
+        left = mid + 0.0001;
+      } else {
+        right = mid - 0.0001;
+      }
+    }
+    return result;
+  };
+  // const validateAmount = (amount: number) => {
+  //   if (isNaN(amount) || amount <= 0) return false;
+  //   const maxAmount = getMaxAvailableAmount();
+  //   if (amount > maxAmount) return false;
+  //   const tokenCInfoBalance = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
+  //   const tokenDInfoBalance = parseTokenValue(rowData.data.token_d_info.balance, decimalsD);
+  //   const newCollateral = tokenCInfoBalance + amount;
+  //   const newLeverage = calculateLeverage(tokenDInfoBalance, priceD, newCollateral, priceC);
+  //   return newLeverage >= 1;
+  // };
   const handleLeverAddClick = (value) => {
     if (selectedLever === value) {
       setSelectedLever(null);
@@ -155,13 +263,13 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
       return;
     }
     setSelectedLever(value);
+    const maxAmount = getMaxAvailableAmount();
     let newInputValue;
     if (value === "Max") {
-      const maxPercentage = Number(balance) / priceC;
-      newInputValue = Number(maxPercentage);
+      newInputValue = maxAmount;
     } else {
       const percentage = parseFloat(value);
-      newInputValue = (Number(balance) * percentage) / 100 / priceC;
+      newInputValue = (maxAmount * percentage) / 100;
     }
     setInputValue(newInputValue);
     handleCollateralChange({ target: { value: newInputValue } }, true);
@@ -173,13 +281,15 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
       return;
     }
     setSelectedLever(value);
+    const maxRemovable = calculateMaxRemovable();
+    const tokenCInfoBalance = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
+    const actualMaxRemovable = Math.min(tokenCInfoBalance, maxRemovable);
     let newInputValue;
     if (value === "Max") {
-      const maxPercentage = collateralTotal / priceC;
-      newInputValue = Number(maxPercentage);
+      newInputValue = actualMaxRemovable;
     } else {
       const percentage = parseFloat(value);
-      newInputValue = (collateralTotal * percentage) / 100 / priceC;
+      newInputValue = (actualMaxRemovable * percentage) / 100;
     }
     setInputValue(newInputValue);
     handleCollateralChange({ target: { value: newInputValue } }, false);
@@ -248,11 +358,17 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
                   <div className=" bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md flex items-center justify-between mb-1.5">
                     <div>
                       <input
-                        type="number"
-                        step="any"
-                        value={String(inputValue)}
-                        onChange={handleAddChange}
+                        type="text"
+                        value={Number.isNaN(inputValue) ? "" : String(inputValue)}
+                        onChange={
+                          ChangeCollateralTab === "Add" ? handleAddChange : handleDeleteChange
+                        }
                         placeholder="0"
+                        className="w-full bg-transparent outline-none"
+                        inputMode="decimal"
+                        autoComplete="off"
+                        autoCorrect="off"
+                        spellCheck="false"
                       />
                       <p className="text-gray-300 text-xs mt-1.5">
                         Add: ${Number.isNaN(inputValue) ? 0 : inputValue * priceC}
@@ -264,7 +380,11 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
                         <p className="text-base ml-1">{symbolC}</p>
                       </div>
                       <p className="text-xs text-gray-300 mt-1.5">
-                        Max Available: <span className="text-white"> ${balance}</span>
+                        Max Available:{" "}
+                        <span className="text-white">
+                          {" "}
+                          ${toInternationalCurrencySystem_number(getMaxAvailableAmount() * priceC)}
+                        </span>
                       </p>
                     </div>
                   </div>
@@ -381,7 +501,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
                       <p className="text-xs text-gray-300 mt-1.5">
                         Max Available:{" "}
                         <span className="text-white">
-                          ${toInternationalCurrencySystem_number(collateralTotal)}
+                          ${toInternationalCurrencySystem_number(calculateMaxRemovable() * priceC)}
                         </span>
                       </p>
                     </div>

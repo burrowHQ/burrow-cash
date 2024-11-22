@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAppDispatch } from "../../redux/hooks";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 import MyMarginTrading from "./components/MyTrading";
@@ -6,7 +6,16 @@ import MarketMarginTrading from "./components/MarketTrading";
 
 const MarginTrading = () => {
   const dispatch = useAppDispatch();
-  const [activeTab, setActiveTab] = useState("market");
+  const [activeTab, setActiveTab] = useState(() => {
+    const savedTab = localStorage.getItem("marginTradingTab");
+    return savedTab || "market";
+  });
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    localStorage.setItem("marginTradingTab", tab);
+  };
+
   const getTabClassName = (tabName) => {
     const baseClass = "py-2.5 px-24 text-base";
     const activeClass = "bg-primary rounded-md text-dark-200";
@@ -19,11 +28,15 @@ const MarginTrading = () => {
         <button
           type="button"
           className={getTabClassName("market")}
-          onClick={() => setActiveTab("market")}
+          onClick={() => handleTabChange("market")}
         >
           Market
         </button>
-        <button type="button" className={getTabClassName("my")} onClick={() => setActiveTab("my")}>
+        <button
+          type="button"
+          className={getTabClassName("my")}
+          onClick={() => handleTabChange("my")}
+        >
           Yours
         </button>
       </div>
