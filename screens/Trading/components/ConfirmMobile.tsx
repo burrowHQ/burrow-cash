@@ -142,7 +142,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
                   {confirmInfo.longInputName?.metadata.symbol}
                 </p>
                 <span className="text-xs text-gray-300">
-                  Usd ${toInternationalCurrencySystem_number(confirmInfo.longInputUsd)}
+                  ${toInternationalCurrencySystem_number(confirmInfo.longInputUsd)}
                 </span>
               </div>
               <RightShoulder />

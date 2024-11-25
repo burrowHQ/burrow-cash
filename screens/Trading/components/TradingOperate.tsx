@@ -467,7 +467,7 @@ const TradingOperate = () => {
                   type="cate2"
                 />
               </div>
-              <p className="text-gray-300 mt-2 text-xs">Use: ${longInputUsd.toFixed(2)}</p>
+              <p className="text-gray-300 mt-2 text-xs">${longInputUsd.toFixed(2)}</p>
             </div>
             <div className="relative my-2.5 flex justify-end z-0 w-1/2" style={{ zoom: "2" }}>
               <ShrinkArrow />
@@ -485,7 +485,7 @@ const TradingOperate = () => {
                 <TradingToken tokenList={categoryAssets1} type="cate1" />
               </div>
               <p className="text-gray-300 mt-2 text-xs">
-                Long: ${longOutputUsd && formatNumber(Number(longOutputUsd), 2)}
+                ${longOutputUsd && formatNumber(Number(longOutputUsd), 2)}
               </p>
             </div>
             <RangeSlider defaultValue={rangeMount} action="Long" setRangeMount={setRangeMount} />
@@ -612,7 +612,7 @@ const TradingOperate = () => {
                   type="cate2"
                 />
               </div>
-              <p className="text-gray-300 mt-2 text-xs">Use: ${shortInputUsd.toFixed(2)}</p>
+              <p className="text-gray-300 mt-2 text-xs">${shortInputUsd.toFixed(2)}</p>
             </div>
             <div className="relative my-2.5 flex justify-end z-0 w-1/2" style={{ zoom: "2" }}>
               <ShrinkArrow />
@@ -630,7 +630,7 @@ const TradingOperate = () => {
                 <TradingToken tokenList={categoryAssets1} type="cate1" />
               </div>
               <p className="text-gray-300 mt-2 text-xs">
-                Short: ${shortOutputUsd && formatNumber(Number(shortOutputUsd), 2)}
+                ${shortOutputUsd && formatNumber(Number(shortOutputUsd), 2)}
               </p>
             </div>
             <RangeSlider defaultValue={rangeMount} action="Short" setRangeMount={setRangeMount} />

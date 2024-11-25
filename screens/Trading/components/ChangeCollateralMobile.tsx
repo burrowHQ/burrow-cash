@@ -371,7 +371,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
                         spellCheck="false"
                       />
                       <p className="text-gray-300 text-xs mt-1.5">
-                        Add: ${Number.isNaN(inputValue) ? 0 : inputValue * priceC}
+                        ${Number.isNaN(inputValue) ? 0 : inputValue * priceC}
                       </p>
                     </div>
                     <div>
@@ -490,7 +490,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
                         placeholder="0"
                       />
                       <p className="text-gray-300 text-xs mt-1.5">
-                        Delete: ${Number.isNaN(inputValue) ? 0 : inputValue * priceC}
+                        ${Number.isNaN(inputValue) ? 0 : inputValue * priceC}
                       </p>
                     </div>
                     <div>
