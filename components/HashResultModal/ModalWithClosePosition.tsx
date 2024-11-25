@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { NearIconMini } from "../../screens/MarginTrading/components/Icon";
 import { CloseIcon } from "../Icons/Icons";
 
@@ -20,30 +20,44 @@ const ModalWithFailure = ({
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [countdown, setCountdown] = useState(10);
   const [progress, setProgress] = useState(100);
-  let countdownTimer;
+
+  // 使用 useRef 来存储 timer
+  const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (show) {
       setIsModalVisible(true);
       startCountdown();
     } else {
-      setIsModalVisible(false);
-      clearTimeoutOrInterval(countdownTimer);
+      // 使用 setTimeout 来延迟隐藏模态框
+      const hideTimeout = setTimeout(() => {
+        setIsModalVisible(false);
+        clearTimeoutOrInterval(countdownTimerRef.current);
+      }, 0);
+
+      return () => clearTimeout(hideTimeout);
     }
-    return () => clearTimeoutOrInterval(countdownTimer);
+
+    return () => clearTimeoutOrInterval(countdownTimerRef.current);
   }, [show]);
 
   const clearTimeoutOrInterval = (timerId) => {
     if (timerId) {
       clearInterval(timerId);
-      countdownTimer = null;
+      countdownTimerRef.current = null;
     }
   };
 
   const hideModal = () => {
-    setIsModalVisible(false);
-    onClose();
-    clearTimeout(countdownTimer);
+    // 使用 setTimeout 来避免同步卸载
+    setTimeout(() => {
+      setIsModalVisible(false);
+      onClose();
+      clearTimeoutOrInterval(countdownTimerRef.current);
+
+      const cleanUrl = window.location.href.split("?")[0];
+      window.history.replaceState({}, "", cleanUrl);
+    }, 0);
   };
 
   const startCountdown = () => {
@@ -51,11 +65,11 @@ const ModalWithFailure = ({
     setProgress(100);
 
     const timerInterval = 1000;
-    countdownTimer = setInterval(() => {
+    countdownTimerRef.current = setInterval(() => {
       setCountdown((prevCountdown) => {
         if (prevCountdown <= 1) {
           hideModal();
-          clearTimeoutOrInterval(countdownTimer);
+          clearTimeoutOrInterval(countdownTimerRef.current);
           return 0;
         }
         return prevCountdown - 1;

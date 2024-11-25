@@ -1,4 +1,4 @@
-import { useState, createContext } from "react";
+import { useState, createContext, useEffect } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
@@ -89,6 +89,9 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     slippageTolerance: ReduxSlippageTolerance / 100,
   });
   // console.log(estimateData, "85>>>");
+  useEffect(() => {
+    setIsDisabled(!estimateData?.swap_indication || !estimateData?.min_amount_out);
+  }, [estimateData]);
   const [isDisabled, setIsDisabled] = useState(false);
   const handleCloseOpsitionEvt = async () => {
     // console.log(extraProps, "extraProps....");

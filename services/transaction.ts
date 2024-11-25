@@ -32,34 +32,45 @@ export const handleTransactionResults = async (
         }),
       );
 
+      const shouldShowClose = results.some(({ result, hasStorageDeposit }: TransactionResult) => {
+        if (hasStorageDeposit) {
+          const args = parsedArgs(result?.transaction?.actions?.[0]?.FunctionCall?.args || "");
+          const { actions } = JSON.parse(args || "");
+          return actions[0]?.CloseMTPosition;
+        }
+        return false;
+      });
+
+      if (shouldShowClose) {
+        showPositionClose({});
+        return;
+      }
+
       results.forEach(({ result, hasStorageDeposit }: TransactionResult) => {
         if (hasStorageDeposit) {
           const args = parsedArgs(result?.transaction?.actions?.[0]?.FunctionCall?.args || "");
           const { actions } = JSON.parse(args || "");
+          console.log(actions, "actions....");
           const isLong = actions[0]?.OpenPosition?.token_p_id == "wrap.testnet";
 
-          if (actions[0]?.CloseMTPosition) {
-            showPositionClose({});
-          } else {
-            showPositionResult({
-              title: "Open Position",
-              type: isLong ? "Long" : "Short",
-              price: (isLong
-                ? Number(shrinkToken(actions[0]?.OpenPosition?.token_d_amount, 18)) /
-                  Number(shrinkToken(actions[0]?.OpenPosition?.min_token_p_amount, 24))
-                : Number(shrinkToken(actions[0]?.OpenPosition?.min_token_p_amount, 18)) /
-                  Number(shrinkToken(actions[0]?.OpenPosition?.token_d_amount, 24))
-              ).toString(),
-              transactionHashes: txhash[0],
-              positionSize: {
-                amount: isLong
-                  ? shrinkToken(actions[0]?.OpenPosition?.min_token_p_amount, 24, 6)
-                  : shrinkToken(actions[0]?.OpenPosition?.token_d_amount, 24, 6),
-                symbol: "NEAR",
-                usdValue: "1000",
-              },
-            });
-          }
+          showPositionResult({
+            title: "Open Position",
+            type: isLong ? "Long" : "Short",
+            price: (isLong
+              ? Number(shrinkToken(actions[0]?.OpenPosition?.token_d_amount, 18)) /
+                Number(shrinkToken(actions[0]?.OpenPosition?.min_token_p_amount, 24))
+              : Number(shrinkToken(actions[0]?.OpenPosition?.min_token_p_amount, 18)) /
+                Number(shrinkToken(actions[0]?.OpenPosition?.token_d_amount, 24))
+            ).toString(),
+            transactionHashes: txhash[0],
+            positionSize: {
+              amount: isLong
+                ? shrinkToken(actions[0]?.OpenPosition?.min_token_p_amount, 24, 6)
+                : shrinkToken(actions[0]?.OpenPosition?.token_d_amount, 24, 6),
+              symbol: "NEAR",
+              usdValue: "1000",
+            },
+          });
         }
       });
     } catch (error) {
@@ -77,6 +88,7 @@ export const handleTransactionResults = async (
 
 export const handleTransactionHash = async (
   transactionHashes: string | string[] | undefined,
+  errorMessage?: string | string[],
 ): Promise<TransactionResult[]> => {
   if (transactionHashes) {
     try {
@@ -87,12 +99,32 @@ export const handleTransactionHash = async (
       const results = await Promise.all(
         txhash.map(async (txHash: string): Promise<TransactionResult> => {
           const result: any = await getTransactionResult(txHash);
-          const hasStorageDeposit = result.transaction.actions.some(
+          let hasStorageDeposit = false;
+
+          const isMarginExecute = result.transaction.actions.some(
             (action: any) => action?.FunctionCall?.method_name === "margin_execute_with_pyth",
           );
+
+          if (isMarginExecute) {
+            const args = parsedArgs(result?.transaction?.actions?.[0]?.FunctionCall?.args || "");
+            const { actions } = JSON.parse(args || "");
+            hasStorageDeposit = !actions[0]?.CloseMTPosition;
+          }
+
           return { txHash, result, hasStorageDeposit };
         }),
       );
+
+      // 检查是否有任何一个交易的 hasStorageDeposit 为 false
+      const hasAnyFalseStorageDeposit = results.some((result) => !result.hasStorageDeposit);
+
+      // 如果有任何一个为 false，则所有结果的 hasStorageDeposit 都设为 false
+      if (hasAnyFalseStorageDeposit) {
+        return results.map((result) => ({
+          ...result,
+          hasStorageDeposit: false,
+        }));
+      }
 
       return results;
     } catch (error) {

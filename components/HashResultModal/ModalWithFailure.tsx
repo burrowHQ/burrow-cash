@@ -44,6 +44,8 @@ const ModalWithFailure = ({
     setIsModalVisible(false);
     onClose();
     clearTimeout(countdownTimer);
+    const cleanUrl = window.location.href.split("?")[0];
+    window.history.replaceState({}, "", cleanUrl);
   };
 
   const startCountdown = () => {

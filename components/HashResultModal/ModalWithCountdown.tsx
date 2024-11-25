@@ -53,6 +53,8 @@ const ModalWithCountdown = ({
   const hideModal = () => {
     setIsModalVisible(false);
     clearTimeout(countdownTimer);
+    const cleanUrl = window.location.href.split("?")[0];
+    window.history.replaceState({}, "", cleanUrl);
   };
 
   const startCountdown = () => {

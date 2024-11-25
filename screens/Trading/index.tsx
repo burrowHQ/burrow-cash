@@ -143,7 +143,6 @@ const Trading = () => {
   };
 
   useEffect(() => {
-    handleTransactionResults(query?.transactionHashes, query?.errorMessage);
     if (query?.transactionHashes) {
       (async () => {
         const txHash = await handleTransactionHash(query?.transactionHashes);
@@ -162,6 +161,7 @@ const Trading = () => {
           });
       })();
     }
+    handleTransactionResults(query?.transactionHashes, query?.errorMessage);
   }, [query?.transactionHashes, query?.errorMessage]);
 
   //
