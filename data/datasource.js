@@ -116,6 +116,16 @@ class DataSource {
       config?.marginTradingUrl,
     );
   }
+
+  getFee() {
+    return this.callAPI(
+      `/v3/margin-trading/position/fee`,
+      "GET",
+      null,
+      null,
+      config?.marginTradingUrl,
+    );
+  }
 }
 
 export default DataSource;
