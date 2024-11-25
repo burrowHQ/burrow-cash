@@ -29,6 +29,7 @@ const TradingOperate = () => {
   const { categoryAssets1, categoryAssets2 } = useMarginConfigToken();
   const { parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
   const { marginConfigTokens } = useMarginConfigToken();
+  const { max_active_user_margin_position } = marginConfigTokens;
   const {
     ReduxcategoryAssets1,
     ReduxcategoryAssets2,
