@@ -1,7 +1,7 @@
 import { useState, createContext, useMemo } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
-import { useAppDispatch } from "../../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
 import { CloseIcon } from "../../../components/Modal/svg";
@@ -16,12 +16,18 @@ import {
   RedSolidSubmitButton as RedSolidButton,
 } from "../../../components/Modal/button";
 import { shrinkToken } from "../../../store";
+import { beautifyPrice } from "../../../utils/beautyNumbet";
+
+const getTokenSymbolOnly = (assetId) => {
+  return assetId === "wNEAR" ? "NEAR" : assetId || "";
+};
 
 export const ModalContext = createContext(null) as any;
 const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
   const dispatch = useAppDispatch();
   const theme = useTheme();
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
+  const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
   const actionShowRedColor = action === "Long";
   const [isDisabled, setIsDisabled] = useState(false);
   const { marginConfigTokens } = useMarginConfigToken();
@@ -35,6 +41,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
       ? getAssetById(confirmInfo.longOutputName?.token_id)
       : getAssetById(confirmInfo.longInputName?.token_id),
   );
+  const cateSymbol = getTokenSymbolOnly(ReduxcategoryAssets1.metadata.symbol);
   const confirmOpenPosition = async () => {
     // console.log(
     //   action == "Long"
@@ -128,7 +135,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
                     actionShowRedColor ? "bg-primary text-primary" : "bg-red-50 text-red-50"
                   }`}
                 >
-                  {action} NEAR {confirmInfo.rangeMount}X
+                  {action} {cateSymbol} {confirmInfo.rangeMount}X
                 </div>
               </div>
               <div className="cursor-pointer">
@@ -163,8 +170,10 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
               {/* <div>${confirmInfo.entryPrice || "-"}</div> */}
               <div>
                 $
-                {confirmInfo.tokenInAmount /
-                  Number(shrinkToken(confirmInfo.estimateData?.min_amount_out, decimalsP))}
+                {beautifyPrice(
+                  confirmInfo.tokenInAmount /
+                    Number(shrinkToken(confirmInfo.estimateData?.min_amount_out, decimalsP)),
+                )}
               </div>
             </div>
 
@@ -189,7 +198,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Liq. Price</div>
-              <div>${confirmInfo.LiqPrice}</div>
+              <div>${beautifyPrice(confirmInfo.LiqPrice)}</div>
             </div>
             <div className="flex items-baseline justify-between text-sm mb-4">
               <div className="text-gray-300 flex items-center">
@@ -250,7 +259,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
                 {isDisabled ? (
                   <BeatLoader size={5} color="#14162B" />
                 ) : (
-                  ` Confirm ${action} NEAR ${confirmInfo.rangeMount}X`
+                  ` Confirm ${action} ${cateSymbol} ${confirmInfo.rangeMount}X`
                 )}
               </YellowSolidButton>
             ) : (
@@ -262,7 +271,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
                 {isDisabled ? (
                   <BeatLoader size={5} color="#14162B" />
                 ) : (
-                  ` Confirm ${action} NEAR ${confirmInfo.rangeMount}X`
+                  ` Confirm ${action} ${cateSymbol} ${confirmInfo.rangeMount}X`
                 )}
               </RedSolidButton>
             )}

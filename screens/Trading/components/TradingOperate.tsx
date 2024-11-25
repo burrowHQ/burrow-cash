@@ -20,6 +20,7 @@ import {
   YellowSolidSubmitButton as YellowSolidButton,
   RedSolidSubmitButton as RedSolidButton,
 } from "../../../components/Modal/button";
+import { beautifyPrice } from "../../../utils/beautyNumbet";
 
 // main components
 const TradingOperate = () => {
@@ -63,6 +64,14 @@ const TradingOperate = () => {
   const balance = useAppSelector(getAccountBalance);
   const accountId = useAppSelector(getAccountId);
 
+  const getTokenSymbol = (assetId) => {
+    if (!assetId?.token_id) return "";
+    const asset = assets.data[assetId.token_id];
+    return asset?.metadata.symbol === "wNEAR" ? "NEAR" : asset?.metadata.symbol || "";
+  };
+  const getTokenSymbolOnly = (assetId) => {
+    return assetId === "wNEAR" ? "NEAR" : assetId || "";
+  };
   // pools
   const { simplePools, stablePools, stablePoolsDetail } = usePoolsData();
 
@@ -115,6 +124,7 @@ const TradingOperate = () => {
   //   }, 200);
   // };
 
+  const cateSymbol = getTokenSymbolOnly(ReduxcategoryAssets1.metadata.symbol);
   // slippageTolerance change ecent
   useEffect(() => {
     dispatch(setSlippageToleranceFromRedux(0.5));
@@ -394,7 +404,7 @@ const TradingOperate = () => {
       <div className="flex justify-between items-center">
         <div className="flex bg-dark-200 px-0.5 py-0.5 rounded-md cursor-pointer mr-3">
           <div className={getTabClassName("long")} onClick={() => handleTabClick("long")}>
-            Long NEAR
+            Long {cateSymbol}
           </div>
           <div
             className={
@@ -404,7 +414,7 @@ const TradingOperate = () => {
             }
             onClick={() => handleTabClick("short")}
           >
-            Short NEAR
+            Short {cateSymbol}
           </div>
         </div>
         {/* slip start */}
@@ -491,20 +501,23 @@ const TradingOperate = () => {
             <RangeSlider defaultValue={rangeMount} action="Long" setRangeMount={setRangeMount} />
             <div className="mt-5">
               <div className="flex items-center justify-between text-sm mb-4">
-                <div className="text-gray-300">Minimum received</div>
-                <div className="text-right">
-                  {Number(toInternationalCurrencySystem_number(longOutput)) *
-                    (1 - slippageTolerance / 100)}{" "}
-                  NEAR
-                </div>
-              </div>
-              <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Position Size</div>
                 <div className="text-right">
-                  {toInternationalCurrencySystem_number(longOutput)} NEAR
+                  {toInternationalCurrencySystem_number(longOutput)} {cateSymbol}
                   <span className="text-xs text-gray-300 ml-1.5">
                     (${toInternationalCurrencySystem_number(longOutputUsd)})
                   </span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-sm mb-4">
+                <div className="text-gray-300">Minimum received</div>
+                <div className="text-right">
+                  {beautifyPrice(
+                    Number(toInternationalCurrencySystem_number(longOutput)) *
+                      (1 - slippageTolerance / 100),
+                  )}{" "}
+                  {cateSymbol}
                 </div>
               </div>
               <div className="flex items-center justify-between text-sm mb-4">
@@ -515,7 +528,7 @@ const TradingOperate = () => {
                 <div className="text-gray-300">Fee</div>
                 <div className="flex items-center justify-center">
                   <p className="border-b border-dashed border-dark-800">{formatDecimal(Fee.fee)}</p>
-                  NEAR
+                  {cateSymbol}
                   <span className="text-xs text-gray-300 ml-1.5">
                     (${formatDecimal(Fee.fee * (Fee.price || 0))})
                   </span>
@@ -570,7 +583,7 @@ const TradingOperate = () => {
                 disabled={isDisabled}
                 onClick={handleConfirmButtonClick}
               >
-                Long NEAR {rangeMount}x
+                Long {cateSymbol} {rangeMount}x
               </YellowSolidButton>
               {isConfirmModalOpen && (
                 <ConfirmMobile
@@ -636,20 +649,22 @@ const TradingOperate = () => {
             <RangeSlider defaultValue={rangeMount} action="Short" setRangeMount={setRangeMount} />
             <div className="mt-5">
               <div className="flex items-center justify-between text-sm mb-4">
-                <div className="text-gray-300">Minimum received</div>
-                <div className="text-right">
-                  {Number(toInternationalCurrencySystem_number(shortOutput)) *
-                    (1 - slippageTolerance / 100)}{" "}
-                  NEAR
-                </div>
-              </div>
-              <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Position Size</div>
                 <div>
-                  {toInternationalCurrencySystem_number(shortOutput)} NEAR
+                  {toInternationalCurrencySystem_number(shortOutput)} {cateSymbol}
                   <span className="text-xs text-gray-300 ml-1.5">
                     (${toInternationalCurrencySystem_number(shortOutputUsd)})
                   </span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-sm mb-4">
+                <div className="text-gray-300">Minimum received</div>
+                <div className="text-right">
+                  {beautifyPrice(
+                    Number(toInternationalCurrencySystem_number(shortOutput)) *
+                      (1 - slippageTolerance / 100),
+                  )}{" "}
+                  {cateSymbol}
                 </div>
               </div>
               <div className="flex items-center justify-between text-sm mb-4">
@@ -660,7 +675,7 @@ const TradingOperate = () => {
                 <div className="text-gray-300">Fee</div>
                 <div className="flex items-center justify-center">
                   <p className="border-b border-dashed border-dark-800">{formatDecimal(Fee.fee)}</p>
-                  NEAR
+                  {cateSymbol}
                   <span className="text-xs text-gray-300 ml-1.5">
                     (${formatDecimal(Fee.fee * (Fee.price || 0))})
                   </span>
@@ -715,7 +730,7 @@ const TradingOperate = () => {
                 disabled={isDisabled}
                 onClick={handleConfirmButtonClick}
               >
-                Short NEAR {rangeMount}x
+                Short {cateSymbol} {rangeMount}x
               </RedSolidButton>
               {isConfirmModalOpen && (
                 <ConfirmMobile

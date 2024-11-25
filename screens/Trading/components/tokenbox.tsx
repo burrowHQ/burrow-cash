@@ -128,7 +128,7 @@ const TradingToken: React.FC<TradingTokenInter> = ({ tokenList, type, setOwnBanl
         <div className="mx-1.5 text-base">
           {selectedItem?.metadata?.symbol === "wNEAR" ? "NEAR" : selectedItem?.metadata?.symbol}
         </div>
-        <TokenThinArrow />
+        {type === "cate2" && <TokenThinArrow />}
       </div>
 
       {type === "cate2" && (
@@ -138,7 +138,7 @@ const TradingToken: React.FC<TradingTokenInter> = ({ tokenList, type, setOwnBanl
         </div>
       )}
       {/*  */}
-      {showModal && (
+      {showModal && type === "cate2" && (
         <div
           className="absolute top-10 right-0 py-1.5 bg-dark-250 border border-dark-500 rounded-md z-80 w-52"
           onMouseEnter={handleMouseEnter}

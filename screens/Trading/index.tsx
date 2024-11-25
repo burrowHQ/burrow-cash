@@ -39,7 +39,6 @@ const Trading = () => {
   const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
   const { categoryAssets1, categoryAssets2 } = useMarginConfigToken();
   const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
-
   const router = useRouter();
   const { id }: any = router.query;
   const dispatch = useAppDispatch();
@@ -178,9 +177,9 @@ const Trading = () => {
                     ? "NEAR"
                     : currentTokenCate1?.metadata?.symbol}
                 </p>
-                <TokenArrow />
+                {/* <TokenArrow /> */}
               </div>
-              {showPopupCate1 && (
+              {/* {showPopupCate1 && (
                 <div
                   onMouseEnter={() => handleMouseEnter("1")}
                   onMouseLeave={() => handleMouseLeave("1")}
@@ -209,7 +208,7 @@ const Trading = () => {
                     </div>
                   ))}
                 </div>
-              )}
+              )} */}
             </div>
             {/* cate2 */}
             <div className="text-sm">
