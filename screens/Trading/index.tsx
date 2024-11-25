@@ -28,7 +28,8 @@ import {
   showPositionFailure,
   showPositionClose,
 } from "../../components/HashResultModal";
-import { handleTransactionResults } from "../../services/transaction";
+import { handleTransactionResults, handleTransactionHash } from "../../services/transaction";
+import DataSource from "../../data/datasource";
 
 init_env("dev");
 
@@ -143,6 +144,24 @@ const Trading = () => {
 
   useEffect(() => {
     handleTransactionResults(query?.transactionHashes, query?.errorMessage);
+    if (query?.transactionHashes) {
+      (async () => {
+        const txHash = await handleTransactionHash(query?.transactionHashes);
+        txHash
+          .filter((item) => item.hasStorageDeposit)
+          .forEach(async (item) => {
+            try {
+              await DataSource.shared.getMarginTradingPosition({
+                addr: accountId,
+                process_type: "open",
+                tx_hash: item.txHash,
+              });
+            } catch (error) {
+              console.error("Failed to get margin trading position:", error);
+            }
+          });
+      })();
+    }
   }, [query?.transactionHashes, query?.errorMessage]);
 
   //

@@ -13,11 +13,12 @@ class DataSource {
   }
 
   // eslint-disable-next-line class-methods-use-this,default-param-last
-  async callAPI(endPoint, method = "GET", queryObject, requestBody, host, authentication) {
+  async callAPI(endPoint, method, queryObject, requestBody, host, authentication) {
+    method = method || "GET";
     const url = URLForEndpoint(endPoint, queryObject, host);
     const headers = new Headers();
     headers.append("Content-Type", "application/json");
-    headers.append("pragma", "no-cache");
+    // headers.append("pragma", "no-cache");
     headers.append("cache-control", "no-cache");
     if (authentication) {
       headers.append("Authentication", getAuthenticationHeaders(endPoint));

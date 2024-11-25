@@ -17,6 +17,10 @@ import {
 } from "../../../components/Modal/button";
 import { shrinkToken } from "../../../store";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
+import DataSource from "../../../data/datasource";
+import { getAccountId } from "../../../redux/accountSelectors";
+import { useRouterQuery } from "../../../utils/txhashContract";
+import { handleTransactionHash } from "../../../services/transaction";
 
 const getTokenSymbolOnly = (assetId) => {
   return assetId === "wNEAR" ? "NEAR" : assetId || "";
@@ -24,6 +28,8 @@ const getTokenSymbolOnly = (assetId) => {
 
 export const ModalContext = createContext(null) as any;
 const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
+  const { query } = useRouterQuery();
+  const accountId = useAppSelector(getAccountId);
   const dispatch = useAppDispatch();
   const theme = useTheme();
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
@@ -43,18 +49,6 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
   );
   const cateSymbol = getTokenSymbolOnly(ReduxcategoryAssets1.metadata.symbol);
   const confirmOpenPosition = async () => {
-    // console.log(
-    //   action == "Long"
-    //     ? getAssetById(confirmInfo.longOutputName?.token_id)
-    //     : getAssetById(confirmInfo.longInputName?.token_id),
-    // );
-
-    // return console.log(
-    //   parseTokenValue(confirmInfo.estimateData.min_amount_out, decimalsP) >
-    //     confirmInfo.tokenInAmount /
-    //       (confirmInfo.indexPrice * (1 - marginConfigTokens.max_slippage_rate / 10000)),
-    // );
-
     setIsDisabled(true);
     if (action === "Long") {
       try {
@@ -67,7 +61,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
           min_token_p_amount: confirmInfo.estimateData.min_amount_out,
           swap_indication: confirmInfo.estimateData.swap_indication,
           assets: confirmInfo.assets.data,
-        }).finally(() => {
+        }).finally(async () => {
           setIsDisabled(false);
         });
       } catch (error) {

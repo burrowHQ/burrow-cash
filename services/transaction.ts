@@ -74,3 +74,31 @@ export const handleTransactionResults = async (
     });
   }
 };
+
+export const handleTransactionHash = async (
+  transactionHashes: string | string[] | undefined,
+): Promise<TransactionResult[]> => {
+  if (transactionHashes) {
+    try {
+      const txhash = Array.isArray(transactionHashes)
+        ? transactionHashes
+        : transactionHashes.split(",");
+
+      const results = await Promise.all(
+        txhash.map(async (txHash: string): Promise<TransactionResult> => {
+          const result: any = await getTransactionResult(txHash);
+          const hasStorageDeposit = result.transaction.actions.some(
+            (action: any) => action?.FunctionCall?.method_name === "margin_execute_with_pyth",
+          );
+          return { txHash, result, hasStorageDeposit };
+        }),
+      );
+
+      return results;
+    } catch (error) {
+      console.error("Error processing transactions:", error);
+      return [];
+    }
+  }
+  return [];
+};
