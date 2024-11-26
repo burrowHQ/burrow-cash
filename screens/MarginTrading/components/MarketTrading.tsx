@@ -9,6 +9,7 @@ import {
 } from "../../../utils/uiNumber";
 import { NewTagIcon } from "../../Market/svg";
 import { shrinkToken } from "../../../store/helper";
+import DataSource from "../../../data/datasource";
 
 const MarketMarginTrading = () => {
   const { filterMarginConfigList } = useMarginConfigToken();
@@ -16,6 +17,26 @@ const MarketMarginTrading = () => {
   const [totalShortUSD, setTotalShortUSD] = React.useState(0);
   const [sortDirection, setSortDirection] = React.useState<"asc" | "desc" | null>(null);
   const [sortBy, setSortBy] = React.useState<string | null>(null);
+  const [volumeStats, setVolumeStats] = React.useState({
+    totalVolume: 0,
+    volume24h: 0,
+  });
+
+  useEffect(() => {
+    const fetchVolumeStats = async () => {
+      try {
+        const response = await DataSource.shared.getMarginTradingVolumeStatistics();
+        setVolumeStats({
+          totalVolume: response.totalVolume || 0,
+          volume24h: response.volume24h || 0,
+        });
+      } catch (error) {
+        console.error("Failed to fetch volume statistics:", error);
+      }
+    };
+
+    fetchVolumeStats();
+  }, []);
 
   const handleSort = (field: string) => {
     setSortBy((prev) => field);
@@ -52,8 +73,8 @@ const MarketMarginTrading = () => {
   return (
     <div className="flex flex-col items-center justify-center w-full">
       <div className="flex justify-between items-center w-full h-[100px] border border-dark-50 bg-gray-800 rounded-md mb-8">
-        <DataItem title="Total Volume" value="$-" />
-        <DataItem title="24H Volume" value="$-" />
+        <DataItem title="Total Volume" value={formatWithCommas_usd(volumeStats.totalVolume)} />
+        <DataItem title="24H Volume" value={formatWithCommas_usd(volumeStats.volume24h)} />
         <DataItem title="Long Open Interest" value={formatWithCommas_usd(totalLongUSD)} />
         <DataItem title="Short Open Interest" value={formatWithCommas_usd(totalShortUSD)} />
       </div>

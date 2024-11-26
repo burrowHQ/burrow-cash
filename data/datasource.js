@@ -117,11 +117,41 @@ class DataSource {
     );
   }
 
+  getMarginTradingVolumeStatistics() {
+    return this.callAPI(
+      `/v3/margin-trading/position/statistics`,
+      "GET",
+      null,
+      null,
+      config?.marginTradingUrl,
+    );
+  }
+
   getFee() {
     return this.callAPI(
       `/v3/margin-trading/position/fee`,
       "GET",
       null,
+      null,
+      config?.marginTradingUrl,
+    );
+  }
+
+  getMarginTradingRecordEntryPrice(id) {
+    return this.callAPI(
+      `/v3/margin-trading/position/records/entry-price`,
+      "GET",
+      { pos_ids: id },
+      null,
+      config?.marginTradingUrl,
+    );
+  }
+
+  getMarginTradingPositionHistory(params) {
+    return this.callAPI(
+      `/v3/margin-trading/position/history`,
+      "GET",
+      params,
       null,
       config?.marginTradingUrl,
     );

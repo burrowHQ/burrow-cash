@@ -344,7 +344,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
                 Add
               </div>
               <div
-                className={`pb-3.5 w-1/2 text-center cursor-pointer text-gray-300 text-lg ${
+                className={`py-2 w-1/2 text-center cursor-pointer text-gray-300 text-lg ${
                   ChangeCollateralTab === "Remove" ? "text-red-50 border-b border-red-50" : ""
                 }`}
                 onClick={() => handleChangeCollateralTabClick("Remove")}

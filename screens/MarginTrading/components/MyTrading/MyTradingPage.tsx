@@ -101,8 +101,6 @@ const MyMarginTradingPage = () => {
                       symbol: string;
                       totalValue: number;
                     }
-
-                    // 定义累加器对象的类型
                     type CollateralAccumulator = {
                       [tokenId: string]: MergedCollateralData;
                     };

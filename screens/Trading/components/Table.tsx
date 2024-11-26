@@ -8,6 +8,8 @@ import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
 import { toInternationalCurrencySystem_number } from "../../../utils/uiNumber";
 import { getAssets } from "../../../store/assets";
 import { IAssetEntry } from "../../../interfaces";
+import DataSource from "../../../data/datasource";
+import { useAccountId } from "../../../hooks/hooks";
 
 const TradingTable = ({ positionsList }) => {
   const [selectedTab, setSelectedTab] = useState("positions");
@@ -17,6 +19,10 @@ const TradingTable = ({ positionsList }) => {
   const [assets, setAssets] = useState<IAssetEntry[]>([]);
   const [closePositionModalProps, setClosePositionModalProps] = useState(null);
   const [totalCollateral, setTotalCollateral] = useState(0);
+  const [positionHistory, setPositionHistory] = useState([]);
+  const [nextPageToken, setNextPageToken] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const accountId = useAccountId();
   const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById, calculateLeverage } =
     useMarginAccount();
   const { getPositionType, marginConfigTokens } = useMarginConfigToken();
@@ -42,6 +48,29 @@ const TradingTable = ({ positionsList }) => {
   useEffect(() => {
     fetchAssets();
   }, []);
+  const fetchPositionHistory = async () => {
+    try {
+      setIsLoading(true);
+      const response = await DataSource.shared.getMarginTradingPositionHistory({
+        address: accountId,
+        // next_page_token: nextPageToken,
+      });
+      setPositionHistory((prev) =>
+        nextPageToken ? [...prev, ...response.records] : response.records,
+      );
+      setNextPageToken(response.next_page_token);
+    } catch (error) {
+      console.error("获取历史仓位记录失败:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedTab === "history") {
+      fetchPositionHistory();
+    }
+  }, [selectedTab]);
   const calculateTotalSizeValues = () => {
     let collateralTotal = 0;
     Object.values(marginAccountList).forEach((item) => {
@@ -155,23 +184,42 @@ const TradingTable = ({ positionsList }) => {
                 </tr>
               </thead>
               <tbody>
-                <Link href="/trading">
-                  <tr className="text-base hover:bg-dark-100 cursor-pointer font-normal">
-                    <td className="py-5 pl-5 ">-/-</td>
-                    <td>-</td>
-                    <td className="text-red-50">-</td>
-                    <td>$-</td>
-                    <td>100 NEAR</td>
-                    <td>$1.80</td>
-                    <td>--</td>
-                    <td className="pr-5">
-                      <div>
-                        2024-01-16, 13:23
-                        {/* <Export /> */}
+                {/* {positionHistory.length > 0 ? (
+                  positionHistory.map((record, index) => (
+                    <tr
+                      key={index}
+                      className="text-base hover:bg-dark-100 cursor-pointer font-normal"
+                    >
+                      <td className="py-5 pl-5">{record.market}</td>
+                      <td>{record.operation}</td>
+                      <td className={record.side === "Long" ? "text-green-500" : "text-red-500"}>
+                        {record.side}
+                      </td>
+                      <td>${toInternationalCurrencySystem_number(record.price)}</td>
+                      <td>{record.amount}</td>
+                      <td>${toInternationalCurrencySystem_number(record.fee)}</td>
+                      <td>
+                        <div className="flex items-center">
+                          <span className={record.pnl >= 0 ? "text-green-500" : "text-red-500"}>
+                            ${toInternationalCurrencySystem_number(record.pnl)}
+                          </span>
+                          <span className="text-gray-400 text-xs ml-1">({record.roe}%)</span>
+                        </div>
+                      </td>
+                      <td className="pr-5">
+                        <div>{new Date(record.timestamp).toLocaleString()}</div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={8}>
+                      <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+                        暂无历史记录
                       </div>
                     </td>
                   </tr>
-                </Link>
+                )} */}
               </tbody>
             </table>
           )}
@@ -206,6 +254,36 @@ const PositionRow = ({
   marginConfigTokens,
 }) => {
   // console.log(itemKey, item, index);
+  const [entryPrice, setEntryPrice] = useState(0);
+  useEffect(() => {
+    const fetchEntryPrice = async () => {
+      try {
+        const response = await DataSource.shared.getMarginTradingRecordEntryPrice(itemKey);
+        if (response?.code === 0 && response?.data?.[0]?.entry_price) {
+          const price = parseFloat(response.data[0].entry_price);
+          setEntryPrice(price);
+        } else {
+          const calculatedPrice = calculateBackupEntryPrice();
+          setEntryPrice(calculatedPrice);
+        }
+      } catch (error) {
+        console.error("Failed to fetch entry price:", error);
+        const calculatedPrice = calculateBackupEntryPrice();
+        setEntryPrice(calculatedPrice);
+      }
+    };
+    const calculateBackupEntryPrice = () => {
+      return positionType.label === "Long"
+        ? sizeValueLong === 0
+          ? 0
+          : (leverageD * priceD) / sizeValueLong
+        : sizeValueShort === 0
+        ? 0
+        : netValue / sizeValueShort;
+    };
+
+    fetchEntryPrice();
+  }, [itemKey]);
   const assetD = getAssetById(item.token_d_info.token_id);
   const assetC = getAssetById(item.token_c_info.token_id);
   const assetP = getAssetById(item.token_p_id);
@@ -229,14 +307,14 @@ const PositionRow = ({
 
   const netValue = parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
   const collateral = parseTokenValue(item.token_c_info.balance, decimalsC);
-  const entryPrice =
-    positionType.label === "Long"
-      ? sizeValueLong === 0
-        ? 0
-        : (leverageD * priceD) / sizeValueLong
-      : sizeValueShort === 0
-      ? 0
-      : netValue / sizeValueShort;
+  // const entryPrice =
+  //   positionType.label === "Long"
+  //     ? sizeValueLong === 0
+  //       ? 0
+  //       : (leverageD * priceD) / sizeValueLong
+  //     : sizeValueShort === 0
+  //     ? 0
+  //     : netValue / sizeValueShort;
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
   const debt_assets_d = assets.find((asset) => asset.token_id === item.token_d_info.token_id);
   // const total_cap = leverageC * priceC + sizeValueLong * priceP;
