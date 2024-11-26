@@ -42,10 +42,11 @@ export const executeMultipleTransactions = async (transactions) => {
 
   try {
     const wallet = await selector.wallet();
-    await wallet.signAndSendTransactions({
+    const result = await wallet.signAndSendTransactions({
       transactions: selectorTransactions,
     });
     if (fetchData) fetchData(account.accountId);
+    return result;
   } catch (e: any) {
     if (/reject/.test(e)) {
       alert("Transaction was rejected in wallet. Please try again!");

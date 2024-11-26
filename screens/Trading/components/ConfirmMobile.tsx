@@ -20,7 +20,7 @@ import { beautifyPrice } from "../../../utils/beautyNumbet";
 import DataSource from "../../../data/datasource";
 import { getAccountId } from "../../../redux/accountSelectors";
 import { useRouterQuery } from "../../../utils/txhashContract";
-import { handleTransactionHash } from "../../../services/transaction";
+import { handleTransactionHash, handleTransactionResults } from "../../../services/transaction";
 import { useToastMessage } from "../../../hooks/hooks";
 import { showPositionClose, showPositionFailure } from "../../../components/HashResultModal";
 
@@ -52,60 +52,112 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
       : getAssetById(confirmInfo.longInputName?.token_id),
   );
   const cateSymbol = getTokenSymbolOnly(ReduxcategoryAssets1?.metadata?.symbol);
+  // const confirmOpenPosition = async () => {
+  //   if (Object.values(marginAccountList).length >= max_active_user_margin_position) {
+  //     return showToast("User has exceeded the maximum number of open positions！");
+  //   }
+
+  //   setIsDisabled(true);
+  //   if (action === "Long") {
+  //     try {
+  //       const res: any = await openPosition({
+  //         token_c_amount: confirmInfo.longInput,
+  //         token_c_id: confirmInfo.longInputName?.token_id,
+  //         token_d_amount: confirmInfo.tokenInAmount,
+  //         token_d_id: confirmInfo.longInputName?.token_id,
+  //         token_p_id: confirmInfo.longOutputName?.token_id,
+  //         min_token_p_amount: confirmInfo.estimateData.min_amount_out,
+  //         swap_indication: confirmInfo.estimateData.swap_indication,
+  //         assets: confirmInfo.assets.data,
+  //       });
+  //       const k: any = [];
+  //       res.forEach((item: any) => {
+  //         k.push(item.transaction.hash);
+  //       });
+  //       handleTransactionResults(k);
+  //       // handleTransactionResultsYield(k);
+  //     } catch (error) {
+  //       console.log(error);
+  //       showPositionFailure({
+  //         title: "Open Position Failed",
+  //         errorMessage: JSON.stringify(error),
+  //         type: action,
+  //       });
+  //     } finally {
+  //       setIsDisabled(false);
+  //       onClose();
+  //     }
+  //   } else {
+  //     try {
+  //       const res: any = await openPosition({
+  //         token_c_amount: confirmInfo.longInput,
+  //         token_c_id: confirmInfo.longInputName?.token_id,
+  //         token_d_amount: confirmInfo.tokenInAmount,
+  //         token_d_id: confirmInfo.longOutputName?.token_id,
+  //         token_p_id: confirmInfo.longInputName?.token_id,
+  //         min_token_p_amount: confirmInfo.estimateData.min_amount_out,
+  //         swap_indication: confirmInfo.estimateData.swap_indication,
+  //         assets: confirmInfo.assets.data,
+  //       });
+  //       console.log(res);
+  //       const k: any = [];
+  //       res.forEach((item: any) => {
+  //         k.push(item.transaction.hash);
+  //       });
+  //       handleTransactionResults(k);
+  //     } catch (error) {
+  //       console.log(error);
+  //       showPositionFailure({
+  //         title: "Open Position Failed",
+  //         errorMessage: JSON.stringify(error),
+  //         type: action,
+  //       });
+  //     } finally {
+  //       setIsDisabled(false);
+  //       onClose();
+  //     }
+  //   }
+  // };
+
   const confirmOpenPosition = async () => {
     if (Object.values(marginAccountList).length >= max_active_user_margin_position) {
       return showToast("User has exceeded the maximum number of open positions！");
     }
 
     setIsDisabled(true);
-    if (action === "Long") {
-      try {
-        const res = await openPosition({
-          token_c_amount: confirmInfo.longInput,
-          token_c_id: confirmInfo.longInputName?.token_id,
-          token_d_amount: confirmInfo.tokenInAmount,
-          token_d_id: confirmInfo.longInputName?.token_id,
-          token_p_id: confirmInfo.longOutputName?.token_id,
-          min_token_p_amount: confirmInfo.estimateData.min_amount_out,
-          swap_indication: confirmInfo.estimateData.swap_indication,
-          assets: confirmInfo.assets.data,
-        });
-        console.log(res);
-      } catch (error) {
-        console.log(error);
-        showPositionFailure({
-          title: "Open Position Failed",
-          errorMessage: JSON.stringify(error),
-          type: action,
-        });
-      } finally {
-        setIsDisabled(false);
-        onClose();
-      }
-    } else {
-      try {
-        const res = await openPosition({
-          token_c_amount: confirmInfo.longInput,
-          token_c_id: confirmInfo.longInputName?.token_id,
-          token_d_amount: confirmInfo.tokenInAmount,
-          token_d_id: confirmInfo.longOutputName?.token_id,
-          token_p_id: confirmInfo.longInputName?.token_id,
-          min_token_p_amount: confirmInfo.estimateData.min_amount_out,
-          swap_indication: confirmInfo.estimateData.swap_indication,
-          assets: confirmInfo.assets.data,
-        });
-        console.log(res);
-      } catch (error) {
-        console.log(error);
-        showPositionFailure({
-          title: "Open Position Failed",
-          errorMessage: JSON.stringify(error),
-          type: action,
-        });
-      } finally {
-        setIsDisabled(false);
-        onClose();
-      }
+
+    try {
+      const openPositionParams = {
+        token_c_amount: confirmInfo.longInput,
+        token_c_id: confirmInfo.longInputName?.token_id,
+        token_d_amount: confirmInfo.tokenInAmount,
+        token_d_id:
+          action === "Long"
+            ? confirmInfo.longInputName?.token_id
+            : confirmInfo.longOutputName?.token_id,
+        token_p_id:
+          action === "Long"
+            ? confirmInfo.longOutputName?.token_id
+            : confirmInfo.longInputName?.token_id,
+        min_token_p_amount: confirmInfo.estimateData.min_amount_out,
+        swap_indication: confirmInfo.estimateData.swap_indication,
+        assets: confirmInfo.assets.data,
+      };
+
+      const res: any = await openPosition(openPositionParams);
+      const transactionHashes = res.map(
+        (item: { transaction: { hash: string } }) => item.transaction.hash,
+      );
+      handleTransactionResults(transactionHashes);
+    } catch (error) {
+      showPositionFailure({
+        title: "Open Position Failed",
+        errorMessage: JSON.stringify(error),
+        type: action,
+      });
+    } finally {
+      setIsDisabled(false);
+      onClose();
     }
   };
 

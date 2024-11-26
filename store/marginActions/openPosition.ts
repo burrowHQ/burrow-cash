@@ -107,6 +107,5 @@ export async function openPosition({
     ],
   });
 
-  const result = await prepareAndExecuteTransactions(transactions);
-  return result;
+  return prepareAndExecuteTransactions(transactions);
 }

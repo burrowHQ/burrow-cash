@@ -198,5 +198,5 @@ export const prepareAndExecuteTransactions = async (operations: Transaction[] = 
   }
 
   transactions.push(...operations);
-  await executeMultipleTransactions(transactions);
+  return executeMultipleTransactions(transactions);
 };
