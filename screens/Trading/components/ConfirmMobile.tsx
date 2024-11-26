@@ -59,7 +59,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
     setIsDisabled(true);
     if (action === "Long") {
       try {
-        await openPosition({
+        const res = await openPosition({
           token_c_amount: confirmInfo.longInput,
           token_c_id: confirmInfo.longInputName?.token_id,
           token_d_amount: confirmInfo.tokenInAmount,
@@ -68,16 +68,17 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
           min_token_p_amount: confirmInfo.estimateData.min_amount_out,
           swap_indication: confirmInfo.estimateData.swap_indication,
           assets: confirmInfo.assets.data,
-        }).finally(async () => {
-          setIsDisabled(false);
         });
+        console.log(res);
       } catch (error) {
-        // console.log(error);
+        console.log(error);
+      } finally {
         setIsDisabled(false);
+        onClose();
       }
     } else {
       try {
-        await openPosition({
+        const res = await openPosition({
           token_c_amount: confirmInfo.longInput,
           token_c_id: confirmInfo.longInputName?.token_id,
           token_d_amount: confirmInfo.tokenInAmount,
@@ -86,12 +87,13 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
           min_token_p_amount: confirmInfo.estimateData.min_amount_out,
           swap_indication: confirmInfo.estimateData.swap_indication,
           assets: confirmInfo.assets.data,
-        }).finally(() => {
-          setIsDisabled(false);
         });
+        console.log(res);
       } catch (error) {
-        // console.log(error);
+        console.log(error);
+      } finally {
         setIsDisabled(false);
+        onClose();
       }
     }
   };
