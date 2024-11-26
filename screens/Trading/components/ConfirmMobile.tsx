@@ -21,6 +21,7 @@ import DataSource from "../../../data/datasource";
 import { getAccountId } from "../../../redux/accountSelectors";
 import { useRouterQuery } from "../../../utils/txhashContract";
 import { handleTransactionHash } from "../../../services/transaction";
+import { useToastMessage } from "../../../hooks/hooks";
 
 const getTokenSymbolOnly = (assetId) => {
   return assetId === "wNEAR" ? "NEAR" : assetId || "";
@@ -28,6 +29,7 @@ const getTokenSymbolOnly = (assetId) => {
 
 export const ModalContext = createContext(null) as any;
 const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
+  const { toastMessage, showToast } = useToastMessage();
   const { query } = useRouterQuery();
   const accountId = useAppSelector(getAccountId);
   const dispatch = useAppDispatch();
@@ -37,6 +39,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
   const actionShowRedColor = action === "Long";
   const [isDisabled, setIsDisabled] = useState(false);
   const { marginConfigTokens } = useMarginConfigToken();
+  const { max_active_user_margin_position } = marginConfigTokens;
   const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
   const {
     price: priceP,
@@ -47,8 +50,12 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
       ? getAssetById(confirmInfo.longOutputName?.token_id)
       : getAssetById(confirmInfo.longInputName?.token_id),
   );
-  const cateSymbol = getTokenSymbolOnly(ReduxcategoryAssets1.metadata.symbol);
+  const cateSymbol = getTokenSymbolOnly(ReduxcategoryAssets1?.metadata?.symbol);
   const confirmOpenPosition = async () => {
+    if (Object.values(marginAccountList).length >= max_active_user_margin_position) {
+      return showToast("User has exceeded the maximum number of open positions！");
+    }
+
     setIsDisabled(true);
     if (action === "Long") {
       try {

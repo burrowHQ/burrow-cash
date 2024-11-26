@@ -27,8 +27,9 @@ const TradingOperate = () => {
   const assets = useAppSelector(getAssets);
   const config = useAppSelector(getMarginConfig);
   const { categoryAssets1, categoryAssets2 } = useMarginConfigToken();
-  const { parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
-  const { marginConfigTokens } = useMarginConfigToken();
+  const marginConfig = useAppSelector(getMarginConfig);
+  const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
+  const { marginConfigTokens, filterMarginConfigList } = useMarginConfigToken();
   const { max_active_user_margin_position } = marginConfigTokens;
   const {
     ReduxcategoryAssets1,
@@ -125,7 +126,7 @@ const TradingOperate = () => {
   //   }, 200);
   // };
 
-  const cateSymbol = getTokenSymbolOnly(ReduxcategoryAssets1.metadata.symbol);
+  const cateSymbol = getTokenSymbolOnly(ReduxcategoryAssets1?.metadata?.symbol);
   // slippageTolerance change ecent
   useEffect(() => {
     dispatch(setSlippageToleranceFromRedux(0.5));
