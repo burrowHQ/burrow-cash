@@ -16,6 +16,7 @@ import {
   YellowSolidSubmitButton as YellowSolidButton,
   RedSolidSubmitButton as RedSolidButton,
 } from "../../../components/Modal/button";
+import { showPositionClose } from "../../../components/HashResultModal";
 
 export const ModalContext = createContext(null) as any;
 const ClosePositionMobile = ({ open, onClose, extraProps }) => {
@@ -88,13 +89,11 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     stablePoolsDetail,
     slippageTolerance: ReduxSlippageTolerance / 100,
   });
-  // console.log(estimateData, "85>>>");
   useEffect(() => {
     setIsDisabled(!estimateData?.swap_indication || !estimateData?.min_amount_out);
   }, [estimateData]);
   const [isDisabled, setIsDisabled] = useState(false);
   const handleCloseOpsitionEvt = async () => {
-    // console.log(extraProps, "extraProps....");
     setIsDisabled(true);
     try {
       const res = await closePosition({
@@ -108,11 +107,13 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
           item.token_p_id === item.token_c_info.token_id
             ? toDecimal(Number(item.token_p_amount) + Number(item.token_c_info.balance))
             : item.token_p_amount,
-      }).finally(() => {
-        setIsDisabled(false);
       });
+
+      onClose();
+      showPositionClose({});
     } catch (error) {
-      // console.log(error);
+      console.error("Failed to close position:", error);
+    } finally {
       setIsDisabled(false);
     }
   };
