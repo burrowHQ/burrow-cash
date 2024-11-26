@@ -22,6 +22,7 @@ import { getAccountId } from "../../../redux/accountSelectors";
 import { useRouterQuery } from "../../../utils/txhashContract";
 import { handleTransactionHash } from "../../../services/transaction";
 import { useToastMessage } from "../../../hooks/hooks";
+import { showPositionClose, showPositionFailure } from "../../../components/HashResultModal";
 
 const getTokenSymbolOnly = (assetId) => {
   return assetId === "wNEAR" ? "NEAR" : assetId || "";
@@ -72,6 +73,11 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
         console.log(res);
       } catch (error) {
         console.log(error);
+        showPositionFailure({
+          title: "Open Position Failed",
+          errorMessage: JSON.stringify(error),
+          type: action,
+        });
       } finally {
         setIsDisabled(false);
         onClose();
@@ -91,6 +97,11 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
         console.log(res);
       } catch (error) {
         console.log(error);
+        showPositionFailure({
+          title: "Open Position Failed",
+          errorMessage: JSON.stringify(error),
+          type: action,
+        });
       } finally {
         setIsDisabled(false);
         onClose();
