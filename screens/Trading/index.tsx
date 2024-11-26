@@ -168,8 +168,23 @@ const Trading = () => {
     currentTokenCate1?.metadata?.symbol == "wNEAR" ? "NEAR" : currentTokenCate1?.metadata?.symbol
   }/${currentTokenCate2?.metadata?.symbol}`;
 
+  const [volumeStats, setVolumeStats] = useState<any>({});
+  useEffect(() => {
+    const fetchVolumeStats = async () => {
+      try {
+        const response = await DataSource.shared.getMarginTradingVolumeStatistics();
+        setVolumeStats({
+          totalVolume: response.totalVolume || 0,
+          volume24h: response.volume24h || 0,
+        });
+      } catch (error) {
+        console.error("Failed to fetch volume statistics:", error);
+      }
+    };
+
+    fetchVolumeStats();
+  }, []);
   //
-  console.log(marginAccountList);
   return (
     <LayoutBox>
       {/* back */}
@@ -277,12 +292,12 @@ const Trading = () => {
             {/* total v */}
             <div className="text-sm">
               <p className="text-gray-300  mb-1.5">Total Volume</p>
-              <span>$23.25M</span>
+              <span>{formatWithCommas_usd(volumeStats.totalVolume)}</span>
             </div>
             {/* 24h v */}
             <div className="text-sm">
               <p className="text-gray-300 mb-1.5">24H Volume</p>
-              <span>$13.25K</span>
+              <span>{formatWithCommas_usd(volumeStats.volume24h)}</span>
             </div>
             {/* long short */}
             <div className="text-sm">
