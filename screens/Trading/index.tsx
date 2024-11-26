@@ -164,7 +164,12 @@ const Trading = () => {
     handleTransactionResults(query?.transactionHashes, query?.errorMessage);
   }, [query?.transactionHashes, query?.errorMessage]);
 
+  const filterTitle = `${
+    currentTokenCate1?.metadata?.symbol == "wNEAR" ? "NEAR" : currentTokenCate1?.metadata?.symbol
+  }/${currentTokenCate2?.metadata?.symbol}`;
+
   //
+  console.log(marginAccountList);
   return (
     <LayoutBox>
       {/* back */}
@@ -296,7 +301,7 @@ const Trading = () => {
           <TradingOperate />
         </div>
       </div>
-      {accountId && <TradingTable positionsList={marginAccountList} />}
+      {accountId && <TradingTable positionsList={marginAccountList} filterTitle={filterTitle} />}
     </LayoutBox>
   );
 };

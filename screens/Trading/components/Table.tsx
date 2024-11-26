@@ -11,7 +11,13 @@ import { IAssetEntry } from "../../../interfaces";
 import DataSource from "../../../data/datasource";
 import { useAccountId } from "../../../hooks/hooks";
 
-const TradingTable = ({ positionsList }) => {
+const TradingTable = ({
+  positionsList,
+  filterTitle = "",
+}: {
+  positionsList: any;
+  filterTitle?: string;
+}) => {
   const [selectedTab, setSelectedTab] = useState("positions");
   const [isClosePositionModalOpen, setIsClosePositionMobileOpen] = useState(false);
   const [isChangeCollateralMobileOpen, setIsChangeCollateralMobileOpen] = useState(false);
@@ -132,6 +138,7 @@ const TradingTable = ({ positionsList }) => {
                       calculateLeverage={calculateLeverage}
                       marginConfigTokens={marginConfigTokens}
                       assets={assets}
+                      filterTitle={filterTitle}
                     />
                   ))
                 ) : (
@@ -252,6 +259,7 @@ const PositionRow = ({
   calculateLeverage,
   assets,
   marginConfigTokens,
+  filterTitle,
 }) => {
   // console.log(itemKey, item, index);
   const [entryPrice, setEntryPrice] = useState(0);
@@ -299,7 +307,9 @@ const PositionRow = ({
   const positionType = getPositionType(item.token_d_info.token_id);
   const marketTitle =
     positionType.label === "Long" ? `${symbolP}/${symbolC}` : `${symbolD}/${symbolC}`;
-
+  if (filterTitle && marketTitle !== filterTitle) {
+    return null;
+  }
   const sizeValueLong = parseTokenValue(item.token_p_amount, decimalsP);
   const sizeValueShort = parseTokenValue(item.token_d_info.balance, decimalsD);
   const sizeValue =
