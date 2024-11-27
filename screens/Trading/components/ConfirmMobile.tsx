@@ -1,4 +1,4 @@
-import { useState, createContext, useMemo } from "react";
+import { useState, createContext, useMemo, useEffect } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
@@ -23,6 +23,7 @@ import { useRouterQuery } from "../../../utils/txhashContract";
 import { handleTransactionHash, handleTransactionResults } from "../../../services/transaction";
 import { useToastMessage } from "../../../hooks/hooks";
 import { showPositionClose, showPositionFailure } from "../../../components/HashResultModal";
+import { getBurrow } from "../../../utils";
 
 const getTokenSymbolOnly = (assetId) => {
   return assetId === "wNEAR" ? "NEAR" : assetId || "";
@@ -30,6 +31,19 @@ const getTokenSymbolOnly = (assetId) => {
 
 export const ModalContext = createContext(null) as any;
 const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
+  const [burrowData, setBurrowData] = useState<{
+    selector?: {
+      wallet: () => Promise<{ id: string }>;
+    };
+  } | null>(null);
+
+  useEffect(() => {
+    const initBurrow = async () => {
+      const data: any = await getBurrow();
+      setBurrowData(data);
+    };
+    initBurrow();
+  }, []);
   const { toastMessage, showToast } = useToastMessage();
   const { query } = useRouterQuery();
   const accountId = useAppSelector(getAccountId);
@@ -40,7 +54,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
   const actionShowRedColor = action === "Long";
   const [isDisabled, setIsDisabled] = useState(false);
   const { marginConfigTokens } = useMarginConfigToken();
-  const { max_active_user_margin_position } = marginConfigTokens;
+  const { max_active_user_margin_position, max_slippage_rate } = marginConfigTokens;
   const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
   const {
     price: priceP,
@@ -125,34 +139,57 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
     }
 
     setIsDisabled(true);
+    const openPositionParams = {
+      token_c_amount: confirmInfo.longInput,
+      token_c_id: confirmInfo.longInputName?.token_id,
+      token_d_amount: confirmInfo.tokenInAmount,
+      token_d_id:
+        action === "Long"
+          ? confirmInfo.longInputName?.token_id
+          : confirmInfo.longOutputName?.token_id,
+      token_p_id:
+        action === "Long"
+          ? confirmInfo.longOutputName?.token_id
+          : confirmInfo.longInputName?.token_id,
+      min_token_p_amount: confirmInfo.estimateData.min_amount_out,
+      swap_indication: confirmInfo.estimateData.swap_indication,
+      assets: confirmInfo.assets.data,
+    };
+    if (
+      !(
+        Number(shrinkToken(openPositionParams.min_token_p_amount, 24)) >=
+        ((openPositionParams.token_d_amount *
+          confirmInfo.assets.data[openPositionParams.token_d_id].price.usd) /
+          confirmInfo.assets.data[openPositionParams.token_p_id].price.usd) *
+          (max_slippage_rate / 10000)
+      )
+    ) {
+      return showToast("Token out does not meet contract requirements, unable to open position.");
+    }
+    const wallet = await burrowData?.selector?.wallet();
+    if (wallet?.id && ["my-near-wallet", "mintbase-wallet", "bitte-wallet"].includes(wallet.id)) {
+      return openPosition(openPositionParams);
+    }
 
     try {
-      const openPositionParams = {
-        token_c_amount: confirmInfo.longInput,
-        token_c_id: confirmInfo.longInputName?.token_id,
-        token_d_amount: confirmInfo.tokenInAmount,
-        token_d_id:
-          action === "Long"
-            ? confirmInfo.longInputName?.token_id
-            : confirmInfo.longOutputName?.token_id,
-        token_p_id:
-          action === "Long"
-            ? confirmInfo.longOutputName?.token_id
-            : confirmInfo.longInputName?.token_id,
-        min_token_p_amount: confirmInfo.estimateData.min_amount_out,
-        swap_indication: confirmInfo.estimateData.swap_indication,
-        assets: confirmInfo.assets.data,
-      };
-
       const res: any = await openPosition(openPositionParams);
-      const transactionHashes = res.map(
-        (item: { transaction: { hash: string } }) => item.transaction.hash,
-      );
-      handleTransactionResults(transactionHashes);
+      if (!res || !Array.isArray(res)) {
+        throw new Error("Invalid response from openPosition");
+      }
+
+      const transactionHashes = res.map((item) => {
+        if (!item?.transaction?.hash) {
+          throw new Error("Invalid transaction hash");
+        }
+        return item.transaction.hash;
+      });
+
+      await handleTransactionResults(transactionHashes);
     } catch (error) {
+      console.error("Open position error:", error);
       showPositionFailure({
         title: "Open Position Failed",
-        errorMessage: JSON.stringify(error),
+        errorMessage: error instanceof Error ? error?.message : JSON.stringify(error),
         type: action,
       });
     } finally {
