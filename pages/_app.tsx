@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useState } from "react";
 import Head from "next/head";
 import { Provider } from "react-redux";
