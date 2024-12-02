@@ -154,8 +154,8 @@ const TradingTable = ({
                   <ChangeCollateralMobile
                     open={isChangeCollateralMobileOpen}
                     onClose={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
+                      // e.preventDefault();
+                      // e.stopPropagation();
                       setIsChangeCollateralMobileOpen(false);
                     }}
                     rowData={selectedRowData}
@@ -166,8 +166,8 @@ const TradingTable = ({
                   <ClosePositionMobile
                     open={isClosePositionModalOpen}
                     onClose={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
+                      // e.preventDefault();
+                      // e.stopPropagation();
                       setIsClosePositionMobileOpen(false);
                     }}
                     extraProps={closePositionModalProps}
