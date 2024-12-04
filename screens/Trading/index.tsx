@@ -38,7 +38,7 @@ const Trading = () => {
   const { query } = useRouterQuery();
   const accountId = useAccountId();
   const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
-  const { categoryAssets1, categoryAssets2 } = useMarginConfigToken();
+  const { categoryAssets1, categoryAssets2, filterMarginConfigList } = useMarginConfigToken();
   const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
   const router = useRouter();
   const { id }: any = router.query;
@@ -161,7 +161,11 @@ const Trading = () => {
           });
       })();
     }
-    handleTransactionResults(query?.transactionHashes, query?.errorMessage);
+    handleTransactionResults(
+      query?.transactionHashes,
+      query?.errorMessage,
+      Object.keys(filterMarginConfigList || []),
+    );
   }, [query?.transactionHashes, query?.errorMessage]);
 
   const filterTitle = `${

@@ -89,6 +89,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     stablePoolsDetail,
     slippageTolerance: ReduxSlippageTolerance / 100,
   });
+
   useEffect(() => {
     setIsDisabled(!estimateData?.swap_indication || !estimateData?.min_amount_out);
   }, [estimateData]);
@@ -110,7 +111,9 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
       });
 
       onClose();
-      showPositionClose({});
+      showPositionClose({
+        type: positionType.label,
+      });
     } catch (error) {
       console.error("Failed to close position:", error);
     } finally {
@@ -219,7 +222,10 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
               <YellowSolidButton
                 className="w-full"
                 disabled={isDisabled}
-                onClick={handleCloseOpsitionEvt}
+                onClick={() => {
+                  localStorage.setItem("marginPopType", "Long");
+                  handleCloseOpsitionEvt();
+                }}
               >
                 {isDisabled ? <BeatLoader size={5} color="#14162B" /> : `Close`}
               </YellowSolidButton>
@@ -227,7 +233,10 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
               <RedSolidButton
                 className="w-full"
                 disabled={isDisabled}
-                onClick={handleCloseOpsitionEvt}
+                onClick={() => {
+                  localStorage.setItem("marginPopType", "Short");
+                  handleCloseOpsitionEvt();
+                }}
               >
                 {isDisabled ? <BeatLoader size={5} color="#14162B" /> : `Close`}
               </RedSolidButton>

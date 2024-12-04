@@ -81,19 +81,31 @@ const ModalWithFailure = ({
   return (
     <div>
       {isModalVisible && (
-        <div className="z-50 fixed right-5 bottom-10 w-93 bg-dark-100 text-white  border rounded-sm">
+        <div className="z-50 fixed right-5 bottom-10 w-93 bg-dark-100 text-white  border border-gray-1250 rounded-sm">
           <div className="relative w-full p-6 flex flex-col gap-3">
-            <div onClick={onClose} className="absolute" style={{ top: "-6px", right: "-4px" }}>
+            <div
+              onClick={onClose}
+              className="absolute rounded-full bg-gray-1250 p-1.5 frcc cursor-pointer hover:opacity-90"
+              style={{ top: "-12px", right: "-8px" }}
+            >
               <CloseIcon />
             </div>
             <div className="fc">
-              <NearIconMini />
-              <span className="font-normal text-base px-2">{title}</span>
-              <div className="text-toolTipBoxBorderColor text-sm ml-auto">Success</div>
+              {/* <NearIconMini /> */}
+              <span className="font-normal text-base">{title}</span>
+              <div
+                className={`${
+                  type == "Long" ? "text-toolTipBoxBorderColor" : "text-red-50"
+                } text-sm ml-auto`}
+              >
+                Success
+              </div>
             </div>
             <div className="w-full h-1 bg-black">
               <div
-                className="h-full bg-toolTipBoxBorderColor transition-all ease-linear"
+                className={`h-full ${
+                  type == "Long" ? "bg-toolTipBoxBorderColor" : "bg-red-50"
+                } transition-all ease-linear`}
                 style={{
                   width: `${progress}%`,
                   transitionDuration: "950ms",

@@ -53,7 +53,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
   const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
   const actionShowRedColor = action === "Long";
   const [isDisabled, setIsDisabled] = useState(false);
-  const { marginConfigTokens } = useMarginConfigToken();
+  const { marginConfigTokens, filterMarginConfigList } = useMarginConfigToken();
   const { max_active_user_margin_position, max_slippage_rate } = marginConfigTokens;
   const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
   const {
@@ -134,6 +134,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
   // };
 
   const confirmOpenPosition = async () => {
+    console.log(marginAccountList, max_active_user_margin_position);
     if (Object.values(marginAccountList).length >= max_active_user_margin_position) {
       return showToast("User has exceeded the maximum number of open positions！");
     }
@@ -184,7 +185,11 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
         return item.transaction.hash;
       });
 
-      await handleTransactionResults(transactionHashes);
+      await handleTransactionResults(
+        transactionHashes,
+        "",
+        Object.keys(filterMarginConfigList || []),
+      );
     } catch (error) {
       console.error("Open position error:", error);
       showPositionFailure({

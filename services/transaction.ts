@@ -5,6 +5,7 @@ import {
   showPositionClose,
   showPositionFailure,
 } from "../components/HashResultModal";
+import { useMarginConfigToken } from "../hooks/useMarginConfig";
 
 interface TransactionResult {
   txHash: string;
@@ -15,6 +16,7 @@ interface TransactionResult {
 export const handleTransactionResults = async (
   transactionHashes: string | string[] | undefined,
   errorMessage?: string | string[],
+  cate1?: Array<string>,
 ) => {
   if (transactionHashes) {
     try {
@@ -42,7 +44,8 @@ export const handleTransactionResults = async (
       });
 
       if (shouldShowClose) {
-        showPositionClose({});
+        const marginPopType = localStorage.getItem("marginPopType") as "Long" | "Short" | undefined;
+        showPositionClose({ type: marginPopType || "Long" });
         return;
       }
 
@@ -51,7 +54,7 @@ export const handleTransactionResults = async (
           const args = parsedArgs(result?.transaction?.actions?.[0]?.FunctionCall?.args || "");
           const { actions } = JSON.parse(args || "");
           console.log(actions, "actions....");
-          const isLong = actions[0]?.OpenPosition?.token_p_id == "wrap.testnet";
+          const isLong = cate1?.includes(actions[0]?.OpenPosition?.token_p_id);
 
           showPositionResult({
             title: "Open Position",

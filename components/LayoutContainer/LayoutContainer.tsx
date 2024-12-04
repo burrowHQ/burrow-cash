@@ -36,7 +36,10 @@ export default LayoutContainer;
 
 export const LayoutBox = ({ children, className = "" }: Props) => {
   const router = useRouter();
-  const isSpecialPage = router.route.includes("staking") || router.route.includes("marginTrading");
+  const isSpecialPage =
+    router.route.includes("staking") ||
+    router.route.includes("marginTrading") ||
+    router.route.includes("trading");
   return (
     <div
       className={`mx-auto lg:min-w-[800px] xl:max-w-[1200px] xsm:w-full xsm:overflow-x-hidden ${className}`}

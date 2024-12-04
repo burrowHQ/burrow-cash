@@ -92,6 +92,7 @@ export const showPositionClose = (params: { title?: string; type?: "Long" | "Sho
     root = createRoot(container);
   }
   const handleClose = () => {
+    localStorage?.removeItem("marginPopType");
     if (root) {
       root.unmount();
     }
