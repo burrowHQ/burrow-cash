@@ -31,6 +31,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     parseTokenValue,
     calculateLeverage,
     LiqPrice,
+    entryPrice,
   } = extraProps;
   //
   const accountId = useAccountId();
@@ -57,14 +58,14 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
 
   const netValue = parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
   const collateral = parseTokenValue(item.token_c_info.balance, decimalsC);
-  const entryPrice =
-    positionType.label === "Long"
-      ? sizeValueLong === 0
-        ? 0
-        : (leverageD * priceD) / sizeValueLong
-      : sizeValueShort === 0
-      ? 0
-      : netValue / sizeValueShort;
+  // const entryPrice =
+  //   positionType.label === "Long"
+  //     ? sizeValueLong === 0
+  //       ? 0
+  //       : (leverageD * priceD) / sizeValueLong
+  //     : sizeValueShort === 0
+  //     ? 0
+  //     : netValue / sizeValueShort;
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
   const rowData = {
     pos_id: itemKey,

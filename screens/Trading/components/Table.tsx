@@ -401,6 +401,7 @@ const PositionRow = ({
               parseTokenValue,
               calculateLeverage,
               LiqPrice,
+              entryPrice,
             });
           }}
         >
