@@ -165,6 +165,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
           (max_slippage_rate / 10000)
       )
     ) {
+      setIsDisabled(false);
       return showToast("Token out does not meet contract requirements, unable to open position.");
     }
     const wallet = await burrowData?.selector?.wallet();

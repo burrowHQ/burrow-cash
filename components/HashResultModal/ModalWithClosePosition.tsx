@@ -10,6 +10,15 @@ interface FailureModalProps {
   type?: "Long" | "Short";
 }
 
+const ClosePositionIcon = () => {
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="11" cy="11" r="10" fill="#989293" stroke="white" strokeWidth="2" />
+      <path d="M17.5 4.5L4.5 18" stroke="white" strokeWidth="2" />
+    </svg>
+  );
+};
+
 const ModalWithFailure = ({
   show,
   onClose,
@@ -91,8 +100,8 @@ const ModalWithFailure = ({
               <CloseIcon />
             </div>
             <div className="fc">
-              {/* <NearIconMini /> */}
-              <span className="font-normal text-base">{title}</span>
+              <ClosePositionIcon />
+              <span className="font-normal text-base ml-2">{title}</span>
               <div
                 className={`${
                   type == "Long" ? "text-toolTipBoxBorderColor" : "text-red-50"
