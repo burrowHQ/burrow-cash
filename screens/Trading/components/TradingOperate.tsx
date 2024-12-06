@@ -515,11 +515,7 @@ const TradingOperate = () => {
               <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Minimum received</div>
                 <div className="text-right">
-                  {beautifyPrice(
-                    Number(toInternationalCurrencySystem_number(longOutput)) *
-                      (1 - slippageTolerance / 100),
-                  )}{" "}
-                  {cateSymbol}
+                  {beautifyPrice(Number(longOutput) * (1 - slippageTolerance / 100))} {cateSymbol}
                 </div>
               </div>
               <div className="flex items-center justify-between text-sm mb-4">
