@@ -26,6 +26,7 @@ import { getRpcList } from "../components/Rpc/tool";
 import getConfig, {
   defaultNetwork,
   LOGIC_CONTRACT_NAME,
+  LOGIC_MEMECONTRACT_NAME,
   WALLET_CONNECT_ID,
   isTestnet,
 } from "./config";

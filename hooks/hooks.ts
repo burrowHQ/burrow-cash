@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { getAvailableAssets, isAssetsLoading } from "../redux/assetsSelectors";
 import { getAccountId, getHasNonFarmedAssets, isAccountLoading } from "../redux/accountSelectors";
-import { getPortfolioAssets } from "../redux/selectors/getPortfolioAssets";
+import { getPortfolioAssets, getPortfolioMEMEAssets } from "../redux/selectors/getPortfolioAssets";
 import {
   getConfig,
   getSlimStats,
@@ -67,6 +67,10 @@ export function useAvailableAssets(type?: "supply" | "borrow" | "") {
 
 export function usePortfolioAssets() {
   return useAppSelector(getPortfolioAssets);
+}
+
+export function usePortfolioMEMEAssets() {
+  return useAppSelector(getPortfolioMEMEAssets);
 }
 
 export function useDegenMode() {

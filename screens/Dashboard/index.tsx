@@ -6,7 +6,12 @@ import { ContentBox } from "../../components/ContentBox/ContentBox";
 import LayoutContainer from "../../components/LayoutContainer/LayoutContainer";
 import SupplyTokenSvg from "../../public/svg/Group 24791.svg";
 import BorrowTokenSvg from "../../public/svg/Group 24677.svg";
-import { useAccountId, useAvailableAssets, usePortfolioAssets } from "../../hooks/hooks";
+import {
+  useAccountId,
+  useAvailableAssets,
+  usePortfolioAssets,
+  usePortfolioMEMEAssets,
+} from "../../hooks/hooks";
 import DashboardReward from "./dashboardReward";
 import CustomTable from "../../components/CustomTable/CustomTable";
 import {
@@ -26,8 +31,17 @@ import { APYCell } from "../Market/APYCell";
 
 const Index = () => {
   const accountId = useAccountId();
-  const [suppliedRows, borrowedRows, totalSuppliedUSD, totalBorrowedUSD, , borrowedAll] =
+  const [suppliedRows, borrowedRows, totalSuppliedUSD, totalBorrowedUSD, borrowedAll] =
     usePortfolioAssets();
+
+  const [
+    suppliedMEMERows,
+    borrowedMEMERows,
+    totalMEMESuppliedUSD,
+    totalMEMEBorrowedUSD,
+    borrowedMEMEAll,
+  ] = usePortfolioMEMEAssets();
+
   const isMobile = isMobileDevice();
   let overviewNode;
   if (accountId) {

@@ -3,7 +3,7 @@ import BN from "bn.js";
 import Decimal from "decimal.js";
 
 import { isEmpty } from "lodash";
-import getConfig, { defaultNetwork, LOGIC_CONTRACT_NAME } from "./config";
+import getConfig, { defaultNetwork, LOGIC_CONTRACT_NAME, LOGIC_MEMECONTRACT_NAME } from "./config";
 import { nearMetadata, wooMetadata, sfraxMetadata, fraxMetadata } from "../components/Assets";
 
 import {
@@ -149,9 +149,22 @@ export const getBurrow = async ({
     ViewMethodsLogic,
     ChangeMethodsLogic,
   );
+
+  const logicMEMEContract: Contract = await getContract(
+    account,
+    LOGIC_MEMECONTRACT_NAME,
+    ViewMethodsLogic,
+    ChangeMethodsLogic,
+  );
+
   // get oracle address from
   const config = (await view(
     logicContract,
+    ViewMethodsLogic[ViewMethodsLogic.get_config],
+  )) as IConfig;
+
+  const configMEME = (await view(
+    logicMEMEContract,
     ViewMethodsLogic[ViewMethodsLogic.get_config],
   )) as IConfig;
 
@@ -192,12 +205,14 @@ export const getBurrow = async ({
     signIn,
     account,
     logicContract,
+    logicMEMEContract,
     oracleContract,
     refv1Contract,
     pythContract,
     view,
     call,
     config,
+    configMEME,
   } as IBurrow;
 
   return burrow;
