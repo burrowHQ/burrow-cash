@@ -83,7 +83,7 @@ export const handleTransactionResults = async (
 
   if (errorMessage) {
     showPositionFailure({
-      title: "Open Position",
+      title: "Transactions error",
       errorMessage: decodeURIComponent(errorMessage as string),
     });
   }

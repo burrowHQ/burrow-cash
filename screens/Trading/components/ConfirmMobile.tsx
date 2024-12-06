@@ -194,7 +194,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
     } catch (error) {
       console.error("Open position error:", error);
       showPositionFailure({
-        title: "Open Position Failed",
+        title: "Transactions error",
         errorMessage: error instanceof Error ? error?.message : JSON.stringify(error),
         type: action,
       });

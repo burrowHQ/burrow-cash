@@ -33,6 +33,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     LiqPrice,
     entryPrice,
   } = extraProps;
+
   //
   const accountId = useAccountId();
   const { simplePools, stablePools, stablePoolsDetail } = usePoolsData();
@@ -112,9 +113,12 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
       });
 
       onClose();
-      showPositionClose({
-        type: positionType.label,
-      });
+      console.log(res);
+      if (res !== undefined && res !== null) {
+        showPositionClose({
+          type: positionType.label,
+        });
+      }
     } catch (error) {
       console.error("Failed to close position:", error);
     } finally {

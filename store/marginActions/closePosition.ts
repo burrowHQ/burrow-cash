@@ -122,6 +122,7 @@ export async function closePosition({
       },
     ],
   });
-
-  await prepareAndExecuteTransactions(transactions);
+  const result = await prepareAndExecuteTransactions(transactions);
+  // await prepareAndExecuteTransactions(transactions);
+  return result;
 }
