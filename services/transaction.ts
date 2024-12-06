@@ -55,22 +55,38 @@ export const handleTransactionResults = async (
           const { actions } = JSON.parse(args || "");
           console.log(actions, "actions....");
           const isLong = cate1?.includes(actions[0]?.OpenPosition?.token_p_id);
-
+          const cateSymbolAndDecimals = JSON.parse(
+            localStorage.getItem("cateSymbolAndDecimals") || "{}",
+          );
           showPositionResult({
             title: "Open Position",
             type: isLong ? "Long" : "Short",
             price: (isLong
               ? Number(shrinkToken(actions[0]?.OpenPosition?.token_d_amount, 18)) /
-                Number(shrinkToken(actions[0]?.OpenPosition?.min_token_p_amount, 24))
+                Number(
+                  shrinkToken(
+                    actions[0]?.OpenPosition?.min_token_p_amount,
+                    cateSymbolAndDecimals?.decimals || 24,
+                  ),
+                )
               : Number(shrinkToken(actions[0]?.OpenPosition?.min_token_p_amount, 18)) /
-                Number(shrinkToken(actions[0]?.OpenPosition?.token_d_amount, 24))
+                Number(
+                  shrinkToken(
+                    actions[0]?.OpenPosition?.token_d_amount,
+                    cateSymbolAndDecimals?.decimals || 24,
+                  ),
+                )
             ).toString(),
             transactionHashes: txhash[0],
             positionSize: {
               amount: isLong
-                ? shrinkToken(actions[0]?.OpenPosition?.min_token_p_amount, 24, 6)
+                ? shrinkToken(
+                    actions[0]?.OpenPosition?.min_token_p_amount,
+                    cateSymbolAndDecimals?.decimals || 24,
+                    6,
+                  )
                 : shrinkToken(actions[0]?.OpenPosition?.token_d_amount, 24, 6),
-              symbol: "NEAR",
+              symbol: cateSymbolAndDecimals?.cateSymbol || "NEAR",
               usdValue: "1000",
             },
           });

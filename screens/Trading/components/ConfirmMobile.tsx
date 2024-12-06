@@ -177,6 +177,14 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
       setIsDisabled(false);
       return showToast("Token out does not meet contract requirements, unable to open position.");
     }
+    localStorage.setItem(
+      "cateSymbolAndDecimals",
+      JSON.stringify({
+        cateSymbol,
+        decimals: decimalsP,
+      }),
+    );
+
     const wallet = await burrowData?.selector?.wallet();
     if (wallet?.id && ["my-near-wallet", "mintbase-wallet", "bitte-wallet"].includes(wallet.id)) {
       return openPosition(openPositionParams);
