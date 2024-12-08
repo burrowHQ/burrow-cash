@@ -62,20 +62,6 @@ export const getBurrow = async ({
   hideModal,
   signOut,
 }: GetBurrowArgs = {}): Promise<IBurrow> => {
-  /// because it's being called by multiple components on startup
-  /// all calls wait until setup is complete and then return burrow instance promise
-  const getBurrowInternal = async () => {
-    if (burrow) return burrow;
-    await new Promise((res) => {
-      setTimeout(() => {
-        res({});
-      }, 250);
-    });
-    return getBurrowInternal();
-  };
-  // if (!resetBurrow) return getBurrowInternal();
-  // resetBurrow = false;
-
   const changeAccount = async (accountId) => {
     if (fetchData) fetchData(accountId);
   };
@@ -150,20 +136,28 @@ export const getBurrow = async ({
     ChangeMethodsLogic,
   );
   // get oracle address from
-  const config = (await view(
-    logicContract,
-    ViewMethodsLogic[ViewMethodsLogic.get_config],
-  )) as IConfig;
-
+  let oracle_account_id;
+  let ref_exchange_id;
+  if (process.env.NEXT_PUBLIC_DEFAULT_NETWORK === "mainnet") {
+    oracle_account_id = "priceoracle.near";
+    ref_exchange_id = "v2.ref-finance.near";
+  } else {
+    const config = (await view(
+      logicContract,
+      ViewMethodsLogic[ViewMethodsLogic.get_config],
+    )) as IConfig;
+    oracle_account_id = config.oracle_account_id;
+    ref_exchange_id = config.ref_exchange_id;
+  }
   const oracleContract: Contract = await getContract(
     account,
-    config.oracle_account_id,
+    oracle_account_id,
     ViewMethodsOracle,
     ChangeMethodsOracle,
   );
   const refv1Contract: Contract = await getContract(
     account,
-    config.ref_exchange_id,
+    ref_exchange_id,
     ViewMethodsREFV1,
     ChangeMethodsREFV1,
   );
@@ -197,7 +191,6 @@ export const getBurrow = async ({
     pythContract,
     view,
     call,
-    config,
   } as IBurrow;
 
   return burrow;
