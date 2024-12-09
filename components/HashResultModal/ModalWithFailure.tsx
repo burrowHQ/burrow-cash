@@ -77,9 +77,13 @@ const ModalWithFailure = ({
   return (
     <div>
       {isModalVisible && (
-        <div className="z-50 fixed right-5 bottom-10 w-93 bg-dark-100 text-white border-gray-1050 border rounded-sm">
+        <div className="z-50 fixed right-5 bottom-10 w-93 bg-dark-100 text-white border-gray-1250 border rounded-sm">
           <div className="relative w-full p-6 flex flex-col gap-3">
-            <div onClick={onClose} className="absolute" style={{ top: "-6px", right: "-4px" }}>
+            <div
+              onClick={onClose}
+              className="absolute rounded-full bg-gray-1250 p-1.5 frcc cursor-pointer hover:opacity-90"
+              style={{ top: "-12px", right: "-8px" }}
+            >
               <CloseIcon />
             </div>
             <div className="fc">

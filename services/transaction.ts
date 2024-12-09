@@ -83,9 +83,11 @@ export const handleTransactionResults = async (
                 ? shrinkToken(
                     actions[0]?.OpenPosition?.min_token_p_amount,
                     cateSymbolAndDecimals?.decimals || 24,
-                    6,
                   )
-                : shrinkToken(actions[0]?.OpenPosition?.token_d_amount, 24, 6),
+                : shrinkToken(
+                    actions[0]?.OpenPosition?.token_d_amount,
+                    cateSymbolAndDecimals?.decimals || 24,
+                  ),
               symbol: cateSymbolAndDecimals?.cateSymbol || "NEAR",
               usdValue: "1000",
             },

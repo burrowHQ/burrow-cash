@@ -296,10 +296,15 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
               {/* <div>${confirmInfo.entryPrice || "-"}</div> */}
               <div>
                 $
-                {beautifyPrice(
-                  confirmInfo.tokenInAmount /
-                    Number(shrinkToken(confirmInfo.estimateData?.min_amount_out, decimalsP)),
-                )}
+                {action === "Long"
+                  ? beautifyPrice(
+                      confirmInfo.tokenInAmount /
+                        Number(shrinkToken(confirmInfo.estimateData?.min_amount_out, decimalsP)),
+                    )
+                  : beautifyPrice(
+                      Number(shrinkToken(confirmInfo.estimateData?.min_amount_out, decimalsP)) /
+                        confirmInfo.tokenInAmount,
+                    )}
               </div>
             </div>
 
