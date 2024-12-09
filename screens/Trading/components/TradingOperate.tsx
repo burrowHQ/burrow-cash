@@ -30,6 +30,7 @@ const TradingOperate = () => {
   const marginConfig = useAppSelector(getMarginConfig);
   const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
   const { marginConfigTokens, filterMarginConfigList } = useMarginConfigToken();
+  const dataList = Object.values(filterMarginConfigList as Record<string, any>);
   const { max_active_user_margin_position } = marginConfigTokens;
   const {
     ReduxcategoryAssets1,
@@ -109,8 +110,8 @@ const TradingOperate = () => {
 
   const getTabClassName = (tabName) => {
     return activeTab === tabName
-      ? "bg-primary text-dark-200 py-2.5 pl-6 pr-8 rounded-md"
-      : "text-gray-300 py-2.5 pl-8 pr-10";
+      ? "bg-primary text-dark-200 py-2.5 px-5 rounded-md"
+      : "text-gray-300 py-2.5 px-5";
   };
 
   // mouse leave and enter event for slip
@@ -325,12 +326,16 @@ const TradingOperate = () => {
 
   const Fee = useMemo(() => {
     return {
-      fee:
-        (Number(longInput || shortInput) * config.open_position_fee_rate) / 10000 +
-        (estimateData?.fee ?? 0) / 10000,
+      openPFee: ((Number(longInput || shortInput) * config.open_position_fee_rate) / 10000) * 1,
+      swapFee:
+        ((estimateData?.fee ?? 0) / 10000) *
+        Number(tokenInAmount) *
+        (activeTab == "long" ? 1 : getAssetPrice(ReduxcategoryAssets1) || 0),
       price: getAssetPrice(ReduxcategoryAssets1),
     };
   }, [longInput, shortInput, ReduxcategoryAssets1, estimateData]);
+
+  const [showFeeModal, setShowFeeModal] = useState(false);
 
   function getAssetPrice(categoryId) {
     return categoryId ? assets.data[categoryId["token_id"]].price?.usd : 0;
@@ -411,7 +416,7 @@ const TradingOperate = () => {
           <div
             className={
               activeTab === "short"
-                ? "bg-red-50 text-dark-200 py-2.5 pl-6 pr-8 rounded-md"
+                ? "bg-red-50 text-dark-200 py-2.5 px-5 rounded-md"
                 : getTabClassName("short")
             }
             onClick={() => handleTabClick("short")}
@@ -515,11 +520,7 @@ const TradingOperate = () => {
               <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Minimum received</div>
                 <div className="text-right">
-                  {beautifyPrice(
-                    Number(toInternationalCurrencySystem_number(longOutput)) *
-                      (1 - slippageTolerance / 100),
-                  )}{" "}
-                  {cateSymbol}
+                  {beautifyPrice(Number(longOutput) * (1 - slippageTolerance / 100))} {cateSymbol}
                 </div>
               </div>
               <div className="flex items-center justify-between text-sm mb-4">
@@ -528,12 +529,33 @@ const TradingOperate = () => {
               </div>
               <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Fee</div>
-                <div className="flex items-center justify-center">
-                  <p className="border-b border-dashed border-dark-800">{formatDecimal(Fee.fee)}</p>
-                  {cateSymbol}
-                  <span className="text-xs text-gray-300 ml-1.5">
-                    (${formatDecimal(Fee.fee * (Fee.price || 0))})
-                  </span>
+                <div className="flex items-center justify-center relative">
+                  <p
+                    className="border-b border-dashed border-dark-800 cursor-pointer"
+                    onMouseEnter={() => setShowFeeModal(true)}
+                    onMouseLeave={() => setShowFeeModal(false)}
+                  >
+                    ${formatDecimal(Fee.swapFee + Fee.openPFee)}
+                  </p>
+                  {/* {cateSymbol} */}
+                  {/* <span className="text-xs text-gray-300 ml-1.5">
+                    ($
+                    {formatDecimal(
+                      (Fee.swapFee + Fee.openPFee) * (Fee.price || 0) * (longOutput || shortOutput),
+                    )}
+                    )
+                  </span> */}
+
+                  {showFeeModal && (
+                    <div className="absolute bg-[#14162B] text-white w-35 h-[50px] p-2 rounded text-xs top-[30px] left-[-60px] flex flex-col items-start justify-between">
+                      <p>
+                        <span className="mr-1">Open Fee:</span>${beautifyPrice(Fee.openPFee)}
+                      </p>
+                      <p>
+                        <span className="mr-1">Trade Fee:</span>${beautifyPrice(Fee.swapFee)}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="flex items-baseline justify-between text-sm mb-4">
@@ -662,11 +684,7 @@ const TradingOperate = () => {
               <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Minimum received</div>
                 <div className="text-right">
-                  {beautifyPrice(
-                    Number(toInternationalCurrencySystem_number(shortOutput)) *
-                      (1 - slippageTolerance / 100),
-                  )}{" "}
-                  {cateSymbol}
+                  {beautifyPrice(Number(shortOutput) * (1 - slippageTolerance / 100))} {cateSymbol}
                 </div>
               </div>
               <div className="flex items-center justify-between text-sm mb-4">
@@ -675,12 +693,32 @@ const TradingOperate = () => {
               </div>
               <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Fee</div>
-                <div className="flex items-center justify-center">
-                  <p className="border-b border-dashed border-dark-800">{formatDecimal(Fee.fee)}</p>
-                  {cateSymbol}
-                  <span className="text-xs text-gray-300 ml-1.5">
-                    (${formatDecimal(Fee.fee * (Fee.price || 0))})
-                  </span>
+                <div className="flex items-center justify-center relative">
+                  <p
+                    className="border-b border-dashed border-dark-800 cursor-pointer"
+                    onMouseEnter={() => setShowFeeModal(true)}
+                    onMouseLeave={() => setShowFeeModal(false)}
+                  >
+                    ${formatDecimal(Fee.swapFee + Fee.openPFee)}
+                  </p>
+                  {/* {cateSymbol} */}
+                  {/* <span className="text-xs text-gray-300 ml-1.5">
+                    ($
+                    {formatDecimal(
+                      (Fee.swapFee + Fee.openPFee) * (Fee.price || 0) * (longOutput || shortOutput),
+                    )}
+                    )
+                  </span> */}
+                  {showFeeModal && (
+                    <div className="absolute bg-[#14162B] text-white w-35 h-[50px] p-2 rounded text-xs top-[30px] left-[-60px] flex flex-col items-start justify-between">
+                      <p>
+                        <span className="mr-1">Open Fee:</span>${beautifyPrice(Fee.openPFee)}
+                      </p>
+                      <p>
+                        <span className="mr-1">Trade Fee:</span>${beautifyPrice(Fee.swapFee)}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="flex items-baseline justify-between text-sm mb-4">

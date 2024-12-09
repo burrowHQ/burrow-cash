@@ -2,6 +2,14 @@ import React, { useState, useEffect } from "react";
 import { NearIconMini } from "../../screens/MarginTrading/components/Icon";
 import { CloseIcon } from "../Icons/Icons";
 
+const ClosePositionIcon = () => {
+  return (
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="11" cy="11" r="10" fill="#989293" stroke="white" strokeWidth="2" />
+      <path d="M17.5 4.5L4.5 18" stroke="white" strokeWidth="2" />
+    </svg>
+  );
+};
 interface FailureModalProps {
   show: boolean;
   onClose: () => void;
@@ -69,13 +77,17 @@ const ModalWithFailure = ({
   return (
     <div>
       {isModalVisible && (
-        <div className="z-50 fixed right-5 bottom-10 w-93 bg-dark-100 text-white border-gray-1050 border rounded-sm">
+        <div className="z-50 fixed right-5 bottom-10 w-93 bg-dark-100 text-white border-gray-1250 border rounded-sm">
           <div className="relative w-full p-6 flex flex-col gap-3">
-            <div onClick={onClose} className="absolute" style={{ top: "-6px", right: "-4px" }}>
+            <div
+              onClick={onClose}
+              className="absolute rounded-full bg-gray-1250 p-1.5 frcc cursor-pointer hover:opacity-90"
+              style={{ top: "-12px", right: "-8px" }}
+            >
               <CloseIcon />
             </div>
             <div className="fc">
-              <NearIconMini />
+              <ClosePositionIcon />
               <span className="font-normal text-base px-2">{title}</span>
               <div className="text-red-50 text-sm ml-auto">Failed</div>
             </div>

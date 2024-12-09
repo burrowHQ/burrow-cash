@@ -156,18 +156,35 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
       swap_indication: confirmInfo.estimateData.swap_indication,
       assets: confirmInfo.assets.data,
     };
-    if (
-      !(
-        Number(shrinkToken(openPositionParams.min_token_p_amount, 24)) >=
-        ((openPositionParams.token_d_amount *
-          confirmInfo.assets.data[openPositionParams.token_d_id].price.usd) /
-          confirmInfo.assets.data[openPositionParams.token_p_id].price.usd) *
-          (max_slippage_rate / 10000)
-      )
-    ) {
+    const minTokenPAmount = Number(shrinkToken(openPositionParams.min_token_p_amount, decimalsP));
+    const tokenDAmount = openPositionParams.token_d_amount;
+    const tokenDPrice = confirmInfo.assets.data[openPositionParams.token_d_id].price.usd;
+    const tokenPPrice = confirmInfo.assets.data[openPositionParams.token_p_id].price.usd;
+    const slippageRate = max_slippage_rate / 10000;
+
+    const calculatedValue = ((tokenDAmount * tokenDPrice) / tokenPPrice) * slippageRate;
+
+    console.log([
+      { Key: "minTokenPAmount", Value: minTokenPAmount },
+      { Key: "tokenDAmount", Value: tokenDAmount },
+      { Key: "tokenDPrice", Value: tokenDPrice },
+      { Key: "tokenPPrice", Value: tokenPPrice },
+      { Key: "slippageRate", Value: slippageRate },
+      { Key: "calculatedValue", Value: calculatedValue },
+    ]);
+
+    if (!(minTokenPAmount >= calculatedValue)) {
       setIsDisabled(false);
       return showToast("Token out does not meet contract requirements, unable to open position.");
     }
+    localStorage.setItem(
+      "cateSymbolAndDecimals",
+      JSON.stringify({
+        cateSymbol,
+        decimals: decimalsP,
+      }),
+    );
+
     const wallet = await burrowData?.selector?.wallet();
     if (wallet?.id && ["my-near-wallet", "mintbase-wallet", "bitte-wallet"].includes(wallet.id)) {
       return openPosition(openPositionParams);
@@ -194,7 +211,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
     } catch (error) {
       console.error("Open position error:", error);
       showPositionFailure({
-        title: "Open Position Failed",
+        title: "Transactions error",
         errorMessage: error instanceof Error ? error?.message : JSON.stringify(error),
         type: action,
       });
@@ -279,10 +296,15 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
               {/* <div>${confirmInfo.entryPrice || "-"}</div> */}
               <div>
                 $
-                {beautifyPrice(
-                  confirmInfo.tokenInAmount /
-                    Number(shrinkToken(confirmInfo.estimateData?.min_amount_out, decimalsP)),
-                )}
+                {action === "Long"
+                  ? beautifyPrice(
+                      confirmInfo.tokenInAmount /
+                        Number(shrinkToken(confirmInfo.estimateData?.min_amount_out, decimalsP)),
+                    )
+                  : beautifyPrice(
+                      Number(shrinkToken(confirmInfo.estimateData?.min_amount_out, decimalsP)) /
+                        confirmInfo.tokenInAmount,
+                    )}
               </div>
             </div>
 
