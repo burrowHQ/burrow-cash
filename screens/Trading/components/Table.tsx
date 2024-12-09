@@ -14,9 +14,11 @@ import { useAccountId } from "../../../hooks/hooks";
 const TradingTable = ({
   positionsList,
   filterTitle = "",
+  onTotalPLNChange,
 }: {
   positionsList: any;
   filterTitle?: string;
+  onTotalPLNChange?: (totalPLN: number) => void;
 }) => {
   const [selectedTab, setSelectedTab] = useState("positions");
   const [isClosePositionModalOpen, setIsClosePositionMobileOpen] = useState(false);
@@ -28,6 +30,7 @@ const TradingTable = ({
   const [positionHistory, setPositionHistory] = useState([]);
   const [nextPageToken, setNextPageToken] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [totalPLN, setTotalPLN] = useState(0);
   const accountId = useAccountId();
   const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById, calculateLeverage } =
     useMarginAccount();
@@ -90,6 +93,14 @@ const TradingTable = ({
   useEffect(() => {
     calculateTotalSizeValues();
   }, [marginAccountList]);
+  const handlePLNChange = (pln: number) => {
+    setTotalPLN((prev) => prev + pln);
+  };
+  useEffect(() => {
+    if (onTotalPLNChange) {
+      onTotalPLNChange(totalPLN);
+    }
+  }, [totalPLN]);
   return (
     <div className="flex flex-col items-center justify-center w-full">
       <div className="w-full border border-dark-50 bg-gray-800 rounded-md">
@@ -139,6 +150,7 @@ const TradingTable = ({
                       marginConfigTokens={marginConfigTokens}
                       assets={assets}
                       filterTitle={filterTitle}
+                      onPLNChange={handlePLNChange}
                     />
                   ))
                 ) : (
@@ -260,9 +272,10 @@ const PositionRow = ({
   assets,
   marginConfigTokens,
   filterTitle,
+  onPLNChange,
 }) => {
   // console.log(itemKey, item, index);
-  const [entryPrice, setEntryPrice] = useState(0);
+  const [entryPrice, setEntryPrice] = useState<number | null>(null);
   useEffect(() => {
     const fetchEntryPrice = async () => {
       try {
@@ -271,25 +284,13 @@ const PositionRow = ({
           const price = parseFloat(response.data[0].entry_price);
           setEntryPrice(price);
         } else {
-          const calculatedPrice = calculateBackupEntryPrice();
-          setEntryPrice(calculatedPrice);
+          setEntryPrice(null);
         }
       } catch (error) {
         console.error("Failed to fetch entry price:", error);
-        const calculatedPrice = calculateBackupEntryPrice();
-        setEntryPrice(calculatedPrice);
+        setEntryPrice(null);
       }
     };
-    const calculateBackupEntryPrice = () => {
-      return positionType.label === "Long"
-        ? sizeValueLong === 0
-          ? 0
-          : (leverageD * priceD) / sizeValueLong
-        : sizeValueShort === 0
-        ? 0
-        : netValue / sizeValueShort;
-    };
-
     fetchEntryPrice();
   }, [itemKey]);
   const assetD = getAssetById(item.token_d_info.token_id);
@@ -327,27 +328,39 @@ const PositionRow = ({
   //     : netValue / sizeValueShort;
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
   const debt_assets_d = assets.find((asset) => asset.token_id === item.token_d_info.token_id);
-  // const total_cap = leverageC * priceC + sizeValueLong * priceP;
-  const total_debt = leverageD * priceD;
+  // const total_cap =
+  //   parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0) +
+  //   parseTokenValue(item.token_p_amount, decimalsP) * (LiqPrice || 0);
+  const total_debt = parseTokenValue(item.token_d_info.balance, decimalsD) * (priceD || 0);
   const total_hp_fee =
     (item.debt_cap * ((debt_assets_d?.unit_acc_hp_interest ?? 0) - item.uahpi_at_open)) / 10 ** 18;
   // const decrease_cap = total_cap * (marginConfigTokens.min_safety_buffer / 10000);
   const denominator = sizeValueLong * (1 - marginConfigTokens.min_safety_buffer / 10000);
   // total_cap - decrease_cap === total_debt + total_hp_fee;
-  const LiqPrice =
-    denominator !== 0
-      ? (total_debt +
-          total_hp_fee +
-          (priceC * leverageC * marginConfigTokens.min_safety_buffer) / 10000 -
-          priceC * leverageC) /
-        denominator
-      : 0;
+  const LiqPrice = denominator !== 0 ? (total_debt + total_hp_fee) / denominator : 0;
   const rowData = {
     pos_id: itemKey,
     data: item,
     assets,
     marginConfigTokens,
   };
+  const debtCap = parseFloat(item.debt_cap);
+  const unitAccHpInterest = parseFloat(debt_assets_d?.unit_acc_hp_interest ?? 0);
+  const uahpiAtOpen = parseFloat(item.uahpi_at_open);
+  const interestDifference = unitAccHpInterest - uahpiAtOpen;
+  const totalHpFee = (debtCap * interestDifference) / 10 ** 18;
+  const profitOrLoss = entryPrice !== null ? (indexPrice - entryPrice) * sizeValue : 0;
+  const openTime = new Date(Number(item.open_ts) / 1e6);
+  const currentTime = new Date();
+  const holdingDurationInHours =
+    Math.abs(currentTime.getTime() - openTime.getTime()) / (1000 * 60 * 60);
+  const holdingFee = totalHpFee * holdingDurationInHours;
+  const pnl = profitOrLoss - holdingFee;
+  useEffect(() => {
+    if (onPLNChange) {
+      onPLNChange(pnl);
+    }
+  }, [pnl]);
   return (
     <tr className="text-base hover:bg-dark-100 cursor-pointer font-normal">
       <td className="py-5 pl-5 ">
@@ -376,14 +389,21 @@ const PositionRow = ({
           </div>
         </div>
       </td>
-      <td>${toInternationalCurrencySystem_number(entryPrice)}</td>
+      <td>
+        {entryPrice !== null ? (
+          `$${toInternationalCurrencySystem_number(entryPrice)}`
+        ) : (
+          <span className="text-gray-500">-</span>
+        )}
+      </td>
       <td>${toInternationalCurrencySystem_number(indexPrice)}</td>
       <td>${toInternationalCurrencySystem_number(LiqPrice)}</td>
       <td>
-        <div className="flex items-center">
-          <p className="text-gray-1000"> -</p>
-          {/* <span className="text-gray-400 text-xs">-</span> */}
-        </div>
+        {entryPrice !== null ? (
+          `$${toInternationalCurrencySystem_number(pnl)}`
+        ) : (
+          <span className="text-gray-500">-</span>
+        )}
       </td>
       <td className="pr-5">
         <div

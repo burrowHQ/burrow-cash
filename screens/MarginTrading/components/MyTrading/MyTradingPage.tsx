@@ -11,6 +11,7 @@ const MyMarginTradingPage = () => {
   const [totalLongSizeValue, setTotalLongSizeValue] = useState(0);
   const [totalShortSizeValue, setTotalShortSizeValue] = useState(0);
   const [totalCollateral, setTotalCollateral] = useState(0);
+  const [totalPLN, setTotalPLN] = useState(0);
   const calculateTotalSizeValues = () => {
     let longTotal = 0;
     let shortTotal = 0;
@@ -147,11 +148,11 @@ const MyMarginTradingPage = () => {
         <div className="flex flex-1 justify-center">
           <div>
             <p className="text-gray-300 text-sm">PLN</p>
-            <h2 className="text-h2">{formatCurrency(0)}</h2>
+            <h2 className="text-h2">{formatCurrency(totalPLN)}</h2>
           </div>
         </div>
       </div>
-      <TradingTable positionsList={marginAccountList} />
+      <TradingTable positionsList={marginAccountList} onTotalPLNChange={setTotalPLN} />
     </div>
   );
 };
