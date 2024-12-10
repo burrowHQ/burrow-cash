@@ -763,6 +763,107 @@ export const getAccountDailyRewards = createSelector(
     };
   },
 );
+
+export const getAccountDailyRewardsMEME = createSelector(
+  (state: RootState) => state.assetsMEME,
+  (state: RootState) => state.accountMEME,
+  (state: RootState) => state.appMEME,
+  (assets, account, app) => {
+    const accountDustProcess = dustProcess({
+      accountSource: account,
+      assets,
+      app,
+    });
+    const baseCollateralUsdDaily =
+      getGainsArr(accountDustProcess.portfolio.collaterals, assets)[0] / 365;
+    const baseSuppliedUsdDaily =
+      getGains(accountDustProcess.portfolio, assets, "supplied")[0] / 365;
+    const baseBorrowedUsdDaily = getGainsArr(accountDustProcess.portfolio.borrows, assets)[0] / 365;
+
+    const farmSuppliedUsdDaily = getGainsFromIncentive(account.portfolio, assets, "supplied");
+    const farmBorrowedUsdDaily = getGainsFromIncentive(account.portfolio, assets, "borrowed");
+    const farmNetTvlUsdDaily = getGainsFromIncentive(account.portfolio, assets, "netTvl");
+    const farmTokenNetUsdDaily = getGainsFromIncentive(
+      account.portfolio,
+      assets,
+      "tokennetbalance",
+    );
+
+    const baseSuppliedAmountDaily = getDailyAmount(
+      accountDustProcess.portfolio,
+      assets,
+      "supplies",
+    );
+    const baseCollateralAmountDaily = getDailyAmount(
+      accountDustProcess.portfolio,
+      assets,
+      "collaterals",
+    );
+    const baseBorrowedAmountDaily = getDailyAmount(accountDustProcess.portfolio, assets, "borrows");
+
+    const farmSuppliedAmountDaily = getIncentiveDailyAmount(account.portfolio, assets, "supplied");
+    const farmBorrowedAmountDaily = getIncentiveDailyAmount(account.portfolio, assets, "borrowed");
+    const farmCollateralAmountDaily = getIncentiveDailyAmount(account.portfolio, assets, "netTvl");
+    const farmTokenNetAmountDaily = getIncentiveDailyAmount(
+      account.portfolio,
+      assets,
+      "tokennetbalance",
+    );
+    const allGainRewards = [
+      ...baseSuppliedAmountDaily,
+      ...baseCollateralAmountDaily,
+      ...Object.entries(farmSuppliedAmountDaily).reduce(sumMap, []),
+      ...Object.entries(farmBorrowedAmountDaily).reduce(sumMap, []),
+      ...Object.entries(farmCollateralAmountDaily).reduce(sumMap, []),
+      ...Object.entries(farmTokenNetAmountDaily).reduce(sumMap, []),
+    ];
+    const mergedGainRewards = allGainRewards.reduce((acc, reward) => {
+      const [[rewardTokenId, rewardAmount]] = Object.entries(reward);
+      if (!acc[rewardTokenId]) return { ...acc, ...reward };
+      return { ...acc, [rewardTokenId]: acc[rewardTokenId] + rewardAmount };
+    }, {});
+    baseBorrowedAmountDaily.forEach((reward) => {
+      const [[rewardTokenId, rewardAmount]] = Object.entries(reward);
+      mergedGainRewards[rewardTokenId] = (mergedGainRewards[rewardTokenId] || 0) - rewardAmount;
+    });
+    const allRewards = Object.entries(mergedGainRewards).reduce((acc, [tokenId, amount]) => {
+      const assetCopy = JSON.parse(JSON.stringify(assets.data[tokenId] || {}));
+      standardizeAsset(assetCopy.metadata || {});
+      if (Number(amount) !== 0) {
+        return {
+          ...acc,
+          [tokenId]: {
+            amount,
+            asset: assetCopy,
+          },
+        };
+      }
+      return acc;
+    }, {});
+    return {
+      baseDepositUsdDaily: baseCollateralUsdDaily + baseSuppliedUsdDaily,
+      baseBorrowedUsdDaily,
+
+      farmSuppliedUsdDaily,
+      farmBorrowedUsdDaily,
+      farmNetTvlUsdDaily,
+      farmTokenNetUsdDaily,
+      farmTotalUsdDaily:
+        farmSuppliedUsdDaily + farmBorrowedUsdDaily + farmNetTvlUsdDaily + farmTokenNetUsdDaily,
+
+      totalUsdDaily:
+        baseCollateralUsdDaily +
+        baseSuppliedUsdDaily -
+        baseBorrowedUsdDaily +
+        farmSuppliedUsdDaily +
+        farmBorrowedUsdDaily +
+        farmNetTvlUsdDaily +
+        farmTokenNetUsdDaily,
+
+      allRewards,
+    };
+  },
+);
 export function filterAccountEndedFarms(userFarms, allFarms): IAccountFarms {
   const { supplied, borrowed, netTvl } = Copy(userFarms);
   const newSupplied = Object.entries(supplied)

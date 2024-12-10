@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useRewards, useDailyRewards } from "../../../hooks/useRewards";
+import { useRewards, useDailyRewards, useDailyRewardsMEME } from "../../../hooks/useRewards";
 import { TOKEN_FORMAT, USD_FORMAT, NUMBER_FORMAT } from "../../../store";
 import CustomTooltips from "../../CustomTooltips/CustomTooltips";
 import TokenIcon from "../../TokenIcon";
@@ -10,6 +10,7 @@ import {
   toInternationalCurrencySystem_number,
 } from "../../../utils/uiNumber";
 import { ThreeDotIcon } from "../../Icons/IconsV2";
+import { useAppSelector } from "../../../redux/hooks";
 
 const transformAssetReward = (r, text) => ({
   value: r.dailyAmount.toLocaleString(undefined, TOKEN_FORMAT),
@@ -21,6 +22,7 @@ const transformAssetReward = (r, text) => ({
 const sumRewards = (acc, r) => acc + r.dailyAmount * r.price;
 
 export const UserDailyRewards = () => {
+  const { dashBoardActiveTab } = useAppSelector((state) => state.category);
   const {
     baseDepositUsdDaily,
     baseBorrowedUsdDaily,
@@ -31,8 +33,9 @@ export const UserDailyRewards = () => {
     farmTotalUsdDaily,
     totalUsdDaily,
     allRewards,
-  } = useDailyRewards();
-  useDailyRewards();
+  } = dashBoardActiveTab == "main" ? useDailyRewards() : useDailyRewardsMEME();
+
+  // useDailyRewards();
   const rewardsLabels = [
     [
       {

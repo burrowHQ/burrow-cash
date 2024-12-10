@@ -4,6 +4,7 @@ import {
   getAccountRewards,
   getAccountDailyRewards,
   getAccountRewardsForApy,
+  getAccountDailyRewardsMEME,
 } from "../redux/selectors/getAccountRewards";
 import {
   getNetLiquidityRewards,
@@ -67,6 +68,11 @@ export function useRewards() {
 }
 export function useDailyRewards() {
   const assetRewards = useAppSelector(getAccountDailyRewards);
+  return assetRewards;
+}
+
+export function useDailyRewardsMEME() {
+  const assetRewards = useAppSelector(getAccountDailyRewardsMEME);
   return assetRewards;
 }
 
