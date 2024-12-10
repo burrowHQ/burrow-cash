@@ -7,7 +7,7 @@ import { transformAccount } from "../transformers/account";
 import { initialState } from "./accountState";
 import getAccountMEME from "../api/get-account-meme";
 
-export const farmClaimAll = createAsyncThunk("account/farmClaimAll", async () => {
+export const farmClaimAll = createAsyncThunk("accountMEME/farmClaimAll", async () => {
   const { call, logicMEMEContract } = await getBurrow();
   return call(
     logicMEMEContract,
@@ -17,7 +17,7 @@ export const farmClaimAll = createAsyncThunk("account/farmClaimAll", async () =>
   );
 });
 
-export const fetchAccount = createAsyncThunk("account/fetchAccount", async () => {
+export const fetchAccount = createAsyncThunk("accountMEME/fetchAccount", async () => {
   const account = await getAccountMEME().then(transformAccount);
   if (account?.accountId) {
     const wallet = JSON.parse(

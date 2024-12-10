@@ -6,14 +6,14 @@ import getAssetsMEME from "../api/get-assets-meme";
 import getFarmMEME, { getAllFarmsMEME } from "../api/get-farm-meme";
 import { initialState } from "./assetState";
 
-export const fetchAssets = createAsyncThunk("assets/fetchAssets", async () => {
+export const fetchAssets = createAsyncThunk("assetsMEME/fetchAssets", async () => {
   const assets = await getAssetsMEME().then(transformAssets);
   const netTvlFarm = await getFarmMEME("NetTvl");
   const allFarms = await getAllFarmsMEME().then(transformFarms);
   return { assets, netTvlFarm, allFarms };
 });
 
-export const fetchRefPrices = createAsyncThunk("assets/fetchRefPrices", async () => {
+export const fetchRefPrices = createAsyncThunk("assetsMEME/fetchRefPrices", async () => {
   const prices = await fetch(
     "https://raw.githubusercontent.com/NearDeFi/token-prices/main/ref-prices.json",
   ).then((r) => r.json());

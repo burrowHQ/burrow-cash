@@ -47,6 +47,11 @@ export const getAppState = createSelector(
   (app) => app,
 );
 
+export const getAppStateMEME = createSelector(
+  (state: RootState) => state.appMEME,
+  (app) => app,
+);
+
 export const getShowDust = createSelector(
   (state: RootState) => state.app,
   (app) => app.showDust,

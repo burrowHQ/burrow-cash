@@ -135,7 +135,7 @@ export const initialState: AppState = {
   },
 };
 
-export const fetchConfig = createAsyncThunk("account/getConfig", async () => {
+export const fetchConfig = createAsyncThunk("accountMEME/getConfig", async () => {
   const config = await getConfigMEME();
   return config;
 });

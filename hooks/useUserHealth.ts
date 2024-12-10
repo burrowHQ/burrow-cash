@@ -8,7 +8,7 @@ import {
   getLPHealthFactor,
   getHealthStatus,
 } from "../redux/selectors/getHealthFactor";
-import { getAppState } from "../redux/appSelectors";
+import { getAppState, getAppStateMEME } from "../redux/appSelectors";
 import { toggleShowDailyReturns } from "../redux/appSlice";
 import { trackShowDailyReturns } from "../utils/telemetry";
 import { useSlimStats } from "./hooks";
@@ -16,7 +16,10 @@ import { useFullDigits } from "./useFullDigits";
 
 export function useUserHealth() {
   const dispatch = useAppDispatch();
-  const { showDailyReturns } = useAppSelector(getAppState);
+  const { dashBoardActiveTab } = useAppSelector((state) => state.category);
+  const { showDailyReturns } = useAppSelector(
+    dashBoardActiveTab == "main" ? getAppState : getAppStateMEME,
+  );
   const netAPY = useAppSelector(getNetAPY({ isStaking: false }));
   const netLiquidityAPY = useAppSelector(getNetTvlAPY({ isStaking: false }));
   const dailyReturns = useAppSelector(getDailyReturns);
