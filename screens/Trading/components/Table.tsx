@@ -356,11 +356,9 @@ const PositionRow = ({
     Math.abs(currentTime.getTime() - openTime.getTime()) / (1000 * 60 * 60);
   const holdingFee = totalHpFee * holdingDurationInHours;
   const pnl = profitOrLoss - holdingFee;
-  useEffect(() => {
-    if (onPLNChange) {
-      onPLNChange(pnl);
-    }
-  }, [pnl]);
+  if (onPLNChange) {
+    onPLNChange(pnl);
+  }
   return (
     <tr className="text-base hover:bg-dark-100 cursor-pointer font-normal">
       <td className="py-5 pl-5 ">
