@@ -17,6 +17,7 @@ import {
   RedSolidSubmitButton as RedSolidButton,
 } from "../../../components/Modal/button";
 import { showPositionClose } from "../../../components/HashResultModal";
+import { beautifyPrice } from "../../../utils/beautyNumbet";
 
 export const ModalContext = createContext(null) as any;
 const ClosePositionMobile = ({ open, onClose, extraProps }) => {
@@ -160,8 +161,8 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
               <div className="text-center leading-3">
                 <p className="text-lg">
                   {positionType.label === "Long"
-                    ? Number(sizeValueLong).toFixed(2)
-                    : Number(sizeValueShort).toFixed(2)}{" "}
+                    ? beautifyPrice(Number(sizeValueLong))
+                    : beautifyPrice(Number(sizeValueShort))}{" "}
                   {positionType.label === "Long" ? `${symbolP}` : `${symbolD}`}
                 </p>
                 <span className="text-xs text-gray-300">Close amount</span>
