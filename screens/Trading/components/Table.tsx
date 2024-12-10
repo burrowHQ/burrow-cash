@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { BeatLoader } from "react-spinners";
 import { AddCollateral, Export } from "../../MarginTrading/components/Icon";
 import ClosePositionMobile from "./ClosePositionMobile";
 import ChangeCollateralMobile from "./ChangeCollateralMobile";
@@ -10,6 +11,10 @@ import { getAssets } from "../../../store/assets";
 import { IAssetEntry } from "../../../interfaces";
 import DataSource from "../../../data/datasource";
 import { useAccountId } from "../../../hooks/hooks";
+import { useAppSelector } from "../../../redux/hooks";
+import { getMarginAccountSupplied } from "../../../redux/marginAccountSelectors";
+import { withdrawActionsAll } from "../../../store/marginActions/withdrawAll";
+import { showPositionResult } from "../../../components/HashResultModal";
 
 const TradingTable = ({
   positionsList,
@@ -35,6 +40,8 @@ const TradingTable = ({
   const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById, calculateLeverage } =
     useMarginAccount();
   const { getPositionType, marginConfigTokens } = useMarginConfigToken();
+  const accountSupplied = useAppSelector(getMarginAccountSupplied);
+  const [isLoadingWithdraw, setIsLoadingWithdraw] = useState(false);
   const handleTabClick = (tabNumber) => {
     setSelectedTab(tabNumber);
   };
@@ -101,20 +108,51 @@ const TradingTable = ({
       onTotalPLNChange(totalPLN);
     }
   }, [totalPLN]);
+  const handleWithdrawAllClick = async () => {
+    setIsLoadingWithdraw(true);
+    const accountSuppliedIds = accountSupplied.map((asset) => asset.token_id);
+    try {
+      await withdrawActionsAll(accountSuppliedIds);
+    } catch (error) {
+      console.error("Withdraw failed:", error);
+    } finally {
+      setIsLoadingWithdraw(false);
+    }
+  };
   return (
     <div className="flex flex-col items-center justify-center w-full">
       <div className="w-full border border-dark-50 bg-gray-800 rounded-md">
-        <div className="w-full border-b border-dark-50 flex">
-          <Tab
-            tabName="Positions"
-            isSelected={selectedTab === "positions"}
-            onClick={() => handleTabClick("positions")}
-          />
-          <Tab
-            tabName="History"
-            isSelected={selectedTab === "history"}
-            onClick={() => handleTabClick("history")}
-          />
+        <div className="w-full border-b border-dark-50 flex justify-between items-center">
+          <div className="flex">
+            <Tab
+              tabName="Positions"
+              isSelected={selectedTab === "positions"}
+              onClick={() => handleTabClick("positions")}
+            />
+            <Tab
+              tabName="History"
+              isSelected={selectedTab === "history"}
+              onClick={() => handleTabClick("history")}
+            />
+            <Tab
+              tabName="Liquidation"
+              isSelected={selectedTab === "liquidation"}
+              onClick={() => handleTabClick("liquidation")}
+            />
+            <Tab
+              tabName="Account"
+              isSelected={selectedTab === "account"}
+              onClick={() => handleTabClick("account")}
+            />
+          </div>
+          {selectedTab === "account" && accountSupplied.length > 0 && (
+            <div
+              className="mr-11 px-1.5 py-1 bg-primary bg-opacity-5 border border-primary rounded-md text-primary text-sm cursor-pointer"
+              onClick={handleWithdrawAllClick}
+            >
+              {isLoadingWithdraw ? <BeatLoader size={5} color="#C0C4E9" /> : "Withdraw all"}
+            </div>
+          )}
         </div>
         <div className="py-4">
           {selectedTab === "positions" && (
@@ -239,6 +277,63 @@ const TradingTable = ({
                     </td>
                   </tr>
                 )} */}
+              </tbody>
+            </table>
+          )}
+          {selectedTab === "liquidation" && <div>Liquidation</div>}
+          {selectedTab === "account" && (
+            <table className="w-full text-left">
+              <thead>
+                <tr className="text-gray-300 text-sm font-normal">
+                  <th className="pl-5">Token</th>
+                  <th>Balance</th>
+                  <th>Price</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {accountSupplied.length > 0 ? (
+                  accountSupplied.map((token, index) => {
+                    const assetDetails = getAssetDetails(getAssetById(token.token_id));
+                    return (
+                      <tr
+                        key={index}
+                        className="text-base hover:bg-dark-100 cursor-pointer font-normal"
+                      >
+                        <td className="py-5 pl-5">
+                          <div className="flex items-center">
+                            <img src={assetDetails.icon} alt="" className="w-4 h-4 rounded-2xl" />
+                            <p className="ml-1"> {assetDetails.symbol}</p>
+                          </div>
+                        </td>
+                        <td>
+                          $
+                          {toInternationalCurrencySystem_number(parseTokenValue(token.balance, 18))}
+                        </td>
+                        <td>
+                          {assetDetails.price
+                            ? `$${toInternationalCurrencySystem_number(assetDetails.price)}`
+                            : "/"}
+                        </td>
+                        <td>
+                          {assetDetails.price
+                            ? `$${toInternationalCurrencySystem_number(
+                                parseTokenValue(token.balance, 18) * assetDetails.price,
+                              )}`
+                            : "/"}
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={4}>
+                      <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+                        No data
+                      </div>
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           )}
