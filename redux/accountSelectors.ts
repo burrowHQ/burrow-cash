@@ -13,6 +13,11 @@ export const getAccountPortfolio = createSelector(
   (account) => account.portfolio,
 );
 
+export const getAccountPortfolioMEME = createSelector(
+  (state: RootState) => state.accountMEME,
+  (account) => account.portfolio,
+);
+
 export const getAccountBalance = createSelector(
   (state: RootState) => state.account.balances,
   (balances) => {

@@ -10,6 +10,7 @@ import {
   getTheme,
   getUnreadLiquidation,
   getToastMessage,
+  getUnreadLiquidationMEME,
 } from "../redux/appSelectors";
 import {
   setRepayFrom,
@@ -102,7 +103,10 @@ export function useDarkMode() {
 }
 
 export function useUnreadLiquidation() {
-  const unreadLiquidation = useAppSelector(getUnreadLiquidation);
+  const { dashBoardActiveTab } = useAppSelector((state) => state.category);
+  const unreadLiquidation = useAppSelector(
+    dashBoardActiveTab == "main" ? getUnreadLiquidation : getUnreadLiquidationMEME,
+  );
   const accountId = useAccountId();
   const dispatch = useAppDispatch();
 

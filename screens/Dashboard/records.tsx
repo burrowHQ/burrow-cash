@@ -4,7 +4,7 @@ import Datasource from "../../data/datasource";
 import { useAccountId, useToastMessage } from "../../hooks/hooks";
 import { shrinkToken, TOKEN_FORMAT } from "../../store";
 import { useAppSelector } from "../../redux/hooks";
-import { getAssets } from "../../redux/assetsSelectors";
+import { getAssets, getAssetsMEME } from "../../redux/assetsSelectors";
 import { getDateString } from "../../helpers/helpers";
 import { nearNativeTokens, nearTokenId, standardizeAsset } from "../../utils";
 import {
@@ -16,8 +16,9 @@ import {
 
 const Records = ({ isShow }) => {
   const accountId = useAccountId();
+  const { dashBoardActiveTab } = useAppSelector((state) => state.category);
   const { toastMessage, showToast } = useToastMessage();
-  const assets = useAppSelector(getAssets);
+  const assets = useAppSelector(dashBoardActiveTab == "main" ? getAssets : getAssetsMEME);
   const [isLoading, setIsLoading] = useState(false);
   const [docs, setDocs] = useState<any>([]);
   const [pagination, setPagination] = useState<{

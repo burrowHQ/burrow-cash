@@ -43,6 +43,40 @@ export const getLPHealthFactor = createSelector(
   },
 );
 
+export const getHealthFactorMEME = createSelector(
+  (state: RootState) => state.assetsMEME,
+  (state: RootState) => state.accountMEME.portfolio,
+  (assets, portfolio) => {
+    if (!hasAssets(assets)) return null;
+    if (!portfolio) return null;
+    if (!Object.keys(portfolio.borrowed).length) return -1;
+    return calHealthFactor(portfolio, assets);
+  },
+);
+
+export const getLPHealthFactorMEME = createSelector(
+  (state: RootState) => state.assetsMEME,
+  (state: RootState) => state.accountMEME.portfolio,
+  (assets, portfolio) => {
+    if (!hasAssets(assets)) return null;
+    if (!portfolio?.positions) return null;
+    const LPToken = {};
+    Object.entries(portfolio?.positions).forEach(([key, value]) => {
+      if (key !== DEFAULT_POSITION) {
+        const asset = assets?.data?.[key];
+        const healthFactor = calHealthFactor(portfolio, assets, key);
+        LPToken[key] = {
+          ...value,
+          metadata: asset?.metadata,
+          healthFactor: Math.trunc(healthFactor),
+          healthStatus: getHealthStatus(healthFactor),
+        };
+      }
+    });
+    return LPToken;
+  },
+);
+
 const calHealthFactor = (portfolio: any, assets: any, positionId?: string) => {
   const adjustedCollateralSum = getAdjustedSum("collateral", portfolio, assets.data, positionId);
   const adjustedBorrowedSum = getAdjustedSum("borrowed", portfolio, assets.data, positionId);

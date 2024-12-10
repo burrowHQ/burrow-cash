@@ -37,6 +37,11 @@ export const getProtocolStats = createSelector(
   (app) => app.protocolStats,
 );
 
+export const getProtocolStatsMEME = createSelector(
+  (state: RootState) => state.appMEME,
+  (app) => app.protocolStats,
+);
+
 export const getShowInfo = createSelector(
   (state: RootState) => state.app,
   (app) => app.showInfo,
@@ -125,6 +130,11 @@ export const getAssetDataByTokenId = (tokenId: string) =>
 
 export const getUnreadLiquidation = createSelector(
   (state: RootState) => state.app,
+  (app) => app.unreadLiquidation,
+);
+
+export const getUnreadLiquidationMEME = createSelector(
+  (state: RootState) => state.appMEME,
   (app) => app.unreadLiquidation,
 );
 

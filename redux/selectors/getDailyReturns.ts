@@ -27,3 +27,26 @@ export const getDailyReturns = createSelector(
     return netGains;
   },
 );
+
+export const getDailyReturnsMEME = createSelector(
+  (state: RootState) => state.assetsMEME,
+  (state: RootState) => state.accountMEME,
+  getExtraDailyTotals({ isStaking: false }),
+  getAccountRewards,
+  (assets, account, extraDaily, rewards) => {
+    if (!hasAssets(assets)) return 0;
+
+    const [gainCollateral] = getGains(account.portfolio, assets, "collateral");
+    const [gainSupplied] = getGains(account.portfolio, assets, "supplied");
+    const [gainBorrowed] = getGains(account.portfolio, assets, "borrowed");
+
+    const netTvlDaily = Object.entries(rewards.net).reduce(
+      (acc, [, { dailyAmount, price }]) => acc + dailyAmount * price,
+      0,
+    );
+
+    const netGains =
+      (gainCollateral + gainSupplied + extraDaily * 365 + netTvlDaily * 365 - gainBorrowed) / 365;
+    return netGains;
+  },
+);

@@ -1,12 +1,19 @@
 import { useAppSelector, useAppDispatch } from "../redux/hooks";
-import { getDailyReturns } from "../redux/selectors/getDailyReturns";
-import { getNetAPY, getNetTvlAPY } from "../redux/selectors/getNetAPY";
+import { getDailyReturns, getDailyReturnsMEME } from "../redux/selectors/getDailyReturns";
+import {
+  getNetAPY,
+  getNetTvlAPY,
+  getNetAPYMEME,
+  getNetTvlAPYMEME,
+} from "../redux/selectors/getNetAPY";
 import {
   DANGER_HEALTH_FACTOR,
   LOW_HEALTH_FACTOR,
   getHealthFactor,
   getLPHealthFactor,
   getHealthStatus,
+  getHealthFactorMEME,
+  getLPHealthFactorMEME,
 } from "../redux/selectors/getHealthFactor";
 import { getAppState, getAppStateMEME } from "../redux/appSelectors";
 import { toggleShowDailyReturns } from "../redux/appSlice";
@@ -20,11 +27,25 @@ export function useUserHealth() {
   const { showDailyReturns } = useAppSelector(
     dashBoardActiveTab == "main" ? getAppState : getAppStateMEME,
   );
-  const netAPY = useAppSelector(getNetAPY({ isStaking: false }));
-  const netLiquidityAPY = useAppSelector(getNetTvlAPY({ isStaking: false }));
-  const dailyReturns = useAppSelector(getDailyReturns);
-  const healthFactor = useAppSelector(getHealthFactor);
-  const LPHealthFactor = useAppSelector(getLPHealthFactor);
+  const netAPY = useAppSelector(
+    dashBoardActiveTab == "main"
+      ? getNetAPY({ isStaking: false })
+      : getNetAPYMEME({ isStaking: false }),
+  );
+  const netLiquidityAPY = useAppSelector(
+    dashBoardActiveTab == "main"
+      ? getNetTvlAPY({ isStaking: false })
+      : getNetTvlAPYMEME({ isStaking: false }),
+  );
+  const dailyReturns = useAppSelector(
+    dashBoardActiveTab == "main" ? getDailyReturns : getDailyReturnsMEME,
+  );
+  const healthFactor = useAppSelector(
+    dashBoardActiveTab == "main" ? getHealthFactor : getHealthFactorMEME,
+  );
+  const LPHealthFactor = useAppSelector(
+    dashBoardActiveTab == "main" ? getLPHealthFactor : getLPHealthFactorMEME,
+  );
   const { fullDigits, setDigits } = useFullDigits();
   const slimStats = useSlimStats();
 

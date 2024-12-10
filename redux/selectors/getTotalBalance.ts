@@ -23,3 +23,27 @@ export const getTotalBalance = (source: "borrowed" | "supplied", withNetTvlMulti
         .reduce(sumReducer, 0);
     },
   );
+
+export const getTotalBalanceMEME = (
+  source: "borrowed" | "supplied",
+  withNetTvlMultiplier = false,
+) =>
+  createSelector(
+    (state: RootState) => state.assetsMEME,
+    (assets) => {
+      if (!hasAssets(assets)) return 0;
+      return Object.keys(assets.data)
+        .map((tokenId) => {
+          const asset = assets.data[tokenId];
+          const netTvlMultiplier = withNetTvlMultiplier
+            ? asset.config.net_tvl_multiplier / 10000
+            : 1;
+
+          return (
+            toUsd(asset[source].balance, asset) * netTvlMultiplier +
+            (source === "supplied" ? toUsd(asset.reserved, asset) * netTvlMultiplier : 0)
+          );
+        })
+        .reduce(sumReducer, 0);
+    },
+  );

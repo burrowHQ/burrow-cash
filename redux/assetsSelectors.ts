@@ -38,6 +38,11 @@ export const getAssets = createSelector(
   (assets) => assets,
 );
 
+export const getAssetsMEME = createSelector(
+  (state: RootState) => state.assetsMEME,
+  (assets) => assets,
+);
+
 export const getTotalSupplyAndBorrowUSD = (tokenId: string) =>
   createSelector(
     (state: RootState) => state.assets,
