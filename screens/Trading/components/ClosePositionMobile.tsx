@@ -169,7 +169,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Entry Price</div>
-              <div>${entryPrice.toFixed(2)}</div>
+              <div>{entryPrice ? `$${entryPrice.toFixed(2)}` : "-"}</div>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Index Price</div>
