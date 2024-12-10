@@ -41,10 +41,12 @@ export interface IBurrow {
   signOut: () => void;
   signIn: () => void;
   logicContract: Contract;
+  logicMEMEContract: Contract;
   oracleContract: Contract;
   refv1Contract: Contract;
   pythContract: Contract;
   config: IConfig;
+  configMEME: IConfig;
   view: (
     contract: Contract,
     methodName: string,

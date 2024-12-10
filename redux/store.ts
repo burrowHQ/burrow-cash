@@ -14,10 +14,13 @@ import {
 import storage from "redux-persist/lib/storage";
 
 import assetsReducer from "./assetsSlice";
+import assetsMEMEReducer from "./assetsSliceMEME";
 import accountReducer from "./accountSlice";
+import accountMEMEReducer from "./accountSliceMEME";
 import marginAccountReducer from "./marginAccountSlice";
 import marginConfigReducer from "./marginConfigSlice";
 import appReducer from "./appSlice";
+import appMEMEReducer from "./appSliceMEME";
 import feedReducer from "./feedSlice";
 import { migrations } from "./migrations";
 import marginCategoryReducer from "./marginTrading";
@@ -32,10 +35,13 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   assets: assetsReducer,
+  assetsMEME: assetsMEMEReducer,
   account: accountReducer,
+  accountMEME: accountMEMEReducer,
   marginAccount: marginAccountReducer,
   marginConfig: marginConfigReducer,
   app: appReducer,
+  appMEME: appMEMEReducer,
   feed: feedReducer,
   category: marginCategoryReducer,
 });

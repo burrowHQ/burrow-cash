@@ -3,7 +3,10 @@ import { Typography } from "@mui/material";
 import Decimal from "decimal.js";
 import { useFullDigits } from "../../../hooks/useFullDigits";
 import { useAppSelector } from "../../../redux/hooks";
-import { getTotalAccountBalance } from "../../../redux/selectors/getTotalAccountBalance";
+import {
+  getTotalAccountBalance,
+  getTotalAccountBalanceMEME,
+} from "../../../redux/selectors/getTotalAccountBalance";
 import { m, COMPACT_USD_FORMAT } from "../../../store";
 import { trackFullDigits } from "../../../utils/telemetry";
 import { Stat } from "./components";
@@ -50,8 +53,15 @@ export const ProtocolLiquidity = () => {
 
 export const UserLiquidity = () => {
   const { fullDigits, setDigits } = useFullDigits();
-  const userDeposited = useAppSelector(getTotalAccountBalance("supplied"));
-  const userBorrowed = useAppSelector(getTotalAccountBalance("borrowed"));
+  const { dashBoardActiveTab } = useAppSelector((state) => state.category);
+  const userDeposited =
+    dashBoardActiveTab == "main"
+      ? useAppSelector(getTotalAccountBalance("supplied"))
+      : useAppSelector(getTotalAccountBalanceMEME("borrowed"));
+  const userBorrowed =
+    dashBoardActiveTab == "main"
+      ? useAppSelector(getTotalAccountBalance("borrowed"))
+      : useAppSelector(getTotalAccountBalanceMEME("borrowed"));
   const userNetLiquidity = new Decimal(userDeposited).minus(userBorrowed).toNumber();
   const userNetLiquidityValue = userNetLiquidity > 0 ? `$${m(userNetLiquidity)}` : `$0`;
   const userDepositedValue = userDeposited > 0 ? `$${m(userDeposited)}` : `$0`;

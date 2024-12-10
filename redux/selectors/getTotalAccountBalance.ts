@@ -16,6 +16,18 @@ export const getTotalAccountBalance = (source: "borrowed" | "supplied") =>
     },
   );
 
+export const getTotalAccountBalanceMEME = (source: "borrowed" | "supplied") =>
+  createSelector(
+    (state: RootState) => state.assetsMEME,
+    (state: RootState) => state.accountMEME,
+    (assetsMEME, accountMEME) => {
+      if (!hasAssets(assetsMEME)) return 0;
+      let tokenUsds: any[] = [];
+      tokenUsds = sumTokenUsds(accountMEME, assetsMEME, source);
+      return tokenUsds.reduce(sumReducer, 0);
+    },
+  );
+
 const sumTokenUsds = (account, assets, source) => {
   const { borrows, collaterals, supplies } = account.portfolio || {};
   const tokens = source === "supplied" ? [...supplies, ...collaterals] : borrows;

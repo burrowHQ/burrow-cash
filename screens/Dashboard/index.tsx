@@ -28,19 +28,23 @@ import SupplyBorrowListMobile from "./supplyBorrowListMobile";
 import { AdjustButton, WithdrawButton, RepayButton, MarketButton } from "./supplyBorrowButtons";
 import { hiddenAssets } from "../../utils/config";
 import { APYCell } from "../Market/APYCell";
+import { setDashBoardActiveTab } from "../../redux/marginTrading";
+import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 
 const Index = () => {
   const accountId = useAccountId();
+  const dispatch = useAppDispatch();
+  const { dashBoardActiveTab: activeTab } = useAppSelector((state) => state.category);
   const [suppliedRows, borrowedRows, totalSuppliedUSD, totalBorrowedUSD, borrowedAll] =
-    usePortfolioAssets();
+    activeTab == "main" ? usePortfolioAssets() : usePortfolioMEMEAssets();
 
-  const [
-    suppliedMEMERows,
-    borrowedMEMERows,
-    totalMEMESuppliedUSD,
-    totalMEMEBorrowedUSD,
-    borrowedMEMEAll,
-  ] = usePortfolioMEMEAssets();
+  // const [
+  //   suppliedMEMERows,
+  //   borrowedMEMERows,
+  //   totalMEMESuppliedUSD,
+  //   totalMEMEBorrowedUSD,
+  //   borrowedMEMEAll,
+  // ] = usePortfolioMEMEAssets();
 
   const isMobile = isMobileDevice();
   let overviewNode;
@@ -86,8 +90,36 @@ const Index = () => {
   return (
     <div>
       <LayoutContainer>
-        {overviewNode}
-        <div style={{ minHeight: isMobile ? 300 : 600 }}>{supplyBorrowNode}</div>
+        <div className="grid grid-cols-2 gap-x-1 mb-4 cursor-pointer">
+          <div
+            className={`${
+              activeTab == "main" ? "bg-primary" : "bg-[#C0C4E94D]"
+            } text-center h-12 leading-[48px] text-black rounded-xl`}
+            onClick={() => dispatch(setDashBoardActiveTab("main"))}
+          >
+            Mainstream
+          </div>
+          <div
+            className={`${
+              activeTab == "meme" ? "bg-primary" : "bg-[#C0C4E94D]"
+            } text-center h-12 leading-[48px] text-black rounded-xl`}
+            onClick={() => dispatch(setDashBoardActiveTab("meme"))}
+          >
+            Meme
+          </div>
+        </div>
+        {activeTab === "main" && (
+          <div>
+            {overviewNode}
+            <div style={{ minHeight: isMobile ? 300 : 600 }}>{supplyBorrowNode}</div>
+          </div>
+        )}
+        {activeTab === "meme" && (
+          <div>
+            {overviewNode}
+            <div style={{ minHeight: isMobile ? 300 : 600 }}>{supplyBorrowNode}</div>
+          </div>
+        )}
       </LayoutContainer>
     </div>
   );

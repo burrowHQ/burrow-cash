@@ -215,13 +215,13 @@ export const getPortfolioAssets = createSelector(
 );
 
 export const getPortfolioMEMEAssets = createSelector(
-  (state: RootState) => state.app,
-  (state: RootState) => state.assets,
-  (state: RootState) => state.account,
-  (app, assets, account) => {
-    if (!hasAssets(assets)) return [[], [], 0, 0, {}, []];
-    const brrrTokenId = app.config.booster_token_id;
-    const lpPositions = omit(account.portfolio.positions, DEFAULT_POSITION);
+  (state: RootState) => state.appMEME,
+  (state: RootState) => state.assetsMEME,
+  (state: RootState) => state.accountMEME,
+  (appMEME, assetsMEME, accountMEME) => {
+    if (!hasAssets(assetsMEME)) return [[], [], 0, 0, {}, []];
+    const brrrTokenId = appMEME.config.booster_token_id;
+    const lpPositions = omit(accountMEME.portfolio.positions, DEFAULT_POSITION);
     let portfolioLpAssets = {};
     Object.keys(lpPositions).forEach((shadow_id: string) => {
       portfolioLpAssets = {
@@ -230,23 +230,23 @@ export const getPortfolioMEMEAssets = createSelector(
       };
     });
     const portfolioAssets = {
-      ...account.portfolio.supplied,
-      ...account.portfolio.collateral,
+      ...accountMEME.portfolio.supplied,
+      ...accountMEME.portfolio.collateral,
       ...portfolioLpAssets,
     };
     let totalSuppliedUSD = 0;
     let totalBorrowedUSD = 0;
     const supplied = Object.keys(portfolioAssets)
       .map((tokenId) => {
-        const asset = assets.data[tokenId];
+        const asset = assetsMEME.data[tokenId];
         const { isLpToken } = asset;
         const collateral = shrinkToken(
           (isLpToken
-            ? account.portfolio.positions[tokenId]?.collateral?.[tokenId]?.balance || 0
-            : account.portfolio.collateral?.[tokenId]?.balance) || 0,
+            ? accountMEME.portfolio.positions[tokenId]?.collateral?.[tokenId]?.balance || 0
+            : accountMEME.portfolio.collateral?.[tokenId]?.balance) || 0,
           asset.metadata.decimals + asset.config.extra_decimals,
         );
-        const suppliedBalance = account.portfolio.supplied?.[tokenId]?.balance || 0;
+        const suppliedBalance = accountMEME.portfolio.supplied?.[tokenId]?.balance || 0;
         const totalSupplyD = new Decimal(asset.supplied.balance)
           .plus(new Decimal(asset.reserved))
           .toFixed();
@@ -272,29 +272,29 @@ export const getPortfolioMEMEAssets = createSelector(
             ...getPortfolioRewards(
               "supplied",
               asset,
-              account.portfolio.farms.supplied[tokenId],
-              assets.data,
+              accountMEME.portfolio.farms.supplied[tokenId],
+              assetsMEME.data,
             ),
             ...getPortfolioRewards(
               "tokennetbalance",
               asset,
-              account.portfolio.farms.tokennetbalance[tokenId],
-              assets.data,
+              accountMEME.portfolio.farms.tokennetbalance[tokenId],
+              assetsMEME.data,
             ),
           ],
-          depositRewards: getRewards("supplied", asset, assets.data),
+          depositRewards: getRewards("supplied", asset, assetsMEME.data),
           totalSupplyMoney: toUsd(totalSupplyD, asset),
         });
       })
-      .filter(app.showDust ? Boolean : emptySuppliedAsset);
+      .filter(appMEME.showDust ? Boolean : emptySuppliedAsset);
     // borrow from regular position
-    const borrowed = Object.keys(account.portfolio.borrowed || {})
+    const borrowed = Object.keys(accountMEME.portfolio.borrowed || {})
       .map((tokenId) => {
-        const asset = assets.data[tokenId];
+        const asset = assetsMEME.data[tokenId];
 
-        const borrowedBalance = account.portfolio.borrowed[tokenId].balance;
+        const borrowedBalance = accountMEME.portfolio.borrowed[tokenId].balance;
         const brrrUnclaimedAmount =
-          account.portfolio.farms.borrowed[tokenId]?.[brrrTokenId]?.unclaimed_amount || "0";
+          accountMEME.portfolio.farms.borrowed[tokenId]?.[brrrTokenId]?.unclaimed_amount || "0";
         const totalSupplyD = new Decimal(asset.supplied.balance)
           .plus(new Decimal(asset.reserved))
           .toFixed();
@@ -316,28 +316,28 @@ export const getPortfolioMEMEAssets = createSelector(
           borrowApy: Number(asset.borrow_apr) * 100,
           borrowed: borrowedToken,
           brrrUnclaimedAmount: Number(
-            shrinkToken(brrrUnclaimedAmount, assets.data[brrrTokenId].metadata.decimals),
+            shrinkToken(brrrUnclaimedAmount, assetsMEME.data[brrrTokenId].metadata.decimals),
           ),
           rewards: getPortfolioRewards(
             "borrowed",
             asset,
-            account.portfolio.farms.borrowed[tokenId],
-            assets.data,
+            accountMEME.portfolio.farms.borrowed[tokenId],
+            assetsMEME.data,
           ),
-          borrowRewards: getRewards("borrowed", asset, assets.data),
+          borrowRewards: getRewards("borrowed", asset, assetsMEME.data),
           totalSupplyMoney: toUsd(totalSupplyD, asset),
         });
       })
-      .filter(app.showDust ? Boolean : emptyBorrowedAsset);
+      .filter(appMEME.showDust ? Boolean : emptyBorrowedAsset);
     // borrow from lp position
     const borrowed_LP = Object.keys(lpPositions).reduce((acc, shadow_id: string) => {
       const b = Object.keys(lpPositions[shadow_id].borrowed)
         .map((tokenId) => {
-          const asset = assets.data[tokenId];
-          const lpAsset = assets.data[shadow_id];
+          const asset = assetsMEME.data[tokenId];
+          const lpAsset = assetsMEME.data[shadow_id];
           const borrowedBalance = lpPositions[shadow_id].borrowed[tokenId].balance;
           const brrrUnclaimedAmount =
-            account.portfolio.farms.borrowed[tokenId]?.[brrrTokenId]?.unclaimed_amount || "0";
+            accountMEME.portfolio.farms.borrowed[tokenId]?.[brrrTokenId]?.unclaimed_amount || "0";
           const totalSupplyD = new Decimal(asset.supplied.balance)
             .plus(new Decimal(asset.reserved))
             .toFixed();
@@ -359,19 +359,19 @@ export const getPortfolioMEMEAssets = createSelector(
             borrowApy: Number(asset.borrow_apr) * 100,
             borrowed: borrowedToken,
             brrrUnclaimedAmount: Number(
-              shrinkToken(brrrUnclaimedAmount, assets.data[brrrTokenId].metadata.decimals),
+              shrinkToken(brrrUnclaimedAmount, assetsMEME.data[brrrTokenId].metadata.decimals),
             ),
             rewards: getPortfolioRewards(
               "borrowed",
               asset,
-              account.portfolio.farms.borrowed[tokenId],
-              assets.data,
+              accountMEME.portfolio.farms.borrowed[tokenId],
+              assetsMEME.data,
             ),
-            borrowRewards: getRewards("borrowed", asset, assets.data),
+            borrowRewards: getRewards("borrowed", asset, assetsMEME.data),
             totalSupplyMoney: toUsd(totalSupplyD, asset),
           });
         })
-        .filter(app.showDust ? Boolean : emptyBorrowedAsset);
+        .filter(appMEME.showDust ? Boolean : emptyBorrowedAsset);
       return { ...acc, [shadow_id]: b };
     }, {});
 
