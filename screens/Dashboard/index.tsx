@@ -34,7 +34,7 @@ import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 const Index = () => {
   const accountId = useAccountId();
   const dispatch = useAppDispatch();
-  const { dashBoardActiveTab: activeTab } = useAppSelector((state) => state.category);
+  const { dashBoardActiveTab: activeTab = "main" } = useAppSelector((state) => state.category);
   const [suppliedRows, borrowedRows, totalSuppliedUSD, totalBorrowedUSD, borrowedAll] =
     activeTab == "main" ? usePortfolioAssets() : usePortfolioMEMEAssets();
 
