@@ -48,55 +48,55 @@ function TableHead({ sorting }) {
   }
   if (isMobile) return <HeadMobile sorting={sorting} />;
   return (
-    <div className="grid grid-cols-6 h-12">
-      <div className="col-span-1 border border-dark-50 bg-gray-800 rounded-t-2xl flex items-center pl-5 text-sm text-gray-300">
+    <div className="grid grid-cols-6 h-12 border border-dark-50">
+      <div className="col-span-1 bg-gray-800  flex items-center pl-5 text-sm text-gray-300 sans-bold">
         Market
       </div>
-      <div className="grid grid-cols-2 col-span-2 bg-primary rounded-t-2xl items-center text-sm text-black">
+      <div className="grid grid-cols-2 col-span-2 text-primary items-center text-sm bg-gray-800">
         <div
-          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
+          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap sans-bold"
           onClick={() => {
             dispatch_sort_action("totalSupplyMoney");
           }}
         >
           Total Supplied
-          <SortButton sort={getCurColumnSort("totalSupplyMoney")} />
+          <SortButton sort={getCurColumnSort("totalSupplyMoney")} color="primary" />
         </div>
         <div
-          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
+          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap sans-bold"
           onClick={() => {
             dispatch_sort_action("depositApy");
           }}
         >
-          Supply APY <SortButton sort={getCurColumnSort("depositApy")} />
+          Supply APY <SortButton sort={getCurColumnSort("depositApy")} color="primary" />
         </div>
       </div>
-      <div className="grid grid-cols-2 col-span-2 bg-red-50 rounded-t-2xl items-center text-sm text-black">
+      <div className="grid grid-cols-2 col-span-2 text-red-50 items-center text-sm bg-gray-800">
         <div
-          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
+          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap sans-bold"
           onClick={() => {
             dispatch_sort_action("totalBorrowedMoney");
           }}
         >
-          Total Borrowed <SortButton sort={getCurColumnSort("totalBorrowedMoney")} />
+          Total Borrowed <SortButton sort={getCurColumnSort("totalBorrowedMoney")} color="red-50" />
         </div>
         <div
-          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
+          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap sans-bold"
           onClick={() => {
             dispatch_sort_action("borrowApy");
           }}
         >
-          Borrow APY <SortButton sort={getCurColumnSort("borrowApy")} />
+          Borrow APY <SortButton sort={getCurColumnSort("borrowApy")} color="red-50" />
         </div>
       </div>
       <div
-        className="col-span-1 bg-gray-300 rounded-t-2xl flex items-center text-sm text-black cursor-pointer pl-4 xl:pl-8 whitespace-nowrap"
+        className="col-span-1 text-gray-300 flex items-center text-sm text-black cursor-pointer pl-4 xl:pl-8 whitespace-nowrap bg-gray-800 sans-bold"
         onClick={() => {
           dispatch_sort_action("availableLiquidityMoney");
         }}
       >
         Available Liquidity
-        <SortButton sort={getCurColumnSort("availableLiquidityMoney")} />
+        <SortButton sort={getCurColumnSort("availableLiquidityMoney")} color="gray-300" />
       </div>
     </div>
   );
@@ -554,11 +554,11 @@ function TableRowMobile({
     </Link>
   );
 }
-function SortButton({ sort }: { sort?: "asc" | "desc" }) {
+function SortButton({ sort, color }: { sort?: "asc" | "desc"; color?: string }) {
   return (
     <div className="flex flex-col items-center gap-0.5 ml-1.5">
-      <ArrowUpIcon className={`text-black ${sort === "asc" ? "" : "text-opacity-30"}`} />
-      <ArrowDownIcon className={`text-black ${sort === "desc" ? "" : "text-opacity-30"}`} />
+      <ArrowUpIcon className={`text-${color} ${sort === "asc" ? "" : "text-opacity-30"}`} />
+      <ArrowDownIcon className={`text-${color} ${sort === "desc" ? "" : "text-opacity-30"}`} />
     </div>
   );
 }
