@@ -37,6 +37,12 @@ const Index = () => {
   const { dashBoardActiveTab: activeTab = "main" } = useAppSelector((state) => state.category);
   const [suppliedRows, borrowedRows, totalSuppliedUSD, totalBorrowedUSD, borrowedAll] =
     activeTab == "main" ? usePortfolioAssets() : usePortfolioMEMEAssets();
+
+  useEffect(() => {
+    return () => {
+      dispatch(setDashBoardActiveTab("main"));
+    };
+  }, [dispatch]);
   // const [
   //   suppliedMEMERows,
   //   borrowedMEMERows,
@@ -46,6 +52,7 @@ const Index = () => {
   // ] = usePortfolioMEMEAssets();
 
   const isMobile = isMobileDevice();
+
   let overviewNode;
   if (accountId) {
     overviewNode = <DashboardOverview suppliedRows={suppliedRows} borrowedRows={borrowedRows} />;
