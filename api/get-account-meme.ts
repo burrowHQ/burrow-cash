@@ -19,8 +19,6 @@ const getAccountMEME = async () => {
     );
     const portfolio = await getPortfolioMEME(accountId);
 
-    console.log(accountId, accountBalance, balances, portfolio, tokenIds, "accountMEMe");
-
     return { accountId, accountBalance, balances, portfolio, tokenIds };
   }
 

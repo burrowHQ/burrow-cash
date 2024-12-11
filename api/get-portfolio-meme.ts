@@ -11,7 +11,6 @@ const getPortfolioMEME = async (account_id: string): Promise<IAccountAllPosition
       account_id,
     },
   )) as IAccountAllPositionsDetailed;
-  console.log(accountDetailed, "getPortfolioMEME");
   return accountDetailed;
 };
 

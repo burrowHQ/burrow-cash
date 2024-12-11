@@ -50,7 +50,6 @@ export const getNetAPYMEME = ({ isStaking = false }: { isStaking: boolean }) =>
       const [gainBorrowed, totalBorrowed] = getGainsArr(borrows, assets);
       const [gainCollateral, totalCollateral] = getGainsArr(collaterals, assets);
       const [gainSupplied, totalSupplied] = getGains(account.portfolio, assets, "supplied");
-
       const gainExtra = extraDaily * 365;
 
       const netGains = gainCollateral + gainSupplied + gainExtra - gainBorrowed;
@@ -59,8 +58,7 @@ export const getNetAPYMEME = ({ isStaking = false }: { isStaking: boolean }) =>
         totalSupplied -
         totalBorrowed -
         (isStaking ? Number(amount || 0) * (booster_token_asset.price?.usd || 0) : 0);
-      const netAPY = (netGains / netTotals) * 100;
-
+      const netAPY = netTotals > 0 ? (netGains / netTotals) * 100 : 0;
       return netAPY || 0;
     },
   );
