@@ -6,3 +6,4 @@ tsconfig.tsbuildinfo
 .prettierignore
 yarn-error.log
 .prettierrc
+public/*
