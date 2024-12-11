@@ -37,7 +37,6 @@ const Index = () => {
   const { dashBoardActiveTab: activeTab = "main" } = useAppSelector((state) => state.category);
   const [suppliedRows, borrowedRows, totalSuppliedUSD, totalBorrowedUSD, borrowedAll] =
     activeTab == "main" ? usePortfolioAssets() : usePortfolioMEMEAssets();
-
   // const [
   //   suppliedMEMERows,
   //   borrowedMEMERows,
@@ -74,7 +73,7 @@ const Index = () => {
     supplyBorrowNode = (
       <SupplyBorrowListMobile
         suppliedRows={suppliedRows}
-        borrowedRows={borrowedAll}
+        borrowedRows={borrowedRows}
         accountId={accountId}
       />
     );
@@ -82,7 +81,7 @@ const Index = () => {
     supplyBorrowNode = (
       <StyledSupplyBorrow className="gap-6 lg:flex mb-10">
         <YourSupplied suppliedRows={suppliedRows} accountId={accountId} total={totalSuppliedUSD} />
-        <YourBorrowed borrowedRows={borrowedAll} accountId={accountId} total={totalBorrowedUSD} />
+        <YourBorrowed borrowedRows={borrowedRows} accountId={accountId} total={totalBorrowedUSD} />
       </StyledSupplyBorrow>
     );
   }

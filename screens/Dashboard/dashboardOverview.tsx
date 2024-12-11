@@ -206,7 +206,7 @@ const DashboardOverview = ({ suppliedRows, borrowedRows }) => {
                     )}
                   </div>
 
-                  <div
+                  {/* <div
                     className="flex flex-wrap mt-3 lg3:mt-1"
                     style={{ minWidth: rewardsObj?.extra?.length > 1 ? 45 : 20 }}
                   >
@@ -237,7 +237,7 @@ const DashboardOverview = ({ suppliedRows, borrowedRows }) => {
                           );
                         })
                       : null}
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>

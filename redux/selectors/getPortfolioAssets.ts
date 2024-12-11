@@ -205,7 +205,6 @@ export const getPortfolioAssets = createSelector(
         .filter(app.showDust ? Boolean : emptyBorrowedAsset);
       return { ...acc, [shadow_id]: b };
     }, {});
-
     const borrowedAll = Array.from(borrowed);
     Object.entries(borrowed_LP).forEach(([positionId, value]: [string, any]) => {
       borrowedAll.push(...value);
