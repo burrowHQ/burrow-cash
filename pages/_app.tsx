@@ -19,6 +19,7 @@ import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { fetchAssets, fetchRefPrices } from "../redux/assetsSlice";
 import { fetchAssetsMEME } from "../redux/assetsSliceMEME";
 import { fetchAccount, logoutAccount } from "../redux/accountSlice";
+import { fetchAccountMEME } from "../redux/accountSliceMEME";
 import { fetchConfig } from "../redux/appSlice";
 import { fetchMarginAccount } from "../redux/marginAccountSlice";
 import { fetchMarginConfig } from "../redux/marginConfigSlice";
@@ -86,6 +87,7 @@ const Init = () => {
     dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
     dispatch(fetchAssetsMEME()).then(() => dispatch(fetchRefPrices()));
     dispatch(fetchAccount());
+    dispatch(fetchAccountMEME());
     dispatch(fetchConfig());
     dispatch(fetchMarginAccount());
     dispatch(fetchMarginConfig());
@@ -125,8 +127,10 @@ function Upgrade({ Component, pageProps }) {
     await dispatch(fetchConfig());
     if (accountId) {
       await dispatch(fetchAccount());
+      await dispatch(fetchAccountMEME());
     } else {
       await dispatch(logoutAccount());
+      // await dispatch(logoutAccountMEME());
     }
   }
   return (

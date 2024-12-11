@@ -7,7 +7,7 @@ import { transformAccount } from "../transformers/account";
 import { initialState } from "./accountState";
 import getAccountMEME from "../api/get-account-meme";
 
-export const farmClaimAll = createAsyncThunk("accountMEME/farmClaimAll", async () => {
+export const farmClaimAllMEME = createAsyncThunk("accountMEME/farmClaimAll", async () => {
   const { call, logicMEMEContract } = await getBurrow();
   return call(
     logicMEMEContract,
@@ -17,7 +17,7 @@ export const farmClaimAll = createAsyncThunk("accountMEME/farmClaimAll", async (
   );
 });
 
-export const fetchAccount = createAsyncThunk("accountMEME/fetchAccount", async () => {
+export const fetchAccountMEME = createAsyncThunk("accountMEME/fetchAccount", async () => {
   const account = await getAccountMEME().then(transformAccount);
   if (account?.accountId) {
     const wallet = JSON.parse(
@@ -38,24 +38,24 @@ export const accountSliceMEME = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(farmClaimAll.pending, (state, action) => {
+    builder.addCase(farmClaimAllMEME.pending, (state, action) => {
       state.isClaiming = action.meta.requestStatus;
     });
-    builder.addCase(farmClaimAll.fulfilled, (state, action) => {
+    builder.addCase(farmClaimAllMEME.fulfilled, (state, action) => {
       state.isClaiming = action.meta.requestStatus;
     });
-    builder.addCase(farmClaimAll.rejected, (state, action) => {
+    builder.addCase(farmClaimAllMEME.rejected, (state, action) => {
       state.status = action.meta.requestStatus;
     });
-    builder.addCase(fetchAccount.pending, (state, action) => {
+    builder.addCase(fetchAccountMEME.pending, (state, action) => {
       state.status = action.meta.requestStatus;
     });
-    builder.addCase(fetchAccount.rejected, (state, action) => {
+    builder.addCase(fetchAccountMEME.rejected, (state, action) => {
       state.status = action.meta.requestStatus;
       console.error(action.payload);
       throw new Error("Failed to fetch account");
     });
-    builder.addCase(fetchAccount.fulfilled, (state, action) => {
+    builder.addCase(fetchAccountMEME.fulfilled, (state, action) => {
       state.isClaiming = undefined;
       state.status = action.meta.requestStatus;
       state.fetchedAt = new Date().toString();

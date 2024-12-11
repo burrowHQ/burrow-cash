@@ -13,6 +13,7 @@ import { BeatLoader } from "react-spinners";
 import { fetchAssets, fetchRefPrices } from "../../redux/assetsSlice";
 import { fetchAssetsMEME } from "../../redux/assetsSliceMEME";
 import { logoutAccount, fetchAccount, setAccountId } from "../../redux/accountSlice";
+import { fetchAccountMEME } from "../../redux/accountSliceMEME";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { getBurrow, accountTrim } from "../../utils";
 
@@ -61,7 +62,9 @@ const WalletButton = () => {
 
   const fetchData = (id?: string) => {
     dispatch(setAccountId(id));
+    // dispatch(setAccountIdMEME(id));
     dispatch(fetchAccount());
+    dispatch(fetchAccountMEME());
     dispatch(fetchMarginAccount());
     dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
     dispatch(fetchAssetsMEME()).then(() => dispatch(fetchRefPrices()));
@@ -69,6 +72,7 @@ const WalletButton = () => {
 
   const signOut = () => {
     dispatch(logoutAccount());
+    // dispatch(logoutAccountMEME());
   };
 
   const onMount = async () => {
