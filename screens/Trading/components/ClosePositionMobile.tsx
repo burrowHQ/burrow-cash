@@ -212,7 +212,11 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
               <div className="flex items-center justify-center">
                 {/* <span className="text-red-50">-$0.0689</span> */}
                 {/* <span className="text-xs text-gray-300 ml-1.5">(-2.01%)</span> */}
-                <span className="text-xs text-gray-300 ml-1.5">-</span>
+                <span className="text-xs text-gray-300 ml-1.5">
+                  {entryPrice !== null
+                    ? `$${toInternationalCurrencySystem_number(entryPrice)}`
+                    : "-"}
+                </span>
               </div>
             </div>
             {/* <div
