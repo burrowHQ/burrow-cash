@@ -17,6 +17,7 @@ import { FallbackError, Layout, Modal } from "../components";
 import { posthog, isPostHogEnabled } from "../utils/telemetry";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { fetchAssets, fetchRefPrices } from "../redux/assetsSlice";
+import { fetchAssetsMEME } from "../redux/assetsSliceMEME";
 import { fetchAccount, logoutAccount } from "../redux/accountSlice";
 import { fetchConfig } from "../redux/appSlice";
 import { fetchMarginAccount } from "../redux/marginAccountSlice";
@@ -83,6 +84,7 @@ const Init = () => {
 
   const fetchData = () => {
     dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
+    dispatch(fetchAssetsMEME()).then(() => dispatch(fetchRefPrices()));
     dispatch(fetchAccount());
     dispatch(fetchConfig());
     dispatch(fetchMarginAccount());

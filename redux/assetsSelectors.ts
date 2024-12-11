@@ -23,6 +23,25 @@ export const getAvailableAssets = (source?: "supply" | "borrow" | "") =>
     },
   );
 
+export const getAvailableAssetsMEME = (source?: "supply" | "borrow" | "") =>
+  createSelector(
+    (state: RootState) => state.assetsMEME.data,
+    (state: RootState) => state.accountMEME,
+    (state: RootState) => state.appMEME,
+    (assets, account, app) => {
+      const filterKey = source === "supply" ? "can_deposit" : "can_borrow";
+      const assets_filter_by_source = source
+        ? Object.keys(assets).filter((tokenId) => assets[tokenId].config[filterKey])
+        : Object.keys(assets);
+      return assets_filter_by_source
+        .filter((tokenId) => !hiddenAssets.includes(assets[tokenId].token_id))
+        .map((tokenId) => {
+          console.log(assets[tokenId], account, assets, app, "assets[tokenId]");
+          return transformAsset(assets[tokenId], account, assets, app);
+        });
+    },
+  );
+
 export const isAssetsLoading = createSelector(
   (state: RootState) => state.assets,
   (assets) => assets.status === "pending",

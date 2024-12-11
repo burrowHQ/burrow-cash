@@ -33,6 +33,7 @@ import {
 import Controls from "./Controls";
 import Action from "./Action";
 import { fetchAssets, fetchRefPrices } from "../../redux/assetsSlice";
+import { fetchAssetsMEME } from "../../redux/assetsSliceMEME";
 import { useDegenMode, usePortfolioAssets } from "../../hooks/hooks";
 import {
   CollateralTypeSelectorBorrow,
@@ -105,6 +106,7 @@ const Modal = () => {
   useEffect(() => {
     if (isOpen) {
       dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
+      dispatch(fetchAssetsMEME()).then(() => dispatch(fetchRefPrices()));
       dispatch(fetchConfig());
     }
   }, [isOpen]);

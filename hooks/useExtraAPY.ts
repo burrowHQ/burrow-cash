@@ -30,6 +30,14 @@ export function useExtraAPY({
   const totalNetTvlApy = useAppSelector(getTotalNetTvlAPY);
   const { hasNegativeNetLiquidity } = useNonFarmedAssets();
   const asset = assets.data[assetId];
+  if (!asset)
+    return {
+      computeRewardAPY: () => 0,
+      computeStakingRewardAPY: () => 0,
+      netLiquidityAPY: 0,
+      netTvlMultiplier: 0,
+      computeTokenNetRewardAPY: () => ({ apy: 0, tokenNetRewards: [] }),
+    };
   const assetDecimals = asset.metadata.decimals + asset.config.extra_decimals;
   const assetPrice = assets.data[assetId].price?.usd || 0;
   const position = assetId.indexOf(lpTokenPrefix) > -1 ? assetId : DEFAULT_POSITION;

@@ -11,6 +11,7 @@ import {
 import type { WalletSelector } from "@near-wallet-selector/core";
 import { BeatLoader } from "react-spinners";
 import { fetchAssets, fetchRefPrices } from "../../redux/assetsSlice";
+import { fetchAssetsMEME } from "../../redux/assetsSliceMEME";
 import { logoutAccount, fetchAccount, setAccountId } from "../../redux/accountSlice";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { getBurrow, accountTrim } from "../../utils";
@@ -63,6 +64,7 @@ const WalletButton = () => {
     dispatch(fetchAccount());
     dispatch(fetchMarginAccount());
     dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
+    dispatch(fetchAssetsMEME()).then(() => dispatch(fetchRefPrices()));
   };
 
   const signOut = () => {

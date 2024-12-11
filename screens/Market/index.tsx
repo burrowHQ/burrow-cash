@@ -1,14 +1,15 @@
 import MarketsTable from "./table";
 import MarketsOverview from "./overview";
-import { useAppDispatch } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { showModal } from "../../redux/appSlice";
-import { useAvailableAssets } from "../../hooks/hooks";
+import { useAvailableAssets, useAvailableAssetsMEME } from "../../hooks/hooks";
 import { useTableSorting } from "../../hooks/useTableSorting";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 
 const Market = () => {
   const dispatch = useAppDispatch();
-  const rows = useAvailableAssets();
+  const { dashBoardActiveTab } = useAppSelector((state) => state.category);
+  const rows = dashBoardActiveTab == "main" ? useAvailableAssets() : useAvailableAssetsMEME();
   const { sorting, setSorting } = useTableSorting();
   const handleOnRowClick = ({ tokenId }) => {
     dispatch(showModal({ action: "Supply", tokenId, amount: "0" }));

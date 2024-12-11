@@ -8,6 +8,11 @@ export const getConfig = createSelector(
   (app) => app.config,
 );
 
+export const getConfigMEME = createSelector(
+  (state: RootState) => state.appMEME,
+  (app) => app.config,
+);
+
 export const getModalStatus = createSelector(
   (state: RootState) => state.app,
   (app) => app.showModal,

@@ -1,6 +1,10 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { getAvailableAssets, isAssetsLoading } from "../redux/assetsSelectors";
+import {
+  getAvailableAssets,
+  getAvailableAssetsMEME,
+  isAssetsLoading,
+} from "../redux/assetsSelectors";
 import { getAccountId, getHasNonFarmedAssets, isAccountLoading } from "../redux/accountSelectors";
 import { getPortfolioAssets, getPortfolioMEMEAssets } from "../redux/selectors/getPortfolioAssets";
 import {
@@ -63,6 +67,11 @@ export function useNonFarmedAssets() {
 
 export function useAvailableAssets(type?: "supply" | "borrow" | "") {
   const rows = useAppSelector(getAvailableAssets(type));
+  return rows;
+}
+
+export function useAvailableAssetsMEME(type?: "supply" | "borrow" | "") {
+  const rows = useAppSelector(getAvailableAssetsMEME(type));
   return rows;
 }
 

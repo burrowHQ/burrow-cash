@@ -142,18 +142,22 @@ export const transformAsset = (
     collateralFactor: `${Number(asset.config.volatility_ratio / 100)}%`,
     canUseAsCollateral: asset.config.can_use_as_collateral,
     ...accountAttrs,
-    brrrBorrow: Number(
-      shrinkToken(
-        asset.farms.borrowed[brrrTokenId]?.["reward_per_day"] || "0",
-        assets[brrrTokenId].metadata.decimals,
-      ),
-    ),
-    brrrSupply: Number(
-      shrinkToken(
-        asset.farms.supplied[brrrTokenId]?.["reward_per_day"] || "0",
-        assets[brrrTokenId].metadata.decimals,
-      ),
-    ),
+    brrrBorrow: brrrTokenId
+      ? Number(
+          shrinkToken(
+            asset.farms.borrowed[brrrTokenId]?.["reward_per_day"] || "0",
+            assets[brrrTokenId]?.metadata?.decimals,
+          ),
+        )
+      : 0,
+    brrrSupply: brrrTokenId
+      ? Number(
+          shrinkToken(
+            asset.farms.supplied[brrrTokenId]?.["reward_per_day"] || "0",
+            assets[brrrTokenId]?.metadata?.decimals,
+          ),
+        )
+      : 0,
     depositRewards: getRewards("supplied", asset, assets),
     borrowRewards: getRewards("borrowed", asset, assets),
     can_borrow: asset.config.can_borrow,

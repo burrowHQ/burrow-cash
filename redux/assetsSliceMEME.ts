@@ -6,8 +6,9 @@ import getAssetsMEME from "../api/get-assets-meme";
 import getFarmMEME, { getAllFarmsMEME } from "../api/get-farm-meme";
 import { initialState } from "./assetState";
 
-export const fetchAssets = createAsyncThunk("assetsMEME/fetchAssets", async () => {
+export const fetchAssetsMEME = createAsyncThunk("assetsMEME/fetchAssets", async () => {
   const assets = await getAssetsMEME().then(transformAssets);
+  console.log(assets, "assets pppp");
   const netTvlFarm = await getFarmMEME("NetTvl");
   const allFarms = await getAllFarmsMEME().then(transformFarms);
   return { assets, netTvlFarm, allFarms };
@@ -25,17 +26,17 @@ export const assetSliceMEME = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchAssets.pending, (state) => {
+    builder.addCase(fetchAssetsMEME.pending, (state) => {
       state.status = "fetching";
     });
-    builder.addCase(fetchAssets.fulfilled, (state, action) => {
+    builder.addCase(fetchAssetsMEME.fulfilled, (state, action) => {
       state.data = action.payload.assets;
       state.netTvlFarm = action.payload.netTvlFarm?.rewards || {};
       state.allFarms = action.payload.allFarms || [];
       state.status = action.meta.requestStatus;
       state.fetchedAt = new Date().toString();
     });
-    builder.addCase(fetchAssets.rejected, (state, action) => {
+    builder.addCase(fetchAssetsMEME.rejected, (state, action) => {
       state.status = action.meta.requestStatus;
       console.error(action.payload);
       throw new Error("Failed to fetch assets and metadata");
