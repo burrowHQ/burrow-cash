@@ -30,6 +30,7 @@ import {
 } from "../../components/HashResultModal";
 import { handleTransactionResults, handleTransactionHash } from "../../services/transaction";
 import DataSource from "../../data/datasource";
+import TradingViewChart from "../../components/marginTrading/TradingViewChart";
 
 init_env("dev");
 
@@ -312,7 +313,7 @@ const Trading = () => {
             </div>
           </div>
           <div style={{ height: "520px" }}>
-            {/* <TradingViewWidget symbol="NASDAQ:AAPL" theme={Themes.DARK} locale="en" autosize /> */}
+            <TradingViewChart />
           </div>
         </div>
         {/* right tradingopts */}
