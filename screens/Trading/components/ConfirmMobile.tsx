@@ -134,10 +134,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
   // };
 
   const confirmOpenPosition = async () => {
-    console.log(marginAccountList, max_active_user_margin_position);
-    if (Object.values(marginAccountList).length >= max_active_user_margin_position) {
-      return showToast("User has exceeded the maximum number of open positions！");
-    }
+    // console.log(marginAccountList, max_active_user_margin_position);
 
     setIsDisabled(true);
     const openPositionParams = {

@@ -21,6 +21,7 @@ import {
   RedSolidSubmitButton as RedSolidButton,
 } from "../../../components/Modal/button";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
+import { MaxPositionIcon } from "./Icon";
 
 // main components
 const TradingOperate = () => {
@@ -50,6 +51,7 @@ const TradingOperate = () => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [rangeMount, setRangeMount] = useState(1);
   const [isDisabled, setIsDisabled] = useState(false);
+  const [isMaxPosition, setIsMaxPosition] = useState(false);
 
   //
   const [longInput, setLongInput] = useState("");
@@ -169,6 +171,12 @@ const TradingOperate = () => {
     };
     setDisableBasedOnInputs();
   }, [activeTab, ReduxcategoryCurrentBalance2, longInput, shortInput, longOutput, shortOutput]);
+
+  useEffect(() => {
+    if (Object.values(marginAccountList).length >= max_active_user_margin_position) {
+      setIsMaxPosition(true);
+    }
+  }, [marginAccountList]);
 
   const isValidDecimalString = (str) => {
     if (str <= 0) return false;
@@ -594,6 +602,14 @@ const TradingOperate = () => {
                 </div>
               </div>
               <div className=" text-red-150 text-xs font-normal">{estimateData?.swapError}</div>
+              {isMaxPosition && (
+                <div className=" text-[#EA3F68] text-sm font-normal flex items-start my-1">
+                  <MaxPositionIcon />
+                  <span className="ml-1">
+                    User has exceeded the maximum number of open positions！
+                  </span>
+                </div>
+              )}
               {/* <div
                 className={`flex items-center justify-between  text-dark-200 text-base rounded-md h-12 text-center  ${
                   isDisabled ? "bg-slate-700 cursor-default" : "bg-primary cursor-pointer"
@@ -604,7 +620,7 @@ const TradingOperate = () => {
               </div> */}
               <YellowSolidButton
                 className="w-full"
-                disabled={isDisabled}
+                disabled={isDisabled || isMaxPosition}
                 onClick={handleConfirmButtonClick}
               >
                 Long {cateSymbol} {rangeMount}x
@@ -757,6 +773,14 @@ const TradingOperate = () => {
                 </div>
               </div>
 
+              {isMaxPosition && (
+                <div className=" text-[#EA3F68] text-sm font-normal flex items-start my-1">
+                  <MaxPositionIcon />
+                  <span className="ml-1">
+                    User has exceeded the maximum number of open positions！
+                  </span>
+                </div>
+              )}
               {/* <div
                 className={`flex items-center justify-between  text-dark-200 text-base rounded-md h-12 text-center  ${
                   isDisabled ? "bg-slate-700 cursor-default" : "bg-red-50 cursor-pointer"
@@ -767,7 +791,7 @@ const TradingOperate = () => {
               </div> */}
               <RedSolidButton
                 className="w-full"
-                disabled={isDisabled}
+                disabled={isDisabled || isMaxPosition}
                 onClick={handleConfirmButtonClick}
               >
                 Short {cateSymbol} {rangeMount}x
