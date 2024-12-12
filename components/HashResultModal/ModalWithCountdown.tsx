@@ -16,6 +16,15 @@ interface PositionResultProps {
   };
 }
 
+export const FilledIcon = () => {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="10" cy="10" r="10" fill="#6FA300" />
+      <path d="M5 9.21053L8.87097 13L15 7" stroke="#2E304B" strokeWidth="2" />
+    </svg>
+  );
+};
+
 const ModalWithCountdown = ({
   show,
   onClose,
@@ -107,11 +116,14 @@ const ModalWithCountdown = ({
                   {type} {positionSize.symbol}
                 </div>
               </div>
-              <div className="text-gray-1000 text-sm ml-auto">Filled</div>
+              <div className="text-[#6FA300] text-sm ml-auto flex items-center">
+                <span className="mr-1">Filled</span>
+                <FilledIcon />
+              </div>
             </div>
             <div className="fc justify-between text-sm font-normal">
               <span className="text-gray-300">Price</span>
-              <span>${price}</span>
+              <span>${beautifyPrice(Number(price))}</span>
             </div>
             <div className="fc justify-between text-sm font-normal">
               <span className="text-gray-300">Position Size</span>

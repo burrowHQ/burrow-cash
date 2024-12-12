@@ -867,3 +867,7 @@ options-list::-webkit-scrollbar {
 .MuiTooltip-tooltip {
   max-width: 350px !important;
 }
+
+#TVChartContainer.fullscreen {
+  @apply fixed top-0 left-0 w-screen h-screen z-[1000] bg-black/50;
+}

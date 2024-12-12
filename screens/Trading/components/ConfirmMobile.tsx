@@ -24,6 +24,7 @@ import { handleTransactionHash, handleTransactionResults } from "../../../servic
 import { useToastMessage } from "../../../hooks/hooks";
 import { showPositionClose, showPositionFailure } from "../../../components/HashResultModal";
 import { getBurrow } from "../../../utils";
+import { MaxPositionIcon } from "./Icon";
 
 const getTokenSymbolOnly = (assetId) => {
   return assetId === "wNEAR" ? "NEAR" : assetId || "";
@@ -53,6 +54,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
   const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
   const actionShowRedColor = action === "Long";
   const [isDisabled, setIsDisabled] = useState(false);
+  const [isMinTokenPAmount, setIsMinTokenPAmount] = useState(false);
   const { marginConfigTokens, filterMarginConfigList } = useMarginConfigToken();
   const { max_active_user_margin_position, max_slippage_rate } = marginConfigTokens;
   const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
@@ -134,10 +136,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
   // };
 
   const confirmOpenPosition = async () => {
-    console.log(marginAccountList, max_active_user_margin_position);
-    if (Object.values(marginAccountList).length >= max_active_user_margin_position) {
-      return showToast("User has exceeded the maximum number of open positions！");
-    }
+    // console.log(marginAccountList, max_active_user_margin_position);
 
     setIsDisabled(true);
     const openPositionParams = {
@@ -160,7 +159,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
     const tokenDAmount = openPositionParams.token_d_amount;
     const tokenDPrice = confirmInfo.assets.data[openPositionParams.token_d_id].price.usd;
     const tokenPPrice = confirmInfo.assets.data[openPositionParams.token_p_id].price.usd;
-    const slippageRate = max_slippage_rate / 10000;
+    const slippageRate = 1 - max_slippage_rate / 10000;
 
     const calculatedValue = ((tokenDAmount * tokenDPrice) / tokenPPrice) * slippageRate;
 
@@ -172,9 +171,9 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
       { Key: "slippageRate", Value: slippageRate },
       { Key: "calculatedValue", Value: calculatedValue },
     ]);
-
     if (!(minTokenPAmount >= calculatedValue)) {
       setIsDisabled(false);
+      setIsMinTokenPAmount(true);
       return showToast("Token out does not meet contract requirements, unable to open position.");
     }
     localStorage.setItem(
@@ -371,6 +370,14 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
                 })}
               </div>
             </div>
+            {isMinTokenPAmount && (
+              <div className=" text-[#EA3F68] text-sm font-normal flex items-start mb-1">
+                <MaxPositionIcon />
+                <span className="ml-1">
+                  Unable to place order, Oracle is abnormal or Ref liquidity is insufficient.
+                </span>
+              </div>
+            )}
             {/* <div
               className={`flex items-center justify-between text-dark-200 text-base rounded-md h-12 text-center cursor-pointer ${
                 actionShowRedColor ? "bg-primary" : "bg-red-50"
@@ -384,7 +391,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
             {actionShowRedColor ? (
               <YellowSolidButton
                 className="w-full"
-                disabled={isDisabled}
+                disabled={isDisabled || isMinTokenPAmount}
                 onClick={confirmOpenPosition}
               >
                 {isDisabled ? (
@@ -396,7 +403,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
             ) : (
               <RedSolidButton
                 className="w-full"
-                disabled={isDisabled}
+                disabled={isDisabled || isMinTokenPAmount}
                 onClick={confirmOpenPosition}
               >
                 {isDisabled ? (
