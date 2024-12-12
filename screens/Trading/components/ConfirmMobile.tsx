@@ -174,7 +174,8 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
     if (!(minTokenPAmount >= calculatedValue)) {
       setIsDisabled(false);
       setIsMinTokenPAmount(true);
-      return showToast("Token out does not meet contract requirements, unable to open position.");
+      // return showToast("Token out does not meet contract requirements, unable to open position.");
+      return;
     }
     localStorage.setItem(
       "cateSymbolAndDecimals",
