@@ -578,14 +578,14 @@ const TradingOperate = () => {
                         <div key={index} className="flex mb-2 items-center">
                           {item.map((ite, ind) => {
                             return (
-                              <>
+                              <React.Fragment key={`${ite.symbol}-${ind}`}>
                                 {ind === 0 && (
                                   <>
                                     <div className="bg-opacity-10  text-xs py-0.5 pl-2.5 pr-1.5 rounded  bg-primary text-primary">{`${percentList[index]}%`}</div>
                                     <span className="mx-2">|</span>
                                   </>
                                 )}
-                                <div key={ind} className="flex items-center">
+                                <div className="flex items-center">
                                   <span>{ite.symbol === "wNEAR" ? "NEAR" : ite.symbol}</span>
                                   {ind + 1 < estimateData?.tokensPerRoute[index].length ? (
                                     <span className="mx-2">&gt;</span>
@@ -593,7 +593,7 @@ const TradingOperate = () => {
                                     ""
                                   )}
                                 </div>
-                              </>
+                              </React.Fragment>
                             );
                           })}
                         </div>
@@ -749,14 +749,14 @@ const TradingOperate = () => {
                         <div key={index} className="flex mb-2 items-center">
                           {item.map((ite, ind) => {
                             return (
-                              <>
+                              <React.Fragment key={`${ite.symbol}-${ind}`}>
                                 {ind === 0 && (
                                   <>
                                     <div className="bg-opacity-10  text-xs py-0.5 pl-2.5 pr-1.5 rounded  bg-red-50 text-red-50">{`${percentList[index]}%`}</div>
                                     <span className="mx-2">|</span>
                                   </>
                                 )}
-                                <div key={ind} className="flex items-center">
+                                <div className="flex items-center">
                                   <span>{ite.symbol === "wNEAR" ? "NEAR" : ite.symbol}</span>
                                   {ind + 1 < estimateData?.tokensPerRoute[index].length ? (
                                     <span className="mx-2">&gt;</span>
@@ -764,7 +764,7 @@ const TradingOperate = () => {
                                     ""
                                   )}
                                 </div>
-                              </>
+                              </React.Fragment>
                             );
                           })}
                         </div>
