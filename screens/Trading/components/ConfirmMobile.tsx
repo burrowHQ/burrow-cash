@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
 import { CloseIcon } from "../../../components/Modal/svg";
-import { RefLogoIcon, RightShoulder } from "./TradingIcon";
+import { RefLogoIcon, RightShoulder, MaxPositionIcon } from "./TradingIcon";
 import { toInternationalCurrencySystem_number, toDecimal } from "../../../utils/uiNumber";
 import { openPosition } from "../../../store/marginActions/openPosition";
 import { NearIcon, NearIconMini } from "../../MarginTrading/components/Icon";
@@ -24,7 +24,6 @@ import { handleTransactionHash, handleTransactionResults } from "../../../servic
 import { useToastMessage } from "../../../hooks/hooks";
 import { showPositionClose, showPositionFailure } from "../../../components/HashResultModal";
 import { getBurrow } from "../../../utils";
-import { MaxPositionIcon } from "./Icon";
 
 const getTokenSymbolOnly = (assetId) => {
   return assetId === "wNEAR" ? "NEAR" : assetId || "";
