@@ -423,22 +423,20 @@ const PositionRow = ({
   //     : netValue / sizeValueShort;
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
   const debt_assets_d = assets.find((asset) => asset.token_id === item.token_d_info.token_id);
-  const openPositionPrice = priceC;
-  let liqPriceX = 0;
+  let LiqPrice = 0;
   if (leverage > 1) {
     if (positionType.label === "Long") {
       const k1 = Number(netValue) * leverage * priceC;
       const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
-      liqPriceX = (k1 / k2 - Number(netValue)) / sizeValueLong;
+      LiqPrice = (k1 / k2 - Number(netValue)) / sizeValueLong;
+      if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
     } else {
-      liqPriceX =
-        ((netValue + sizeValueLong) *
-          openPositionPrice *
-          (1 - marginConfigTokens.min_safety_buffer / 10000)) /
+      LiqPrice =
+        ((netValue + sizeValueLong) * priceC * (1 - marginConfigTokens.min_safety_buffer / 10000)) /
         sizeValueShort;
+      if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
     }
   }
-  const LiqPrice = liqPriceX;
   const rowData = {
     pos_id: itemKey,
     data: item,
