@@ -65,6 +65,7 @@ const ModalWithCountdown = ({
     clearTimeout(countdownTimer);
     const cleanUrl = window.location.href.split("?")[0];
     window.history.replaceState({}, "", cleanUrl);
+    onClose();
   };
 
   const startCountdown = () => {
@@ -97,7 +98,7 @@ const ModalWithCountdown = ({
         <div className="z-50 fixed right-5 bottom-10 w-93 h-36 bg-dark-100 text-white border-gray-1250 border rounded-sm">
           <div className="relatvie w-full h-full p-6 flex flex-col justify-between">
             <div
-              onClick={onClose}
+              onClick={hideModal}
               className="absolute rounded-full bg-gray-1250 p-1.5 frcc cursor-pointer hover:opacity-90"
               style={{ top: "-12px", right: "-8px" }}
             >

@@ -80,7 +80,7 @@ const ModalWithFailure = ({
         <div className="z-50 fixed right-5 bottom-10 w-93 bg-dark-100 text-white border-gray-1250 border rounded-sm">
           <div className="relative w-full p-6 flex flex-col gap-3">
             <div
-              onClick={onClose}
+              onClick={hideModal}
               className="absolute rounded-full bg-gray-1250 p-1.5 frcc cursor-pointer hover:opacity-90"
               style={{ top: "-12px", right: "-8px" }}
             >
