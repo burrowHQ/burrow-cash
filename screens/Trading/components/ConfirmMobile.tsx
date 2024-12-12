@@ -1,4 +1,4 @@
-import { useState, createContext, useMemo, useEffect } from "react";
+import React, { useState, createContext, useMemo, useEffect } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
@@ -339,10 +339,10 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
               <div className="flex flex-col justify-end">
                 {confirmInfo.estimateData?.tokensPerRoute.map((item, index) => {
                   return (
-                    <div key={index} className="flex mb-2 items-center">
+                    <div key={index + item.symbol} className="flex mb-2 items-center">
                       {item.map((ite, ind) => {
                         return (
-                          <>
+                          <React.Fragment key={`${index}-${ind}-${ite.symbol}`}>
                             {ind === 0 && (
                               <>
                                 <div
@@ -355,7 +355,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
                                 <span className="mx-2">|</span>
                               </>
                             )}
-                            <div key={ind} className="flex items-center">
+                            <div className="flex items-center">
                               <span>{ite.symbol === "wNEAR" ? "NEAR" : ite.symbol}</span>
                               {ind + 1 < confirmInfo.estimateData?.tokensPerRoute[index].length ? (
                                 <span className="mx-2">&gt;</span>
@@ -363,7 +363,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
                                 ""
                               )}
                             </div>
-                          </>
+                          </React.Fragment>
                         );
                       })}
                     </div>
