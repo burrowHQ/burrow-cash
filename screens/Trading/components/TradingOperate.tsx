@@ -415,7 +415,7 @@ const TradingOperate = () => {
   };
 
   return (
-    <div className="w-full pt-4 px-4 pb-9">
+    <div className="lg:w-full pt-4 px-4 pb-9">
       <div className="flex justify-between items-center">
         <div className="flex bg-dark-200 px-0.5 py-0.5 rounded-md cursor-pointer mr-3">
           <div className={getTabClassName("long")} onClick={() => handleTabClick("long")}>
@@ -605,7 +605,9 @@ const TradingOperate = () => {
               {isMaxPosition && (
                 <div className=" text-[#EA3F68] text-sm font-normal flex items-start my-1">
                   <MaxPositionIcon />
-                  <span className="ml-1">Exceeded the maximum number of open positions！</span>
+                  <span className="ml-1">
+                    User has exceeded the maximum number of open positions！
+                  </span>
                 </div>
               )}
               {/* <div

@@ -120,7 +120,7 @@ const TradingTable = ({
     }
   };
   return (
-    <div className="flex flex-col items-center justify-center w-full">
+    <div className="flex flex-col items-center justify-center lg:w-full xsm:mx-2">
       <div className="w-full border border-dark-50 bg-gray-800 rounded-md">
         <div className="w-full border-b border-dark-50 flex justify-between items-center">
           <div className="flex">
