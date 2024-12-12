@@ -423,16 +423,22 @@ const PositionRow = ({
   //     : netValue / sizeValueShort;
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
   const debt_assets_d = assets.find((asset) => asset.token_id === item.token_d_info.token_id);
-  // const total_cap =
-  //   parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0) +
-  //   parseTokenValue(item.token_p_amount, decimalsP) * (LiqPrice || 0);
-  const total_debt = parseTokenValue(item.token_d_info.balance, decimalsD) * (priceD || 0);
-  const total_hp_fee =
-    (item.debt_cap * ((debt_assets_d?.unit_acc_hp_interest ?? 0) - item.uahpi_at_open)) / 10 ** 18;
-  // const decrease_cap = total_cap * (marginConfigTokens.min_safety_buffer / 10000);
-  const denominator = sizeValueLong * (1 - marginConfigTokens.min_safety_buffer / 10000);
-  // total_cap - decrease_cap === total_debt + total_hp_fee;
-  const LiqPrice = denominator !== 0 ? (total_debt + total_hp_fee) / denominator : 0;
+  const openPositionPrice = priceC;
+  let liqPriceX = 0;
+  if (leverage > 1) {
+    if (positionType.label === "Long") {
+      const k1 = Number(netValue) * leverage * priceC;
+      const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
+      liqPriceX = (k1 / k2 - Number(netValue)) / sizeValueLong;
+    } else {
+      liqPriceX =
+        ((netValue + sizeValueLong) *
+          openPositionPrice *
+          (1 - marginConfigTokens.min_safety_buffer / 10000)) /
+        sizeValueShort;
+    }
+  }
+  const LiqPrice = liqPriceX;
   const rowData = {
     pos_id: itemKey,
     data: item,
