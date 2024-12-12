@@ -194,16 +194,16 @@ const Trading = () => {
     <LayoutBox>
       {/* back */}
       <Link href="/marginTrading">
-        <div className="flex items-center text-sm text-gray-300 cursor-pointer mb-8">
+        <div className="flex items-center text-sm text-gray-300 cursor-pointer lg:mb-8 xsm:m-2">
           <ComeBackIcon />
           <p className="ml-3.5"> Margin Trading Markets</p>
         </div>
       </Link>
       {/* main */}
-      <div className="grid grid-cols-6 mb-4">
+      <div className="lg:grid lg:grid-cols-6 lg:mb-4 xsm:flex xsm:flex-col xsm:w-full xsm:box-border xsm:mb-4">
         {/* left charts */}
-        <div className="col-span-4 bg-gray-800 border border-dark-50 rounded-md mr-4">
-          <div className="flex justify-between items-center border-b border-dark-50 py-6 px-5 h-[100px]">
+        <div className="lg:col-span-4 bg-gray-800 border border-dark-50 rounded-md lg:mr-4 xsm:mx-2 xsm:mb-4">
+          <div className="flex justify-between items-center border-b border-dark-50 py-6 lg:px-5 h-[100px]">
             {/* cate1 */}
             <div onMouseLeave={() => handleMouseLeave("1")} className="cursor-pointer relative ">
               <div onMouseEnter={() => handleMouseEnter("1")} className="flex items-center">
@@ -317,7 +317,7 @@ const Trading = () => {
           </div>
         </div>
         {/* right tradingopts */}
-        <div className="col-span-2 bg-gray-800 border border-dark-50 rounded-md">
+        <div className="lg:col-span-2 bg-gray-800 border border-dark-50 rounded-md xsm:box-border xsm:mx-2">
           <TradingOperate />
         </div>
       </div>
