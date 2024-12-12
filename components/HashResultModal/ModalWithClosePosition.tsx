@@ -107,7 +107,7 @@ const ModalWithFailure = ({
                   type == "Long" ? "text-toolTipBoxBorderColor" : "text-red-50"
                 } text-sm ml-auto`}
               >
-                Success
+                Filled
               </div>
             </div>
             <div className="w-full h-1 bg-black">
