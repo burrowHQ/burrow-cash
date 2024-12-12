@@ -11,26 +11,29 @@ import {
 } from "../../../public/charting_library";
 import datafeed from "./datafeed";
 import { storageStore } from "../../../utils/commonUtils";
+import { LoadingCircle } from "../../LoadingSpinner";
 
 const tvStorage = storageStore("tradingview");
 export default function TradingViewChart() {
+  const [loading, setLoading] = useState(false);
   const [symbol, setSymbol] = useState("NEAR_USDC");
   const tvWidgetRef = useRef<IChartingLibraryWidget>();
   useDebounce(
     () => {
       try {
+        setLoading(true);
         initTradingView(symbol);
       } catch (error) {
         console.error("TradingViewChart", error);
       }
     },
-    1000,
+    300,
     [symbol],
   );
   function initTradingView(symbol: string) {
     const widgetOptions: ChartingLibraryWidgetOptions = {
       symbol,
-      // theme: "dark",
+      theme: "dark",
       datafeed,
       interval: tvStorage?.get("interval") || ("30" as ResolutionString),
       container: "TVChartContainer",
@@ -56,11 +59,11 @@ export default function TradingViewChart() {
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone as Timezone,
       studies_overrides: {},
       loading_screen: {
-        backgroundColor: "#E6E6E6",
-        foregroundColor: "#E6E6E6",
+        backgroundColor: "#23253a",
+        foregroundColor: "#23253a",
       },
       overrides: {
-        "paneProperties.background": "#31344D",
+        "paneProperties.background": "#23253a",
         "paneProperties.backgroundType": "solid",
         "paneProperties.vertGridProperties.color": "rgba(255,255,255, 0.03)",
         "paneProperties.horzGridProperties.color": "rgba(255,255,255, 0.03)",
@@ -68,14 +71,16 @@ export default function TradingViewChart() {
         "scalesProperties.textColor": "#C0C4E9",
         // "paneProperties.crossHairProperties.color": "red",
       },
-      custom_css_url: "https://img.ref.finance/images/custom-theme.css", // TODO-now
+      // custom_css_url: "https://img.ref.finance/images/custom-theme.css", // TODO-now
+      custom_css_url:
+        "https://ref-new-1.s3.us-east-1.amazonaws.com/images/static/charting_library/custom-theme.css", // TODO-now
     };
     tvWidgetRef.current = new widget(widgetOptions);
     tvWidgetRef.current.applyOverrides({
       "mainSeriesProperties.statusViewStyle.symbolTextSource": "ticker",
     });
-    // tvWidgetRef.current.setCSSCustomProperty("--tv-color-platform-background", "red");
     tvWidgetRef.current.onChartReady(() => {
+      setLoading(false);
       const widget = tvWidgetRef.current;
       if (!widget) return;
       widget
@@ -108,9 +113,10 @@ export default function TradingViewChart() {
   return (
     <>
       {/* <Script src="https://assets.deltatrade.ai/assets/static/charting_library/charting_library.standalone.js" />  TODO-now */}
-      {/* <Loading loading={loading}> */}
-      <div id="TVChartContainer" className="w-full h-full" />
-      {/* </Loading> */}
+      <div className="flex items-center justify-center relative w-full h-full">
+        {loading ? <LoadingCircle className="absolute animate-spin" /> : null}
+        <div id="TVChartContainer" className="w-full h-full" />
+      </div>
     </>
   );
 }

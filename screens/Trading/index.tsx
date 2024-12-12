@@ -203,7 +203,7 @@ const Trading = () => {
       <div className="grid grid-cols-6 mb-4">
         {/* left charts */}
         <div className="col-span-4 bg-gray-800 border border-dark-50 rounded-md mr-4">
-          <div className="flex justify-between items-center border-b border-dark-50 py-6 px-5">
+          <div className="flex justify-between items-center border-b border-dark-50 py-6 px-5 h-[100px]">
             {/* cate1 */}
             <div onMouseLeave={() => handleMouseLeave("1")} className="cursor-pointer relative ">
               <div onMouseEnter={() => handleMouseEnter("1")} className="flex items-center">
@@ -277,7 +277,7 @@ const Trading = () => {
                     <div
                       onMouseEnter={() => handleMouseEnter("2")}
                       onMouseLeave={() => handleMouseLeave("2")}
-                      className="bg-dark-250 border border-dark-500 rounded-sm absolute top-8 left-0 right-0 pt-0.5 text-gray-300 text-xs pb-1.5"
+                      className="bg-dark-250 border border-dark-500 rounded-sm absolute z-10 top-8 left-0 right-0 pt-0.5 text-gray-300 text-xs pb-1.5"
                     >
                       {categoryAssets2.map((item, index) => (
                         <div
@@ -312,7 +312,7 @@ const Trading = () => {
               </span>
             </div>
           </div>
-          <div style={{ height: "520px" }}>
+          <div style={{ height: "calc(100% - 100px)" }}>
             <TradingViewChart />
           </div>
         </div>
