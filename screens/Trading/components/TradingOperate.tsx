@@ -115,19 +115,6 @@ const TradingOperate = () => {
       : "text-gray-300 py-2.5 px-5";
   };
 
-  // mouse leave and enter event for slip
-  // let timer;
-  // const handleMouseEnter = () => {
-  //   clearTimeout(timer);
-  //   setShowSetUpPopup(true);
-  // };
-  // const handleMouseLeave = () => {
-  //   clearTimeout(timer);
-  //   timer = setTimeout(() => {
-  //     setShowSetUpPopup(false);
-  //   }, 200);
-  // };
-
   const cateSymbol = getTokenSymbolOnly(ReduxcategoryAssets1?.metadata?.symbol);
   // slippageTolerance change ecent
   useEffect(() => {
@@ -270,29 +257,6 @@ const TradingOperate = () => {
       const { price: priceC, decimals: decimalsC } = getAssetDetails(assetC);
       const { price: priceP, decimals: decimalsP } = getAssetDetails(assetP);
 
-      // console.log(
-      //   longInput,
-      //   "longInput",
-      //   tokenInAmount / Number(shrinkToken(estimateData?.min_amount_out, decimalsP)),
-      //   estimateData,
-      //   decimalsC,
-      //   decimalsD,
-      //   decimalsP,
-      //   assetC,
-      //   assetD,
-      //   assetP,
-      // );
-
-      // input validate
-      // const isValidate =
-      //   parseTokenValue(estimateData.min_amount_out, decimalsP) >
-      //   tokenInAmount /
-      //     ((assets.data[ReduxcategoryAssets1["token_id"]]?.price?.usd || 0) *
-      //       (1 - marginConfigTokens.max_slippage_rate / 10000));
-
-      // if (!isValidate) {
-      //   setIsDisabled(false);
-      // }
       let liqPriceX = 0;
       if (rangeMount > 1) {
         if (activeTab == "long") {
@@ -607,14 +571,7 @@ const TradingOperate = () => {
                   <span className="ml-1">Exceeded the maximum number of open positions.</span>
                 </div>
               )}
-              {/* <div
-                className={`flex items-center justify-between  text-dark-200 text-base rounded-md h-12 text-center  ${
-                  isDisabled ? "bg-slate-700 cursor-default" : "bg-primary cursor-pointer"
-                }`}
-                onClick={handleConfirmButtonClick}
-              >
-                <div className="flex-grow">Long NEAR {rangeMount}x</div>
-              </div> */}
+
               <YellowSolidButton
                 className="w-full"
                 disabled={isDisabled || isMaxPosition}

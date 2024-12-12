@@ -2,18 +2,12 @@ import Link from "next/link";
 import { useEffect, useMemo, useState, createContext } from "react";
 import { fetchAllPools, getStablePools, init_env } from "@ref-finance/ref-sdk";
 import { useRouter } from "next/router";
-import TradingViewWidget, { Themes } from "react-tradingview-widget";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 import { ComeBackIcon, ShrinkArrow, TokenArrow } from "./components/TradingIcon";
 import { NearIcon } from "../MarginTrading/components/Icon";
 import TradingTable from "./components/Table";
 import TradingOperate from "./components/TradingOperate";
-import { useEstimateSwap } from "../../hooks/useEstimateSwap";
-import { openPosition } from "../../store/marginActions/openPosition";
-import { closePosition } from "../../store/marginActions/closePosition";
-import { increaseCollateral } from "../../store/marginActions/increaseCollateral";
-import { decreaseCollateral } from "../../store/marginActions/decreaseCollateral";
 import { getAssets } from "../../redux/assetsSelectors";
 import { shrinkToken } from "../../store";
 import { getMarginConfig } from "../../redux/marginConfigSelectors";
@@ -21,13 +15,8 @@ import { formatWithCommas_usd, toInternationalCurrencySystem_number } from "../.
 import { useMarginConfigToken } from "../../hooks/useMarginConfig";
 import { setCategoryAssets1, setCategoryAssets2 } from "../../redux/marginTrading";
 import { useMarginAccount } from "../../hooks/useMarginAccount";
-import { useAccountId, usePortfolioAssets } from "../../hooks/hooks";
-import { useRouterQuery, getTransactionResult, parsedArgs } from "../../utils/txhashContract";
-import {
-  showPositionResult,
-  showPositionFailure,
-  showPositionClose,
-} from "../../components/HashResultModal";
+import { useAccountId } from "../../hooks/hooks";
+import { useRouterQuery } from "../../utils/txhashContract";
 import { handleTransactionResults, handleTransactionHash } from "../../services/transaction";
 import DataSource from "../../data/datasource";
 import TradingViewChart from "../../components/marginTrading/TradingViewChart";
@@ -47,7 +36,6 @@ const Trading = () => {
   const assets = useAppSelector(getAssets);
   const [showPopupCate1, setShowPopup1] = useState(false);
   const [showPopupCate2, setShowPopup2] = useState(false);
-  const [currentPair, setCurrentPair] = useState("");
 
   //
   const [currentTokenCate1, setCurrentTokenCate1] = useState<any>({});
@@ -55,11 +43,6 @@ const Trading = () => {
 
   const [longAndShortPosition, setLongAndShortPosition] = useState<any>([]);
 
-  const [showModal, setShowModal] = useState(false);
-
-  const handleClose = () => {
-    setShowModal(false);
-  };
   let timer;
 
   // computed currentTokenCate1 dropdown
@@ -95,15 +78,6 @@ const Trading = () => {
   useMemo(() => {
     setCurrentTokenCate2(ReduxcategoryAssets2);
   }, [ReduxcategoryAssets2]);
-
-  // async function getPoolsData() {
-  //   const { ratedPools, unRatedPools, simplePools: simplePoolsFromSdk } = await fetchAllPools();
-  //   const stablePoolsFromSdk = unRatedPools.concat(ratedPools);
-  //   const stablePoolsDetailFromSdk = await getStablePools(stablePools);
-  //   setSimplePools(simplePoolsFromSdk);
-  //   setStablePools(stablePoolsFromSdk);
-  //   setStablePoolsDetail(stablePoolsDetailFromSdk);
-  // }
 
   // mouseenter and leave inter
   const handlePopupToggle = () => {
