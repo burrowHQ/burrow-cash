@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import _, { range } from "lodash";
 import TradingToken from "./tokenbox";
-import { RefLogoIcon, SetUp, ShrinkArrow, errorTipsIcon } from "./TradingIcon";
+import { RefLogoIcon, SetUp, ShrinkArrow, errorTipsIcon, MaxPositionIcon } from "./TradingIcon";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import RangeSlider from "./RangeSlider";
 import ConfirmMobile from "./ConfirmMobile";
@@ -21,7 +21,6 @@ import {
   RedSolidSubmitButton as RedSolidButton,
 } from "../../../components/Modal/button";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
-import { MaxPositionIcon } from "./Icon";
 
 // main components
 const TradingOperate = () => {
@@ -605,9 +604,7 @@ const TradingOperate = () => {
               {isMaxPosition && (
                 <div className=" text-[#EA3F68] text-sm font-normal flex items-start my-1">
                   <MaxPositionIcon />
-                  <span className="ml-1">
-                    User has exceeded the maximum number of open positions！
-                  </span>
+                  <span className="ml-1">Exceeded the maximum number of open positions.</span>
                 </div>
               )}
               {/* <div

@@ -12,10 +12,10 @@ import { useAppSelector } from "../../../redux/hooks";
 import { getAssets } from "../../../redux/assetsSelectors";
 import { decreaseCollateral } from "../../../store/marginActions/decreaseCollateral";
 import { getAccountBalance } from "../../../redux/accountSelectors";
+import DataSource from "../../../data/datasource";
 
 export const ModalContext = createContext(null) as any;
 const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => {
-  // console.log(rowData);
   const { marginConfigTokens, getPositionType } = useMarginConfigToken();
   const { parseTokenValue, getAssetDetails, getAssetById, calculateLeverage } = useMarginAccount();
   const theme = useTheme();
@@ -26,6 +26,24 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
   const [addLeverage, setAddLeverage] = useState(0);
   const balance = useAppSelector(getAccountBalance);
   const [selectedLever, setSelectedLever] = useState(null);
+  const [entryPrice, setEntryPrice] = useState<number | null>(null);
+  useEffect(() => {
+    const fetchEntryPrice = async () => {
+      try {
+        const response = await DataSource.shared.getMarginTradingRecordEntryPrice(rowData.pos_id);
+        if (response?.code === 0 && response?.data?.[0]?.entry_price) {
+          const price = parseFloat(response.data[0].entry_price);
+          setEntryPrice(price);
+        } else {
+          setEntryPrice(null);
+        }
+      } catch (error) {
+        console.error("Failed to fetch entry price:", error);
+        setEntryPrice(null);
+      }
+    };
+    fetchEntryPrice();
+  }, [rowData]);
   const handleChangeCollateralTabClick = (tab) => {
     setChangeCollateralTab(tab);
     setInputValue(NaN);
@@ -153,33 +171,24 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
   const sizeValue =
     positionType.label === "Long" ? sizeValueLong * (priceP || 0) : sizeValueShort * (priceD || 0);
   const netValue = parseTokenValue(rowData.data.token_c_info.balance, decimalsC) * (priceC || 0);
-  const entryPrice =
-    positionType.label === "Long"
-      ? sizeValueLong === 0
-        ? 0
-        : (leverageD * priceD) / sizeValueLong
-      : sizeValueShort === 0
-      ? 0
-      : netValue / sizeValueShort;
   const debt_assets_d = rowData.assets.find(
     (asset) => asset.token_id === rowData.data.token_d_info.token_id,
   );
   const total_cap = leverageC * priceC + sizeValueLong * priceP;
-  const total_debt = leverageD * priceD;
-  const total_hp_fee =
-    (rowData.data.debt_cap *
-      ((debt_assets_d?.unit_acc_hp_interest ?? 0) - rowData.data.uahpi_at_open)) /
-    10 ** 18;
-  const decrease_cap = total_cap * (marginConfigTokens.min_safety_buffer / 10000);
-  const denominator = sizeValueLong * (1 - marginConfigTokens.min_safety_buffer / 10000);
-  const LiqPrice =
-    denominator !== 0
-      ? (total_debt +
-          total_hp_fee +
-          (priceC * leverageC * marginConfigTokens.min_safety_buffer) / 10000 -
-          priceC * leverageC) /
-        denominator
-      : 0;
+  let LiqPrice = 0;
+  if (leverage > 1) {
+    if (positionType.label === "Long") {
+      const k1 = Number(netValue) * leverage * priceC;
+      const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
+      LiqPrice = (k1 / k2 - Number(netValue)) / sizeValueLong;
+      if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
+    } else {
+      LiqPrice =
+        ((netValue + sizeValueLong) * priceC * (1 - marginConfigTokens.min_safety_buffer / 10000)) /
+        sizeValueShort;
+      if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
+    }
+  }
   const { pos_id } = rowData;
   const token_c_id = rowData.data.token_c_info.token_id;
   const amount = `${inputValue}`;
@@ -219,7 +228,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
       const newLeverage = getNewLeverageAfterAdd(mid);
       if (newLeverage >= targetMinLeverage) {
         result = mid;
-        left = mid + 0.0001; // 增加精度
+        left = mid + 0.0001;
       } else {
         right = mid - 0.0001;
       }
@@ -229,7 +238,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
   const calculateMaxRemovable = () => {
     const tokenCInfoBalance = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
     const tokenDInfoBalance = parseTokenValue(rowData.data.token_d_info.balance, decimalsD);
-    const maxLeverage = 10;
+    const maxLeverage = marginConfigTokens["max_leverage_rate"];
     let left = 0;
     let right = tokenCInfoBalance;
     let result = 0;
