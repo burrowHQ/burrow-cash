@@ -605,9 +605,7 @@ const TradingOperate = () => {
               {isMaxPosition && (
                 <div className=" text-[#EA3F68] text-sm font-normal flex items-start my-1">
                   <MaxPositionIcon />
-                  <span className="ml-1">
-                    User has exceeded the maximum number of open positions！
-                  </span>
+                  <span className="ml-1">Exceeded the maximum number of open positions！</span>
                 </div>
               )}
               {/* <div
