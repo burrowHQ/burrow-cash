@@ -139,11 +139,13 @@ const TradingTable = ({
               isSelected={selectedTab === "liquidation"}
               onClick={() => handleTabClick("liquidation")}
             />
-            <Tab
-              tabName="Account"
-              isSelected={selectedTab === "account"}
-              onClick={() => handleTabClick("account")}
-            />
+            {!filterTitle && (
+              <Tab
+                tabName="Account"
+                isSelected={selectedTab === "account"}
+                onClick={() => handleTabClick("account")}
+              />
+            )}
           </div>
           {selectedTab === "account" && accountSupplied.length > 0 && (
             <div
