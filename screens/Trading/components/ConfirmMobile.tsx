@@ -6,9 +6,8 @@ import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
 import { CloseIcon } from "../../../components/Modal/svg";
 import { RefLogoIcon, RightShoulder, MaxPositionIcon } from "./TradingIcon";
-import { toInternationalCurrencySystem_number, toDecimal } from "../../../utils/uiNumber";
+import { toInternationalCurrencySystem_number } from "../../../utils/uiNumber";
 import { openPosition } from "../../../store/marginActions/openPosition";
-import { NearIcon, NearIconMini } from "../../MarginTrading/components/Icon";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";
 import {
@@ -17,12 +16,11 @@ import {
 } from "../../../components/Modal/button";
 import { shrinkToken } from "../../../store";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
-import DataSource from "../../../data/datasource";
 import { getAccountId } from "../../../redux/accountSelectors";
 import { useRouterQuery } from "../../../utils/txhashContract";
-import { handleTransactionHash, handleTransactionResults } from "../../../services/transaction";
+import { handleTransactionResults } from "../../../services/transaction";
 import { useToastMessage } from "../../../hooks/hooks";
-import { showPositionClose, showPositionFailure } from "../../../components/HashResultModal";
+import { showPositionFailure } from "../../../components/HashResultModal";
 import { getBurrow } from "../../../utils";
 
 const getTokenSymbolOnly = (assetId) => {
@@ -44,7 +42,6 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
     };
     initBurrow();
   }, []);
-  const { toastMessage, showToast } = useToastMessage();
   const { query } = useRouterQuery();
   const accountId = useAppSelector(getAccountId);
   const dispatch = useAppDispatch();
