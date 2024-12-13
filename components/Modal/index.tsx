@@ -183,7 +183,7 @@ const Modal = () => {
                   tokenId={asset.tokenId}
                 />
               )}
-              <BorrowLimit from={maxBorrowValue} to={adjustedMaxBorrowValue} />
+              {/* <BorrowLimit from={maxBorrowValue} to={adjustedMaxBorrowValue} /> */}
             </div>
             <Alerts data={alerts} />
             <Action
