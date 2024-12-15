@@ -1,21 +1,17 @@
+import Decimal from "decimal.js";
 import dayjs from "dayjs";
 import {
   type ChartingLibraryWidgetOptions,
   type DatafeedConfiguration,
   type ResolutionString,
-  type SearchSymbolResultItem,
-  type LibrarySymbolInfo,
 } from "../../../public/charting_library";
 import { pairServices } from "../../../services/tradingView";
-
-interface SymbolInfo extends LibrarySymbolInfo {
-  full_name: string;
-}
+import { SymbolInfo, SearchSymbolResultItemInfo } from "../../../interfaces/tradingView";
+import { store } from "../../../redux/store";
+import { standardizeAsset } from "../../../utils";
 
 const lastBarsCache = new Map();
-
 const supported_resolutions = ["1", "5", "15", "30", "1H", "1D", "1W", "1M"] as ResolutionString[];
-
 const configurationData: DatafeedConfiguration = {
   supported_resolutions,
   exchanges: [
@@ -28,9 +24,35 @@ const configurationData: DatafeedConfiguration = {
   supports_marks: true,
   supports_timescale_marks: true,
 };
-
 const getAllSymbols = async () => {
-  // TODO-now query from margin_config
+  const currentState = store.getState();
+  const { marginConfig, assets } = currentState;
+  const baseIds: string[] = [];
+  const quoteIds: string[] = [];
+  Object.entries(marginConfig.registered_tokens).forEach(([id, level]) => {
+    if (level == 1) baseIds.push(id);
+    if (level == 2) quoteIds.push(id);
+  });
+  // const supportPairs: SearchSymbolResultItemInfo[] = [];
+  // baseIds.forEach((baseId) => {
+  //   const baseMeta = standardizeAsset(assets.data[baseId].metadata);
+  //   const baseSymbol = baseMeta.symbol;
+  //   quoteIds.forEach((quoteId) => {
+  //     const quoteMeta = standardizeAsset(assets.data[quoteId].metadata);
+  //     const quoteSymbol = quoteMeta.symbol;
+  //     supportPairs.push({
+  //       description: `${baseSymbol}/${quoteSymbol}`,
+  //       exchange: "Burrow",
+  //       full_name: `${baseSymbol}/${quoteSymbol}`,
+  //       symbol: `${baseSymbol}_${quoteSymbol}`,
+  //       type: "crypto",
+  //       base: baseId,
+  //       quote: quoteId,
+  //     });
+  //   });
+  // });
+  // console.log('00000000-supportPairs', supportPairs);
+  // TODO-now this is test data
   const supportPairs = [
     {
       description: "NEAR/USDC",
@@ -38,13 +60,28 @@ const getAllSymbols = async () => {
       full_name: "NEAR/USDC",
       symbol: "NEAR_USDC",
       type: "crypto",
+      base: "wrap.near",
+      quote: "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
     },
-  ] as SearchSymbolResultItem[];
+  ] as SearchSymbolResultItemInfo[];
   return supportPairs;
 };
-function getPairDecimals(symbol: string) {
-  // TODO-now caculate by token price
-  return 2;
+function getPairDecimals(symbolInfo: SearchSymbolResultItemInfo) {
+  const currentState = store.getState();
+  const { assets } = currentState;
+  const { base, quote } = symbolInfo;
+  const basePrice = assets.data?.[base]?.price?.usd || 0;
+  const quotePrice = assets.data?.[quote]?.price?.usd || 0;
+  if (!+basePrice || !+quotePrice) return 2;
+  const pair_price_decimal = new Decimal(basePrice).div(quotePrice);
+  const pair_price = new Decimal(basePrice).div(quotePrice).toFixed();
+  if (pair_price_decimal.gte(1)) {
+    return 2;
+  } else {
+    const decimalPart = pair_price.split(".")[1] || "";
+    const leadingZeros = decimalPart.match(/^0*/)?.[0].length || 0;
+    return leadingZeros + 2;
+  }
 }
 
 let pullingQueryPriceTimer: any = null;
@@ -82,7 +119,7 @@ const datafeed: ChartingLibraryWidgetOptions["datafeed"] = {
       onResolveErrorCallback("cannot resolve symbol");
       return;
     }
-    const priceDecimals = getPairDecimals(symbolItem.symbol);
+    const priceDecimals = getPairDecimals(symbolItem);
     const symbolInfo: SymbolInfo = {
       ticker: symbolItem.full_name,
       name: symbolItem.full_name,
@@ -102,6 +139,8 @@ const datafeed: ChartingLibraryWidgetOptions["datafeed"] = {
       full_name: symbolItem.full_name,
       listed_exchange: "",
       format: "price",
+      base: symbolItem.base,
+      quote: symbolItem.quote,
     };
     onSymbolResolvedCallback(symbolInfo);
     return "";
@@ -125,7 +164,7 @@ const datafeed: ChartingLibraryWidgetOptions["datafeed"] = {
     }
     try {
       const data = await pairServices.queryTradingViewHistory({
-        symbol: symbolInfo.ticker ?? "",
+        symbolInfo,
         resolution,
         from: _from,
         to,
@@ -181,12 +220,8 @@ const datafeed: ChartingLibraryWidgetOptions["datafeed"] = {
     currentSymbolInfo = symbolInfo;
     const fetchPrice = async () => {
       if (!currentSymbolInfo?.name) return;
-      const [base, quote] = currentSymbolInfo.name.includes("_")
-        ? currentSymbolInfo.name.split("_")
-        : currentSymbolInfo.name.split("/");
-      // TODO-now query token id by symbol
-      // const pairId = `${getTokenAddress(base)}:${getTokenAddress(quote)}`;
-      const pairId = "wrap.near:17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1";
+      const { base, quote } = currentSymbolInfo;
+      const pairId = `${base}:${quote}`;
       const pairPrice = await pairServices.queryPairPrice(pairId);
       console.log("subscribe price", currentSymbolInfo.name, pairPrice[pairId]?.pairPrice);
       const price = Number(pairPrice?.[pairId]?.pairPrice || 0);

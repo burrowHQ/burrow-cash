@@ -20,6 +20,7 @@ import { useRouterQuery } from "../../utils/txhashContract";
 import { handleTransactionResults, handleTransactionHash } from "../../services/transaction";
 import DataSource from "../../data/datasource";
 import TradingViewChart from "../../components/marginTrading/TradingViewChart";
+import { standardizeAsset } from "../../utils";
 
 init_env("dev");
 
@@ -44,7 +45,6 @@ const Trading = () => {
   const [longAndShortPosition, setLongAndShortPosition] = useState<any>([]);
 
   let timer;
-
   // computed currentTokenCate1 dropdown
   useEffect(() => {
     if (id) {
@@ -287,7 +287,10 @@ const Trading = () => {
             </div>
           </div>
           <div style={{ height: "calc(100% - 100px)" }}>
-            <TradingViewChart />
+            <TradingViewChart
+              baseSymbol={standardizeAsset(currentTokenCate1?.metadata)?.symbol}
+              quoteSymbol={standardizeAsset(currentTokenCate2?.metadata)?.symbol}
+            />
           </div>
         </div>
         {/* right tradingopts */}

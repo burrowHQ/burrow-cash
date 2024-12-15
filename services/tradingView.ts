@@ -1,3 +1,5 @@
+import { SymbolInfo, SearchSymbolResultItemInfo } from "../interfaces/tradingView";
+
 const apiDomain = "https://api.deltatrade.ai/api";
 interface PairPrice {
   pair_id: string;
@@ -58,7 +60,7 @@ export const pairServices = {
     return result;
   },
   async queryTradingViewHistory(params: {
-    symbol: string;
+    symbolInfo: SymbolInfo;
     resolution: string;
     from: number;
     to: number;
@@ -70,13 +72,15 @@ export const pairServices = {
     }
   },
 };
-async function mockData(params: { symbol: string; resolution: string; from: number; to: number }) {
-  if (!params.symbol) return;
-  const [base, quote] = params.symbol.includes("_")
-    ? params.symbol.split("_")
-    : params.symbol.split("/");
-  //   const pairId = `${base}:${quote}`; TODO-now
-  const pairId = "wrap.near:17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1";
+async function mockData(params: {
+  symbolInfo: SymbolInfo;
+  resolution: string;
+  from: number;
+  to: number;
+}) {
+  if (!params.symbolInfo) return;
+  const { base, quote } = params.symbolInfo;
+  const pairId = `${base}:${quote}`;
   let priceData: {
     open: number;
     close: number;

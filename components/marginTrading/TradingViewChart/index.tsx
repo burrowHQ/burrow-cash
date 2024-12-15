@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import Script from "next/script";
+import _ from "lodash";
 import { useDebounce } from "react-use";
 import {
   type ChartingLibraryWidgetOptions,
@@ -12,23 +12,39 @@ import {
 import datafeed from "./datafeed";
 import { storageStore } from "../../../utils/commonUtils";
 import { LoadingCircle } from "../../LoadingSpinner";
+import { getAssets } from "../../../redux/assetsSelectors";
+import { getMarginConfig } from "../../../redux/marginConfigSelectors";
+import { useAppSelector } from "../../../redux/hooks";
 
 const tvStorage = storageStore("tradingview");
-export default function TradingViewChart() {
+export default function TradingViewChart({
+  baseSymbol,
+  quoteSymbol,
+}: {
+  baseSymbol: string;
+  quoteSymbol: string;
+}) {
   const [loading, setLoading] = useState(false);
-  const [symbol, setSymbol] = useState("NEAR_USDC");
   const tvWidgetRef = useRef<IChartingLibraryWidget>();
+  const assets = useAppSelector(getAssets);
+  const marginConfig = useAppSelector(getMarginConfig);
+  const assets_cached = !_.isEmpty(assets?.data);
+  const margin_cached = !_.isEmpty(marginConfig?.registered_tokens);
+  // const symbol = `${baseSymbol}/${quoteSymbol}`;
+  const symbol = "NEAR/USDC"; // TODO-now this is test data
   useDebounce(
     () => {
       try {
-        setLoading(true);
-        initTradingView(symbol);
+        if (assets_cached && margin_cached && baseSymbol && quoteSymbol) {
+          setLoading(true);
+          initTradingView(symbol);
+        }
       } catch (error) {
         console.error("TradingViewChart", error);
       }
     },
     300,
-    [symbol],
+    [baseSymbol, quoteSymbol, assets_cached, margin_cached],
   );
   function initTradingView(symbol: string) {
     const widgetOptions: ChartingLibraryWidgetOptions = {
@@ -69,11 +85,8 @@ export default function TradingViewChart() {
         "paneProperties.horzGridProperties.color": "rgba(255,255,255, 0.03)",
         "paneProperties.separatorColor": "transparent",
         "scalesProperties.textColor": "#C0C4E9",
-        // "paneProperties.crossHairProperties.color": "red",
       },
-      // custom_css_url: "https://img.ref.finance/images/custom-theme.css", // TODO-now
-      custom_css_url:
-        "https://ref-new-1.s3.us-east-1.amazonaws.com/images/static/charting_library/custom-theme.css", // TODO-now
+      custom_css_url: "https://img.ref.finance/images/static/charting_library/custom-theme.css",
     };
     tvWidgetRef.current = new widget(widgetOptions);
     tvWidgetRef.current.applyOverrides({
@@ -111,13 +124,10 @@ export default function TradingViewChart() {
     });
   }
   return (
-    <>
-      {/* <Script src="https://assets.deltatrade.ai/assets/static/charting_library/charting_library.standalone.js" />  TODO-now */}
-      <div className="flex items-center justify-center relative w-full h-full">
-        {loading ? <LoadingCircle className="absolute animate-spin" /> : null}
-        <div id="TVChartContainer" className="w-full h-full" />
-      </div>
-    </>
+    <div className="flex items-center justify-center relative w-full h-full">
+      {loading ? <LoadingCircle className="absolute animate-spin" /> : null}
+      <div id="TVChartContainer" className="w-full h-full" />
+    </div>
   );
 }
 
