@@ -1,5 +1,5 @@
 import Decimal from "decimal.js";
-
+import { executeBTCDepositAndAction } from "btc-wallet";
 import { decimalMin, getBurrow } from "../../utils";
 import { expandTokenDecimal } from "../helper";
 import { ChangeMethodsToken } from "../../interfaces";
@@ -41,12 +41,20 @@ export async function supply({
     ],
   };
 
-  await prepareAndExecuteTokenTransactions(tokenContract, {
-    methodName: ChangeMethodsToken[ChangeMethodsToken.ft_transfer_call],
-    args: {
+  // await prepareAndExecuteTokenTransactions(tokenContract, {
+  //   methodName: ChangeMethodsToken[ChangeMethodsToken.ft_transfer_call],
+  //   args: {
+  //     receiver_id: logicContract.contractId,
+  //     amount: expandedAmount.toFixed(0),
+  //     msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
+  //   },
+  // });
+  await executeBTCDepositAndAction({
+    action: {
       receiver_id: logicContract.contractId,
       amount: expandedAmount.toFixed(0),
       msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
     },
+    isDev: true,
   });
 }
