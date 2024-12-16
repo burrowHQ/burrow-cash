@@ -26,7 +26,7 @@ import getConfig, { incentiveTokens, topTokens } from "../../utils/config";
 function MarketsTable({ rows, sorting }: TableProps) {
   const allowedTokenIds = [
     "wbtc.ft.ref-labs.testnet",
-    "nbtc1-nsp.testnet",
+    "nbtc-dev.testnet",
     "eth.ft.ref-labs.testnet",
     "usdcc.ft.ref-labs.testnet",
     "usdtt.ft.ref-labs.testnet",
