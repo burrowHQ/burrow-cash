@@ -349,6 +349,7 @@ const TradingOperate = () => {
 
     // set input usd
     inputUsdSetter(inputUsdCharcate2 * inputAmount);
+    console.log(estimateData, "for nico");
     if (tab === "long") {
       setTokenInAmount(adjustedInputAmount / inputUsdCharcate2);
     } else {
