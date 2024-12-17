@@ -21,10 +21,12 @@ import { handleTransactionResults, handleTransactionHash } from "../../services/
 import DataSource from "../../data/datasource";
 import TradingViewChart from "../../components/marginTrading/TradingViewChart";
 import { standardizeAsset } from "../../utils";
+import { isMobileDevice } from "../../helpers/helpers";
 
 init_env("dev");
 
 const Trading = () => {
+  const isMobile = isMobileDevice();
   const marginConfig = useAppSelector(getMarginConfig);
   const { query } = useRouterQuery();
   const accountId = useAccountId();
@@ -45,6 +47,7 @@ const Trading = () => {
   const [longAndShortPosition, setLongAndShortPosition] = useState<any>([]);
 
   let timer;
+  console.log(currentTokenCate1);
   // computed currentTokenCate1 dropdown
   useEffect(() => {
     if (id) {
@@ -168,7 +171,7 @@ const Trading = () => {
     <LayoutBox>
       {/* back */}
       <Link href="/marginTrading">
-        <div className="flex items-center text-sm text-gray-300 cursor-pointer lg:mb-8 xsm:m-2">
+        <div className="flex items-center text-sm text-gray-300 cursor-pointer lg:mb-8 xsm:m-2 xsm:mb-9">
           <ComeBackIcon />
           <p className="ml-3.5"> Margin Trading Markets</p>
         </div>
@@ -176,8 +179,9 @@ const Trading = () => {
       {/* main */}
       <div className="lg:grid lg:grid-cols-6 lg:mb-4 xsm:flex xsm:flex-col xsm:w-full xsm:box-border xsm:mb-4">
         {/* left charts */}
-        <div className="lg:col-span-4 bg-gray-800 border border-dark-50 rounded-md lg:mr-4 xsm:mx-2 xsm:mb-4">
-          <div className="flex justify-between items-center border-b border-dark-50 py-6 lg:px-5 h-[100px]">
+        <div className="lg:col-span-4 bg-gray-800 border border-dark-50 rounded-md lg:mr-4 xsm:mx-2 xsm:mb-4 xsm:min-h-[488px]">
+          {/* for pc */}
+          <div className="flex justify-between items-center border-b border-dark-50 py-6 lg:px-5 h-[100px] xsm:hidden">
             {/* cate1 */}
             <div onMouseLeave={() => handleMouseLeave("1")} className="cursor-pointer relative ">
               <div onMouseEnter={() => handleMouseEnter("1")} className="flex items-center">
@@ -197,36 +201,6 @@ const Trading = () => {
                 </p>
                 {/* <TokenArrow /> */}
               </div>
-              {/* {showPopupCate1 && (
-                <div
-                  onMouseEnter={() => handleMouseEnter("1")}
-                  onMouseLeave={() => handleMouseLeave("1")}
-                  className=" bg-dark-250 border border-dark-500 rounded-sm absolute top-8 left-0 right-0 pt-0.5 text-gray-300 text-xs pb-1.5"
-                >
-                  {categoryAssets1.map((item, index) => (
-                    <div
-                      key={index}
-                      className="py-1 pl-1.5 hover:bg-gray-950"
-                      onClick={() => handleTokenSelectCate1(item)}
-                    >
-                      <div className="flex items-center">
-                        {item?.metadata?.symbol === "wNEAR" ? (
-                          <NearIcon />
-                        ) : (
-                          <img
-                            alt=""
-                            src={item?.metadata?.icon}
-                            style={{ width: "26px", height: "26px" }}
-                          />
-                        )}
-                        <p className="ml-2 mr-3.5 text-sm">
-                          {item?.metadata?.symbol === "wNEAR" ? "NEAR" : item?.metadata?.symbol}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )} */}
             </div>
             {/* cate2 */}
             <div className="text-sm">
@@ -286,7 +260,89 @@ const Trading = () => {
               </span>
             </div>
           </div>
-          <div style={{ height: "calc(100% - 100px)" }}>
+
+          {/* for mobile */}
+          <div className="flex flex-col border-b border-dark-50 p-6 lg:hidden">
+            {/* cate1 */}
+            <div className="cursor-pointer relative mb-[21px]">
+              <div className="flex">
+                <img
+                  alt=""
+                  src={currentTokenCate1?.metadata?.icon}
+                  style={{ width: "24px", height: "24px" }}
+                  className="rounded-full mr-2 mt-0.5"
+                />
+                <div className="flex flex-col">
+                  <p className="text-base text-white">
+                    {currentTokenCate1?.metadata?.symbol === "wNEAR"
+                      ? "NEAR"
+                      : currentTokenCate1?.metadata?.symbol}
+                  </p>
+                  <p className="text-[#C0C4E9] text-xs">${currentTokenCate1?.price?.usd}</p>
+                </div>
+
+                {/* cate2 */}
+                <div className="text-xs">
+                  <div className="flex justify-center items-center">
+                    <div
+                      className="relative bg-gray-300 bg-opacity-20 py-[1px] rounded-sm cursor-pointer min-w-20 ml-1 mt-0.5"
+                      onMouseLeave={() => handleMouseLeave("2")}
+                    >
+                      <div
+                        onMouseEnter={() => handleMouseEnter("2")}
+                        onClick={handlePopupToggle}
+                        className="flex justify-center items-center"
+                      >
+                        <p className="mr-1">
+                          {currentTokenCate2?.metadata?.symbol ||
+                            categoryAssets2[0]?.metadata.symbol}
+                        </p>
+                        <TokenArrow />
+                      </div>
+                      {showPopupCate2 && (
+                        <div
+                          onMouseEnter={() => handleMouseEnter("2")}
+                          onMouseLeave={() => handleMouseLeave("2")}
+                          className="bg-dark-250 border border-dark-500 rounded-sm absolute z-10 top-6 left-0 right-0 pt-0.5 text-gray-300 text-xs pb-1.5"
+                        >
+                          {categoryAssets2.map((item, index) => (
+                            <div
+                              key={index}
+                              className="py-1 pl-1.5 hover:bg-gray-950"
+                              onClick={() => handleTokenSelectCate2(item)}
+                            >
+                              {item?.metadata?.symbol === "wNEAR" ? "NEAR" : item?.metadata?.symbol}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {/* <TokenArrow /> */}
+              </div>
+            </div>
+
+            {/* total v */}
+            <div className="text-sm flex items-center justify-between">
+              <p className="text-gray-300  mb-1.5">Total Volume</p>
+              <span>{formatWithCommas_usd(volumeStats.totalVolume)}</span>
+            </div>
+            {/* 24h v */}
+            <div className="text-sm flex items-center justify-between my-[16px]">
+              <p className="text-gray-300 mb-1.5">24H Volume</p>
+              <span>{formatWithCommas_usd(volumeStats.volume24h)}</span>
+            </div>
+            {/* long short */}
+            <div className="text-sm flex items-center justify-between">
+              <p className="text-gray-300 mb-1.5">Long / Short Positions</p>
+              <span>
+                ${longAndShortPosition[0]} / ${longAndShortPosition[1]}
+              </span>
+            </div>
+          </div>
+
+          <div style={{ height: isMobile ? "488px" : "calc(100% - 100px)" }}>
             <TradingViewChart
               baseSymbol={standardizeAsset(currentTokenCate1?.metadata)?.symbol}
               quoteSymbol={standardizeAsset(currentTokenCate2?.metadata)?.symbol}
