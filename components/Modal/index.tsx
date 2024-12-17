@@ -15,7 +15,7 @@ import { recomputeHealthFactorSupply } from "../../redux/selectors/recomputeHeal
 import { recomputeHealthFactorRepay } from "../../redux/selectors/recomputeHealthFactorRepay";
 import { recomputeHealthFactorRepayFromDeposits } from "../../redux/selectors/recomputeHealthFactorRepayFromDeposits";
 import { formatWithCommas_number } from "../../utils/uiNumber";
-import { DEFAULT_POSITION, lpTokenPrefix } from "../../utils/config";
+import { DEFAULT_POSITION, lpTokenPrefix, NBTCTokenId } from "../../utils/config";
 import { Wrapper } from "./style";
 import { getModalData } from "./utils";
 import {
@@ -28,6 +28,7 @@ import {
   CollateralSwitch,
   CollateralTip,
   BorrowLimit,
+  Receive,
 } from "./components";
 import Controls from "./Controls";
 import Action from "./Action";
@@ -70,7 +71,10 @@ const Modal = () => {
   const maxBorrowAmountPositions = useAppSelector(getBorrowMaxAmount(tokenId));
   const maxWithdrawAmount = useAppSelector(getWithdrawMaxAmount(tokenId));
   const repayPositions = useAppSelector(getRepayPositions(tokenId));
-  const { availableBalance: btcAvailableBalance } = useBtcAction(0);
+  const { availableBalance: btcAvailableBalance, receiveAmount } = useBtcAction({
+    inputAmount: amount,
+    decimals: asset.decimals,
+  });
   const activePosition =
     action === "Repay" || action === "Borrow"
       ? selectedCollateralType
@@ -125,7 +129,7 @@ const Modal = () => {
   }
   const repay_to_lp =
     action === "Repay" && isRepayFromDeposits && selectedCollateralType !== DEFAULT_POSITION;
-  const isBtc = action === "Supply" && asset.tokenId === "nbtc-dev.testnet";
+  const isBtc = action === "Supply" && asset.tokenId === NBTCTokenId;
   return (
     <MUIModal open={isOpen} onClose={handleClose}>
       <Wrapper
@@ -171,6 +175,7 @@ const Modal = () => {
               available$={available$}
             />
             <div className="flex flex-col gap-4 mt-6">
+              {isBtc ? <Receive value={receiveAmount} /> : null}
               <HealthFactor value={healthFactor} />
               {repay_to_lp ? (
                 <HealthFactor value={single_healthFactor} title="Health Factor(Single)" />

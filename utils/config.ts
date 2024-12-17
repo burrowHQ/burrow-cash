@@ -170,5 +170,4 @@ const getConfig = (env: string = defaultNetwork) => {
 
 export const isTestnet = getConfig(defaultNetwork).networkId === "testnet";
 export const REFV1_CONTRACT_NAME = getConfig().REF_FI_CONTRACT_ID;
-
 export default getConfig;

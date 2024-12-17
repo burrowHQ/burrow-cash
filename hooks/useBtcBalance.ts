@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react";
 import { useDebounce } from "react-use";
 import Decimal from "decimal.js";
-import { useBtcWalletSelector, getBtcBalance } from "btc-wallet";
+import { useBtcWalletSelector, getBtcBalance, estimateDepositAmount } from "btc-wallet";
+import { expandToken, shrinkToken } from "../store/helper";
 
-export function useBtcAction({ updater }: any) {
+export function useBtcAction({ updater, inputAmount, decimals }: any) {
   const [balance, setBalance] = useState<number>(0);
+  const [receiveAmount, setReceiveAmount] = useState<string>("0");
   const [availableBalance, setAvailableBalance] = useState<number>(0);
   const btcSelector = useBtcWalletSelector();
+  const expandInputAmount = expandToken(inputAmount || 0, decimals || 0, 0);
   useDebounce(
     () => {
       if (btcSelector?.account) {
-        // btcSelector.getBalance().then((res) => {
-        //   const _balance = new Decimal(res).div(10 ** 8).toString();
-        //   setBalance(_balance);
-        // });
         getBtcBalance().then((res) => {
           const { rawBalance, balance: btcBalance, availableBalance: btcAvailableBalance } = res;
           setBalance(btcBalance || 0);
@@ -24,9 +23,24 @@ export function useBtcAction({ updater }: any) {
     500,
     [btcSelector?.account, updater],
   );
+  useDebounce(
+    () => {
+      const inputAmountDecimal = new Decimal(expandInputAmount || 0);
+      if (inputAmountDecimal.lte(0)) {
+        setReceiveAmount("0");
+      } else {
+        estimateDepositAmount(expandInputAmount, { isDev: true }).then((received: string) => {
+          setReceiveAmount(shrinkToken(received || "0", decimals));
+        });
+      }
+    },
+    500,
+    [expandInputAmount],
+  );
 
   return {
     balance,
     availableBalance,
+    receiveAmount,
   };
 }

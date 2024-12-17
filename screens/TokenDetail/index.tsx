@@ -924,10 +924,14 @@ function TokenUserInfo() {
   const { tokenId, tokens, isLpToken, price } = tokenRow;
   const accountId = useAccountId();
   const isWrappedNear = tokenRow.symbol === "NEAR";
-  const { supplyBalance, maxBorrowAmountPositions } = useUserBalance(tokenId, isWrappedNear);
+  const { supplyBalance, maxBorrowAmountPositions, btcSupplyBalance } = useUserBalance(
+    tokenId,
+    isWrappedNear,
+  );
   const handleSupplyClick = useSupplyTrigger(tokenId);
   const handleBorrowClick = useBorrowTrigger(tokenId);
   const dispatch = useAppDispatch();
+  const isBtc = tokenId === NBTCTokenId;
   function getIcons() {
     return (
       <div className="flex items-center justify-center flex-wrap flex-shrink-0">
@@ -1062,7 +1066,7 @@ function TokenUserInfo() {
         {accountId ? (
           <>
             <YellowSolidButton
-              disabled={!+supplyBalance}
+              disabled={isBtc ? !+btcSupplyBalance : !+supplyBalance}
               className="w-1 flex-grow"
               onClick={handleSupplyClick}
             >

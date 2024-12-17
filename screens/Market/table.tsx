@@ -21,12 +21,12 @@ import {
   formatWithCommas_usd,
 } from "../../utils/uiNumber";
 import { APYCell } from "./APYCell";
-import getConfig, { incentiveTokens, topTokens } from "../../utils/config";
+import getConfig, { incentiveTokens, topTokens, NBTCTokenId } from "../../utils/config";
 
 function MarketsTable({ rows, sorting }: TableProps) {
   const allowedTokenIds = [
     "wbtc.ft.ref-labs.testnet",
-    "nbtc-dev.testnet",
+    NBTCTokenId,
     "eth.ft.ref-labs.testnet",
     "usdcc.ft.ref-labs.testnet",
     "usdtt.ft.ref-labs.testnet",
