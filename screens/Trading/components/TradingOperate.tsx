@@ -378,7 +378,7 @@ const TradingOperate = () => {
   };
 
   return (
-    <div className="lg:w-full pt-4 px-4 pb-9">
+    <div className="lg:w-full pt-4 lg:px-4 pb-9">
       <div className="flex justify-between items-center">
         <div className="flex bg-dark-200 px-0.5 py-0.5 rounded-md cursor-pointer mr-3">
           <div className={getTabClassName("long")} onClick={() => handleTabClick("long")}>
