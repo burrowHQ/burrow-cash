@@ -1,6 +1,5 @@
 import { useEffect, useState, createContext } from "react";
 import { Modal as MUIModal, Typography, Box, Stack, useTheme } from "@mui/material";
-
 import Decimal from "decimal.js";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { hideModal, fetchConfig, updateAmount, updatePosition } from "../../redux/appSlice";
@@ -34,6 +33,7 @@ import Controls from "./Controls";
 import Action from "./Action";
 import { fetchAssets, fetchRefPrices } from "../../redux/assetsSlice";
 import { useDegenMode, usePortfolioAssets } from "../../hooks/hooks";
+import { useBtcAction } from "../../hooks/useBtcBalance";
 import {
   CollateralTypeSelectorBorrow,
   CollateralTypeSelectorRepay,
@@ -50,9 +50,7 @@ const Modal = () => {
   const { isRepayFromDeposits } = useDegenMode();
   const theme = useTheme();
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
-
   const { action = "Deposit", tokenId, position } = asset;
-
   const { healthFactor, maxBorrowValue: adjustedMaxBorrowValue } = useAppSelector(
     action === "Withdraw"
       ? recomputeHealthFactorWithdraw(tokenId, +amount)
@@ -72,6 +70,7 @@ const Modal = () => {
   const maxBorrowAmountPositions = useAppSelector(getBorrowMaxAmount(tokenId));
   const maxWithdrawAmount = useAppSelector(getWithdrawMaxAmount(tokenId));
   const repayPositions = useAppSelector(getRepayPositions(tokenId));
+  const { availableBalance: btcAvailableBalance } = useBtcAction(0);
   const activePosition =
     action === "Repay" || action === "Borrow"
       ? selectedCollateralType
@@ -126,6 +125,7 @@ const Modal = () => {
   }
   const repay_to_lp =
     action === "Repay" && isRepayFromDeposits && selectedCollateralType !== DEFAULT_POSITION;
+  const isBtc = action === "Supply" && asset.tokenId === "nbtc-dev.testnet";
   return (
     <MUIModal open={isOpen} onClose={handleClose}>
       <Wrapper
@@ -163,11 +163,11 @@ const Modal = () => {
             <RepayTab asset={asset} />
             <Controls
               amount={amount}
-              available={available}
+              available={isBtc ? btcAvailableBalance : available}
               action={action}
               tokenId={tokenId}
               asset={asset}
-              totalAvailable={available}
+              totalAvailable={isBtc ? btcAvailableBalance : available}
               available$={available$}
             />
             <div className="flex flex-col gap-4 mt-6">

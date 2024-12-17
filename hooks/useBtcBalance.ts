@@ -5,6 +5,7 @@ import { useBtcWalletSelector, getBtcBalance } from "btc-wallet";
 
 export function useBtcAction({ updater }: any) {
   const [balance, setBalance] = useState<number>(0);
+  const [availableBalance, setAvailableBalance] = useState<number>(0);
   const btcSelector = useBtcWalletSelector();
   useDebounce(
     () => {
@@ -14,8 +15,9 @@ export function useBtcAction({ updater }: any) {
         //   setBalance(_balance);
         // });
         getBtcBalance().then((res) => {
-          const { rawBalance, balance: btcBalance } = res;
-          setBalance(btcBalance);
+          const { rawBalance, balance: btcBalance, availableBalance: btcAvailableBalance } = res;
+          setBalance(btcBalance || 0);
+          setAvailableBalance(btcAvailableBalance || 0);
         });
       }
     },
@@ -25,5 +27,6 @@ export function useBtcAction({ updater }: any) {
 
   return {
     balance,
+    availableBalance,
   };
 }
