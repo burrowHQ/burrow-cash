@@ -90,7 +90,7 @@ const ModalWithFailure = ({
   return (
     <div>
       {isModalVisible && (
-        <div className="z-50 fixed right-5 bottom-10 w-93 bg-dark-100 text-white  border border-gray-1250 rounded-sm">
+        <div className="z-50 fixed lg:right-5 bottom-10 lg:w-93 xsm:w-[94vw] xsm:ml-[3vw] bg-dark-100 text-white  border border-gray-1250 rounded-sm">
           <div className="relative w-full p-6 flex flex-col gap-3">
             <div
               onClick={hideModal}

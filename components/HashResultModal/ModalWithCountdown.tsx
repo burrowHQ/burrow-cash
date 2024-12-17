@@ -95,7 +95,7 @@ const ModalWithCountdown = ({
   return (
     <div>
       {isModalVisible && (
-        <div className="z-50 fixed right-5 bottom-10 w-93 h-36 bg-dark-100 text-white border-gray-1250 border rounded-sm">
+        <div className="z-50 fixed lg:right-5 bottom-10 lg:w-93 xsm:w-[94vw] xsm:ml-[3vw] bg-dark-100 text-white  border border-gray-1250 rounded-sm">
           <div className="relatvie w-full h-full p-6 flex flex-col justify-between">
             <div
               onClick={hideModal}
