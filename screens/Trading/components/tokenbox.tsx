@@ -139,7 +139,7 @@ const TradingToken: React.FC<TradingTokenInter> = ({ tokenList, type, setOwnBanl
       {type === "cate2" && (
         <div onClick={sendBalance} className="text-xs flex justify-end text-gray-300">
           Balance:&nbsp;
-          <span className="text-white border-b border-dashed border-dark-800">{ownBalance}</span>
+          <span className="text-white border-b border-dark-800">{ownBalance}</span>
         </div>
       )}
       {/*  */}
