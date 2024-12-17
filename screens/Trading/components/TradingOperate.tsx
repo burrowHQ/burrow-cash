@@ -428,12 +428,20 @@ const TradingOperate = () => {
                   value={slippageTolerance}
                   style={{ width: "32px" }}
                   className={selectedSetUpOption === "auto" ? "text-gray-700" : "text-white"}
+                  onBlur={() => {
+                    if (!slippageTolerance) {
+                      slippageToleranceChange(0.5);
+                    }
+                  }}
                 />
                 <div className={selectedSetUpOption === "auto" ? "text-gray-700" : "text-white"}>
                   %
                 </div>
               </div>
             </div>
+            {!slippageTolerance && (
+              <p className="text-sm mt-2 text-red-150">Slippage is required</p>
+            )}
           </div>
         </div>
         {/* slip end */}
@@ -529,14 +537,14 @@ const TradingOperate = () => {
                   )}
                 </div>
               </div>
-              <div className="flex items-baseline justify-between text-sm mb-4">
+              {/* <div className="flex items-baseline justify-between text-sm mb-4">
                 <div className="text-gray-300 flex items-center">
                   <RefLogoIcon />
                   <span className="ml-2">Route</span>
                 </div>
                 <div className="flex flex-col justify-end">
                   {!isDisabled &&
-                    estimateData?.tokensPerRoute.map((item, index) => {
+                    estimateData?.tokensPerRoute.map((item: any[], index: React.Key | null | undefined) => {
                       return (
                         <div key={index} className="flex mb-2 items-center">
                           {item.map((ite, ind) => {
@@ -563,7 +571,7 @@ const TradingOperate = () => {
                       );
                     })}
                 </div>
-              </div>
+              </div> */}
               <div className=" text-red-150 text-xs font-normal">{estimateData?.swapError}</div>
               {isMaxPosition && (
                 <div className=" text-[#EA3F68] text-sm font-normal flex items-start my-1">
@@ -691,7 +699,7 @@ const TradingOperate = () => {
                   )}
                 </div>
               </div>
-              <div className="flex items-baseline justify-between text-sm mb-4">
+              {/* <div className="flex items-baseline justify-between text-sm mb-4">
                 <div className="text-gray-300 flex items-center">
                   <RefLogoIcon />
                   <span className="ml-2">Route</span>
@@ -725,7 +733,7 @@ const TradingOperate = () => {
                       );
                     })}
                 </div>
-              </div>
+              </div> */}
 
               {isMaxPosition && (
                 <div className=" text-[#EA3F68] text-sm font-normal flex items-start my-1">
