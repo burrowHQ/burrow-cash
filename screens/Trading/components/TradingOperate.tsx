@@ -189,22 +189,22 @@ const TradingOperate = () => {
     slippageTolerance: slippageTolerance / 100,
   });
   const [percentList, setPercentList] = useState([]);
-  useMemo(() => {
-    if (estimateData?.identicalRoutes) {
-      const { identicalRoutes } = estimateData;
-      let sum = 0;
-      const perArray = identicalRoutes.map((routes) => {
-        const k = routes.reduce((pre, cur) => {
-          return pre + (Number(cur.pool?.partialAmountIn) || 0);
-        }, 0);
-        sum += k; //
-        return k;
-      });
+  // useMemo(() => {
+  //   if (estimateData?.identicalRoutes) {
+  //     const { identicalRoutes } = estimateData;
+  //     let sum = 0;
+  //     const perArray = identicalRoutes.map((routes) => {
+  //       const k = routes.reduce((pre, cur) => {
+  //         return pre + (Number(cur.pool?.partialAmountIn) || 0);
+  //       }, 0);
+  //       sum += k; //
+  //       return k;
+  //     });
 
-      const perStrArray = perArray.map((item) => ((item * 100) / sum).toFixed(2)); //
-      setPercentList(perStrArray);
-    }
-  }, [estimateData]);
+  //     const perStrArray = perArray.map((item) => ((item * 100) / sum).toFixed(2)); //
+  //     setPercentList(perStrArray);
+  //   }
+  // }, [estimateData]);
 
   // long & short input change fn.
   const inputPriceChange = _.debounce((newValue) => {
@@ -328,8 +328,8 @@ const TradingOperate = () => {
       outputUsdSetter(0);
       setLiqPrice(0);
     } else if (tab === "long") {
-      outputSetter(estimateData?.amount_out || 0);
-      outputUsdSetter(inputUsdCharcate * (estimateData.amount_out || 0));
+      outputSetter(+(estimateData?.amount_out || 0));
+      outputUsdSetter(inputUsdCharcate * +(estimateData?.amount_out || 0));
     } else if (tab === "short") {
       outputSetter(tokenInAmount as any);
       outputUsdSetter(inputUsdCharcate * tokenInAmount);
@@ -571,8 +571,8 @@ const TradingOperate = () => {
                       );
                     })}
                 </div>
-              </div> */}
-              <div className=" text-red-150 text-xs font-normal">{estimateData?.swapError}</div>
+              </div>
+              {/* <div className=" text-red-150 text-xs font-normal">{estimateData?.swapError}</div> */}
               {isMaxPosition && (
                 <div className=" text-[#EA3F68] text-sm font-normal flex items-start my-1">
                   <MaxPositionIcon />

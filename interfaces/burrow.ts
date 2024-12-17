@@ -1,6 +1,5 @@
 import { Account, Contract } from "near-api-js";
 import type { WalletSelector } from "@near-wallet-selector/core";
-
 import {
   IMetadata,
   AssetEntry,
@@ -13,6 +12,7 @@ import {
 import { IAccount, IAccountDetailed, IAccountAllPositionsDetailed } from "./account";
 import { IPrices, IPythPrice } from "./oracle";
 import { IMarginConfig, IMarginAccountDetailedView } from "./margin";
+import { IPoolDcl, IQuoteResult } from "./pool";
 
 export interface IConfig {
   booster_decimals: number;
@@ -31,6 +31,26 @@ export interface IConfig {
   enable_price_oracle: boolean;
   enable_pyth_oracle: boolean;
 }
+export type IViewReturnType =
+  | IPrices
+  | IPythPrice
+  | IMetadata
+  | AssetEntry[]
+  | IAssetDetailed
+  | IAccountDetailed
+  | IUnitLptAsset
+  | IShadowRecordInfo
+  | IAccount[]
+  | IAccountAllPositionsDetailed
+  | Balance
+  | IConfig
+  | NetTvlFarm
+  | string
+  | boolean
+  | IMarginConfig
+  | IMarginAccountDetailedView
+  | IPoolDcl[]
+  | IQuoteResult;
 
 export interface IBurrow {
   selector: WalletSelector;
@@ -44,30 +64,8 @@ export interface IBurrow {
   oracleContract: Contract;
   refv1Contract: Contract;
   pythContract: Contract;
-  config: IConfig;
-  view: (
-    contract: Contract,
-    methodName: string,
-    args?: any,
-  ) => Promise<
-    | IPrices
-    | IPythPrice
-    | IMetadata
-    | AssetEntry[]
-    | IAssetDetailed
-    | IAccountDetailed
-    | IUnitLptAsset
-    | IShadowRecordInfo
-    | IAccount[]
-    | IAccountAllPositionsDetailed
-    | Balance
-    | IConfig
-    | NetTvlFarm
-    | string
-    | boolean
-    | IMarginConfig
-    | IMarginAccountDetailedView
-  >;
+  dclContract: Contract;
+  view: (contract: Contract, methodName: string, args?: any) => Promise<IViewReturnType>;
   call: (
     contract: Contract,
     methodName: string,

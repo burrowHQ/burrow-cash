@@ -21,6 +21,7 @@ import appReducer from "./appSlice";
 import feedReducer from "./feedSlice";
 import { migrations } from "./migrations";
 import marginCategoryReducer from "./marginTrading";
+import poolReducer from "./poolSlice";
 
 const persistConfig = {
   key: "root",
@@ -38,6 +39,7 @@ const rootReducer = combineReducers({
   app: appReducer,
   feed: feedReducer,
   category: marginCategoryReducer,
+  poolData: poolReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

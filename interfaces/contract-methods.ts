@@ -91,3 +91,9 @@ export enum ViewMethodsPyth {
 }
 
 export enum ChangeMethodsPyth {}
+
+export enum ViewMethodsDcl {
+  list_pools,
+  quote,
+}
+export enum ChangeMethodsDcl {}

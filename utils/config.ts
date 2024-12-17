@@ -13,6 +13,16 @@ export const defaultNetwork = (process.env.NEXT_PUBLIC_DEFAULT_NETWORK ||
 
 const META_TOKEN = { testnet: undefined, mainnet: "meta-token.near" };
 const REF_TOKEN = { testnet: "ref.fakes.testnet", mainnet: "token.v2.ref-finance.near" };
+interface IAppConfig {
+  REF_FI_CONTRACT_ID: string;
+  PYTH_ORACLE_CONTRACT_ID: string;
+  DCL_SWAP_CONTRACT_ID: string;
+  ORACLE_ACCOUNT_ID: string;
+  REF_EXCHANGE_ID: string;
+  recordsUrl: string;
+  findPathUrl: string;
+  indexUrl: string;
+}
 export const STABLE_POOL_IDS = [
   "4179",
   "3514",
@@ -86,11 +96,12 @@ const getConfig = (env: string = defaultNetwork) => {
         ],
         PYTH_ORACLE_CONTRACT_ID: "pyth-oracle.near",
         REF_FI_CONTRACT_ID: "v2.ref-finance.near",
-      } as unknown as ConnectConfig & {
-        REF_FI_CONTRACT_ID: string;
-        PYTH_ORACLE_CONTRACT_ID: string;
-        recordsUrl: string;
-      };
+        DCL_SWAP_CONTRACT_ID: "dclv2.ref-labs.near",
+        ORACLE_ACCOUNT_ID: "priceoracle.near",
+        REF_EXCHANGE_ID: "v2.ref-finance.near",
+        findPathUrl: "smartrouter.ref.finance",
+        indexUrl: "https://api.ref.finance",
+      } as unknown as ConnectConfig & IAppConfig;
 
     case "development":
     case "testnet":
@@ -111,11 +122,14 @@ const getConfig = (env: string = defaultNetwork) => {
         NEW_TOKENS: ["usdc.fakes.testnet", "shadow_ref_v1-0", "shadow_ref_v1-2"],
         REF_FI_CONTRACT_ID: "exchange.ref-dev.testnet",
         PYTH_ORACLE_CONTRACT_ID: "pyth-oracle.testnet",
-      } as unknown as ConnectConfig & {
-        REF_FI_CONTRACT_ID: string;
-        PYTH_ORACLE_CONTRACT_ID: string;
-        recordsUrl: string;
-      };
+        DCL_SWAP_CONTRACT_ID: "refv2-dev.ref-dev.testnet", // dclv2.ref-dev.testnet
+        ORACLE_ACCOUNT_ID: "mock-priceoracle.testnet",
+        REF_EXCHANGE_ID: "exchange.ref-dev.testnet",
+        findPathUrl: "smartroutertest.refburrow.top",
+        // findPathUrl: "smartrouter.ref.finance",
+        indexUrl: "https://dev-indexer.ref-finance.com",
+        // indexUrl: "https://api.ref.finance",
+      } as unknown as ConnectConfig & IAppConfig;
     case "betanet":
       return {
         networkId: "betanet",
@@ -124,43 +138,27 @@ const getConfig = (env: string = defaultNetwork) => {
         helperUrl: "https://helper.betanet.near.org",
         explorerUrl: "https://explorer.betanet.near.org",
         SPECIAL_REGISTRATION_TOKEN_IDS: [],
-      } as unknown as ConnectConfig & {
-        REF_FI_CONTRACT_ID: string;
-        PYTH_ORACLE_CONTRACT_ID: string;
-        recordsUrl: string;
-      };
+      } as unknown as ConnectConfig & IAppConfig;
     case "local":
       return {
         networkId: "local",
         nodeUrl: RPC_LIST[endPoint].url,
         keyPath: `${process.env.HOME}/.near/validator_key.json`,
         walletUrl: "http://localhost:4000/wallet",
-      } as unknown as ConnectConfig & {
-        REF_FI_CONTRACT_ID: string;
-        PYTH_ORACLE_CONTRACT_ID: string;
-        recordsUrl: string;
-      };
+      } as unknown as ConnectConfig & IAppConfig;
     case "test":
     case "ci":
       return {
         networkId: "shared-test",
         nodeUrl: RPC_LIST[endPoint].url,
         masterAccount: "test.near",
-      } as unknown as ConnectConfig & {
-        REF_FI_CONTRACT_ID: string;
-        PYTH_ORACLE_CONTRACT_ID: string;
-        recordsUrl: string;
-      };
+      } as unknown as ConnectConfig & IAppConfig;
     case "ci-betanet":
       return {
         networkId: "shared-test-staging",
         nodeUrl: RPC_LIST[endPoint].url,
         masterAccount: "test.near",
-      } as unknown as ConnectConfig & {
-        REF_FI_CONTRACT_ID: string;
-        PYTH_ORACLE_CONTRACT_ID: string;
-        recordsUrl: string;
-      };
+      } as unknown as ConnectConfig & IAppConfig;
     default:
       throw Error(`Unconfigured environment '${env}'. Can be configured in src/config.js.`);
   }

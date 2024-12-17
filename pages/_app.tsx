@@ -28,6 +28,7 @@ import PubTestModal from "../components/PubTestModal";
 import { getAccountId, getAccountPortfolio } from "../redux/accountSelectors";
 import { getAssets } from "../redux/assetsSelectors";
 import { getConfig } from "../redux/appSelectors";
+import { fetchAllPools } from "../redux/poolSlice";
 import "./slip.css";
 
 ModalReact.defaultStyles = {
@@ -87,6 +88,7 @@ const Init = () => {
     dispatch(fetchConfig());
     dispatch(fetchMarginAccount());
     dispatch(fetchMarginConfig());
+    dispatch(fetchAllPools());
   };
   useEffect(fetchData, []);
   useInterval(fetchData, !isIdle ? REFETCH_INTERVAL : null);

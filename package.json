@@ -69,6 +69,7 @@
     "isomorphic-unfetch": "^4.0.2",
     "lodash": "^4.17.21",
     "luxon": "^3.0.4",
+    "mathjs": "^9.3.0",
     "millify": "^5.0.1",
     "near-api-js": "~0.44.2",
     "neth": "^0.5.8",
