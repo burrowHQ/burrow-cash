@@ -326,7 +326,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
               <div className="text-gray-300">Liq. Price</div>
               <div>${beautifyPrice(confirmInfo.LiqPrice)}</div>
             </div>
-            <div className="flex items-baseline justify-between text-sm mb-4">
+            {/* <div className="flex items-baseline justify-between text-sm mb-4">
               <div className="text-gray-300 flex items-center">
                 <RefLogoIcon />
                 <span className="ml-2">Route</span>
@@ -365,7 +365,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
                   );
                 })}
               </div>
-            </div>
+            </div> */}
             {isMinTokenPAmount && (
               <div className=" text-[#EA3F68] text-sm font-normal flex items-start mb-1">
                 <MaxPositionIcon />
