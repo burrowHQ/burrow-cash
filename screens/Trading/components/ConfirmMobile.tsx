@@ -267,23 +267,23 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
             <div className="pt-10 pb-8 flex items-center justify-around  border-b border-dark-700 -mx-5 px-5 mb-5">
               <div className="text-center leading-3">
                 <p className="text-lg">
-                  {toInternationalCurrencySystem_number(confirmInfo.longInput)}{" "}
+                  {beautifyPrice(confirmInfo.longInput)}{" "}
                   {confirmInfo.longInputName?.metadata.symbol}
                 </p>
                 <span className="text-xs text-gray-300">
-                  ${toInternationalCurrencySystem_number(confirmInfo.longInputUsd)}
+                  ${beautifyPrice(confirmInfo.longInputUsd)}
                 </span>
               </div>
               <RightShoulder />
               <div className="text-center leading-3">
                 <p className="text-lg">
-                  {(+confirmInfo.longOutput).toFixed(6)}{" "}
+                  {beautifyPrice(+confirmInfo.longOutput)}{" "}
                   {confirmInfo.longOutputName?.metadata.symbol === "wNEAR"
                     ? "NEAR"
                     : confirmInfo.longOutputName?.metadata.symbol}
                 </p>
                 <span className="text-xs text-gray-300">
-                  {action} ${toInternationalCurrencySystem_number(confirmInfo.longOutputUsd)}
+                  {action} ${beautifyPrice(confirmInfo.longOutputUsd)}
                 </span>
               </div>
             </div>
@@ -316,10 +316,9 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Collateral</div>
               <div className="text-right flex">
-                {toInternationalCurrencySystem_number(confirmInfo.longInput)}{" "}
-                {confirmInfo.longInputName?.metadata.symbol}
+                {beautifyPrice(confirmInfo.longInput)} {confirmInfo.longInputName?.metadata.symbol}
                 <span className="text-xs text-gray-300 ml-1.5">
-                  (${toInternationalCurrencySystem_number(confirmInfo.longInputUsd)})
+                  (${beautifyPrice(confirmInfo.longInputUsd)})
                 </span>
               </div>
             </div>

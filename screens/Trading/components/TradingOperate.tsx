@@ -349,7 +349,6 @@ const TradingOperate = () => {
 
     // set input usd
     inputUsdSetter(inputUsdCharcate2 * inputAmount);
-
     if (tab === "long") {
       setTokenInAmount(adjustedInputAmount / inputUsdCharcate2);
     } else {
@@ -481,9 +480,9 @@ const TradingOperate = () => {
               <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Position Size</div>
                 <div className="text-right">
-                  {toInternationalCurrencySystem_number(longOutput)} {cateSymbol}
+                  {beautifyPrice(longOutput)} {cateSymbol}
                   <span className="text-xs text-gray-300 ml-1.5">
-                    (${toInternationalCurrencySystem_number(longOutputUsd)})
+                    (${beautifyPrice(longOutputUsd)})
                   </span>
                 </div>
               </div>
@@ -506,7 +505,7 @@ const TradingOperate = () => {
                     onMouseEnter={() => setShowFeeModal(true)}
                     onMouseLeave={() => setShowFeeModal(false)}
                   >
-                    ${formatDecimal(Fee.swapFee + Fee.openPFee)}
+                    ${beautifyPrice(Number(formatDecimal(Fee.swapFee + Fee.openPFee)))}
                   </p>
                   {/* {cateSymbol} */}
                   {/* <span className="text-xs text-gray-300 ml-1.5">
@@ -645,9 +644,9 @@ const TradingOperate = () => {
               <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Position Size</div>
                 <div>
-                  {toInternationalCurrencySystem_number(shortOutput)} {cateSymbol}
+                  {beautifyPrice(shortOutput)} {cateSymbol}
                   <span className="text-xs text-gray-300 ml-1.5">
-                    (${toInternationalCurrencySystem_number(shortOutputUsd)})
+                    (${beautifyPrice(shortOutputUsd)})
                   </span>
                 </div>
               </div>
@@ -669,7 +668,7 @@ const TradingOperate = () => {
                     onMouseEnter={() => setShowFeeModal(true)}
                     onMouseLeave={() => setShowFeeModal(false)}
                   >
-                    ${formatDecimal(Fee.swapFee + Fee.openPFee)}
+                    ${beautifyPrice(Number(formatDecimal(Fee.swapFee + Fee.openPFee)))}
                   </p>
                   {/* {cateSymbol} */}
                   {/* <span className="text-xs text-gray-300 ml-1.5">
