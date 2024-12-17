@@ -1,3 +1,5 @@
+import { twMerge } from "tailwind-merge";
+
 export const beautifyPrice = (num: number) => {
   // 处理科学计数法的数字
   let numStr = num.toString();
@@ -49,7 +51,14 @@ export const beautifyPrice = (num: number) => {
     return (
       <span key={num} className="animate-flipIn">
         0.0
-        <span className="text-[8px] px-px">{nonZeroIndex}</span>
+        <span
+          className={twMerge("px-px need-small", "")}
+          style={{
+            color: "#d2ff3a",
+          }}
+        >
+          {nonZeroIndex}
+        </span>
         {digits}
       </span>
     );
