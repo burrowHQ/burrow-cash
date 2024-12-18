@@ -2,7 +2,7 @@ import Decimal from "decimal.js";
 import { executeBTCDepositAndAction } from "btc-wallet";
 import { decimalMin, getBurrow } from "../../utils";
 import { expandTokenDecimal } from "../helper";
-import { ChangeMethodsToken } from "../../interfaces";
+import { NBTCTokenId } from "../../utils/config";
 import { getTokenContract, getMetadata, prepareAndExecuteTokenTransactions } from "../tokens";
 import getBalance from "../../api/get-balance";
 
@@ -23,13 +23,13 @@ export async function supply({
   const { decimals } = (await getMetadata(tokenId))!;
   const tokenContract = await getTokenContract(tokenId);
   const tokenBalance = new Decimal(await getBalance(tokenId, account.accountId));
-
-  const expandedAmount = isMax
+  let expandedAmount = isMax
     ? tokenBalance
     : decimalMin(expandTokenDecimal(amount, decimals), tokenBalance);
-
+  if (tokenId === NBTCTokenId) {
+    expandedAmount = expandTokenDecimal(amount, decimals);
+  }
   const collateralAmount = expandTokenDecimal(expandedAmount, extraDecimals);
-
   const collateralActions = {
     actions: [
       {
