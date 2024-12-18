@@ -1020,7 +1020,7 @@ function TokenUserInfo() {
             <span className="text-gray-300">BTC Chain</span>
             <span className="flex items-center">
               <span className="mr-[6px] text-sm">
-                {accountId ? btcChainDetail.availableBalance : "-"}
+                {accountId ? digitalProcess(btcChainDetail.availableBalance || 0, 8) : "-"}
               </span>
               <BtcChainIcon />
             </span>

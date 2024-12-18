@@ -22,12 +22,14 @@ export async function supply({
   const { account, logicContract } = await getBurrow();
   const { decimals } = (await getMetadata(tokenId))!;
   const tokenContract = await getTokenContract(tokenId);
-  const tokenBalance = new Decimal(await getBalance(tokenId, account.accountId));
-  let expandedAmount = isMax
-    ? tokenBalance
-    : decimalMin(expandTokenDecimal(amount, decimals), tokenBalance);
+  let expandedAmount;
   if (tokenId === NBTCTokenId) {
     expandedAmount = expandTokenDecimal(amount, decimals);
+  } else {
+    const tokenBalance = new Decimal(await getBalance(tokenId, account.accountId));
+    expandedAmount = isMax
+      ? tokenBalance
+      : decimalMin(expandTokenDecimal(amount, decimals), tokenBalance);
   }
   const collateralAmount = expandTokenDecimal(expandedAmount, extraDecimals);
   const collateralActions = {
