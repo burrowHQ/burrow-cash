@@ -533,7 +533,7 @@ const TradingOperate = () => {
                   </span> */}
 
                   {showFeeModal && (
-                    <div className="absolute bg-[#14162B] text-white w-35 h-[50px] p-2 rounded text-xs top-[30px] left-[-60px] flex flex-col items-start justify-between">
+                    <div className="absolute bg-[#14162B] text-white min-w-36 min-h-[50px] p-2 rounded text-xs top-[30px] left-[-60px] flex flex-col items-start justify-between z-[1]">
                       <p>
                         <span className="mr-1">Open Fee:</span>${beautifyPrice(Fee.openPFee)}
                       </p>
@@ -696,7 +696,7 @@ const TradingOperate = () => {
                     )
                   </span> */}
                   {showFeeModal && (
-                    <div className="absolute bg-[#14162B] text-white w-35 h-[50px] p-2 rounded text-xs top-[30px] left-[-60px] flex flex-col items-start justify-between">
+                    <div className="absolute bg-[#14162B] text-white min-w-36 min-h-[50px] p-2 rounded text-xs top-[30px] left-[-60px] flex flex-col items-start justify-between z-[1]">
                       <p>
                         <span className="mr-1">Open Fee:</span>${beautifyPrice(Fee.openPFee)}
                       </p>
