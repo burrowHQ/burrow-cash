@@ -9,7 +9,7 @@ import { RefLogoIcon, RightArrow, RightShoulder } from "./TradingIcon";
 import { toInternationalCurrencySystem_number, toDecimal } from "../../../utils/uiNumber";
 import { closePosition } from "../../../store/marginActions/closePosition";
 import { useEstimateSwap } from "../../../hooks/useEstimateSwap";
-import { useAccountId } from "../../../hooks/hooks";
+import { useAccountId, useAvailableAssets } from "../../../hooks/hooks";
 import { usePoolsData } from "../../../hooks/useGetPoolsData";
 import { shrinkToken } from "../../../store/helper";
 import {
@@ -18,10 +18,13 @@ import {
 } from "../../../components/Modal/button";
 import { showPositionClose } from "../../../components/HashResultModal";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
+import { findPathReserve } from "../../../api/get-swap-path";
 
 export const ModalContext = createContext(null) as any;
 const ClosePositionMobile = ({ open, onClose, extraProps }) => {
+  const rows = useAvailableAssets();
   const { ReduxSlippageTolerance } = useAppSelector((state) => state.category);
+  const marginAccount = useAppSelector((state) => state.marginAccount);
   const {
     itemKey,
     index,
@@ -46,6 +49,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
   const { price: priceD, symbol: symbolD, decimals: decimalsD } = getAssetDetails(assetD);
   const { price: priceC, symbol: symbolC, decimals: decimalsC } = getAssetDetails(assetC);
   const { price: priceP, symbol: symbolP, decimals: decimalsP } = getAssetDetails(assetP);
+  console.log(decimalsD, "pricePDDDD");
 
   const leverageD = parseTokenValue(item.token_d_info.balance, decimalsD);
   const leverageC = parseTokenValue(item.token_c_info.balance, decimalsC);
@@ -79,9 +83,51 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
   const actionShowRedColor = positionType.label === "Long";
 
+  const getShortExpandedValue = async () => {
+    const row: any = rows.find((row) => row.tokenId === item.token_d_info.token_id);
+
+    const res = await findPathReserve({
+      amountOut: (
+        ((row?.borrowApy || 0) * item.token_d_info.balance * 2) / (100 * 1440 * 365) +
+        item.token_d_info.balance * 1
+      ).toFixed(),
+      tokenIn: item.token_p_id,
+      tokenOut: item.token_d_info.token_id,
+      slippage: 0,
+    });
+    const debtBalance = res.result_data.amount_out;
+    const d = (shrinkToken(debtBalance, decimalsD) as any) * priceD;
+    const p = (shrinkToken(item.token_p_amount, decimalsP) as any) * priceP;
+    const minus = d - p;
+    // console.log(minus, "for nico 133 minus");
+    let expandedValue = 0;
+    if (minus > 0) {
+      // 需要c.balance + p
+      expandedValue = (minus / priceC) * 10 ** decimalsC + Number(item.token_p_amount);
+    } else {
+      // 需要 p
+      expandedValue = Number(item.token_p_amount);
+    }
+    return expandedValue.toFixed();
+  };
+
+  const [tokenInAmount, setTokenInAmount] = useState<string | null>(null);
+
+  useEffect(() => {
+    const updateTokenInAmount = async () => {
+      const amount =
+        item.token_p_id === item.token_c_info.token_id
+          ? shrinkToken(await getShortExpandedValue(), decimalsP)
+          : shrinkToken(item.token_p_amount, decimalsP);
+      setTokenInAmount(amount);
+    };
+    updateTokenInAmount();
+  }, [item]);
+
   const estimateData = useEstimateSwap({
     tokenIn_id: item.token_p_id,
     tokenOut_id: item.token_d_info.token_id,
+    // tokenIn_amount: tokenInAmount || "",
     tokenIn_amount:
       item.token_p_id === item.token_c_info.token_id
         ? shrinkToken(Number(item.token_p_amount) + Number(item.token_c_info.balance), decimalsP)
@@ -97,7 +143,20 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     setIsDisabled(!estimateData?.swap_indication || !estimateData?.min_amount_out);
   }, [estimateData]);
   const [isDisabled, setIsDisabled] = useState(false);
+
+  // 1. 当前债务的balance
+  // const debtBalance = marginAccount.debt_balance;
+  // 2. 当前债务的apy
+  // const debtApy = marginAccount.debt_apy;
+  // 3. 去swaprouter
+  // 4. 大于仓位 需要c.balance + p
+  // 5. 小于仓位 需要 p
+
   const handleCloseOpsitionEvt = async () => {
+    // return console.log(item);
+    const expandedValue =
+      positionType.label === "Short" ? await getShortExpandedValue() : item.token_p_amount;
+
     setIsDisabled(true);
     try {
       const res = await closePosition({
@@ -107,6 +166,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
         pos_id: itemKey,
         token_p_id: item.token_p_id,
         token_d_id: item.token_d_info.token_id,
+        // token_p_amount: expandedValue,
         token_p_amount:
           item.token_p_id === item.token_c_info.token_id
             ? toDecimal(Number(item.token_p_amount) + Number(item.token_c_info.balance))
@@ -114,7 +174,6 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
       });
 
       onClose();
-      console.log(res);
       if (res !== undefined && res !== null) {
         showPositionClose({
           type: positionType.label,
