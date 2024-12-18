@@ -148,11 +148,6 @@ const TradingTable = ({
               isSelected={selectedTab === "history"}
               onClick={() => handleTabClick("history")}
             />
-            <Tab
-              tabName="Liquidation"
-              isSelected={selectedTab === "liquidation"}
-              onClick={() => handleTabClick("liquidation")}
-            />
             {!filterTitle && (
               <Tab
                 tabName="Account"
@@ -297,7 +292,6 @@ const TradingTable = ({
               </tbody>
             </table>
           )}
-          {selectedTab === "liquidation" && <div>Liquidation</div>}
           {selectedTab === "account" && (
             <table className="w-full text-left">
               <thead>
@@ -359,7 +353,7 @@ const TradingTable = ({
       {/* mobile */}
       <div className="md:hidden w-full px-4 pb-[150px]">
         {/* title */}
-        <div className="grid grid-cols-3 bg-gray-800 rounded-md h-[42px] text-white text-base items-center justify-items-stretch mt-6 mb-6">
+        <div className="grid grid-cols-2 bg-gray-800 rounded-md h-[42px] text-white text-base items-center justify-items-stretch mt-6 mb-6">
           <div className="relative flex items-center justify-center border-r border-dark-1000">
             <span
               onClick={() => {
@@ -380,7 +374,7 @@ const TradingTable = ({
               <YellowBallIcon className="absolute top-6" />
             </div>
           </div>
-          <div className="relative flex items-center justify-center border-r border-dark-1000">
+          <div className="relative flex items-center justify-center">
             <span
               onClick={() => {
                 setSelectedTab("history");
@@ -394,26 +388,6 @@ const TradingTable = ({
             <div
               className={`absolute top-1 flex items-center justify-center ${
                 selectedTab === "history" ? "" : "hidden"
-              }`}
-            >
-              <span className="flex w-10 h-10 bg-gray-800" style={{ borderRadius: "50%" }} />
-              <YellowBallIcon className="absolute top-6" />
-            </div>
-          </div>
-          <div className="relative flex items-center justify-center">
-            <span
-              onClick={() => {
-                setSelectedTab("liquidation");
-              }}
-              className={`relative z-10 text-center ${
-                selectedTab === "liquidation" ? "text-primary" : ""
-              }`}
-            >
-              Liquidation
-            </span>
-            <div
-              className={`absolute top-1 flex items-center justify-center ${
-                selectedTab === "liquidation" ? "" : "hidden"
               }`}
             >
               <span className="flex w-10 h-10 bg-gray-800" style={{ borderRadius: "50%" }} />
@@ -479,7 +453,6 @@ const TradingTable = ({
           </>
         )}
         {selectedTab === "history" && <div>history</div>}
-        {selectedTab === "liquidation" && <div>Liquidation</div>}
         {!filterTitle && (
           <div
             className="fixed rounded-t-xl bottom-0 left-0 right-0 z-50 bg-gray-1300 pt-[18px] px-[32px] pb-[52px] w-full"
@@ -497,7 +470,73 @@ const TradingTable = ({
                 />
               </div>
             </div>
-            {isAccountDetailsOpen && <div className="h-[50vh] overflow-y-auto">展开</div>}
+            {isAccountDetailsOpen && (
+              <div className="h-[50vh] overflow-y-auto -ml-[32px] -mr-[32px]">
+                <table className="w-full text-left">
+                  <thead className="border-b border-gray-1350">
+                    <tr className="text-gray-300 text-sm font-normal">
+                      <th className="pb-[14px] pl-[30px]">Token</th>
+                      <th className="pb-[14px]">Balance</th>
+                      <th className="pb-[14px] text-right pr-[32px]">Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {accountSupplied.length > 0 ? (
+                      accountSupplied.map((token, index) => {
+                        const assetDetails = getAssetDetails(getAssetById(token.token_id));
+                        return (
+                          <tr
+                            key={index}
+                            className="text-sm hover:bg-dark-100 cursor-pointer font-normal "
+                          >
+                            <td className="pb-[10px] pl-[30px] pt-[10px]">
+                              <div className="flex items-center">
+                                <img
+                                  src={assetDetails.icon}
+                                  alt=""
+                                  className="w-[26px] h-[26px] rounded-2xl"
+                                />
+                                <div className="ml-2">
+                                  <p className="text-sm"> {assetDetails.symbol}</p>
+                                  <p className="text-xs text-gray-300 -mt-0.5">
+                                    {assetDetails.price
+                                      ? `$${toInternationalCurrencySystem_number(
+                                          assetDetails.price,
+                                        )}`
+                                      : "/"}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              $
+                              {toInternationalCurrencySystem_number(
+                                parseTokenValue(token.balance, 18),
+                              )}
+                            </td>
+                            <td className="text-right pr-[32px]">
+                              {assetDetails.price
+                                ? `$${toInternationalCurrencySystem_number(
+                                    parseTokenValue(token.balance, 18) * assetDetails.price,
+                                  )}`
+                                : "/"}
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan={4}>
+                          <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+                            No data
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
             <div
               className="w-full bg-primary bg-opacity-5 text-primary h-[36px] rounded-md border border-marginWithdrawAllBtn flex items-center justify-center"
               onClick={handleWithdrawAllClick}
