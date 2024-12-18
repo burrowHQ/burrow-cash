@@ -212,9 +212,36 @@ const TradingOperate = () => {
     activeTab === "long" ? setLongInput(newValue) : setShortInput(newValue);
   }, 50);
   let lastValue = "";
-  const tokenChange = (value) => {
+
+  //
+  const isValidInput = (value: string): boolean => {
+    //
+    if (value === "") return true;
+
+    //
+    const regex = /^\d*\.?\d*$/;
+    if (!regex.test(value)) return false;
+
+    //
+    const num = parseFloat(value);
+    if (Number.isNaN(num)) return false;
+
+    //
+    // const decimals = value.includes(".") ? value.split(".")[1].length : 0;
+    // if (decimals > 18) return false;
+
+    return true;
+  };
+
+  const tokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+
+    // 验证输入值
+    if (!isValidInput(value)) return;
+
+    // 处理输入变化
     if (value.includes(".") && !lastValue.includes(".")) {
-      inputPriceChange.cancel(); //
+      inputPriceChange.cancel();
       setTimeout(() => {
         inputPriceChange(value);
       }, 50);
@@ -451,10 +478,11 @@ const TradingOperate = () => {
           <>
             <div className="relative bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-30">
               <input
-                onChange={(e) => tokenChange(e.target.value)}
-                type="number"
+                onChange={tokenChange}
+                type="text"
                 value={longInput}
                 placeholder="0"
+                className="lg:max-w-[60%]"
               />
               <div className="absolute top-2 right-2">
                 <TradingToken
@@ -615,10 +643,11 @@ const TradingOperate = () => {
           <>
             <div className="relative bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-30">
               <input
-                onChange={(e) => tokenChange(e.target.value)}
-                type="number"
+                onChange={tokenChange}
+                type="text"
                 value={shortInput}
                 placeholder="0"
+                className="lg:max-w-[60%]"
               />
               <div className="absolute top-2 right-2">
                 <TradingToken
