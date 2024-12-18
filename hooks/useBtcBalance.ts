@@ -17,6 +17,10 @@ export function useBtcAction({ updater, inputAmount, decimals }: any) {
           const { rawBalance, balance: btcBalance, availableBalance: btcAvailableBalance } = res;
           setBalance(btcBalance || 0);
           setAvailableBalance(btcAvailableBalance || 0);
+          // eslint-disable-next-line no-console
+          console.log("----------------Balance", btcBalance);
+          // eslint-disable-next-line no-console
+          console.log("----------------btcAvailableBalance", btcAvailableBalance);
         });
       }
     },
@@ -31,6 +35,8 @@ export function useBtcAction({ updater, inputAmount, decimals }: any) {
       } else {
         estimateDepositAmount(expandInputAmount, { isDev: true }).then((received: string) => {
           setReceiveAmount(shrinkToken(received || "0", decimals));
+          // eslint-disable-next-line no-console
+          console.log("---------------receivedBalance", shrinkToken(received || "0", decimals));
         });
       }
     },
