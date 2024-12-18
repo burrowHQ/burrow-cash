@@ -152,7 +152,7 @@ const TradingOperate = () => {
         !isValidInput ||
           !(Number(inputValue) <= currentBalance2) ||
           !outputValue ||
-          rangeMount === 1,
+          rangeMount == 1,
       );
     };
     setDisableBasedOnInputs();
@@ -210,7 +210,7 @@ const TradingOperate = () => {
   const inputPriceChange = _.debounce((newValue) => {
     // eslint-disable-next-line no-unused-expressions
     activeTab === "long" ? setLongInput(newValue) : setShortInput(newValue);
-  }, 50);
+  }, 10);
   let lastValue = "";
 
   //
@@ -238,13 +238,12 @@ const TradingOperate = () => {
 
     // 验证输入值
     if (!isValidInput(value)) return;
-
     // 处理输入变化
     if (value.includes(".") && !lastValue.includes(".")) {
       inputPriceChange.cancel();
       setTimeout(() => {
         inputPriceChange(value);
-      }, 50);
+      }, 10);
     } else {
       inputPriceChange(value);
     }
@@ -258,7 +257,6 @@ const TradingOperate = () => {
   useEffect(() => {
     const inputUsdCharcate1 = getAssetPrice(ReduxcategoryAssets1);
     const inputUsdCharcate2 = getAssetPrice(ReduxcategoryAssets2);
-
     if (inputUsdCharcate1 && estimateData) {
       updateOutput(activeTab, inputUsdCharcate1);
     }
@@ -299,25 +297,6 @@ const TradingOperate = () => {
             shortOutput;
         }
       }
-      console.log(Number(shrinkToken(estimateData?.min_amount_out, decimalsC)));
-      // const total_debt =
-      //   (shrinkToken(ReduxcategoryAssets2.margin_debt.balance, decimalsD) as any) * priceD;
-      // const total_hp_fee =
-      //   (ReduxcategoryAssets2.margin_debt.debt_cap * (unit_acc_hp_interest - uahpi_at_open)) /
-      //   10 ** 18;
-
-      // const numerator =
-      //   total_debt +
-      //   total_hp_fee -
-      //   (shrinkToken(ReduxcategoryAssets1.margin_debt.balance, decimalsD) as any) *
-      //     priceC *
-      //     (1 - marginConfigTokens.min_safety_buffer / 10000);
-
-      // const denominator =
-      //   estimateData?.min_amount_out * (1 - marginConfigTokens.min_safety_buffer / 10000);
-
-      console.log(marginConfigTokens, ReduxcategoryAssets2, ReduxcategoryAssets1);
-
       setLiqPrice(liqPriceX);
     }
   }, [longOutput, shortOutput]);
@@ -350,7 +329,7 @@ const TradingOperate = () => {
     // set output usd
     const outputUsdSetter = tab === "long" ? setLongOutputUsd : setShortOutputUsd;
     //
-    if (input === undefined || inputUsd === 0 || !input) {
+    if (input === undefined || !input) {
       outputSetter(0);
       outputUsdSetter(0);
       setLiqPrice(0);
@@ -681,7 +660,7 @@ const TradingOperate = () => {
             <div className="mt-5">
               <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Position Size</div>
-                <div>
+                <div className="text-right">
                   {beautifyPrice(shortOutput)} {cateSymbol}
                   <span className="text-xs text-gray-300 ml-1.5">
                     (${beautifyPrice(shortOutputUsd)})
