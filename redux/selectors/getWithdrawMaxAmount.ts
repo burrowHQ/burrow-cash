@@ -41,10 +41,10 @@ export const getAdjustedSum = (
           .div(new Decimal(unitShare));
         const tokenAssetVolatilitRatio = tokenAsset.config.volatility_ratio;
         const priceViotility = tokenBalance
-          .mul(tokenPrice.multiplier)
+          .mul(tokenPrice?.multiplier || 0)
           .div(
             new Decimal(10).pow(
-              Number(tokenPrice.decimals) + Number(tokenAsset.config.extra_decimals),
+              Number(tokenPrice?.decimals || 0) + Number(tokenAsset.config.extra_decimals),
             ),
           )
           .mul(tokenAssetVolatilitRatio)
@@ -99,7 +99,7 @@ export const computeWithdrawMaxAmount = (tokenId: string, assets: Assets, portfo
         const tokenUnitBalance = shrinkToken(tokenValue.amount, tokenAsset.metadata.decimals);
         const tokenAssetVolatilitRatio = tokenAsset.config.volatility_ratio;
         const priceViotility = new Decimal(tokenUnitBalance)
-          .mul(tokenPrice.usd || 0)
+          .mul(tokenPrice?.usd || 0)
           .mul(tokenAssetVolatilitRatio)
           .div(MAX_RATIO);
         return sum.add(priceViotility);

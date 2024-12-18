@@ -6,8 +6,6 @@ import {
   Transaction,
   init_env,
   getAvgFee,
-  getPriceImpact,
-  separateRoutes,
 } from "@ref-finance/ref-sdk";
 import { isEmpty } from "lodash";
 import Decimal from "decimal.js";
@@ -15,12 +13,16 @@ import { useAppSelector } from "../redux/hooks";
 import { getAssets } from "../redux/assetsSelectors";
 import { getMarginConfig } from "../redux/marginConfigSelectors";
 import { getAllPools } from "../redux/poolSelectors";
-import { deepCopy } from "../utils/commonUtils";
 import { expandTokenDecimal } from "../store";
 import { IEstimateResult, IFindPathResult, IServerPool, IRoute } from "../interfaces/margin";
 import { findPath } from "../api/get-swap-path";
 import { shrinkToken, expandToken } from "../store/helper";
-import { percentLess } from "../utils/number";
+import {
+  getMetadatas,
+  get_swap_indication_info,
+  get_min_amount_out,
+  get_registered_dexes,
+} from "../utils/margin";
 
 init_env("dev");
 const SHUTDOWN_SERVER = true;
@@ -92,22 +94,12 @@ export const useV1EstimateSwap = ({
       tokenOut: tokenOut_id,
       slippage: slippageTolerance,
     }).catch(() => ({}));
-    // test code
-    // const resultFromServer = await findPath({
-    //   amountIn: "1000000000000000000000000",
-    //   tokenIn: "wrap.near",
-    //   tokenOut: "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near",
-    //   slippage: 0.005,
-    // }).catch(() => ({}));
     if (!(resultFromServer?.result_code !== 0 || !resultFromServer?.result_data?.routes?.length)) {
       const result: IFindPathResult = resultFromServer.result_data;
-      const min_output_amount = percentLess(slippageTolerance, result.amount_out || "0");
-      const dexMap = Object.entries(marginConfig.registered_dexes).reduce((acc, cur: any) => {
-        return {
-          ...acc,
-          [cur[1]]: cur[0],
-        };
-      }, {});
+      const min_output_amount = new Decimal(1 - slippageTolerance || 0)
+        .mul(result.amount_out || "0")
+        .toFixed(0);
+      const dexMap = get_registered_dexes();
       const dex = dexMap["1"];
       const { routes } = result;
       const actionsList: IServerPool[] = [];
@@ -130,15 +122,12 @@ export const useV1EstimateSwap = ({
       });
       setEstimateData({
         amount_out: shrinkToken(result.amount_out, tokenOut_metadata.decimals),
-        min_amount_out: new Decimal(min_output_amount || 0).toFixed(0),
+        min_amount_out: min_output_amount,
         swap_indication: {
           dex_id: dex,
           swap_action_text: msg,
-          client_echo: null,
         },
         fee: avgFee,
-        tokensPerRoute: [], // TODO-now
-        identicalRoutes: [], // TODO-now
         tag: `${tokenIn_id}@${tokenOut_id}@${tokenIn_amount}`,
         from: "v1",
       });
@@ -191,21 +180,21 @@ export const useV1EstimateSwap = ({
       tokenOut_id,
       expandTokenDecimal(tokenIn_amount, tokenIn_metadata.decimals).toFixed(0),
     );
-    const priceImpact = getPriceImpact({
-      estimates: swapTodos,
-      tokenIn: tokenIn_metadata,
-      tokenOut: tokenOut_metadata,
-      amountIn: tokenIn_amount,
-      amountOut,
-      stablePools: stablePoolsDetail,
-    });
-    const tokensPerRoute = swapTodos
-      .filter((swap) => swap.inputToken === tokenIn_metadata?.id)
-      .map((swap) => swap.tokens);
-    const identicalRoutes = separateRoutes(
-      swapTodos,
-      swapTodos[swapTodos.length - 1]?.outputToken || "",
-    );
+    // const priceImpact = getPriceImpact({
+    //   estimates: swapTodos,
+    //   tokenIn: tokenIn_metadata,
+    //   tokenOut: tokenOut_metadata,
+    //   amountIn: tokenIn_amount,
+    //   amountOut,
+    //   stablePools: stablePoolsDetail,
+    // });
+    // const tokensPerRoute = swapTodos
+    //   .filter((swap) => swap.inputToken === tokenIn_metadata?.id)
+    //   .map((swap) => swap.tokens);
+    // const identicalRoutes = separateRoutes(
+    //   swapTodos,
+    //   swapTodos[swapTodos.length - 1]?.outputToken || "",
+    // );
     setEstimateData({
       amount_out: amountOut,
       min_amount_out: expandTokenDecimal(
@@ -215,11 +204,8 @@ export const useV1EstimateSwap = ({
       swap_indication: {
         dex_id,
         swap_action_text: msg,
-        client_echo: null,
       },
       fee,
-      tokensPerRoute,
-      identicalRoutes,
       tag: `${tokenIn_id}@${tokenOut_id}@${tokenIn_amount}`,
       from: "v1",
     });
@@ -263,41 +249,3 @@ export const useV1EstimateSwap = ({
   }
   return estimateData;
 };
-function getMetadatas(tokenAssets) {
-  return tokenAssets.map((asset) => {
-    const tokenData = deepCopy(asset) as any;
-    const { metadata } = tokenData;
-    metadata.id = metadata.token_id;
-    return metadata;
-  });
-}
-function get_swap_indication_info(swapTransaction, registered_dexes) {
-  const msg = swapTransaction?.functionCalls?.[0]?.args?.msg || "{}";
-  const msgObj = JSON.parse(msg);
-  let dex = "";
-  const dexMap = Object.entries(registered_dexes).reduce((acc, cur: any) => {
-    return {
-      ...acc,
-      [cur[1]]: cur[0],
-    };
-  }, {});
-  if (!isEmpty(msgObj.Swap)) {
-    msgObj.Swap.skip_unwrap_near = true;
-    dex = dexMap["2"];
-  } else {
-    dex = dexMap["1"];
-  }
-  return [dex, JSON.stringify(msgObj)];
-}
-function get_min_amount_out(msg) {
-  const { actions, Swap } = JSON.parse(msg);
-  if (!isEmpty(actions)) {
-    return actions
-      .reduce((sum, action) => sum.plus(action.min_amount_out), new Decimal(0))
-      .toFixed();
-  }
-  if (!isEmpty(Swap)) {
-    return Swap.min_output_amount;
-  }
-  return "0";
-}

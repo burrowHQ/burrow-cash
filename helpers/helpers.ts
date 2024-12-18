@@ -1,3 +1,4 @@
+// @ts-nocheck
 import millify from "millify";
 import { APY_FORMAT, DUST_FORMAT, NUMBER_FORMAT, TOKEN_FORMAT, USD_FORMAT } from "../store";
 

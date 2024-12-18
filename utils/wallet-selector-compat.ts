@@ -8,12 +8,12 @@ import { setupMeteorWallet } from "@near-wallet-selector/meteor-wallet";
 import { setupWalletConnect } from "@near-wallet-selector/wallet-connect";
 import { setupNeth } from "@near-wallet-selector/neth";
 import { setupNearMobileWallet } from "@near-wallet-selector/near-mobile-wallet";
-import { setupModal } from "@near-wallet-selector/modal-ui";
+import { setupModal } from "ref-modal-ui";
 import { setupLedger } from "@near-wallet-selector/ledger";
 import { setupMintbaseWallet } from "@near-wallet-selector/mintbase-wallet";
 import { setupBitteWallet } from "@near-wallet-selector/bitte-wallet";
 import { setupCoin98Wallet } from "@near-wallet-selector/coin98-wallet";
-import type { WalletSelectorModal } from "@near-wallet-selector/modal-ui";
+import type { WalletSelectorModal } from "ref-modal-ui";
 import { Near } from "near-api-js/lib/near";
 import { Account } from "near-api-js/lib/account";
 import { BrowserLocalStorageKeyStore } from "near-api-js/lib/key_stores";
@@ -21,6 +21,17 @@ import BN from "bn.js";
 import { map, distinctUntilChanged } from "rxjs";
 import { setupKeypom } from "@keypom/selector";
 import { setupOKXWallet } from "@near-wallet-selector/okx-wallet";
+// @ts-nocheck
+import type { Config } from "@wagmi/core";
+// @ts-nocheck
+import { reconnect, http, createConfig } from "@wagmi/core";
+// @ts-nocheck
+import { walletConnect, injected } from "@wagmi/connectors";
+// @ts-nocheck
+import { setupEthereumWallets } from "@near-wallet-selector/ethereum-wallets";
+// @ts-nocheck
+import { createWeb3Modal } from "@web3modal/wagmi";
+// @ts-nocheck
 import { getRpcList } from "../components/Rpc/tool";
 
 import getConfig, {
@@ -57,8 +68,46 @@ let near: Near;
 let accountId: string;
 let init = false;
 let selector: WalletSelector | null = null;
-
-const walletConnect = setupWalletConnect({
+const nearBlock = {
+  id: 397,
+  name: "NEAR Mainnet",
+  nativeCurrency: {
+    decimals: 18,
+    name: "NEAR",
+    symbol: "NEAR",
+  },
+  rpcUrls: {
+    default: { http: ["https://eth-rpc.mainnet.near.org"] },
+    public: { http: ["https://eth-rpc.mainnet.near.org"] },
+  },
+  blockExplorers: {
+    default: {
+      name: "NEAR Explorer",
+      url: "https://eth-explorer.near.org",
+    },
+  },
+  testnet: false,
+};
+const wagmiConfig: Config = createConfig({
+  chains: [nearBlock],
+  transports: {
+    [nearBlock.id]: http(),
+  },
+  connectors: [
+    walletConnect({
+      projectId: WALLET_CONNECT_ID,
+      showQrModal: false,
+    }),
+    injected({ shimDisconnect: true }),
+  ],
+});
+reconnect(wagmiConfig);
+const web3Modal = createWeb3Modal({
+  wagmiConfig,
+  projectId: WALLET_CONNECT_ID,
+  allowUnsupportedChain: true,
+});
+const walletConnect2 = setupWalletConnect({
   projectId: WALLET_CONNECT_ID,
   metadata: {
     name: "Burrow Finance",
@@ -102,11 +151,16 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
   } catch (error) {}
   selector = await setupWalletSelector({
     modules: [
+      setupEthereumWallets({
+        wagmiConfig,
+        web3Modal,
+        alwaysOnboardDuringSignIn: true,
+      } as any),
       setupOKXWallet({}),
       myNearWallet,
       setupSender() as any,
       setupMeteorWallet(),
-      walletConnect,
+      walletConnect2,
       setupNearMobileWallet({
         dAppMetadata: {
           logoUrl: "https://ref-finance-images-v2.s3.amazonaws.com/images/burrowIcon.png",
@@ -166,7 +220,24 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
       }
     });
 
-  const modal = setupModal(selector, { contractId: LOGIC_CONTRACT_NAME });
+  const modal = setupModal(selector as any, {
+    contractId: LOGIC_CONTRACT_NAME,
+    blockFunctionKeyWallets: [
+      "okx-wallet",
+      "my-near-wallet",
+      "meteor-wallet",
+      "neth",
+      "nightly",
+      "ledger",
+      "wallet-connect",
+      "keypom",
+      "mintbase-wallet",
+      "bitte-wallet",
+      "ethereum-wallets",
+      "sender",
+      "coin98-wallet",
+    ],
+  });
   window.modal = modal;
   window.selectorSubscription = subscription;
 

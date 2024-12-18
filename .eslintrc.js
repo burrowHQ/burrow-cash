@@ -3,6 +3,7 @@ module.exports = {
     browser: true,
     es2021: true,
   },
+  ignorePatterns: ["node_modules/"],
   extends: [
     "airbnb",
     "plugin:react/recommended",

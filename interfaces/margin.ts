@@ -37,13 +37,10 @@ export interface IEstimateResult {
   swap_indication: {
     dex_id: string;
     swap_action_text: string;
-    client_echo: null;
   };
   fee: number;
-  tokensPerRoute: any[];
   tag: string;
   from: "v1" | "dcl";
-  identicalRoutes?: any[];
 }
 export interface IPool {
   amount_in?: string;

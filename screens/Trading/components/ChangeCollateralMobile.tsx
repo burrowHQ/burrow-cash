@@ -1,5 +1,6 @@
 import { useState, createContext, useEffect } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
+import { BeatLoader } from "react-spinners";
 import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
 import { CloseIcon } from "../../../components/Modal/svg";
@@ -13,20 +14,24 @@ import { getAssets } from "../../../redux/assetsSelectors";
 import { decreaseCollateral } from "../../../store/marginActions/decreaseCollateral";
 import { getAccountBalance } from "../../../redux/accountSelectors";
 import DataSource from "../../../data/datasource";
+import { shrinkToken } from "../../../store";
 
 export const ModalContext = createContext(null) as any;
 const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => {
+  const account = useAppSelector((state) => state.account);
   const { marginConfigTokens, getPositionType } = useMarginConfigToken();
   const { parseTokenValue, getAssetDetails, getAssetById, calculateLeverage } = useMarginAccount();
   const theme = useTheme();
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
   const [ChangeCollateralTab, setChangeCollateralTab] = useState("Add");
-  const [inputValue, setInputValue] = useState(0);
+  const [inputValue, setInputValue] = useState("");
   const [addedValue, setAddedValue] = useState(0);
   const [addLeverage, setAddLeverage] = useState(0);
   const balance = useAppSelector(getAccountBalance);
   const [selectedLever, setSelectedLever] = useState(null);
   const [entryPrice, setEntryPrice] = useState<number | null>(null);
+  const [isAddCollateralLoading, setIsAddCollateralLoading] = useState(false);
+  const [isDeleteCollateralLoading, setIsDeleteCollateralLoading] = useState(false);
   useEffect(() => {
     const fetchEntryPrice = async () => {
       try {
@@ -46,7 +51,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
   }, [rowData]);
   const handleChangeCollateralTabClick = (tab) => {
     setChangeCollateralTab(tab);
-    setInputValue(NaN);
+    setInputValue("");
     setSelectedLever(null);
   };
   const leverData = [
@@ -70,7 +75,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
   };
 
   const handleCollateralChange = (event, isAddition) => {
-    const value = parseFloat(event.target.value);
+    const { value } = event.target;
     const tokenCInfoBalance = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
     const tokenDInfoBalance = parseTokenValue(rowData.data.token_d_info.balance, decimalsD);
     const leverage = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
@@ -91,64 +96,47 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
       setAddLeverage(0);
     }
   };
-  const handleInputValidation = (value: string) => {
-    if (value.startsWith("-")) return false;
-    if (!/^\d*\.?\d*$/.test(value)) return false;
-    if (value.includes(".")) {
-      const decimals = value.split(".")[1];
-      if (decimals.length > 8) return false;
-    }
-    return true;
-  };
 
   const handleAddChange = (event) => {
     const { value } = event.target;
-    if (value === "" || value === ".") {
-      setInputValue(NaN);
+    if (value === "") {
+      setInputValue("");
       setAddedValue(0);
       setAddLeverage(0);
       return;
     }
-    if (!handleInputValidation(value)) {
-      return;
-    }
-    const numValue = parseFloat(value);
     const maxAmount = getMaxAvailableAmount();
-    if (numValue > maxAmount) {
-      setInputValue(maxAmount);
+    if (value > maxAmount) {
+      setInputValue(String(maxAmount));
       const syntheticEvent = {
         target: { value: String(maxAmount) },
       };
       handleCollateralChange(syntheticEvent, true);
       return;
     }
-    setInputValue(numValue);
+    setInputValue(value);
     handleCollateralChange(event, true);
   };
   const handleDeleteChange = (event) => {
     const { value } = event.target;
-    if (value === "" || value === ".") {
-      setInputValue(NaN);
+    if (value === "") {
+      setInputValue("");
       setAddedValue(0);
       setAddLeverage(0);
       return;
     }
-    if (!handleInputValidation(value)) {
-      return;
-    }
-    const numValue = parseFloat(value);
     const tokenCInfoBalance = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
     const maxRemovable = calculateMaxRemovable();
     const actualMaxRemovable = Math.min(tokenCInfoBalance, maxRemovable);
-    if (numValue > actualMaxRemovable) {
-      setInputValue(actualMaxRemovable);
+    if (value > actualMaxRemovable) {
+      setInputValue(String(actualMaxRemovable));
       const syntheticEvent = {
         target: { value: String(actualMaxRemovable) },
       };
       handleCollateralChange(syntheticEvent, false);
       return;
     }
-    setInputValue(numValue);
+    setInputValue(value);
     handleCollateralChange(event, false);
   };
   const assetD = getAssetById(rowData.data.token_d_info.token_id);
@@ -196,23 +184,33 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
   const assets = getAssetsdata.data;
   const handleAddCollateralClick = async () => {
     try {
+      setIsAddCollateralLoading(true);
       await increaseCollateral({ pos_id, token_c_id, amount, assets });
       localStorage.setItem("marginTradingTab", "my");
     } catch (error) {
       console.error("Error adding collateral:", error);
+    } finally {
+      setIsAddCollateralLoading(false);
     }
   };
   const handleDeleteCollateralClick = async () => {
     try {
+      setIsDeleteCollateralLoading(true);
       await decreaseCollateral({ pos_id, token_c_id, amount, assets });
       localStorage.setItem("marginTradingTab", "my");
     } catch (error) {
       console.error("Error deleted collateral:", error);
+    } finally {
+      setIsDeleteCollateralLoading(false);
     }
   };
   const getMaxAvailableAmount = () => {
-    const currentLeverage = leverage || 1;
+    // const currentLeverage = leverage || 1;
     const targetMinLeverage = 1;
+    const assetCbalances = shrinkToken(
+      account.balances[rowData.data.token_c_info.token_id],
+      assetC.metadata.decimals,
+    );
     const rawMaxAmount = Number(balance) / priceC;
     const getNewLeverageAfterAdd = (addAmount: number) => {
       const tokenCInfoBalance = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
@@ -233,7 +231,8 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
         right = mid - 0.0001;
       }
     }
-    return Math.min(rawMaxAmount, result);
+    const maxAmount = Math.min(rawMaxAmount, result);
+    return Math.min(maxAmount, Number(assetCbalances));
   };
   const calculateMaxRemovable = () => {
     const tokenCInfoBalance = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
@@ -255,20 +254,10 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
     }
     return result;
   };
-  // const validateAmount = (amount: number) => {
-  //   if (isNaN(amount) || amount <= 0) return false;
-  //   const maxAmount = getMaxAvailableAmount();
-  //   if (amount > maxAmount) return false;
-  //   const tokenCInfoBalance = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
-  //   const tokenDInfoBalance = parseTokenValue(rowData.data.token_d_info.balance, decimalsD);
-  //   const newCollateral = tokenCInfoBalance + amount;
-  //   const newLeverage = calculateLeverage(tokenDInfoBalance, priceD, newCollateral, priceC);
-  //   return newLeverage >= 1;
-  // };
   const handleLeverAddClick = (value) => {
     if (selectedLever === value) {
       setSelectedLever(null);
-      setInputValue(NaN);
+      setInputValue("");
       return;
     }
     setSelectedLever(value);
@@ -286,7 +275,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
   const handleLeverDeleteClick = (value) => {
     if (selectedLever === value) {
       setSelectedLever(null);
-      setInputValue(NaN);
+      setInputValue("");
       return;
     }
     setSelectedLever(value);
@@ -367,20 +356,14 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
                   <div className=" bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md flex items-center justify-between mb-1.5">
                     <div>
                       <input
-                        type="text"
-                        value={Number.isNaN(inputValue) ? "" : String(inputValue)}
-                        onChange={
-                          ChangeCollateralTab === "Add" ? handleAddChange : handleDeleteChange
-                        }
+                        type="number"
+                        step="any"
+                        value={String(inputValue)}
+                        onChange={handleAddChange}
                         placeholder="0"
-                        className="w-full bg-transparent outline-none"
-                        inputMode="decimal"
-                        autoComplete="off"
-                        autoCorrect="off"
-                        spellCheck="false"
                       />
                       <p className="text-gray-300 text-xs mt-1.5">
-                        ${Number.isNaN(inputValue) ? 0 : inputValue * priceC}
+                        ${inputValue === "" ? 0 : Number(inputValue) * priceC}
                       </p>
                     </div>
                     <div>
@@ -477,13 +460,19 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
                   </div>
                   <div
                     className={`flex items-center bg-primary justify-between text-dark-200 text-base rounded-md h-12 text-center cursor-pointer ${
-                      inputValue === 0 || Number.isNaN(inputValue)
+                      Number(inputValue) === 0 || Number.isNaN(inputValue)
                         ? "opacity-50 pointer-events-none"
                         : "opacity-100"
                     }`}
                     onClick={handleAddCollateralClick}
                   >
-                    <div className="flex-grow">Add Collateral</div>
+                    <div className="flex-grow">
+                      {isAddCollateralLoading ? (
+                        <BeatLoader size={5} color="#14162B" />
+                      ) : (
+                        " Add Collateral"
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
@@ -499,7 +488,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
                         placeholder="0"
                       />
                       <p className="text-gray-300 text-xs mt-1.5">
-                        ${Number.isNaN(inputValue) ? 0 : inputValue * priceC}
+                        ${inputValue === "" ? 0 : Number(inputValue) * priceC}
                       </p>
                     </div>
                     <div>
@@ -595,13 +584,19 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
                   </div>
                   <div
                     className={`flex items-center bg-red-50 justify-between text-dark-200 text-base rounded-md h-12 text-center cursor-pointer ${
-                      inputValue === 0 || Number.isNaN(inputValue)
+                      Number(inputValue) === 0 || Number.isNaN(inputValue)
                         ? "opacity-50 pointer-events-none"
                         : "opacity-100"
                     }`}
                     onClick={handleDeleteCollateralClick}
                   >
-                    <div className="flex-grow">Remove Collateral</div>
+                    <div className="flex-grow">
+                      {isDeleteCollateralLoading ? (
+                        <BeatLoader size={5} color="#14162B" />
+                      ) : (
+                        " Remove Collateral"
+                      )}
+                    </div>
                   </div>
                 </div>
               )}

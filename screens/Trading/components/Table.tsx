@@ -156,14 +156,18 @@ const TradingTable = ({
               />
             )}
           </div>
-          {selectedTab === "account" && accountSupplied.length > 0 && (
-            <div
-              className="mr-11 px-1.5 py-1 bg-primary bg-opacity-5 border border-primary rounded-md text-primary text-sm cursor-pointer"
-              onClick={handleWithdrawAllClick}
-            >
-              {isLoadingWithdraw ? <BeatLoader size={5} color="#C0C4E9" /> : "Withdraw all"}
-            </div>
-          )}
+          {selectedTab === "account" &&
+            accountSupplied.filter((token) => {
+              const assetDetails = getAssetById(token.token_id);
+              return assetDetails.metadata.decimals >= assetDetails.config.extra_decimals;
+            }).length > 0 && (
+              <div
+                className="w-[110px] h-6 px-1.5 mr-11 flex items-center justify-center bg-primary bg-opacity-5 border border-primary rounded-md text-primary text-sm cursor-pointer"
+                onClick={handleWithdrawAllClick}
+              >
+                {isLoadingWithdraw ? <BeatLoader size={5} color="#C0C4E9" /> : "Withdraw all"}
+              </div>
+            )}
         </div>
         {/* content */}
         <div className="py-4">
@@ -303,33 +307,43 @@ const TradingTable = ({
                 </tr>
               </thead>
               <tbody>
-                {accountSupplied.length > 0 ? (
+                {accountSupplied.filter((token) => {
+                  const assetDetails = getAssetById(token.token_id);
+                  return assetDetails.metadata.decimals >= assetDetails.config.extra_decimals;
+                }).length > 0 ? (
                   accountSupplied.map((token, index) => {
-                    const assetDetails = getAssetDetails(getAssetById(token.token_id));
+                    const assetDetails = getAssetById(token.token_id);
+                    const marginAssetDetails = getAssetDetails(assetDetails);
+                    if (assetDetails.metadata.decimals < assetDetails.config.extra_decimals) {
+                      return null;
+                    }
                     return (
-                      <tr
-                        key={index}
-                        className="text-base hover:bg-dark-100 cursor-pointer font-normal"
-                      >
+                      <tr key={index} className="text-base hover:bg-dark-100 font-normal">
                         <td className="py-5 pl-5">
                           <div className="flex items-center">
-                            <img src={assetDetails.icon} alt="" className="w-4 h-4 rounded-2xl" />
-                            <p className="ml-1"> {assetDetails.symbol}</p>
+                            <img
+                              src={assetDetails.metadata.icon}
+                              alt=""
+                              className="w-4 h-4 rounded-2xl"
+                            />
+                            <p className="ml-1"> {assetDetails.metadata.symbol}</p>
                           </div>
                         </td>
                         <td>
-                          $
-                          {toInternationalCurrencySystem_number(parseTokenValue(token.balance, 18))}
+                          {toInternationalCurrencySystem_number(
+                            parseTokenValue(token.balance, assetDetails.metadata.decimals),
+                          )}
                         </td>
                         <td>
-                          {assetDetails.price
-                            ? `$${toInternationalCurrencySystem_number(assetDetails.price)}`
+                          {marginAssetDetails.price
+                            ? `$${toInternationalCurrencySystem_number(marginAssetDetails.price)}`
                             : "/"}
                         </td>
                         <td>
-                          {assetDetails.price
+                          {marginAssetDetails.price
                             ? `$${toInternationalCurrencySystem_number(
-                                parseTokenValue(token.balance, 18) * assetDetails.price,
+                                parseTokenValue(token.balance, assetDetails.metadata.decimals) *
+                                  marginAssetDetails.price,
                               )}`
                             : "/"}
                         </td>
@@ -453,98 +467,108 @@ const TradingTable = ({
           </>
         )}
         {selectedTab === "history" && <div>history</div>}
-        {!filterTitle && (
-          <div
-            className="fixed rounded-t-xl bottom-0 left-0 right-0 z-50 bg-gray-1300 pt-[18px] px-[32px] pb-[52px] w-full"
-            style={{
-              boxShadow:
-                "0px -5px 12px 0px #0000001A, 0px -21px 21px 0px #00000017, 0px -47px 28px 0px #0000000D, 0px -84px 33px 0px #00000003, 0px -131px 37px 0px #00000000",
-            }}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-lg">Account</p>
-              <div className="flex items-center" onClick={handleAccountDetailsClick}>
-                <p className="text-base text-gray-300 mr-2">Detail</p>
-                <MarginAccountDetailIcon
-                  className={`transform ${isAccountDetailsOpen ? "rotate-180" : ""}`}
-                />
-              </div>
-            </div>
-            {isAccountDetailsOpen && (
-              <div className="h-[50vh] overflow-y-auto -ml-[32px] -mr-[32px]">
-                <table className="w-full text-left">
-                  <thead className="border-b border-gray-1350">
-                    <tr className="text-gray-300 text-sm font-normal">
-                      <th className="pb-[14px] pl-[30px]">Token</th>
-                      <th className="pb-[14px]">Balance</th>
-                      <th className="pb-[14px] text-right pr-[32px]">Value</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {accountSupplied.length > 0 ? (
-                      accountSupplied.map((token, index) => {
-                        const assetDetails = getAssetDetails(getAssetById(token.token_id));
-                        return (
-                          <tr
-                            key={index}
-                            className="text-sm hover:bg-dark-100 cursor-pointer font-normal "
-                          >
-                            <td className="pb-[10px] pl-[30px] pt-[10px]">
-                              <div className="flex items-center">
-                                <img
-                                  src={assetDetails.icon}
-                                  alt=""
-                                  className="w-[26px] h-[26px] rounded-2xl"
-                                />
-                                <div className="ml-2">
-                                  <p className="text-sm"> {assetDetails.symbol}</p>
-                                  <p className="text-xs text-gray-300 -mt-0.5">
-                                    {assetDetails.price
-                                      ? `$${toInternationalCurrencySystem_number(
-                                          assetDetails.price,
-                                        )}`
-                                      : "/"}
-                                  </p>
-                                </div>
-                              </div>
-                            </td>
-                            <td>
-                              $
-                              {toInternationalCurrencySystem_number(
-                                parseTokenValue(token.balance, 18),
-                              )}
-                            </td>
-                            <td className="text-right pr-[32px]">
-                              {assetDetails.price
-                                ? `$${toInternationalCurrencySystem_number(
-                                    parseTokenValue(token.balance, 18) * assetDetails.price,
-                                  )}`
-                                : "/"}
-                            </td>
-                          </tr>
-                        );
-                      })
-                    ) : (
-                      <tr>
-                        <td colSpan={4}>
-                          <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
-                            No data
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            )}
+        {!filterTitle &&
+          accountSupplied.filter((token) => {
+            const assetDetails = getAssetById(token.token_id);
+            return assetDetails.metadata.decimals >= assetDetails.config.extra_decimals;
+          }).length > 0 && (
             <div
-              className="w-full bg-primary bg-opacity-5 text-primary h-[36px] rounded-md border border-marginWithdrawAllBtn flex items-center justify-center"
-              onClick={handleWithdrawAllClick}
+              className="fixed rounded-t-xl bottom-0 left-0 right-0 z-50 bg-gray-1300 pt-[18px] px-[32px] pb-[52px] w-full"
+              style={{
+                boxShadow:
+                  "0px -5px 12px 0px #0000001A, 0px -21px 21px 0px #00000017, 0px -47px 28px 0px #0000000D, 0px -84px 33px 0px #00000003, 0px -131px 37px 0px #00000000",
+              }}
             >
-              {isLoadingWithdraw ? <BeatLoader size={5} color="#C0C4E9" /> : "Withdraw all"}
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-lg">Account</p>
+                <div className="flex items-center" onClick={handleAccountDetailsClick}>
+                  <p className="text-base text-gray-300 mr-2">Detail</p>
+                  <MarginAccountDetailIcon
+                    className={`transform ${isAccountDetailsOpen ? "rotate-180" : ""}`}
+                  />
+                </div>
+              </div>
+              {isAccountDetailsOpen && (
+                <div className="h-[50vh] overflow-y-auto -ml-[32px] -mr-[32px]">
+                  <table className="w-full text-left">
+                    <thead className="border-b border-gray-1350">
+                      <tr className="text-gray-300 text-sm font-normal">
+                        <th className="pb-[14px] pl-[30px]">Token</th>
+                        <th className="pb-[14px]">Balance</th>
+                        <th className="pb-[14px] text-right pr-[32px]">Value</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {accountSupplied.filter((token) => {
+                        const assetDetails = getAssetById(token.token_id);
+                        return assetDetails.metadata.decimals >= assetDetails.config.extra_decimals;
+                      }).length > 0 ? (
+                        accountSupplied.map((token, index) => {
+                          const assetDetails = getAssetById(token.token_id);
+                          const marginAssetDetails = getAssetDetails(assetDetails);
+                          if (assetDetails.metadata.decimals < assetDetails.config.extra_decimals) {
+                            return null;
+                          }
+                          return (
+                            <tr key={index} className="text-sm hover:bg-dark-100 font-normal ">
+                              <td className="pb-[10px] pl-[30px] pt-[10px]">
+                                <div className="flex items-center">
+                                  <img
+                                    src={assetDetails.metadata.icon}
+                                    alt=""
+                                    className="w-[26px] h-[26px] rounded-2xl"
+                                  />
+                                  <div className="ml-2">
+                                    <p className="text-sm"> {assetDetails.metadata.symbol}</p>
+                                    <p className="text-xs text-gray-300 -mt-0.5">
+                                      {assetDetails.price
+                                        ? `$${toInternationalCurrencySystem_number(
+                                            assetDetails.price,
+                                          )}`
+                                        : "/"}
+                                    </p>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                {toInternationalCurrencySystem_number(
+                                  parseTokenValue(token.balance, assetDetails.metadata.decimals),
+                                )}
+                              </td>
+                              <td className="text-right pr-[32px]">
+                                {marginAssetDetails.price
+                                  ? `$${toInternationalCurrencySystem_number(
+                                      parseTokenValue(
+                                        token.balance,
+                                        assetDetails.metadata.decimals,
+                                      ) * marginAssetDetails.price,
+                                    )}`
+                                  : "/"}
+                              </td>
+                            </tr>
+                          );
+                        })
+                      ) : (
+                        <tr>
+                          <td colSpan={4}>
+                            <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+                              No data
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              <div
+                className="w-full bg-primary bg-opacity-5 text-primary h-[36px] rounded-md border border-marginWithdrawAllBtn flex items-center justify-center"
+                onClick={handleWithdrawAllClick}
+              >
+                {isLoadingWithdraw ? <BeatLoader size={5} color="#C0C4E9" /> : "Withdraw all"}
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
       {isAccountDetailsOpen && (
         <div
@@ -672,7 +696,7 @@ const PositionRow = ({
     onPLNChange(pnl);
   }
   return (
-    <tr className="text-base hover:bg-dark-100 cursor-pointer font-normal">
+    <tr className="text-base hover:bg-dark-100 font-normal">
       <td className="py-5 pl-5 ">
         {marketTitle}
         <span className={`text-xs ml-1.5 ${getPositionType(item.token_d_info.token_id).class}`}>
@@ -689,6 +713,7 @@ const PositionRow = ({
             <span className="ml-1">{symbolC}</span>
           </p>
           <div
+            className="cursor-pointer"
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -719,7 +744,7 @@ const PositionRow = ({
       </td>
       <td className="pr-5">
         <div
-          className="text-gray-300 text-sm border border-dark-300 text-center h-6 rounded flex justify-center items-center"
+          className="text-gray-300 text-sm border cursor-pointer  border-dark-300 text-center h-6 rounded flex justify-center items-center"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
