@@ -480,30 +480,32 @@ const TradingTable = ({
         )}
         {selectedTab === "history" && <div>history</div>}
         {selectedTab === "liquidation" && <div>Liquidation</div>}
-        <div
-          className="fixed rounded-t-xl bottom-0 left-0 right-0 z-50 bg-gray-1300 pt-[18px] px-[32px] pb-[52px] w-full"
-          style={{
-            boxShadow:
-              "0px -5px 12px 0px #0000001A, 0px -21px 21px 0px #00000017, 0px -47px 28px 0px #0000000D, 0px -84px 33px 0px #00000003, 0px -131px 37px 0px #00000000",
-          }}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-lg">Account</p>
-            <div className="flex items-center" onClick={handleAccountDetailsClick}>
-              <p className="text-base text-gray-300 mr-2">Detail</p>
-              <MarginAccountDetailIcon
-                className={`transform ${isAccountDetailsOpen ? "rotate-180" : ""}`}
-              />
+        {!filterTitle && (
+          <div
+            className="fixed rounded-t-xl bottom-0 left-0 right-0 z-50 bg-gray-1300 pt-[18px] px-[32px] pb-[52px] w-full"
+            style={{
+              boxShadow:
+                "0px -5px 12px 0px #0000001A, 0px -21px 21px 0px #00000017, 0px -47px 28px 0px #0000000D, 0px -84px 33px 0px #00000003, 0px -131px 37px 0px #00000000",
+            }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-lg">Account</p>
+              <div className="flex items-center" onClick={handleAccountDetailsClick}>
+                <p className="text-base text-gray-300 mr-2">Detail</p>
+                <MarginAccountDetailIcon
+                  className={`transform ${isAccountDetailsOpen ? "rotate-180" : ""}`}
+                />
+              </div>
+            </div>
+            {isAccountDetailsOpen && <div className="h-[50vh] overflow-y-auto">展开</div>}
+            <div
+              className="w-full bg-primary bg-opacity-5 text-primary h-[36px] rounded-md border border-marginWithdrawAllBtn flex items-center justify-center"
+              onClick={handleWithdrawAllClick}
+            >
+              {isLoadingWithdraw ? <BeatLoader size={5} color="#C0C4E9" /> : "Withdraw all"}
             </div>
           </div>
-          {isAccountDetailsOpen && <div className="h-[50vh] overflow-y-auto">展开</div>}
-          <div
-            className="w-full bg-primary bg-opacity-5 text-primary h-[36px] rounded-md border border-marginWithdrawAllBtn flex items-center justify-center"
-            onClick={handleWithdrawAllClick}
-          >
-            {isLoadingWithdraw ? <BeatLoader size={5} color="#C0C4E9" /> : "Withdraw all"}
-          </div>
-        </div>
+        )}
       </div>
       {isAccountDetailsOpen && (
         <div
