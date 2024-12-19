@@ -125,7 +125,7 @@ const getConfig = (env: string = defaultNetwork) => {
         DCL_SWAP_CONTRACT_ID: "refv2-dev.ref-dev.testnet", // dclv2.ref-dev.testnet
         ORACLE_ACCOUNT_ID: "mock-priceoracle.testnet",
         REF_EXCHANGE_ID: "exchange.ref-dev.testnet",
-        findPathUrl: "smartroutertest.refburrow.top",
+        findPathUrl: "smartrouterdev.refburrow.top",
         // findPathUrl: "smartrouter.ref.finance",
         indexUrl: "https://dev-indexer.ref-finance.com",
         // indexUrl: "https://api.ref.finance",
