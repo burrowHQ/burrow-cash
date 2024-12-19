@@ -584,7 +584,7 @@ const TradingOperate = () => {
                 </div>
               </div>
               {/* <div className=" text-red-150 text-xs font-normal">{estimateData?.swapError}</div> */}
-              {isMaxPosition && (
+              {isMaxPosition && accountId && (
                 <div className=" text-[#EA3F68] text-sm font-normal flex items-start my-1">
                   <MaxPositionIcon />
                   <span className="ml-1">Exceeded the maximum number of open positions.</span>
@@ -749,7 +749,7 @@ const TradingOperate = () => {
                 </div>
               </div> */}
 
-              {isMaxPosition && (
+              {isMaxPosition && accountId && (
                 <div className=" text-[#EA3F68] text-sm font-normal flex items-start my-1">
                   <MaxPositionIcon />
                   <span className="ml-1">Exceeded the maximum number of open positions.</span>
