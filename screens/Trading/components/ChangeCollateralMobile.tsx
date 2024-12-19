@@ -77,7 +77,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
   };
 
   const handleCollateralChange = (event, isAddition) => {
-    const { value } = event.target;
+    const value = parseFloat(event.target.value);
     const tokenCInfoBalance = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
     const tokenDInfoBalance = parseTokenValue(rowData.data.token_d_info.balance, decimalsD);
     const leverage = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
@@ -92,7 +92,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
     setAddCollateral(newValue);
     setAddedValue(newNetValue);
     setAddLeverage(newLeverage);
-    setInputValue(value);
+    setInputValue(String(value));
     if (event.target.value === "") {
       setAddedValue(0);
       setAddLeverage(0);
