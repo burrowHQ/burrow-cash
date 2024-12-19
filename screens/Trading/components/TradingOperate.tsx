@@ -349,8 +349,10 @@ const TradingOperate = () => {
     const input = tab === "long" ? longInput : shortInput;
     const inputAmount = input ? Number(input) : 0;
     const openFeeAmount = (inputAmount * config.open_position_fee_rate) / 10000;
-    const adjustedInputAmount = (inputAmount - openFeeAmount) * inputUsdCharcate2 * rangeMount;
-
+    // console.log(inputAmount, openFeeAmount, rangeMount, inputUsdCharcate2);
+    // const adjustedInputAmount = (inputAmount - openFeeAmount) * inputUsdCharcate2 * rangeMount;
+    const adjustedInputAmount =
+      inputAmount * inputUsdCharcate2 * rangeMount - openFeeAmount * inputUsdCharcate2;
     const inputUsdSetter = tab === "long" ? setLongInputUsd : setShortInputUsd;
 
     // set input usd
