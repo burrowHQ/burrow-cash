@@ -63,6 +63,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
       ? getAssetById(confirmInfo.longOutputName?.token_id)
       : getAssetById(confirmInfo.longInputName?.token_id),
   );
+  // console.log(confirmInfo, "for nico");
   const cateSymbol = getTokenSymbolOnly(ReduxcategoryAssets1?.metadata?.symbol);
   // const confirmOpenPosition = async () => {
   //   if (Object.values(marginAccountList).length >= max_active_user_margin_position) {
@@ -151,6 +152,12 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
       swap_indication: confirmInfo.estimateData.swap_indication,
       assets: confirmInfo.assets.data,
     };
+    const { decimals: localDecimals } = getAssetDetails(
+      getAssetById(
+        action === "Long" ? openPositionParams.token_p_id : openPositionParams.token_d_id,
+      ),
+    );
+
     const minTokenPAmount = Number(shrinkToken(openPositionParams.min_token_p_amount, decimalsP));
     const tokenDAmount = openPositionParams.token_d_amount;
     const tokenDPrice = confirmInfo.assets.data[openPositionParams.token_d_id].price.usd;
@@ -177,7 +184,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
       "cateSymbolAndDecimals",
       JSON.stringify({
         cateSymbol,
-        decimals: decimalsP,
+        decimals: localDecimals,
       }),
     );
 
