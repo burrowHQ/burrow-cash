@@ -349,8 +349,10 @@ const TradingOperate = () => {
     const input = tab === "long" ? longInput : shortInput;
     const inputAmount = input ? Number(input) : 0;
     const openFeeAmount = (inputAmount * config.open_position_fee_rate) / 10000;
-    const adjustedInputAmount = (inputAmount - openFeeAmount) * inputUsdCharcate2 * rangeMount;
-
+    // console.log(inputAmount, openFeeAmount, rangeMount, inputUsdCharcate2);
+    // const adjustedInputAmount = (inputAmount - openFeeAmount) * inputUsdCharcate2 * rangeMount;
+    const adjustedInputAmount =
+      inputAmount * inputUsdCharcate2 * rangeMount - openFeeAmount * inputUsdCharcate2;
     const inputUsdSetter = tab === "long" ? setLongInputUsd : setShortInputUsd;
 
     // set input usd
@@ -477,12 +479,7 @@ const TradingOperate = () => {
             </div>
             <div className="relative bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-20">
               {/* long out  */}
-              <input
-                disabled
-                type="text"
-                value={longOutput && formatNumber(Number(longOutput), 6)}
-                placeholder="0"
-              />
+              <div>{longOutput && beautifyPrice(Number(longOutput))}</div>
               {/*  */}
               <div className="absolute top-2 right-2">
                 <TradingToken tokenList={categoryAssets1} type="cate1" />
@@ -582,7 +579,7 @@ const TradingOperate = () => {
                 </div>
               </div>
               {/* <div className=" text-red-150 text-xs font-normal">{estimateData?.swapError}</div> */}
-              {isMaxPosition && (
+              {isMaxPosition && accountId && (
                 <div className=" text-[#EA3F68] text-sm font-normal flex items-start my-1">
                   <MaxPositionIcon />
                   <span className="ml-1">Exceeded the maximum number of open positions.</span>
@@ -644,12 +641,7 @@ const TradingOperate = () => {
             </div>
             <div className="relative bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-20">
               {/* short out */}
-              <input
-                disabled
-                type="text"
-                value={shortOutput && formatNumber(Number(shortOutput), 6)}
-                placeholder="0"
-              />
+              <div>{shortOutput && beautifyPrice(Number(shortOutput))}</div>
               {/*  */}
               <div className="absolute top-2 right-2">
                 <TradingToken tokenList={categoryAssets1} type="cate1" />
@@ -747,7 +739,7 @@ const TradingOperate = () => {
                 </div>
               </div> */}
 
-              {isMaxPosition && (
+              {isMaxPosition && accountId && (
                 <div className=" text-[#EA3F68] text-sm font-normal flex items-start my-1">
                   <MaxPositionIcon />
                   <span className="ml-1">Exceeded the maximum number of open positions.</span>
