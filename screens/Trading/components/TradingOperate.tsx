@@ -235,6 +235,20 @@ const TradingOperate = () => {
 
   const tokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
+    console.log(value, "for nico");
+    if (value === "") {
+      setLongInput("");
+      setShortInput("");
+      setLongOutput(0);
+      setShortOutput(0);
+      setLongInputUsd(0);
+      setShortInputUsd(0);
+      setLongOutputUsd(0);
+      setShortOutputUsd(0);
+      setTokenInAmount(0);
+      setLiqPrice(0);
+      return;
+    }
 
     // 验证输入值
     if (!isValidInput(value)) return;
@@ -340,10 +354,11 @@ const TradingOperate = () => {
     // set output usd
     const outputUsdSetter = tab === "long" ? setLongOutputUsd : setShortOutputUsd;
     //
-    if (input === undefined || !input) {
+    if (input === undefined || !input || input === "0" || input === "0.") {
       outputSetter(0);
       outputUsdSetter(0);
       setLiqPrice(0);
+      setTokenInAmount(0);
     } else if (tab === "long") {
       outputSetter(+(estimateData?.amount_out || 0));
       outputUsdSetter(inputUsdCharcate * +(estimateData?.amount_out || 0));
