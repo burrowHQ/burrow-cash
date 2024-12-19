@@ -36,6 +36,9 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
   const handleChangeCollateralTabClick = (tab) => {
     setChangeCollateralTab(tab);
     setInputValue("");
+    setAddedValue(0);
+    setAddLeverage(0);
+    setAddPnl(0);
     setSelectedLever(null);
   };
   const leverData = [
