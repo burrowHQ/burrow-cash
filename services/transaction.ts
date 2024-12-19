@@ -4,6 +4,7 @@ import {
   showPositionResult,
   showPositionClose,
   showPositionFailure,
+  showChangeCollateralPosition,
 } from "../components/HashResultModal";
 import { useMarginConfigToken } from "../hooks/useMarginConfig";
 
@@ -50,6 +51,19 @@ export const handleTransactionResults = async (
       }
 
       results.forEach(({ result, hasStorageDeposit }: TransactionResult) => {
+        const marginTransactionType = localStorage.getItem("marginTransactionType");
+        if (marginTransactionType === "changeCollateral") {
+          const collateralInfo = JSON.parse(localStorage.getItem("collateralInfo") || "{}");
+          showChangeCollateralPosition({
+            title: "Change Collateral",
+            icon: collateralInfo.iconC,
+            type: collateralInfo.positionType,
+            symbol: collateralInfo.symbolC,
+            collateral: collateralInfo.addedValue,
+          });
+          // localStorage.removeItem("marginTransactionType");
+          return;
+        }
         if (hasStorageDeposit) {
           const args = parsedArgs(result?.transaction?.actions?.[0]?.FunctionCall?.args || "");
           const { actions } = JSON.parse(args || "");

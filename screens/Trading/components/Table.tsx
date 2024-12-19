@@ -14,8 +14,9 @@ import { useAccountId } from "../../../hooks/hooks";
 import { useAppSelector } from "../../../redux/hooks";
 import { getMarginAccountSupplied } from "../../../redux/marginAccountSelectors";
 import { withdrawActionsAll } from "../../../store/marginActions/withdrawAll";
-import { showPositionResult } from "../../../components/HashResultModal";
 import { MarginAccountDetailIcon, YellowBallIcon } from "../../TokenDetail/svg";
+import { useRouterQuery } from "../../../utils/txhashContract";
+import { handleTransactionHash, handleTransactionResults } from "../../../services/transaction";
 
 const TradingTable = ({
   positionsList,
@@ -26,6 +27,8 @@ const TradingTable = ({
   filterTitle?: string;
   onTotalPLNChange?: (totalPLN: number) => void;
 }) => {
+  const { query } = useRouterQuery();
+  const { filterMarginConfigList } = useMarginConfigToken();
   const [selectedTab, setSelectedTab] = useState("positions");
   const [isClosePositionModalOpen, setIsClosePositionMobileOpen] = useState(false);
   const [isChangeCollateralMobileOpen, setIsChangeCollateralMobileOpen] = useState(false);
@@ -63,6 +66,13 @@ const TradingTable = ({
       console.error("Error fetching assets:", error);
     }
   };
+  useEffect(() => {
+    handleTransactionResults(
+      query?.transactionHashes,
+      query?.errorMessage,
+      Object.keys(filterMarginConfigList || []),
+    );
+  }, [query?.transactionHashes, query?.errorMessage]);
   useEffect(() => {
     if (isAccountDetailsOpen) {
       document.body.style.overflow = "hidden";

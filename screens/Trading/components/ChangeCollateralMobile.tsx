@@ -16,9 +16,12 @@ import { getAccountBalance } from "../../../redux/accountSelectors";
 import DataSource from "../../../data/datasource";
 import { shrinkToken } from "../../../store";
 import { showChangeCollateralPosition } from "../../../components/HashResultModal";
+import { handleTransactionHash } from "../../../services/transaction";
+import { useRouterQuery } from "../../../utils/txhashContract";
 
 export const ModalContext = createContext(null) as any;
 const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => {
+  const { query } = useRouterQuery();
   const account = useAppSelector((state) => state.account);
   const { marginConfigTokens, getPositionType } = useMarginConfigToken();
   const { parseTokenValue, getAssetDetails, getAssetById, calculateLeverage } = useMarginAccount();
@@ -189,16 +192,26 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
   const handleAddCollateralClick = async () => {
     try {
       setIsAddCollateralLoading(true);
-      await increaseCollateral({ pos_id, token_c_id, amount, assets });
-      localStorage.setItem("marginTradingTab", "my");
-      onClose();
-      showChangeCollateralPosition({
-        title: "Change Collateral",
+      const res = await increaseCollateral({ pos_id, token_c_id, amount, assets });
+      const collateralInfo = {
+        positionType: positionType.label,
         icon: iconC,
-        type: positionType.label === "Long" ? "Long" : "Short",
         symbol: symbolC,
-        collateral: String(addedValue),
-      });
+        addedValue: String(addedValue),
+      };
+      localStorage.setItem("marginTradingTab", "my");
+      localStorage.setItem("marginTransactionType", "changeCollateral");
+      localStorage.setItem("collateralInfo", JSON.stringify(collateralInfo));
+      onClose();
+      if (res !== undefined && res !== null) {
+        showChangeCollateralPosition({
+          title: "Change Collateral",
+          icon: iconC,
+          type: positionType.label === "Long" ? "Long" : "Short",
+          symbol: symbolC,
+          collateral: String(addedValue),
+        });
+      }
     } catch (error) {
       console.error("Error adding collateral:", error);
     } finally {
@@ -208,16 +221,26 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
   const handleDeleteCollateralClick = async () => {
     try {
       setIsDeleteCollateralLoading(true);
-      await decreaseCollateral({ pos_id, token_c_id, amount, assets });
-      localStorage.setItem("marginTradingTab", "my");
-      onClose();
-      showChangeCollateralPosition({
-        title: "Change Collateral",
-        type: positionType.label === "Long" ? "Long" : "Short",
+      const res = await decreaseCollateral({ pos_id, token_c_id, amount, assets });
+      const collateralInfo = {
+        positionType: positionType.label,
         icon: iconC,
         symbol: symbolC,
-        collateral: String(addedValue),
-      });
+        addedValue: String(addedValue),
+      };
+      localStorage.setItem("marginTradingTab", "my");
+      localStorage.setItem("marginTransactionType", "changeCollateral");
+      localStorage.setItem("collateralInfo", JSON.stringify(collateralInfo));
+      onClose();
+      if (res !== undefined && res !== null) {
+        showChangeCollateralPosition({
+          title: "Change Collateral",
+          type: positionType.label === "Long" ? "Long" : "Short",
+          icon: iconC,
+          symbol: symbolC,
+          collateral: String(addedValue),
+        });
+      }
     } catch (error) {
       console.error("Error deleted collateral:", error);
     } finally {

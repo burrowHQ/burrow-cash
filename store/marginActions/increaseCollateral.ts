@@ -71,5 +71,7 @@ export async function increaseCollateral({
       },
     ],
   });
-  await prepareAndExecuteTransactions(transactions);
+  const result = await prepareAndExecuteTransactions(transactions);
+
+  return result;
 }
