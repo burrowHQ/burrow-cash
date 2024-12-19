@@ -691,7 +691,7 @@ const PositionRow = ({
   const holdingDurationInHours =
     Math.abs(currentTime.getTime() - openTime.getTime()) / (1000 * 60 * 60);
   const holdingFee = totalHpFee * holdingDurationInHours;
-  const pnl = profitOrLoss - holdingFee;
+  const pnl = profitOrLoss === 0 ? 0 : profitOrLoss - holdingFee;
   if (onPLNChange) {
     onPLNChange(pnl);
   }
@@ -871,7 +871,7 @@ const PositionMobileRow = ({
   const holdingDurationInHours =
     Math.abs(currentTime.getTime() - openTime.getTime()) / (1000 * 60 * 60);
   const holdingFee = totalHpFee * holdingDurationInHours;
-  const pnl = profitOrLoss - holdingFee;
+  const pnl = profitOrLoss === 0 ? 0 : profitOrLoss - holdingFee;
   if (onPLNChange) {
     onPLNChange(pnl);
   }
