@@ -19,6 +19,7 @@ const MarketMarginTrading = () => {
   const [totalShortUSD, setTotalShortUSD] = React.useState(0);
   const [sortDirection, setSortDirection] = React.useState<"asc" | "desc" | null>(null);
   const [sortBy, setSortBy] = React.useState<string | null>(null);
+  const [mergedData, setMergedData] = useState<any[]>([]);
   const [volumeStats, setVolumeStats] = React.useState({
     totalVolume: 0,
     volume24h: 0,
@@ -30,7 +31,7 @@ const MarketMarginTrading = () => {
         const response = await DataSource.shared.getMarginTradingVolumeStatistics();
         setVolumeStats({
           totalVolume: response.totalVolume || 0,
-          volume24h: response.volume24h || 0,
+          volume24h: response["24h_volume"] || 0,
         });
       } catch (error) {
         console.error("Failed to fetch volume statistics:", error);
@@ -41,15 +42,39 @@ const MarketMarginTrading = () => {
     handleSort("longPosition");
   }, []);
 
+  useEffect(() => {
+    const fetchAllVolumeStats = async () => {
+      try {
+        const marginConfigList: Record<string, any> = filterMarginConfigList;
+        const promises = Object.values(marginConfigList).map((item) =>
+          DataSource.shared.getMarginTradingTokenVolumeStatistics(item.token_id),
+        );
+        const results = await Promise.all(promises);
+        const mergedData: any[] = Object.values(marginConfigList).map((item, index) => {
+          const volumeData: any | undefined = results[index];
+          return {
+            ...item,
+            totalVolume: volumeData?.data.total_volume || 0,
+            volume24h: volumeData?.data["24h_volume"] || 0,
+          };
+        });
+        setMergedData(mergedData);
+      } catch (error) {
+        console.error("Failed to fetch volume statistics:", error);
+      }
+    };
+
+    fetchAllVolumeStats();
+  }, []);
   const handleSort = (field: string) => {
     setSortBy((prev) => field);
     setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
   };
   const sortedData = React.useMemo(() => {
     if (!sortBy || !sortDirection) {
-      return Object.values(filterMarginConfigList as Record<string, any>);
+      return Object.values(mergedData as Record<string, any>);
     }
-    const dataList = Object.values(filterMarginConfigList as Record<string, any>);
+    const dataList = Object.values(mergedData as Record<string, any>);
     return dataList.sort((a, b) => {
       let valueA = 0;
       let valueB = 0;
@@ -68,11 +93,16 @@ const MarketMarginTrading = () => {
         valueB = parseFloat(
           shrinkToken(b.margin_debt.balance, b.metadata.decimals + a.config.extra_decimals) || "0",
         );
+      } else if (sortBy === "totalVolume") {
+        valueA = a.totalVolume;
+        valueB = b.totalVolume;
+      } else if (sortBy === "volume24h") {
+        valueA = a.volume24h;
+        valueB = b.volume24h;
       }
       return sortDirection === "asc" ? valueA - valueB : valueB - valueA;
     });
-  }, [filterMarginConfigList, sortBy, sortDirection]);
-
+  }, [mergedData, sortBy, sortDirection]);
   return (
     <div className="flex flex-col items-center justify-center w-full">
       {isMobile ? (
@@ -128,11 +158,11 @@ const DataItem = ({ title, value }) => (
   </div>
 );
 
-function SortButton({ sort }) {
+function SortButton({ sort, activeColor, inactiveColor }) {
   return (
     <div className="flex flex-col items-center gap-0.5 ml-1.5">
-      <ArrowUpIcon fill={`${sort === "asc" ? "rgba(0, 0, 0, 1)" : "rgba(0, 0, 0, 0.5)"}`} />
-      <ArrowDownIcon fill={`${sort === "desc" ? "rgba(0, 0, 0, 1)" : "rgba(0, 0, 0, 0.5)"}`} />
+      <ArrowUpIcon fill={`${sort === "asc" ? activeColor : inactiveColor}`} />
+      <ArrowDownIcon fill={`${sort === "desc" ? activeColor : inactiveColor}`} />
     </div>
   );
 }
@@ -144,13 +174,27 @@ function TableHead({ onSort, sortDirection, sortBy }) {
         <div className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap">
           Market
         </div>
-        <div className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap">
+        <div
+          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
+          onClick={() => onSort("totalVolume")}
+        >
           Total Volume
-          {/* <SortButton color="#C0C4E9" /> */}
+          <SortButton
+            activeColor="rgba(192, 196, 233, 1)"
+            inactiveColor="rgba(192, 196, 233, 0.5)"
+            sort={sortBy === "totalVolume" ? sortDirection : null}
+          />
         </div>
-        <div className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap">
+        <div
+          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
+          onClick={() => onSort("volume24h")}
+        >
           24H Volume
-          {/* <SortButton color="#C0C4E9" /> */}
+          <SortButton
+            activeColor="rgba(192, 196, 233, 1)"
+            inactiveColor="rgba(192, 196, 233, 0.5)"
+            sort={sortBy === "volume24h" ? sortDirection : null}
+          />
         </div>
       </div>
       <div
@@ -159,7 +203,11 @@ function TableHead({ onSort, sortDirection, sortBy }) {
       >
         <div className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap">
           Long Position
-          <SortButton sort={sortBy === "longPosition" ? sortDirection : null} />
+          <SortButton
+            activeColor="rgba(0, 0, 0, 1)"
+            inactiveColor="rgba(0, 0, 0, 0.5)"
+            sort={sortBy === "longPosition" ? sortDirection : null}
+          />
         </div>
       </div>
       <div
@@ -168,7 +216,11 @@ function TableHead({ onSort, sortDirection, sortBy }) {
       >
         <div className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap">
           Short Position
-          <SortButton sort={sortBy === "shortPosition" ? sortDirection : null} />
+          <SortButton
+            activeColor="rgba(0, 0, 0, 1)"
+            inactiveColor="rgba(0, 0, 0, 0.5)"
+            sort={sortBy === "shortPosition" ? sortDirection : null}
+          />
         </div>
       </div>
     </div>
@@ -250,7 +302,6 @@ function TableBody({
   setTotalLongUSD: (value: number) => void;
   setTotalShortUSD: (value: number) => void;
 }) {
-  // console.log(data);
   const { NATIVE_TOKENS, NEW_TOKENS } = getConfig() as any;
   useEffect(() => {
     let totalLongUSD = 0;
@@ -310,14 +361,14 @@ function TableBody({
               </div>
               <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
                 <div className="flex flex-col items-start ml-3">
-                  <div className="flex items-end">-</div>
-                  <span className="text-xs text-gray-300">$-</span>
+                  <div className="flex items-end">{item.totalVolume}</div>
+                  {/* <span className="text-xs text-gray-300">$-</span> */}
                 </div>
               </div>
               <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
                 <div className="flex flex-col items-start ml-3">
-                  <div className="flex items-end">-</div>
-                  <span className="text-xs text-gray-300">$-</span>
+                  <div className="flex items-end">{item.volume24h}</div>
+                  {/* <span className="text-xs text-gray-300">$-</span> */}
                 </div>
               </div>
               <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
@@ -420,8 +471,8 @@ function TableBodyMobile({
                     />
                   ) : null}
                 </div>
-                <div className="flex flex-col items-start ml-2">
-                  <div className="flex items-center flex-wrap text-sm">-</div>
+                <div className="flex flex-col items-end ml-2">
+                  <div className="flex items-center flex-wrap text-sm">{item.totalVolume}</div>
                   <span className="text-xs text-gray-300">Total Valume</span>
                 </div>
               </div>
@@ -429,7 +480,8 @@ function TableBodyMobile({
                 <div className="flex items-center justify-between mb-4 text-sm">
                   <p className="text-gray-300 h4">24H Volume</p>
                   <p>
-                    - <span className="text-xs text-gray-300">(-)</span>
+                    {item.volume24h}
+                    {/* <span className="text-xs text-gray-300">(-)</span> */}
                   </p>
                 </div>
                 <div className="flex items-center justify-between mb-4 text-sm">

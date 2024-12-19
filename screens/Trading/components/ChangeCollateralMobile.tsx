@@ -31,26 +31,8 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
   const [addPnl, setAddPnl] = useState(0);
   const balance = useAppSelector(getAccountBalance);
   const [selectedLever, setSelectedLever] = useState(null);
-  const [entryPrice, setEntryPrice] = useState<number | null>(null);
   const [isAddCollateralLoading, setIsAddCollateralLoading] = useState(false);
   const [isDeleteCollateralLoading, setIsDeleteCollateralLoading] = useState(false);
-  useEffect(() => {
-    const fetchEntryPrice = async () => {
-      try {
-        const response = await DataSource.shared.getMarginTradingRecordEntryPrice(rowData.pos_id);
-        if (response?.code === 0 && response?.data?.[0]?.entry_price) {
-          const price = parseFloat(response.data[0].entry_price);
-          setEntryPrice(price);
-        } else {
-          setEntryPrice(null);
-        }
-      } catch (error) {
-        console.error("Failed to fetch entry price:", error);
-        setEntryPrice(null);
-      }
-    };
-    fetchEntryPrice();
-  }, [rowData]);
   const handleChangeCollateralTabClick = (tab) => {
     setChangeCollateralTab(tab);
     setInputValue("");
@@ -484,7 +466,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
                   </div>
                   <div className="flex items-center justify-between text-sm mb-4">
                     <div className="text-gray-300">Entry Price</div>
-                    <div>${toInternationalCurrencySystem_number(entryPrice)}</div>
+                    <div>${toInternationalCurrencySystem_number(rowData.entryPrice)}</div>
                   </div>
                   <div className="flex items-center justify-between text-sm mb-4">
                     <div className="text-gray-300">Liq. Price</div>
@@ -628,7 +610,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
                   </div>
                   <div className="flex items-center justify-between text-sm mb-4">
                     <div className="text-gray-300">Entry Price</div>
-                    <div>${toInternationalCurrencySystem_number(entryPrice)}</div>
+                    <div>${toInternationalCurrencySystem_number(rowData.entryPrice)}</div>
                   </div>
                   <div className="flex items-center justify-between text-sm mb-4">
                     <div className="text-gray-300">Liq. Price</div>

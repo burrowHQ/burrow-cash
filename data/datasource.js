@@ -134,6 +134,16 @@ class DataSource {
     );
   }
 
+  getMarginTradingTokenVolumeStatistics(id) {
+    return this.callAPI(
+      `/v3/margin-trading/position/statistics`,
+      "GET",
+      { token_address: id },
+      null,
+      config?.marginTradingUrl,
+    );
+  }
+
   getFee() {
     return this.callAPI(
       `/v3/margin-trading/position/fee`,
