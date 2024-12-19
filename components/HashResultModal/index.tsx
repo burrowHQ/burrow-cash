@@ -131,6 +131,7 @@ export const showChangeCollateralPosition = (params: ShowChangeCollateralParams)
       container = null;
       root = null;
     }
+    localStorage?.removeItem("marginTransactionType");
   };
 
   root?.render(<ModalWithChangeCollateral show onClose={handleClose} {...params} />);
