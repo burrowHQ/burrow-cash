@@ -655,6 +655,7 @@ const PositionRow = ({
     data: item,
     assets,
     marginConfigTokens,
+    entryPrice,
   };
   const debtCap = parseFloat(item.debt_cap);
   const unitAccHpInterest = parseFloat(debt_assets_d?.unit_acc_hp_interest ?? 0);
