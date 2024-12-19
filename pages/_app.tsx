@@ -22,7 +22,7 @@ import { fetchConfig } from "../redux/appSlice";
 import { fetchMarginAccount } from "../redux/marginAccountSlice";
 import { fetchMarginConfig } from "../redux/marginConfigSlice";
 import { ToastMessage } from "../components/ToastMessage";
-import Popup from "../components/popup";
+// import Popup from "../components/popup";
 import RpcList from "../components/Rpc";
 import PubTestModal from "../components/PubTestModal";
 import { getAccountId, getAccountPortfolio } from "../redux/accountSelectors";
@@ -142,12 +142,12 @@ function Upgrade({ Component, pageProps }) {
         </div>
       ) : (
         <Layout>
-          <Popup className="lg:hidden" />
+          {/* <Popup className="lg:hidden" /> */}
           <Init />
           <Modal />
           <ToastMessage />
           <Component {...pageProps} />
-          <Popup className="xsm:hidden" />
+          {/* <Popup className="xsm:hidden" /> */}
           <RpcList />
           <PubTestModal />
         </Layout>
