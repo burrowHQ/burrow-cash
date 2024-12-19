@@ -533,12 +533,14 @@ const TradingOperate = () => {
                   </span> */}
 
                   {showFeeModal && (
-                    <div className="absolute bg-[#14162B] text-white min-w-36 min-h-[50px] p-2 rounded text-xs top-[30px] left-[-60px] flex flex-col items-start justify-between z-[1]">
+                    <div className="absolute bg-[#14162B] text-white min-h-[50px] p-2 rounded text-xs top-[30px] left-[-60px] flex flex-col items-start justify-between z-[1] w-auto">
                       <p>
-                        <span className="mr-1">Open Fee:</span>${beautifyPrice(Fee.openPFee)}
+                        <span className="mr-1 whitespace-nowrap">Open Fee:</span>$
+                        {beautifyPrice(Fee.openPFee)}
                       </p>
                       <p>
-                        <span className="mr-1">Trade Fee:</span>${beautifyPrice(Fee.swapFee)}
+                        <span className="mr-1 whitespace-nowrap">Trade Fee:</span>$
+                        {beautifyPrice(Fee.swapFee)}
                       </p>
                     </div>
                   )}
@@ -696,12 +698,14 @@ const TradingOperate = () => {
                     )
                   </span> */}
                   {showFeeModal && (
-                    <div className="absolute bg-[#14162B] text-white min-w-36 min-h-[50px] p-2 rounded text-xs top-[30px] left-[-60px] flex flex-col items-start justify-between z-[1]">
+                    <div className="absolute bg-[#14162B] text-white h-[50px] p-2 rounded text-xs top-[30px] left-[-60px] flex flex-col items-start justify-between z-[1] w-auto">
                       <p>
-                        <span className="mr-1">Open Fee:</span>${beautifyPrice(Fee.openPFee)}
+                        <span className="mr-1 whitespace-nowrap">Open Fee:</span>$
+                        {beautifyPrice(Fee.openPFee)}
                       </p>
                       <p>
-                        <span className="mr-1">Trade Fee:</span>${beautifyPrice(Fee.swapFee)}
+                        <span className="mr-1 whitespace-nowrap">Trade Fee:</span>$
+                        {beautifyPrice(Fee.swapFee)}
                       </p>
                     </div>
                   )}
