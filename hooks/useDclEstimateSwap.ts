@@ -69,7 +69,9 @@ export const useDclEstimateSwap = ({
         tag: `${pool_id}@${expandAmount}`,
       }),
     );
-    const estimates = await Promise.all(quotePending);
+    const estimatesResult = await Promise.allSettled(quotePending);
+    const fulfilledEstimates = estimatesResult.filter((res) => res.status == "fulfilled");
+    const estimates = fulfilledEstimates.map((r) => r.value);
     const bestEstimate: IQuoteResult = _.maxBy(estimates, (e) => Number(e.amount))!;
     const dexMap = get_registered_dexes();
     const dex = dexMap["2"];
