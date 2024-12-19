@@ -64,8 +64,6 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
   const { price: priceC, symbol: symbolC, decimals: decimalsC } = getAssetDetails(assetC);
   const { price: priceP, symbol: symbolP, decimals: decimalsP } = getAssetDetails(assetP);
 
-  // console.log(extraProps, assets, assetP, getAssetDetails(assetP), "extraProps");
-
   const leverageD = parseTokenValue(item.token_d_info.balance, decimalsD);
   const leverageC = parseTokenValue(item.token_c_info.balance, decimalsC);
   const leverage = calculateLeverage(leverageD, priceD, leverageC, priceC);
@@ -102,10 +100,10 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
         .toFixed(),
       tokenIn: item.token_p_id,
       tokenOut: item.token_d_info.token_id,
-      slippage: 0,
+      slippage: ReduxSlippageTolerance,
     });
-    const debtBalance = res.result_data.amount_out;
-    const d = (shrinkToken(debtBalance, decimalsD) as any) * priceD;
+    const pBalance = res.result_data.amount_in;
+    const d = (shrinkToken(pBalance, assetP.metadata.decimals) as any) * priceP;
     const p = (shrinkToken(item.token_p_amount, decimalsP) as any) * priceP;
     const minus = d - p;
 
@@ -136,11 +134,11 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
   const estimateData = useEstimateSwap({
     tokenIn_id: item.token_p_id,
     tokenOut_id: item.token_d_info.token_id,
-    // tokenIn_amount: tokenInAmount || "",
-    tokenIn_amount:
-      item.token_p_id === item.token_c_info.token_id
-        ? shrinkToken(Number(item.token_p_amount) + Number(item.token_c_info.balance), decimalsP)
-        : shrinkToken(item.token_p_amount, decimalsP),
+    tokenIn_amount: tokenInAmount || "",
+    // tokenIn_amount:
+    //   item.token_p_id === item.token_c_info.token_id
+    //     ? shrinkToken(Number(item.token_p_amount) + Number(item.token_c_info.balance), decimalsP)
+    //     : shrinkToken(item.token_p_amount, decimalsP),
     account_id: accountId,
     simplePools,
     stablePools,
@@ -148,7 +146,6 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     slippageTolerance: ReduxSlippageTolerance / 100,
   });
 
-  // console.log(estimateData, "estimateData");
   useEffect(() => {
     setIsDisabled(!estimateData?.swap_indication || !estimateData?.min_amount_out);
   }, [estimateData]);
@@ -161,12 +158,9 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
   // 3. 去swaprouter
   // 4. 大于仓位 需要c.balance + p
   // 5. 小于仓位 需要 p
-
   const handleCloseOpsitionEvt = async () => {
-    // return console.log(item);
     const expandedValue =
       positionType.label === "Short" ? await getShortExpandedValue() : item.token_p_amount;
-
     setIsDisabled(true);
     try {
       const res = await closePosition({
@@ -176,11 +170,11 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
         pos_id: itemKey,
         token_p_id: item.token_p_id,
         token_d_id: item.token_d_info.token_id,
-        // token_p_amount: expandedValue,
-        token_p_amount:
-          item.token_p_id === item.token_c_info.token_id
-            ? toDecimal(Number(item.token_p_amount) + Number(item.token_c_info.balance))
-            : item.token_p_amount,
+        token_p_amount: expandedValue,
+        // token_p_amount:
+        //   item.token_p_id === item.token_c_info.token_id
+        //     ? toDecimal(Number(item.token_p_amount) + Number(item.token_c_info.balance))
+        //     : item.token_p_amount,
       });
 
       onClose();
@@ -197,7 +191,6 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
   };
 
   const Fee = useMemo(() => {
-    // console.log(estimateData, estimateData?.fee, tokenInAmount, priceD);
     const uahpi: any = shrinkToken((assets as any).data[item.token_p_id]?.uahpi, 18) ?? 0;
     const uahpi_at_open: any = shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
     return {
