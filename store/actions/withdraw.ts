@@ -15,6 +15,8 @@ import { transformAccount } from "../../transformers/account";
 import { computeWithdrawMaxAmount } from "../../redux/selectors/getWithdrawMaxAmount";
 import getConfig from "../../utils/config";
 import { shadow_action_withdraw } from "./shadow";
+import type { Assets } from "../../redux/assetState";
+import type { Portfolio } from "../../redux/accountState";
 
 const { SPECIAL_REGISTRATION_TOKEN_IDS } = getConfig() as any;
 interface Props {
@@ -23,6 +25,9 @@ interface Props {
   amount: string;
   isMax: boolean;
   enable_pyth_oracle: boolean;
+  assets: Assets;
+  accountPortfolio: Portfolio;
+  accountId: string;
 }
 
 export async function withdraw({
@@ -31,18 +36,25 @@ export async function withdraw({
   amount,
   isMax,
   enable_pyth_oracle,
+  assets,
+  accountPortfolio,
+  accountId,
 }: Props) {
-  const assets = await getAssets().then(transformAssets);
-  const account = await getAccount().then(transformAccount);
-  if (!account) return;
+  // const assets = await getAssets().then(transformAssets);
+  // const account = await getAccount().then(transformAccount);
+  // console.log('0000000000000-assets', assets)
+  // console.log('0000000000000-accountPortfolio', accountPortfolio)
+  // console.log('0000000000000-accountId', accountId)
+  // console.log('0000000000000-account', account)
+  if (!accountId) return;
 
   const asset = assets[tokenId];
   const { decimals } = asset.metadata;
   const { logicContract, oracleContract } = await getBurrow();
   const isNEAR = tokenId === nearTokenId;
   const { isLpToken } = asset;
-  const suppliedBalance = new Decimal(account.portfolio?.supplied[tokenId]?.balance || 0);
-  const maxAmount = computeWithdrawMaxAmount(tokenId, assets, account.portfolio!);
+  const suppliedBalance = new Decimal(accountPortfolio?.supplied[tokenId]?.balance || 0);
+  const maxAmount = computeWithdrawMaxAmount(tokenId, assets, accountPortfolio!);
 
   const expandedAmount = isMax
     ? maxAmount
@@ -61,11 +73,11 @@ export async function withdraw({
   } else {
     const tokenContract = await getTokenContract(tokenId);
     if (
-      !(await isRegistered(account.accountId, tokenContract)) &&
+      !(await isRegistered(accountId, tokenContract)) &&
       !NO_STORAGE_DEPOSIT_CONTRACTS.includes(tokenContract.contractId)
     ) {
       if (SPECIAL_REGISTRATION_TOKEN_IDS.includes(tokenContract.contractId)) {
-        const r = await isRegisteredNew(account.accountId, tokenContract);
+        const r = await isRegisteredNew(accountId, tokenContract);
         if (r) {
           transactions.push({
             receiverId: tokenContract.contractId,
@@ -84,7 +96,7 @@ export async function withdraw({
                 methodName: ChangeMethodsToken[ChangeMethodsToken.register_account],
                 gas: new BN("10000000000000"),
                 args: {
-                  account_id: account.accountId,
+                  account_id: accountId,
                 },
                 attachedDeposit: new BN(0),
               },

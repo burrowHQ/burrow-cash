@@ -43,7 +43,6 @@ export interface IBurrow {
   oracleContract: Contract;
   refv1Contract: Contract;
   pythContract: Contract;
-  config: IConfig;
   view: (
     contract: Contract,
     methodName: string,

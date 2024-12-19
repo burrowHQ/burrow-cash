@@ -1,8 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { Box, Typography, Switch, Tooltip, Alert, useTheme } from "@mui/material";
-import LoadingButton from "@mui/lab/LoadingButton";
 import Decimal from "decimal.js";
-import { FcInfo } from "@react-icons/all-files/fc/FcInfo";
 import { nearTokenId } from "../../utils";
 import { toggleUseAsCollateral, hideModal } from "../../redux/appSlice";
 import { getModalData } from "./utils";
@@ -18,10 +15,11 @@ import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { getSelectedValues, getAssetData, getConfig } from "../../redux/appSelectors";
 import { trackActionButton } from "../../utils/telemetry";
 import { useDegenMode } from "../../hooks/hooks";
-import { SubmitButton, AlertWarning } from "./components";
-import { getAccountPortfolio } from "../../redux/accountSelectors";
+import { SubmitButton } from "./components";
 import getShadowRecords from "../../api/get-shadows";
 import { expandToken, shrinkToken } from "../../store";
+import { getAssets as getAssetSelector } from "../../redux/assetsSelectors";
+import { getAccountPortfolio, getAccountId } from "../../redux/accountSelectors";
 
 export default function Action({ maxBorrowAmount, healthFactor, collateralType, poolAsset }) {
   const [loading, setLoading] = useState(false);
@@ -29,6 +27,9 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
   const { enable_pyth_oracle } = useAppSelector(getConfig);
   const dispatch = useAppDispatch();
   const asset = useAppSelector(getAssetData);
+  const assets = useAppSelector(getAssetSelector);
+  const accountPortfolio = useAppSelector(getAccountPortfolio);
+  const accountId = useAppSelector(getAccountId);
   const { action = "Deposit", tokenId, borrowApy, price, portfolio, isLpToken, position } = asset;
   const { isRepayFromDeposits } = useDegenMode();
   const { available, canUseAsCollateral, extraDecimals, collateral, disabled, decimals } =
@@ -97,6 +98,9 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
           amount,
           isMax,
           enable_pyth_oracle,
+          assets: assets.data,
+          accountPortfolio,
+          accountId,
         });
         break;
       }
