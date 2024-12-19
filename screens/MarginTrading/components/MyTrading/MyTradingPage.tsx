@@ -4,9 +4,11 @@ import { useMarginAccount } from "../../../../hooks/useMarginAccount";
 import { useMarginConfigToken } from "../../../../hooks/useMarginConfig";
 import { toInternationalCurrencySystem_number } from "../../../../utils/uiNumber";
 import { isMobileDevice } from "../../../../helpers/helpers";
+import { useAppSelector } from "../../../../redux/hooks";
 
 const MyMarginTradingPage = () => {
   const isMobile = isMobileDevice();
+  const { ReduxTotalPLN } = useAppSelector((state) => state.category);
   const [showCollateralPopup, setShowCollateralPopup] = useState(false);
   const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
   const { getPositionType } = useMarginConfigToken();
@@ -147,7 +149,7 @@ const MyMarginTradingPage = () => {
             </div>
             <div className="flex-1">
               <p className="text-gray-300 text-sm">PLN</p>
-              <h2 className="text-h2">{formatCurrency(totalPLN)}</h2>
+              <h2 className="text-h2">{formatCurrency(ReduxTotalPLN)}</h2>
             </div>
           </div>
         </div>
@@ -236,12 +238,12 @@ const MyMarginTradingPage = () => {
           <div className="flex flex-1 justify-center">
             <div>
               <p className="text-gray-300 text-sm">PLN</p>
-              <h2 className="text-h2">{formatCurrency(totalPLN)}</h2>
+              <h2 className="text-h2">{formatCurrency(ReduxTotalPLN)}</h2>
             </div>
           </div>
         </div>
       )}
-      <TradingTable positionsList={marginAccountList} onTotalPLNChange={setTotalPLN} />
+      <TradingTable positionsList={marginAccountList} />
     </div>
   );
 };

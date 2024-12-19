@@ -11,11 +11,12 @@ import { getAssets } from "../../../store/assets";
 import { IAssetEntry } from "../../../interfaces";
 import DataSource from "../../../data/datasource";
 import { useAccountId } from "../../../hooks/hooks";
-import { useAppSelector } from "../../../redux/hooks";
+import { useAppSelector, useAppDispatch } from "../../../redux/hooks";
 import { getMarginAccountSupplied } from "../../../redux/marginAccountSelectors";
 import { withdrawActionsAll } from "../../../store/marginActions/withdrawAll";
 import { showPositionResult } from "../../../components/HashResultModal";
 import { MarginAccountDetailIcon, YellowBallIcon } from "../../TokenDetail/svg";
+import { setReduxTotalPLN } from "../../../redux/marginTrading";
 
 const TradingTable = ({
   positionsList,
@@ -26,6 +27,7 @@ const TradingTable = ({
   filterTitle?: string;
   onTotalPLNChange?: (totalPLN: number) => void;
 }) => {
+  const dispatch = useAppDispatch();
   const [selectedTab, setSelectedTab] = useState("positions");
   const [isClosePositionModalOpen, setIsClosePositionMobileOpen] = useState(false);
   const [isChangeCollateralMobileOpen, setIsChangeCollateralMobileOpen] = useState(false);
@@ -109,14 +111,14 @@ const TradingTable = ({
   useEffect(() => {
     calculateTotalSizeValues();
   }, [marginAccountList]);
-  const handlePLNChange = (pln: number) => {
-    setTotalPLN((prev) => prev + pln);
-  };
-  useEffect(() => {
-    if (onTotalPLNChange) {
-      onTotalPLNChange(totalPLN);
-    }
-  }, [totalPLN]);
+  // const handlePLNChange = (pln: number) => {
+  //   setTotalPLN((prev) => prev + pln);
+  // };
+  // useEffect(() => {
+  //   if (onTotalPLNChange) {
+  //     onTotalPLNChange(totalPLN);
+  //   }
+  // }, [totalPLN]);
   const handleWithdrawAllClick = async () => {
     setIsLoadingWithdraw(true);
     const accountSuppliedIds = accountSupplied.map((asset) => asset.token_id);
@@ -204,7 +206,7 @@ const TradingTable = ({
                       marginConfigTokens={marginConfigTokens}
                       assets={assets}
                       filterTitle={filterTitle}
-                      onPLNChange={handlePLNChange}
+                      // onPLNChange={handlePLNChange}
                     />
                   ))
                 ) : (
@@ -429,7 +431,7 @@ const TradingTable = ({
                   marginConfigTokens={marginConfigTokens}
                   assets={assets}
                   filterTitle={filterTitle}
-                  onPLNChange={handlePLNChange}
+                  // onPLNChange={handlePLNChange}
                 />
               ))
             ) : (
@@ -604,7 +606,7 @@ const PositionRow = ({
   assets,
   marginConfigTokens,
   filterTitle,
-  onPLNChange,
+  // onPLNChange,
 }) => {
   // console.log(itemKey, item, index);
   const [entryPrice, setEntryPrice] = useState<number | null>(null);
@@ -692,9 +694,15 @@ const PositionRow = ({
     Math.abs(currentTime.getTime() - openTime.getTime()) / (1000 * 60 * 60);
   const holdingFee = totalHpFee * holdingDurationInHours;
   const pnl = profitOrLoss - holdingFee;
-  if (onPLNChange) {
-    onPLNChange(pnl);
-  }
+  const dispatch = useAppDispatch();
+  // if (onPLNChange) {
+  //   onPLNChange(pnl);
+  // }
+  useEffect(() => {
+    dispatch(setReduxTotalPLN(pnl));
+  }, [pnl]);
+  // redux
+
   return (
     <tr className="text-base hover:bg-dark-100 font-normal">
       <td className="py-5 pl-5 ">
@@ -783,7 +791,7 @@ const PositionMobileRow = ({
   assets,
   marginConfigTokens,
   filterTitle,
-  onPLNChange,
+  // onPLNChange,
 }) => {
   // console.log(itemKey, item, index);
   const [entryPrice, setEntryPrice] = useState<number | null>(null);
@@ -872,9 +880,9 @@ const PositionMobileRow = ({
     Math.abs(currentTime.getTime() - openTime.getTime()) / (1000 * 60 * 60);
   const holdingFee = totalHpFee * holdingDurationInHours;
   const pnl = profitOrLoss - holdingFee;
-  if (onPLNChange) {
-    onPLNChange(pnl);
-  }
+  // if (onPLNChange) {
+  //   onPLNChange(pnl);
+  // }
   return (
     <div className="bg-gray-800 rounded-xl mb-4">
       <div className="pt-5 px-4 pb-4 border-b border-dark-950 flex justify-between">

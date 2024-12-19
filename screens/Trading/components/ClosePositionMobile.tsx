@@ -1,6 +1,7 @@
-import { useState, createContext, useEffect } from "react";
+import { useState, createContext, useEffect, useMemo } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
+import Big from "big.js";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
@@ -19,12 +20,25 @@ import {
 import { showPositionClose } from "../../../components/HashResultModal";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
 import { findPathReserve } from "../../../api/get-swap-path";
+import { getMarginConfig } from "../../../redux/marginConfigSelectors";
+import { getAssets } from "../../../redux/assetsSelectors";
+import { useMarginAccount } from "../../../hooks/useMarginAccount";
 
 export const ModalContext = createContext(null) as any;
 const ClosePositionMobile = ({ open, onClose, extraProps }) => {
   const rows = useAvailableAssets();
-  const { ReduxSlippageTolerance } = useAppSelector((state) => state.category);
+  const config = useAppSelector(getMarginConfig);
+  const assets = useAppSelector(getAssets);
+  const { marginAccountList } = useMarginAccount();
+  const {
+    ReduxcategoryAssets1,
+    ReduxcategoryAssets2,
+    ReduxcategoryCurrentBalance1,
+    ReduxcategoryCurrentBalance2,
+    ReduxSlippageTolerance,
+  } = useAppSelector((state) => state.category);
   const marginAccount = useAppSelector((state) => state.marginAccount);
+
   const {
     itemKey,
     index,
@@ -49,7 +63,8 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
   const { price: priceD, symbol: symbolD, decimals: decimalsD } = getAssetDetails(assetD);
   const { price: priceC, symbol: symbolC, decimals: decimalsC } = getAssetDetails(assetC);
   const { price: priceP, symbol: symbolP, decimals: decimalsP } = getAssetDetails(assetP);
-  console.log(decimalsD, "pricePDDDD");
+
+  // console.log(extraProps, assets, assetP, getAssetDetails(assetP), "extraProps");
 
   const leverageD = parseTokenValue(item.token_d_info.balance, decimalsD);
   const leverageC = parseTokenValue(item.token_c_info.balance, decimalsC);
@@ -64,14 +79,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
 
   const netValue = parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
   const collateral = parseTokenValue(item.token_c_info.balance, decimalsC);
-  // const entryPrice =
-  //   positionType.label === "Long"
-  //     ? sizeValueLong === 0
-  //       ? 0
-  //       : (leverageD * priceD) / sizeValueLong
-  //     : sizeValueShort === 0
-  //     ? 0
-  //     : netValue / sizeValueShort;
+
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
   const rowData = {
     pos_id: itemKey,
@@ -85,12 +93,13 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
 
   const getShortExpandedValue = async () => {
     const row: any = rows.find((row) => row.tokenId === item.token_d_info.token_id);
-
     const res = await findPathReserve({
-      amountOut: (
-        ((row?.borrowApy || 0) * item.token_d_info.balance * 2) / (100 * 1440 * 365) +
-        item.token_d_info.balance * 1
-      ).toFixed(),
+      amountOut: Big(row?.borrowApy || 0)
+        .times(item.token_d_info.balance)
+        .times(2)
+        .div(100 * 1440 * 365)
+        .plus(item.token_d_info.balance)
+        .toFixed(),
       tokenIn: item.token_p_id,
       tokenOut: item.token_d_info.token_id,
       slippage: 0,
@@ -99,7 +108,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     const d = (shrinkToken(debtBalance, decimalsD) as any) * priceD;
     const p = (shrinkToken(item.token_p_amount, decimalsP) as any) * priceP;
     const minus = d - p;
-    // console.log(minus, "for nico 133 minus");
+
     let expandedValue = 0;
     if (minus > 0) {
       // 需要c.balance + p
@@ -139,6 +148,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     slippageTolerance: ReduxSlippageTolerance / 100,
   });
 
+  // console.log(estimateData, "estimateData");
   useEffect(() => {
     setIsDisabled(!estimateData?.swap_indication || !estimateData?.min_amount_out);
   }, [estimateData]);
@@ -185,6 +195,28 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
       setIsDisabled(false);
     }
   };
+
+  const Fee = useMemo(() => {
+    // console.log(estimateData, estimateData?.fee, tokenInAmount, priceD);
+    const uahpi = (assets as any).data[item.token_p_id]?.uahpi ?? 0;
+    const uahpi_at_open: any = marginAccountList[itemKey]?.uahpi_at_open ?? 0;
+    console.log(assets, uahpi, uahpi_at_open, "uahpi");
+    return {
+      HPFee: leverageD * priceD * (uahpi - uahpi_at_open),
+      swapFee:
+        ((estimateData?.fee ?? 0) / 10000) *
+        Number(tokenInAmount) *
+        (actionShowRedColor ? 1 : priceD || 0),
+    };
+  }, [collateral, ReduxcategoryAssets1, estimateData]);
+
+  const formatDecimal = (value: number) => {
+    if (!value) return "0";
+    // 移除末尾的0和不必要的小数点
+    return value.toFixed(6).replace(/\.?0+$/, "");
+  };
+
+  const [showFeeModal, setShowFeeModal] = useState(false);
   return (
     <MUIModal open={open} onClose={onClose}>
       <Wrapper
@@ -278,6 +310,33 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
                 </span>
               </div>
             </div>
+
+            <div className="flex items-center justify-between text-sm mb-4">
+              <div className="text-gray-300">Fee</div>
+              <div className="flex items-center justify-center relative">
+                <p
+                  className="border-b border-dashed border-dark-800 cursor-pointer"
+                  onMouseEnter={() => setShowFeeModal(true)}
+                  onMouseLeave={() => setShowFeeModal(false)}
+                >
+                  ${beautifyPrice(Number(formatDecimal(Fee.swapFee + Fee.HPFee)))}
+                </p>
+
+                {showFeeModal && (
+                  <div className="absolute bg-[#14162B] text-white h-[50px] p-2 rounded text-xs top-[30px] left-[-60px] flex flex-col items-start justify-between z-[1] w-auto">
+                    <p>
+                      <span className="mr-1 whitespace-nowrap">Hold Fee:</span>$
+                      {beautifyPrice(Fee.HPFee)}
+                    </p>
+                    <p>
+                      <span className="mr-1 whitespace-nowrap">Trade Fee:</span>$
+                      {beautifyPrice(Fee.swapFee)}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* <div
               className={`flex items-center justify-between text-dark-200 text-base rounded-md h-12 text-center cursor-pointer ${
                 actionShowRedColor ? "bg-primary" : "bg-red-50"
