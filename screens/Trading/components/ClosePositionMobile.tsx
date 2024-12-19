@@ -198,11 +198,10 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
 
   const Fee = useMemo(() => {
     // console.log(estimateData, estimateData?.fee, tokenInAmount, priceD);
-    const uahpi = (assets as any).data[item.token_p_id]?.uahpi ?? 0;
-    const uahpi_at_open: any = marginAccountList[itemKey]?.uahpi_at_open ?? 0;
-    console.log(assets, uahpi, uahpi_at_open, "uahpi");
+    const uahpi: any = shrinkToken((assets as any).data[item.token_p_id]?.uahpi, 18) ?? 0;
+    const uahpi_at_open: any = shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
     return {
-      HPFee: leverageD * priceD * (uahpi - uahpi_at_open),
+      HPFee: leverageD * priceD * (uahpi * 1 - uahpi_at_open * 1),
       swapFee:
         ((estimateData?.fee ?? 0) / 10000) *
         Number(tokenInAmount) *
