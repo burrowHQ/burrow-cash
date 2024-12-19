@@ -235,7 +235,7 @@ const MyMarginTradingPage = () => {
           </div>
           <div className="flex flex-1 justify-center">
             <div>
-              <p className="text-gray-300 text-sm">PLN</p>
+              <p className="text-gray-300 text-sm">PNL</p>
               <h2 className="text-h2">{formatCurrency(totalPLN)}</h2>
             </div>
           </div>
