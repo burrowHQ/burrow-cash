@@ -479,12 +479,7 @@ const TradingOperate = () => {
             </div>
             <div className="relative bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-20">
               {/* long out  */}
-              <input
-                disabled
-                type="text"
-                value={longOutput && formatNumber(Number(longOutput), 6)}
-                placeholder="0"
-              />
+              <div>{longOutput && beautifyPrice(Number(longOutput))}</div>
               {/*  */}
               <div className="absolute top-2 right-2">
                 <TradingToken tokenList={categoryAssets1} type="cate1" />
@@ -646,12 +641,7 @@ const TradingOperate = () => {
             </div>
             <div className="relative bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-20">
               {/* short out */}
-              <input
-                disabled
-                type="text"
-                value={shortOutput && formatNumber(Number(shortOutput), 6)}
-                placeholder="0"
-              />
+              <div>{shortOutput && beautifyPrice(Number(shortOutput))}</div>
               {/*  */}
               <div className="absolute top-2 right-2">
                 <TradingToken tokenList={categoryAssets1} type="cate1" />
