@@ -255,6 +255,7 @@ const TradingOperate = () => {
    * longInput shortInput deal start
    *  */
   useEffect(() => {
+    // console.log(longInput, tokenInAmount, estimateData);
     const inputUsdCharcate1 = getAssetPrice(ReduxcategoryAssets1);
     const inputUsdCharcate2 = getAssetPrice(ReduxcategoryAssets2);
     if (inputUsdCharcate1 && estimateData) {
@@ -295,6 +296,16 @@ const TradingOperate = () => {
               (getAssetPrice(ReduxcategoryAssets2) as any) *
               (1 - marginConfigTokens.min_safety_buffer / 10000)) /
             shortOutput;
+        }
+      }
+      if (activeTab == "long") {
+        if (!longInput) {
+          liqPriceX = 0;
+        }
+      }
+      if (activeTab == "short") {
+        if (!shortInput) {
+          liqPriceX = 0;
         }
       }
       setLiqPrice(liqPriceX);
