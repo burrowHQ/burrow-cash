@@ -159,7 +159,8 @@ const TradingTable = ({
           {selectedTab === "account" &&
             accountSupplied.filter((token) => {
               const assetDetails = getAssetById(token.token_id);
-              return assetDetails.metadata.decimals >= assetDetails.config.extra_decimals;
+              const marginAssetDetails = getAssetDetails(assetDetails);
+              return marginAssetDetails.decimals >= assetDetails.config.extra_decimals;
             }).length > 0 && (
               <div
                 className="w-[110px] h-6 px-1.5 mr-11 flex items-center justify-center bg-primary bg-opacity-5 border border-primary rounded-md text-primary text-sm cursor-pointer"
@@ -182,7 +183,7 @@ const TradingTable = ({
                   <th>Entry Price</th>
                   <th>Index Price</th>
                   <th>Liq. Price</th>
-                  <th>PLN & ROE</th>
+                  <th>PNL & ROE</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -257,42 +258,17 @@ const TradingTable = ({
                 </tr>
               </thead>
               <tbody>
-                {/* {positionHistory.length > 0 ? (
-                  positionHistory.map((record, index) => (
-                    <tr
-                      key={index}
-                      className="text-base hover:bg-dark-100 cursor-pointer font-normal"
-                    >
-                      <td className="py-5 pl-5">{record.market}</td>
-                      <td>{record.operation}</td>
-                      <td className={record.side === "Long" ? "text-green-500" : "text-red-500"}>
-                        {record.side}
-                      </td>
-                      <td>${toInternationalCurrencySystem_number(record.price)}</td>
-                      <td>{record.amount}</td>
-                      <td>${toInternationalCurrencySystem_number(record.fee)}</td>
-                      <td>
-                        <div className="flex items-center">
-                          <span className={record.pnl >= 0 ? "text-green-500" : "text-red-500"}>
-                            ${toInternationalCurrencySystem_number(record.pnl)}
-                          </span>
-                          <span className="text-gray-400 text-xs ml-1">({record.roe}%)</span>
-                        </div>
-                      </td>
-                      <td className="pr-5">
-                        <div>{new Date(record.timestamp).toLocaleString()}</div>
-                      </td>
-                    </tr>
-                  ))
+                {positionHistory && positionHistory.length > 0 ? (
+                  positionHistory.map((record, index) => <>111</>)
                 ) : (
                   <tr>
                     <td colSpan={8}>
                       <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
-                        暂无历史记录
+                        No data
                       </div>
                     </td>
                   </tr>
-                )} */}
+                )}
               </tbody>
             </table>
           )}
@@ -309,12 +285,13 @@ const TradingTable = ({
               <tbody>
                 {accountSupplied.filter((token) => {
                   const assetDetails = getAssetById(token.token_id);
-                  return assetDetails.metadata.decimals >= assetDetails.config.extra_decimals;
+                  const marginAssetDetails = getAssetDetails(assetDetails);
+                  return marginAssetDetails.decimals >= assetDetails.config.extra_decimals;
                 }).length > 0 ? (
                   accountSupplied.map((token, index) => {
                     const assetDetails = getAssetById(token.token_id);
                     const marginAssetDetails = getAssetDetails(assetDetails);
-                    if (assetDetails.metadata.decimals < assetDetails.config.extra_decimals) {
+                    if (marginAssetDetails.decimals < assetDetails.config.extra_decimals) {
                       return null;
                     }
                     return (
@@ -331,7 +308,7 @@ const TradingTable = ({
                         </td>
                         <td>
                           {toInternationalCurrencySystem_number(
-                            parseTokenValue(token.balance, assetDetails.metadata.decimals),
+                            parseTokenValue(token.balance, marginAssetDetails.decimals),
                           )}
                         </td>
                         <td>
@@ -342,7 +319,7 @@ const TradingTable = ({
                         <td>
                           {marginAssetDetails.price
                             ? `$${toInternationalCurrencySystem_number(
-                                parseTokenValue(token.balance, assetDetails.metadata.decimals) *
+                                parseTokenValue(token.balance, marginAssetDetails.decimals) *
                                   marginAssetDetails.price,
                               )}`
                             : "/"}
@@ -501,12 +478,13 @@ const TradingTable = ({
                     <tbody>
                       {accountSupplied.filter((token) => {
                         const assetDetails = getAssetById(token.token_id);
-                        return assetDetails.metadata.decimals >= assetDetails.config.extra_decimals;
+                        const marginAssetDetails = getAssetDetails(assetDetails);
+                        return marginAssetDetails.decimals >= assetDetails.config.extra_decimals;
                       }).length > 0 ? (
                         accountSupplied.map((token, index) => {
                           const assetDetails = getAssetById(token.token_id);
                           const marginAssetDetails = getAssetDetails(assetDetails);
-                          if (assetDetails.metadata.decimals < assetDetails.config.extra_decimals) {
+                          if (marginAssetDetails.decimals < assetDetails.config.extra_decimals) {
                             return null;
                           }
                           return (
@@ -532,16 +510,14 @@ const TradingTable = ({
                               </td>
                               <td>
                                 {toInternationalCurrencySystem_number(
-                                  parseTokenValue(token.balance, assetDetails.metadata.decimals),
+                                  parseTokenValue(token.balance, marginAssetDetails.decimals),
                                 )}
                               </td>
                               <td className="text-right pr-[32px]">
                                 {marginAssetDetails.price
                                   ? `$${toInternationalCurrencySystem_number(
-                                      parseTokenValue(
-                                        token.balance,
-                                        assetDetails.metadata.decimals,
-                                      ) * marginAssetDetails.price,
+                                      parseTokenValue(token.balance, marginAssetDetails.decimals) *
+                                        marginAssetDetails.price,
                                     )}`
                                   : "/"}
                               </td>
@@ -948,7 +924,7 @@ const PositionMobileRow = ({
           <p>${toInternationalCurrencySystem_number(LiqPrice)}</p>
         </div>
         <div className="bg-dark-100 rounded-2xl flex items-center justify-center text-xs py-1 text-gray-300 mb-4">
-          PLN & ROE{" "}
+          PNL & ROE{" "}
           <span className="text-primary ml-1.5">
             {entryPrice !== null ? (
               `$${toInternationalCurrencySystem_number(pnl)}`

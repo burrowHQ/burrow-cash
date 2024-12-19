@@ -113,12 +113,12 @@ const ModalWithChangeCollateral = ({
                 <FilledIcon />
               </div>
             </div>
-            <div className="fc justify-between text-sm font-normal mb-4">
+            {/* <div className="fc justify-between text-sm font-normal mb-4">
               <span className="text-gray-300">symbol</span>
               <span>{symbol}</span>
-            </div>
+            </div> */}
             <div className="fc justify-between text-sm font-normal">
-              <span className="text-gray-300">collateral</span>
+              <span className="text-gray-300">collateral({symbol})</span>
               <span>${toInternationalCurrencySystem_number(Number(collateral))}</span>
             </div>
             <div className="absolute bottom-0 z-50 w-full left-0">{renderProgressBar()}</div>
