@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import ModalWithCountdown from "./ModalWithCountdown";
 import ModalWithFailure from "./ModalWithFailure";
 import ModalWithClosePosition from "./ModalWithClosePosition";
+import ModalWithChangeCollateral from "./ModalWithChangeCollateral";
 
 interface ShowPositionResultParams {
   title?: string;
@@ -103,4 +104,34 @@ export const showPositionClose = (params: { title?: string; type?: "Long" | "Sho
     }
   };
   root?.render(<ModalWithClosePosition show onClose={handleClose} {...params} />);
+};
+
+interface ShowChangeCollateralParams {
+  title?: string;
+  type?: "Long" | "Short";
+  icon: string;
+  symbol: string;
+  collateral: string;
+}
+
+export const showChangeCollateralPosition = (params: ShowChangeCollateralParams) => {
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "change-collateral-container";
+    document.body.appendChild(container);
+    root = createRoot(container);
+  }
+
+  const handleClose = () => {
+    if (root) {
+      root.unmount();
+    }
+    if (container) {
+      container.remove();
+      container = null;
+      root = null;
+    }
+  };
+
+  root?.render(<ModalWithChangeCollateral show onClose={handleClose} {...params} />);
 };
