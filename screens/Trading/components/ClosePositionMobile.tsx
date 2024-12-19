@@ -12,7 +12,7 @@ import { closePosition } from "../../../store/marginActions/closePosition";
 import { useEstimateSwap } from "../../../hooks/useEstimateSwap";
 import { useAccountId, useAvailableAssets } from "../../../hooks/hooks";
 import { usePoolsData } from "../../../hooks/useGetPoolsData";
-import { shrinkToken } from "../../../store/helper";
+import { expandToken, shrinkToken } from "../../../store/helper";
 import {
   YellowSolidSubmitButton as YellowSolidButton,
   RedSolidSubmitButton as RedSolidButton,
@@ -166,7 +166,11 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
       const res = await closePosition({
         isLong: positionType.label === "Long",
         swap_indication: estimateData!.swap_indication,
-        min_token_d_amount: estimateData!.min_amount_out,
+        min_token_d_amount: expandToken(
+          estimateData!.min_amount_out,
+          assetD.config.extra_decimals || 0,
+          0,
+        ),
         pos_id: itemKey,
         token_p_id: item.token_p_id,
         token_d_id: item.token_d_info.token_id,
