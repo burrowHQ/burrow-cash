@@ -14,7 +14,7 @@ import {
   YellowSolidSubmitButton as YellowSolidButton,
   RedSolidSubmitButton as RedSolidButton,
 } from "../../../components/Modal/button";
-import { shrinkToken } from "../../../store";
+import { shrinkToken, expandToken } from "../../../store";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
 import { getAccountId } from "../../../redux/accountSelectors";
 import { useRouterQuery } from "../../../utils/txhashContract";
@@ -148,7 +148,18 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
         action === "Long"
           ? confirmInfo.longOutputName?.token_id
           : confirmInfo.longInputName?.token_id,
-      min_token_p_amount: confirmInfo.estimateData.min_amount_out,
+      min_token_p_amount:
+        action === "Long"
+          ? expandToken(
+              confirmInfo.estimateData.min_amount_out,
+              confirmInfo?.longInputName?.config?.extra_decimals || 0,
+              0,
+            )
+          : expandToken(
+              confirmInfo.estimateData.min_amount_out,
+              confirmInfo?.longInputName?.config?.extra_decimals || 0,
+              0,
+            ),
       swap_indication: confirmInfo.estimateData.swap_indication,
       assets: confirmInfo.assets.data,
     };

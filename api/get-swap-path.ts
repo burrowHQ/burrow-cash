@@ -24,7 +24,7 @@ export async function findPath({
       config.findPathUrl
     }/findPath?amountIn=${amountIn}&tokenIn=${tokenIn}&tokenOut=${tokenOut}&pathDeep=${
       supportLedger ? 1 : 3
-    }&slippage=${Number(slippage) / 100}`,
+    }&slippage=${Number(slippage)}`,
     {
       signal: controller.signal,
     },
