@@ -25,7 +25,7 @@ import {
 } from "../utils/margin";
 
 init_env("dev");
-const SHUTDOWN_SERVER = true;
+const SHUTDOWN_SERVER = false;
 export const useV1EstimateSwap = ({
   tokenIn_id,
   tokenOut_id,
@@ -96,9 +96,10 @@ export const useV1EstimateSwap = ({
     }).catch(() => ({}));
     if (!(resultFromServer?.result_code !== 0 || !resultFromServer?.result_data?.routes?.length)) {
       const result: IFindPathResult = resultFromServer.result_data;
-      const min_output_amount = new Decimal(1 - slippageTolerance || 0)
-        .mul(result.amount_out || "0")
-        .toFixed(0);
+      let min_output_amount = new Decimal(0);
+      // const min_output_amount = new Decimal(1 - slippageTolerance || 0)
+      //   .mul(result.amount_out || "0")
+      //   .toFixed(0);
       const dexMap = get_registered_dexes();
       const dex = dexMap["1"];
       const { routes } = result;
@@ -110,6 +111,7 @@ export const useV1EstimateSwap = ({
           }
           pool.pool_id = Number(pool.pool_id);
           actionsList.push(pool);
+          min_output_amount = min_output_amount.plus(pool.min_amount_out || 0);
         });
       });
       const msg = JSON.stringify({
@@ -122,7 +124,7 @@ export const useV1EstimateSwap = ({
       });
       setEstimateData({
         amount_out: shrinkToken(result.amount_out, tokenOut_metadata.decimals),
-        min_amount_out: min_output_amount,
+        min_amount_out: min_output_amount.toFixed(0),
         swap_indication: {
           dex_id: dex,
           swap_action_text: msg,
