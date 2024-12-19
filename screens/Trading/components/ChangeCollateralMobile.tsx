@@ -92,6 +92,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
     if (event.target.value === "") {
       setAddedValue(0);
       setAddLeverage(0);
+      setAddPnl(0);
     }
   };
 
@@ -101,6 +102,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
       setInputValue("");
       setAddedValue(0);
       setAddLeverage(0);
+      setAddPnl(0);
       return;
     }
     const maxAmount = getMaxAvailableAmount();
@@ -121,6 +123,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
       setInputValue("");
       setAddedValue(0);
       setAddLeverage(0);
+      setAddPnl(0);
       return;
     }
     const tokenCInfoBalance = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
@@ -614,7 +617,19 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
                   </div>
                   <div className="flex items-center justify-between text-sm mb-4">
                     <div className="text-gray-300">Liq. Price</div>
-                    <div>${toInternationalCurrencySystem_number(LiqPrice)}</div>
+                    <div className="flex items-center justify-center">
+                      {addPnl ? (
+                        <>
+                          <span className="text-gray-300 mr-2 line-through">
+                            ${toInternationalCurrencySystem_number(LiqPrice)}
+                          </span>
+                          <RightArrow />
+                          <p className="ml-2">${toInternationalCurrencySystem_number(addPnl)}</p>
+                        </>
+                      ) : (
+                        <p>${toInternationalCurrencySystem_number(LiqPrice)}</p>
+                      )}
+                    </div>
                   </div>
                   <div
                     className={`flex items-center bg-red-50 justify-between text-dark-200 text-base rounded-md h-12 text-center  ${
