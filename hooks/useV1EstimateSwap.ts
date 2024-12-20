@@ -35,6 +35,7 @@ export const useV1EstimateSwap = ({
   simplePools,
   stablePools,
   stablePoolsDetail,
+  forceUpdate,
 }: {
   tokenIn_id: string;
   tokenOut_id: string;
@@ -44,6 +45,7 @@ export const useV1EstimateSwap = ({
   simplePools: any[];
   stablePools: any[];
   stablePoolsDetail: any[];
+  forceUpdate?: number;
 }) => {
   const assets = useAppSelector(getAssets);
   const marginConfig = useAppSelector(getMarginConfig);
@@ -78,6 +80,7 @@ export const useV1EstimateSwap = ({
     simplePools?.length,
     stablePools?.length,
     stablePoolsDetail?.length,
+    forceUpdate,
   ]);
   async function getEstimateSwapData() {
     if (SHUTDOWN_SERVER) {

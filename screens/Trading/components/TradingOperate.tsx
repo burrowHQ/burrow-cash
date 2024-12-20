@@ -21,6 +21,7 @@ import {
   RedSolidSubmitButton as RedSolidButton,
 } from "../../../components/Modal/button";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
+import { ConnectWalletButton } from "../../../components/Header/WalletButton";
 
 // main components
 const TradingOperate = () => {
@@ -176,6 +177,7 @@ const TradingOperate = () => {
   const [tokenInAmount, setTokenInAmount] = useState(0);
   const [LiqPrice, setLiqPrice] = useState(0);
   const [entryPrice, setEntryPrice] = useState(0);
+  const [forceUpdate, setForceUpdate] = useState(0);
   const estimateData = useEstimateSwap({
     tokenIn_id:
       activeTab === "long" ? ReduxcategoryAssets2?.token_id : ReduxcategoryAssets1?.token_id,
@@ -187,24 +189,8 @@ const TradingOperate = () => {
     stablePools,
     stablePoolsDetail,
     slippageTolerance: slippageTolerance / 100,
+    forceUpdate,
   });
-  const [percentList, setPercentList] = useState([]);
-  // useMemo(() => {
-  //   if (estimateData?.identicalRoutes) {
-  //     const { identicalRoutes } = estimateData;
-  //     let sum = 0;
-  //     const perArray = identicalRoutes.map((routes) => {
-  //       const k = routes.reduce((pre, cur) => {
-  //         return pre + (Number(cur.pool?.partialAmountIn) || 0);
-  //       }, 0);
-  //       sum += k; //
-  //       return k;
-  //     });
-
-  //     const perStrArray = perArray.map((item) => ((item * 100) / sum).toFixed(2)); //
-  //     setPercentList(perStrArray);
-  //   }
-  // }, [estimateData]);
 
   // long & short input change fn.
   const inputPriceChange = _.debounce((newValue) => {
@@ -332,6 +318,21 @@ const TradingOperate = () => {
       setLiqPrice(liqPriceX);
     }
   }, [longOutput, shortOutput]);
+
+  const [lastTokenInAmount, setLastTokenInAmount] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (tokenInAmount === lastTokenInAmount) {
+        setTokenInAmount((prev) => prev);
+        setForceUpdate((prev) => prev + 1);
+      } else {
+        setLastTokenInAmount(tokenInAmount);
+      }
+    }, 20000);
+
+    return () => clearInterval(interval);
+  }, [tokenInAmount, lastTokenInAmount]);
 
   const Fee = useMemo(() => {
     return {
@@ -618,13 +619,17 @@ const TradingOperate = () => {
                 </div>
               )}
 
-              <YellowSolidButton
-                className="w-full"
-                disabled={isDisabled || isMaxPosition}
-                onClick={handleConfirmButtonClick}
-              >
-                Long {cateSymbol} {rangeMount}x
-              </YellowSolidButton>
+              {accountId ? (
+                <YellowSolidButton
+                  className="w-full"
+                  disabled={isDisabled || isMaxPosition}
+                  onClick={handleConfirmButtonClick}
+                >
+                  Long {cateSymbol} {rangeMount}x
+                </YellowSolidButton>
+              ) : (
+                <ConnectWalletButton accountId={accountId} className="w-full" />
+              )}
               {isConfirmModalOpen && (
                 <ConfirmMobile
                   open={isConfirmModalOpen}
@@ -785,13 +790,17 @@ const TradingOperate = () => {
               >
                 <div className="flex-grow">Short NEAR {rangeMount}x</div>
               </div> */}
-              <RedSolidButton
-                className="w-full"
-                disabled={isDisabled || isMaxPosition}
-                onClick={handleConfirmButtonClick}
-              >
-                Short {cateSymbol} {rangeMount}x
-              </RedSolidButton>
+              {accountId ? (
+                <RedSolidButton
+                  className="w-full"
+                  disabled={isDisabled || isMaxPosition}
+                  onClick={handleConfirmButtonClick}
+                >
+                  Short {cateSymbol} {rangeMount}x
+                </RedSolidButton>
+              ) : (
+                <ConnectWalletButton accountId={accountId} className="w-full" isShort />
+              )}
               {isConfirmModalOpen && (
                 <ConfirmMobile
                   open={isConfirmModalOpen}
