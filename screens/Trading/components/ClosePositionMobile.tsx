@@ -1,7 +1,7 @@
 import { useState, createContext, useEffect, useMemo } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
-import Big from "big.js";
+import Decimal from "decimal.js";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
@@ -12,7 +12,12 @@ import { closePosition } from "../../../store/marginActions/closePosition";
 import { useEstimateSwap } from "../../../hooks/useEstimateSwap";
 import { useAccountId, useAvailableAssets } from "../../../hooks/hooks";
 import { usePoolsData } from "../../../hooks/useGetPoolsData";
-import { expandToken, shrinkToken } from "../../../store/helper";
+import {
+  expandToken,
+  shrinkToken,
+  shrinkTokenDecimal,
+  expandTokenDecimal,
+} from "../../../store/helper";
 import {
   YellowSolidSubmitButton as YellowSolidButton,
   RedSolidSubmitButton as RedSolidButton,
@@ -26,19 +31,6 @@ import { useMarginAccount } from "../../../hooks/useMarginAccount";
 
 export const ModalContext = createContext(null) as any;
 const ClosePositionMobile = ({ open, onClose, extraProps }) => {
-  const rows = useAvailableAssets();
-  const config = useAppSelector(getMarginConfig);
-  const assets = useAppSelector(getAssets);
-  const { marginAccountList } = useMarginAccount();
-  const {
-    ReduxcategoryAssets1,
-    ReduxcategoryAssets2,
-    ReduxcategoryCurrentBalance1,
-    ReduxcategoryCurrentBalance2,
-    ReduxSlippageTolerance,
-  } = useAppSelector((state) => state.category);
-  const marginAccount = useAppSelector((state) => state.marginAccount);
-
   const {
     itemKey,
     index,
@@ -51,122 +43,92 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     LiqPrice,
     entryPrice,
   } = extraProps;
+  const [showFeeModal, setShowFeeModal] = useState(false);
+  const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
+  const [tokenInAmount, setTokenInAmount] = useState<string | null>(null);
+  const [isDisabled, setIsDisabled] = useState(false);
 
-  //
+  const theme = useTheme();
+  const assets = useAppSelector(getAssets);
+  const { marginAccountList } = useMarginAccount();
+  const {
+    ReduxcategoryAssets1,
+    ReduxcategoryAssets2,
+    ReduxcategoryCurrentBalance1,
+    ReduxcategoryCurrentBalance2,
+    ReduxSlippageTolerance,
+  } = useAppSelector((state) => state.category);
+  const marginAccount = useAppSelector((state) => state.marginAccount);
   const accountId = useAccountId();
   const { simplePools, stablePools, stablePoolsDetail } = usePoolsData();
 
   const assetD = getAssetById(item.token_d_info.token_id);
   const assetC = getAssetById(item.token_c_info.token_id);
   const assetP = getAssetById(item.token_p_id);
-
   const { price: priceD, symbol: symbolD, decimals: decimalsD } = getAssetDetails(assetD);
   const { price: priceC, symbol: symbolC, decimals: decimalsC } = getAssetDetails(assetC);
   const { price: priceP, symbol: symbolP, decimals: decimalsP } = getAssetDetails(assetP);
-
   const leverageD = parseTokenValue(item.token_d_info.balance, decimalsD);
   const leverageC = parseTokenValue(item.token_c_info.balance, decimalsC);
   const leverage = calculateLeverage(leverageD, priceD, leverageC, priceC);
-
   const positionType = getPositionType(item.token_d_info.token_id);
-
   const sizeValueLong = parseTokenValue(item.token_p_amount, decimalsP);
   const sizeValueShort = parseTokenValue(item.token_d_info.balance, decimalsD);
   const sizeValue =
     positionType.label === "Long" ? sizeValueLong * (priceP || 0) : sizeValueShort * (priceD || 0);
-
   const netValue = parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
   const collateral = parseTokenValue(item.token_c_info.balance, decimalsC);
-
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
-  const rowData = {
-    pos_id: itemKey,
-    data: item,
-  };
-
-  const dispatch = useAppDispatch();
-  const theme = useTheme();
-  const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
+  console.log("-----------------assetD", assetD);
+  console.log("-----------------assetC", assetC);
+  console.log("-----------------assetP", assetP);
+  console.log("-----------------item", item);
   const actionShowRedColor = positionType.label === "Long";
 
-  const getShortExpandedValue = async () => {
-    const row: any = rows.find((row) => row.tokenId === item.token_d_info.token_id);
-    const res = await findPathReserve({
-      amountOut: Big(row?.borrowApy || 0)
-        .times(item.token_d_info.balance)
-        .times(2)
-        .div(100 * 1440 * 365)
-        .plus(item.token_d_info.balance)
-        .round()
-        .toFixed(),
-      tokenIn: item.token_p_id,
-      tokenOut: item.token_d_info.token_id,
-      slippage: ReduxSlippageTolerance,
-    });
-    const pBalance = res.result_data.amount_in;
-    const d = Big(shrinkToken(pBalance, assetP.metadata.decimals)).times(priceP);
-    const p = Big(shrinkToken(item.token_p_amount, decimalsP)).times(priceP);
-    const minus = d.minus(p);
-
-    let expandedValue = 0;
-    if (minus.toNumber() > 0) {
-      // 需要c.balance + p
-      expandedValue = minus
-        .div(priceC)
-        .times(Big(10).pow(decimalsC))
-        .plus(item.token_p_amount)
-        .toNumber();
-    } else {
-      // 需要 p
-      expandedValue = Number(item.token_p_amount);
-    }
-    return expandedValue.toFixed();
-  };
-
-  const [tokenInAmount, setTokenInAmount] = useState<string | null>(null);
-
+  // get estimate token in amount
   useEffect(() => {
-    const updateTokenInAmount = async () => {
-      const amount =
-        item.token_p_id === item.token_c_info.token_id
-          ? shrinkToken(await getShortExpandedValue(), decimalsP)
-          : shrinkToken(item.token_p_amount, decimalsP);
-      setTokenInAmount(amount);
-    };
-    updateTokenInAmount();
-  }, [item]);
-
+    if (positionType.label === "Short") {
+      // quote to get how much p is needed to pay off the debt
+      getMinRequiredPAmount().then((res) => {
+        setTokenInAmount(res || "0");
+      });
+    } else {
+      setTokenInAmount(
+        shrinkTokenDecimal(item.token_p_amount, assetP.config.extra_decimals).toFixed(
+          0,
+          Decimal.ROUND_DOWN,
+        ),
+      );
+    }
+  }, [positionType.label]);
+  // estimate
   const estimateData = useEstimateSwap({
     tokenIn_id: item.token_p_id,
     tokenOut_id: item.token_d_info.token_id,
-    tokenIn_amount: tokenInAmount || "",
-    // tokenIn_amount:
-    //   item.token_p_id === item.token_c_info.token_id
-    //     ? shrinkToken(Number(item.token_p_amount) + Number(item.token_c_info.balance), decimalsP)
-    //     : shrinkToken(item.token_p_amount, decimalsP),
+    tokenIn_amount: shrinkToken(tokenInAmount || "0", assetP.metadata.decimals),
     account_id: accountId,
     simplePools,
     stablePools,
     stablePoolsDetail,
     slippageTolerance: ReduxSlippageTolerance / 100,
   });
-  // console.log(tokenInAmount, "estimateData");
-
   useEffect(() => {
     setIsDisabled(!estimateData?.swap_indication || !estimateData?.min_amount_out);
   }, [estimateData]);
-  const [isDisabled, setIsDisabled] = useState(false);
+  const Fee = useMemo(() => {
+    const uahpi: any = shrinkToken((assets as any).data[item.token_p_id]?.uahpi, 18) ?? 0;
+    const uahpi_at_open: any = shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
+    return {
+      HPFee: leverageD * priceD * (uahpi * 1 - uahpi_at_open * 1),
+      swapFee:
+        ((estimateData?.fee ?? 0) / 10000) *
+        Number(tokenInAmount) *
+        (actionShowRedColor ? 1 : priceD || 0),
+    };
+  }, [collateral, ReduxcategoryAssets1, estimateData]);
 
-  // 1. 当前债务的balance
-  // const debtBalance = marginAccount.debt_balance;
-  // 2. 当前债务的apy
-  // const debtApy = marginAccount.debt_apy;
-  // 3. 去swaprouter
-  // 4. 大于仓位 需要c.balance + p
-  // 5. 小于仓位 需要 p
+  // close position action
   const handleCloseOpsitionEvt = async () => {
-    const expandedValue =
-      positionType.label === "Short" ? await getShortExpandedValue() : item.token_p_amount;
     setIsDisabled(true);
     try {
       const res = await closePosition({
@@ -180,11 +142,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
         pos_id: itemKey,
         token_p_id: item.token_p_id,
         token_d_id: item.token_d_info.token_id,
-        token_p_amount: expandedValue,
-        // token_p_amount:
-        //   item.token_p_id === item.token_c_info.token_id
-        //     ? toDecimal(Number(item.token_p_amount) + Number(item.token_c_info.balance))
-        //     : item.token_p_amount,
+        token_p_amount: expandToken(tokenInAmount || "0", assetP.config.extra_decimals, 0),
       });
 
       onClose();
@@ -199,26 +157,39 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
       setIsDisabled(false);
     }
   };
-
-  const Fee = useMemo(() => {
-    const uahpi: any = shrinkToken((assets as any).data[item.token_p_id]?.uahpi, 18) ?? 0;
-    const uahpi_at_open: any = shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
-    return {
-      HPFee: leverageD * priceD * (uahpi * 1 - uahpi_at_open * 1),
-      swapFee:
-        ((estimateData?.fee ?? 0) / 10000) *
-        Number(tokenInAmount) *
-        (actionShowRedColor ? 1 : priceD || 0),
-    };
-  }, [collateral, ReduxcategoryAssets1, estimateData]);
-
+  async function getMinRequiredPAmount() {
+    const dAmount = shrinkTokenDecimal(
+      item.token_d_info.balance,
+      assetD.config.extra_decimals,
+    ).toFixed(0, Decimal.ROUND_UP);
+    const accruedInterest = new Decimal(assetD.borrow_apr).mul(dAmount).div(365 * 24 * 60 * 5);
+    const totalHpFee = get_total_hp_fee();
+    const res = await findPathReserve({
+      amountOut: accruedInterest.plus(totalHpFee).plus(dAmount).toFixed(0, Decimal.ROUND_UP),
+      tokenIn: item.token_p_id,
+      tokenOut: item.token_d_info.token_id,
+      slippage: Number(ReduxSlippageTolerance) / 100,
+    });
+    const requiredPAmount = res.result_data.amount_in;
+    const token_p_amount = shrinkTokenDecimal(
+      item.token_p_amount,
+      assetP.config.extra_decimals,
+    ).toFixed(0, Decimal.ROUND_UP);
+    const requiredPAmountOnShort = Decimal.max(requiredPAmount, token_p_amount).toFixed(0);
+    return requiredPAmountOnShort;
+  }
+  function get_total_hp_fee() {
+    const uahpi_at_current = assetD.uahpi;
+    const { uahpi_at_open, debt_cap } = item;
+    return shrinkTokenDecimal(
+      new Decimal(uahpi_at_current).minus(uahpi_at_open).mul(debt_cap).toFixed(0, Decimal.ROUND_UP),
+      18,
+    ).toFixed(0, Decimal.ROUND_UP);
+  }
   const formatDecimal = (value: number) => {
     if (!value) return "0";
-    // 移除末尾的0和不必要的小数点
     return value.toFixed(6).replace(/\.?0+$/, "");
   };
-
-  const [showFeeModal, setShowFeeModal] = useState(false);
   return (
     <MUIModal open={open} onClose={onClose}>
       <Wrapper

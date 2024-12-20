@@ -58,7 +58,7 @@ export async function closePosition({
       },
     ],
   });
-  const pWithDrawActionsTemplate = {
+  const cWithDrawActionsTemplate = {
     actions: [
       {
         Withdraw: {
@@ -87,11 +87,11 @@ export async function closePosition({
             : ChangeMethodsOracle[ChangeMethodsOracle.oracle_call],
           args: {
             ...(enable_pyth_oracle
-              ? pWithDrawActionsTemplate
+              ? cWithDrawActionsTemplate
               : {
                   receiver_id: logicContract.contractId,
                   msg: JSON.stringify({
-                    MarginExecute: pWithDrawActionsTemplate,
+                    MarginExecute: cWithDrawActionsTemplate,
                   }),
                 }),
           },

@@ -62,7 +62,7 @@ export async function findPathReserve({
       config.findPathUrl
     }/findPathExactOut?amountOut=${amountOut}&tokenIn=${tokenIn}&tokenOut=${tokenOut}&pathDeep=${
       supportLedger ? 1 : 3
-    }&slippage=${Number(slippage) / 100}`,
+    }&slippage=${Number(slippage)}`,
     {
       signal: controller.signal,
     },

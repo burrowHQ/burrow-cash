@@ -79,6 +79,7 @@ module.exports = {
     "array-callback-return": "off",
     "prefer-template": "off",
     "no-restricted-syntax": "off",
+    "prefer-destructuring": "off",
   },
   settings: {
     react: {
