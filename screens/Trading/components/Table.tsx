@@ -859,6 +859,7 @@ const PositionMobileRow = ({
   }
   const sizeValueLong = parseTokenValue(item.token_p_amount, decimalsP);
   const sizeValueShort = parseTokenValue(item.token_d_info.balance, decimalsD);
+  const size = positionType.label === "Long" ? sizeValueLong : sizeValueShort;
   const sizeValue =
     positionType.label === "Long" ? sizeValueLong * (priceP || 0) : sizeValueShort * (priceD || 0);
 
@@ -936,7 +937,12 @@ const PositionMobileRow = ({
           </div>
         </div>
         <div className="text-right">
-          <p>${toInternationalCurrencySystem_number(sizeValue)}</p>
+          <div className="flex items-center">
+            <p className="mr-2"> {toInternationalCurrencySystem_number(size)}</p>
+            <span className="text-gray-300 text-sm">
+              (${toInternationalCurrencySystem_number(sizeValue)})
+            </span>
+          </div>
           <p className="text-xs text-gray-300">Size</p>
         </div>
       </div>
