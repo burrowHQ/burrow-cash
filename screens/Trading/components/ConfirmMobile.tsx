@@ -152,7 +152,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
         action === "Long"
           ? expandToken(
               confirmInfo.estimateData.min_amount_out,
-              confirmInfo?.longInputName?.config?.extra_decimals || 0,
+              confirmInfo?.longOutputName?.config?.extra_decimals || 0,
               0,
             )
           : expandToken(

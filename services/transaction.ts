@@ -58,7 +58,7 @@ export const handleTransactionResults = async (
             title: "Change Collateral",
             icon: collateralInfo.iconC,
             type: collateralInfo.positionType,
-            symbol: collateralInfo.symbolC,
+            symbol: collateralInfo.symbol,
             collateral: collateralInfo.addedValue,
           });
           // localStorage.removeItem("marginTransactionType");
