@@ -94,14 +94,12 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
     setAddedValue(newNetValue);
     setAddLeverage(newLeverage);
     setAddPnl(newLiqPrice);
-    setInputValue(String(value));
     if (event.target.value === "") {
       setAddedValue(0);
       setAddLeverage(0);
       setAddPnl(0);
     }
   };
-
   const handleAddChange = (event) => {
     const { value } = event.target;
     if (value === "" || Number(value) < 0) {
@@ -111,6 +109,11 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
       setAddPnl(0);
       return;
     }
+    if (selectedLever !== null && value !== "") {
+      setSelectedLever(null);
+    }
+    const regex = /^\d*\.?\d*$/;
+    if (!regex.test(value)) return;
     const maxAmount = getMaxAvailableAmount();
     if (value > maxAmount) {
       setInputValue(String(maxAmount));
@@ -132,6 +135,11 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
       setAddPnl(0);
       return;
     }
+    if (selectedLever !== null && value !== "") {
+      setSelectedLever(null);
+    }
+    const regex = /^\d*\.?\d*$/;
+    if (!regex.test(value)) return;
     const tokenCInfoBalance = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
     const maxRemovable = calculateMaxRemovable();
     const actualMaxRemovable = Math.min(tokenCInfoBalance, maxRemovable);
@@ -399,9 +407,8 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
                   <div className=" bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md flex items-center justify-between mb-1.5">
                     <div>
                       <input
-                        type="number"
-                        step="any"
-                        value={String(inputValue)}
+                        type="text"
+                        value={inputValue}
                         onChange={handleAddChange}
                         placeholder="0"
                       />
@@ -544,9 +551,8 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
                   <div className=" bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md flex items-center justify-between mb-1.5">
                     <div>
                       <input
-                        type="number"
-                        step="any"
-                        value={String(inputValue)}
+                        type="text"
+                        value={inputValue}
                         onChange={handleDeleteChange}
                         placeholder="0"
                       />
