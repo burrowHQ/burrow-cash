@@ -342,7 +342,7 @@ const TradingOperate = () => {
         (activeTab == "long" ? 1 : getAssetPrice(ReduxcategoryAssets1) || 0),
       price: getAssetPrice(ReduxcategoryAssets1),
     };
-  }, [longInput, shortInput, ReduxcategoryAssets1, estimateData]);
+  }, [longInput, shortInput, ReduxcategoryAssets1, estimateData, tokenInAmount]);
 
   const [showFeeModal, setShowFeeModal] = useState(false);
 
