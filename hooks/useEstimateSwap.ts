@@ -50,7 +50,10 @@ export const useEstimateSwap = ({
     if (dclEstimateResult?.tag && v1EstimateResult?.tag && validator()) {
       getBestEstimateResult();
     }
-  }, [dclEstimateResult?.tag, v1EstimateResult?.tag]);
+    if (tokenIn_amount == "0") {
+      setEstimateResult((prev: any) => ({ ...prev, amount_out: "0" }));
+    }
+  }, [dclEstimateResult?.tag, v1EstimateResult?.tag, tokenIn_amount]);
   function getBestEstimateResult() {
     const { amount_out: dcl_amount_out } = dclEstimateResult!;
     const { amount_out: v1_amount_out } = v1EstimateResult!;
