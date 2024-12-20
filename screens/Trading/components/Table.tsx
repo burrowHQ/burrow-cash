@@ -169,8 +169,7 @@ const TradingTable = ({
           {selectedTab === "account" &&
             accountSupplied.filter((token) => {
               const assetDetails = getAssetById(token.token_id);
-              const marginAssetDetails = getAssetDetails(assetDetails);
-              return marginAssetDetails.decimals >= assetDetails.config.extra_decimals;
+              return token.balance.toString().length >= assetDetails.config.extra_decimals;
             }).length > 0 && (
               <div
                 className="w-[110px] h-6 px-1.5 mr-11 flex items-center justify-center bg-primary bg-opacity-5 border border-primary rounded-md text-primary text-sm cursor-pointer"
@@ -295,13 +294,12 @@ const TradingTable = ({
               <tbody>
                 {accountSupplied.filter((token) => {
                   const assetDetails = getAssetById(token.token_id);
-                  const marginAssetDetails = getAssetDetails(assetDetails);
-                  return marginAssetDetails.decimals >= assetDetails.config.extra_decimals;
+                  return token.balance.toString().length >= assetDetails.config.extra_decimals;
                 }).length > 0 ? (
                   accountSupplied.map((token, index) => {
                     const assetDetails = getAssetById(token.token_id);
                     const marginAssetDetails = getAssetDetails(assetDetails);
-                    if (marginAssetDetails.decimals < assetDetails.config.extra_decimals) {
+                    if (token.balance.toString().length < assetDetails.config.extra_decimals) {
                       return null;
                     }
                     return (
@@ -488,13 +486,16 @@ const TradingTable = ({
                     <tbody>
                       {accountSupplied.filter((token) => {
                         const assetDetails = getAssetById(token.token_id);
-                        const marginAssetDetails = getAssetDetails(assetDetails);
-                        return marginAssetDetails.decimals >= assetDetails.config.extra_decimals;
+                        return (
+                          token.balance.toString().length >= assetDetails.config.extra_decimals
+                        );
                       }).length > 0 ? (
                         accountSupplied.map((token, index) => {
                           const assetDetails = getAssetById(token.token_id);
                           const marginAssetDetails = getAssetDetails(assetDetails);
-                          if (marginAssetDetails.decimals < assetDetails.config.extra_decimals) {
+                          if (
+                            token.balance.toString().length < assetDetails.config.extra_decimals
+                          ) {
                             return null;
                           }
                           return (
