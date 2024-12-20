@@ -34,6 +34,7 @@ import { get_blocked } from "../api/get-blocked";
 import Popup from "../components/popup";
 import { getMarginAccountSupplied } from "../redux/marginAccountSelectors";
 import BalanceReminder from "../components/BalanceReminder";
+import { useMarginAccount } from "../hooks/useMarginAccount";
 
 ModalReact.defaultStyles = {
   overlay: {
@@ -100,6 +101,7 @@ const Init = () => {
   return null;
 };
 function Upgrade({ Component, pageProps }) {
+  const { getAssetById } = useMarginAccount();
   const [upgrading, setUpgrading] = useState<boolean>(true);
   const [showTip, setShowTip] = useState<boolean>(true);
   const accountSupplied = useAppSelector(getMarginAccountSupplied);
@@ -108,6 +110,12 @@ function Upgrade({ Component, pageProps }) {
   const portfolio = useAppSelector(getAccountPortfolio);
   const assets = useAppSelector(getAssets);
   const config = useAppSelector(getConfig);
+  const hasValidAccountSupplied =
+    accountSupplied.length > 0 &&
+    accountSupplied.some((token) => {
+      const assetDetails = getAssetById(token.token_id);
+      return token.balance.toString().length >= assetDetails.config.extra_decimals;
+    });
   useEffect(() => {
     if (
       !portfolio.positions ||
@@ -153,7 +161,7 @@ function Upgrade({ Component, pageProps }) {
           <ToastMessage />
           <Component {...pageProps} />
           {/* <Popup className="xsm:hidden" /> */}
-          {/* {accountSupplied && <BalanceReminder />} */}
+          {hasValidAccountSupplied && <BalanceReminder />}
           <RpcList />
           <PubTestModal />
         </Layout>

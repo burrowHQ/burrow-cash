@@ -1,24 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { useAppDispatch } from "../../redux/hooks";
+import { useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 import MyMarginTrading from "./components/MyTrading";
 import MarketMarginTrading from "./components/MarketTrading";
+import { RootState } from "../../redux/store";
+import { setActiveTab } from "../../redux/marginTabSlice";
 
 const MarginTrading = () => {
   const dispatch = useAppDispatch();
-  const [activeTab, setActiveTab] = useState(() => {
-    const savedTab = localStorage.getItem("marginTradingTab");
-    return savedTab || "market";
-  });
-  useEffect(() => {
-    const savedTab = localStorage.getItem("marginTradingTab");
-    if (savedTab) {
-      setActiveTab(savedTab);
-    }
-  }, []);
+  const activeTab = useSelector((state: RootState) => state.tab.activeTab);
+
   const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-    localStorage.setItem("marginTradingTab", tab);
+    dispatch(setActiveTab(tab));
   };
 
   const getTabClassName = (tabName) => {

@@ -1,6 +1,7 @@
 import { useState, createContext, useEffect } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
+import { useDispatch } from "react-redux";
 import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
 import { CloseIcon } from "../../../components/Modal/svg";
@@ -18,10 +19,12 @@ import { shrinkToken } from "../../../store";
 import { showChangeCollateralPosition } from "../../../components/HashResultModal";
 import { handleTransactionHash } from "../../../services/transaction";
 import { useRouterQuery } from "../../../utils/txhashContract";
+import { setActiveTab } from "../../../redux/marginTabSlice";
 
 export const ModalContext = createContext(null) as any;
 const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => {
   const { query } = useRouterQuery();
+  const dispatch = useDispatch();
   const account = useAppSelector((state) => state.account);
   const { marginConfigTokens, getPositionType } = useMarginConfigToken();
   const { parseTokenValue, getAssetDetails, getAssetById, calculateLeverage } = useMarginAccount();
@@ -236,7 +239,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
         symbol: symbolC,
         addedValue: String(addedValue),
       };
-      localStorage.setItem("marginTradingTab", "my");
+      dispatch(setActiveTab("my"));
       localStorage.setItem("marginTransactionType", "changeCollateral");
       localStorage.setItem("collateralInfo", JSON.stringify(collateralInfo));
       onClose();

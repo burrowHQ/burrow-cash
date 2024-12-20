@@ -16,12 +16,13 @@ import { getAssets } from "../../../store/assets";
 import { IAssetEntry } from "../../../interfaces";
 import DataSource from "../../../data/datasource";
 import { useAccountId } from "../../../hooks/hooks";
-import { useAppSelector } from "../../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { getMarginAccountSupplied } from "../../../redux/marginAccountSelectors";
 import { withdrawActionsAll } from "../../../store/marginActions/withdrawAll";
 import { MarginAccountDetailIcon, YellowBallIcon } from "../../TokenDetail/svg";
 import { useRouterQuery } from "../../../utils/txhashContract";
 import { handleTransactionHash, handleTransactionResults } from "../../../services/transaction";
+import { setSelectedTab } from "../../../redux/marginTabSlice";
 
 const TradingTable = ({
   positionsList,
@@ -34,7 +35,8 @@ const TradingTable = ({
 }) => {
   const { query } = useRouterQuery();
   const { filterMarginConfigList } = useMarginConfigToken();
-  const [selectedTab, setSelectedTab] = useState("positions");
+  const dispatch = useAppDispatch();
+  const selectedTab = useAppSelector((state) => state.tab.selectedTab);
   const [isClosePositionModalOpen, setIsClosePositionMobileOpen] = useState(false);
   const [isChangeCollateralMobileOpen, setIsChangeCollateralMobileOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
@@ -54,8 +56,9 @@ const TradingTable = ({
   const [isAccountDetailsOpen, setIsAccountDetailsOpen] = useState(false);
   const [sortBy, setSortBy] = useState<string | null>("open_ts");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-  const handleTabClick = (tabNumber) => {
-    setSelectedTab(tabNumber);
+  const [isSelectedMobileTab, setSelectedMobileTab] = useState("positions");
+  const handleTabClick = (tab: string) => {
+    dispatch(setSelectedTab(tab));
   };
   const handleClosePositionButtonClick = (key) => {
     setClosePositionModalProps(key);
@@ -396,17 +399,17 @@ const TradingTable = ({
           <div className="relative flex items-center justify-center border-r border-dark-1000">
             <span
               onClick={() => {
-                setSelectedTab("positions");
+                setSelectedMobileTab("positions");
               }}
               className={`relative z-10 text-center ${
-                selectedTab === "positions" ? "text-primary" : ""
+                isSelectedMobileTab === "positions" ? "text-primary" : ""
               }`}
             >
               Positions
             </span>
             <div
               className={`absolute top-1 flex items-center justify-center  ${
-                selectedTab === "positions" ? "" : "hidden"
+                isSelectedMobileTab === "positions" ? "" : "hidden"
               }`}
             >
               <span className="flex w-10 h-10 bg-gray-800" style={{ borderRadius: "50%" }} />
@@ -416,17 +419,17 @@ const TradingTable = ({
           <div className="relative flex items-center justify-center">
             <span
               onClick={() => {
-                setSelectedTab("history");
+                setSelectedMobileTab("history");
               }}
               className={`relative z-10 text-center ${
-                selectedTab === "history" ? "text-primary" : ""
+                isSelectedMobileTab === "history" ? "text-primary" : ""
               }`}
             >
               History
             </span>
             <div
               className={`absolute top-1 flex items-center justify-center ${
-                selectedTab === "history" ? "" : "hidden"
+                isSelectedMobileTab === "history" ? "" : "hidden"
               }`}
             >
               <span className="flex w-10 h-10 bg-gray-800" style={{ borderRadius: "50%" }} />
@@ -435,7 +438,7 @@ const TradingTable = ({
           </div>
         </div>
         {/* content */}
-        {selectedTab === "positions" && (
+        {isSelectedMobileTab === "positions" && (
           <>
             {sortedPositionsList && Object.keys(sortedPositionsList).length > 0 ? (
               Object.entries(sortedPositionsList).map(([key, item], index) => (
@@ -491,7 +494,7 @@ const TradingTable = ({
             )}
           </>
         )}
-        {selectedTab === "history" && <div>history</div>}
+        {isSelectedMobileTab === "history" && <div>history</div>}
         {!filterTitle &&
           accountSupplied.filter((token) => {
             const assetDetails = getAssetById(token.token_id);
@@ -513,81 +516,84 @@ const TradingTable = ({
                   />
                 </div>
               </div>
-              {isAccountDetailsOpen && (
-                <div className="h-[50vh] overflow-y-auto -ml-[32px] -mr-[32px]">
-                  <table className="w-full text-left">
-                    <thead className="border-b border-gray-1350">
-                      <tr className="text-gray-300 text-sm font-normal">
-                        <th className="pb-[14px] pl-[30px]">Token</th>
-                        <th className="pb-[14px]">Balance</th>
-                        <th className="pb-[14px] text-right pr-[32px]">Value</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {accountSupplied.filter((token) => {
-                        const assetDetails = getAssetById(token.token_id);
-                        return (
-                          token.balance.toString().length >= assetDetails.config.extra_decimals
-                        );
-                      }).length > 0 ? (
-                        accountSupplied.map((token, index) => {
-                          const assetDetails = getAssetById(token.token_id);
-                          const marginAssetDetails = getAssetDetails(assetDetails);
-                          if (
-                            token.balance.toString().length < assetDetails.config.extra_decimals
-                          ) {
-                            return null;
-                          }
-                          return (
-                            <tr key={index} className="text-sm hover:bg-dark-100 font-normal ">
-                              <td className="pb-[10px] pl-[30px] pt-[10px]">
-                                <div className="flex items-center">
-                                  <img
-                                    src={assetDetails.metadata.icon}
-                                    alt=""
-                                    className="w-[26px] h-[26px] rounded-2xl"
-                                  />
-                                  <div className="ml-2">
-                                    <p className="text-sm"> {assetDetails.metadata.symbol}</p>
-                                    <p className="text-xs text-gray-300 -mt-0.5">
-                                      {assetDetails.price
-                                        ? `$${toInternationalCurrencySystem_number(
-                                            assetDetails.price,
-                                          )}`
-                                        : "/"}
-                                    </p>
-                                  </div>
-                                </div>
-                              </td>
-                              <td>
-                                {toInternationalCurrencySystem_number(
-                                  parseTokenValue(token.balance, marginAssetDetails.decimals),
-                                )}
-                              </td>
-                              <td className="text-right pr-[32px]">
-                                {marginAssetDetails.price
-                                  ? `$${toInternationalCurrencySystem_number(
-                                      parseTokenValue(token.balance, marginAssetDetails.decimals) *
-                                        marginAssetDetails.price,
-                                    )}`
-                                  : "/"}
-                              </td>
-                            </tr>
-                          );
-                        })
-                      ) : (
-                        <tr>
-                          <td colSpan={4}>
-                            <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
-                              No data
-                            </div>
-                          </td>
+              {isAccountDetailsOpen ||
+                (selectedTab === "account" && (
+                  <div className="h-[50vh] overflow-y-auto -ml-[32px] -mr-[32px]">
+                    <table className="w-full text-left">
+                      <thead className="border-b border-gray-1350">
+                        <tr className="text-gray-300 text-sm font-normal">
+                          <th className="pb-[14px] pl-[30px]">Token</th>
+                          <th className="pb-[14px]">Balance</th>
+                          <th className="pb-[14px] text-right pr-[32px]">Value</th>
                         </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                      </thead>
+                      <tbody>
+                        {accountSupplied.filter((token) => {
+                          const assetDetails = getAssetById(token.token_id);
+                          return (
+                            token.balance.toString().length >= assetDetails.config.extra_decimals
+                          );
+                        }).length > 0 ? (
+                          accountSupplied.map((token, index) => {
+                            const assetDetails = getAssetById(token.token_id);
+                            const marginAssetDetails = getAssetDetails(assetDetails);
+                            if (
+                              token.balance.toString().length < assetDetails.config.extra_decimals
+                            ) {
+                              return null;
+                            }
+                            return (
+                              <tr key={index} className="text-sm hover:bg-dark-100 font-normal ">
+                                <td className="pb-[10px] pl-[30px] pt-[10px]">
+                                  <div className="flex items-center">
+                                    <img
+                                      src={assetDetails.metadata.icon}
+                                      alt=""
+                                      className="w-[26px] h-[26px] rounded-2xl"
+                                    />
+                                    <div className="ml-2">
+                                      <p className="text-sm"> {assetDetails.metadata.symbol}</p>
+                                      <p className="text-xs text-gray-300 -mt-0.5">
+                                        {assetDetails.price
+                                          ? `$${toInternationalCurrencySystem_number(
+                                              assetDetails.price,
+                                            )}`
+                                          : "/"}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td>
+                                  {toInternationalCurrencySystem_number(
+                                    parseTokenValue(token.balance, marginAssetDetails.decimals),
+                                  )}
+                                </td>
+                                <td className="text-right pr-[32px]">
+                                  {marginAssetDetails.price
+                                    ? `$${toInternationalCurrencySystem_number(
+                                        parseTokenValue(
+                                          token.balance,
+                                          marginAssetDetails.decimals,
+                                        ) * marginAssetDetails.price,
+                                      )}`
+                                    : "/"}
+                                </td>
+                              </tr>
+                            );
+                          })
+                        ) : (
+                          <tr>
+                            <td colSpan={4}>
+                              <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+                                No data
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                ))}
               <div
                 className="w-full bg-primary bg-opacity-5 text-primary h-[36px] rounded-md border border-marginWithdrawAllBtn flex items-center justify-center"
                 onClick={handleWithdrawAllClick}
