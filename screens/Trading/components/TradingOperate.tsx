@@ -235,7 +235,7 @@ const TradingOperate = () => {
 
   const tokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    console.log(value, "for nico");
+    console.log(value, tokenInAmount, "for nico");
     if (value === "") {
       setLongInput("");
       setShortInput("");
@@ -280,6 +280,13 @@ const TradingOperate = () => {
       updateInputAmounts(activeTab, inputUsdCharcate2, inputUsdCharcate1);
     }
   }, [longInput, shortInput, rangeMount, estimateData, slippageTolerance]);
+
+  useEffect(() => {
+    const inputUsdCharcate1 = getAssetPrice(ReduxcategoryAssets1);
+    if (inputUsdCharcate1 && estimateData) {
+      updateOutput(activeTab, inputUsdCharcate1);
+    }
+  }, [tokenInAmount, activeTab, estimateData, ReduxcategoryAssets1]);
 
   useEffect(() => {
     if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
@@ -383,7 +390,6 @@ const TradingOperate = () => {
 
     // set input usd
     inputUsdSetter(inputUsdCharcate2 * inputAmount);
-    console.log(estimateData, "for nico");
     if (tab === "long") {
       setTokenInAmount(adjustedInputAmount / inputUsdCharcate2);
     } else {
