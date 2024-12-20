@@ -58,6 +58,7 @@ const TradingTable = ({
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [isSelectedMobileTab, setSelectedMobileTab] = useState("positions");
   const [currentPage, setCurrentPage] = useState(1);
+  const [inputPage, setInputPage] = useState<string>("");
   const itemsPerPage = 10;
   const handleTabClick = (tab: string) => {
     dispatch(setSelectedTab(tab));
@@ -177,15 +178,10 @@ const TradingTable = ({
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = sortedPositionsList.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(sortedPositionsList.length / itemsPerPage);
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+  const handlePageJump = (newPage) => {
+    const pageNumber = parseInt(newPage, 10);
+    if (!Number.isNaN(pageNumber) && pageNumber > 0 && pageNumber <= totalPages) {
+      setCurrentPage(pageNumber);
     }
   };
   return (
@@ -258,11 +254,11 @@ const TradingTable = ({
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedPositionsList && Object.keys(sortedPositionsList).length > 0 ? (
-                    Object.entries(sortedPositionsList).map(([key, item], index) => (
+                  {Array.isArray(currentItems) && currentItems.length > 0 ? ( // 确保 currentItems 是一个数组
+                    currentItems.map((item, index) => (
                       <PositionRow
                         index={index}
-                        key={key}
+                        key={item.itemKey}
                         item={item}
                         itemKey={item.itemKey}
                         getAssetById={getAssetById}
@@ -334,17 +330,21 @@ const TradingTable = ({
                 })}
                 <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
                 <input
+                  className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
                   type="text"
-                  min={1}
-                  max={totalPages}
-                  value={currentPage || ""}
+                  value={inputPage}
                   onChange={(e) => {
-                    const page = Number(e.target.value);
-                    if (page >= 1 && page <= totalPages) {
-                      setCurrentPage(page);
+                    const { value } = e.target;
+                    if (value === "" || (Number.isInteger(Number(value)) && !value.includes("."))) {
+                      setInputPage(value);
                     }
                   }}
-                  className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      const pageNumber = Number(inputPage);
+                      handlePageJump(pageNumber);
+                    }
+                  }}
                 />
               </div>
             </>
