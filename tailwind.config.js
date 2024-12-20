@@ -110,6 +110,8 @@ module.exports = {
           1050: "#2F324A",
           1100: "#404040",
           1150: "#2F324B",
+          1200: "#444766",
+          1250: "#727591",
         },
         red: {
           50: "#FF6BA9",
@@ -139,6 +141,7 @@ module.exports = {
           1250: "#454869",
           1300: "#383A56",
           1350: "#565A7B",
+          1400: "#5A5C7A",
         },
         toolTipBoxBorderColor: "#D2FF3A",
         toolTipBoxBgColor: "rgba(35,37,58,0.8)",

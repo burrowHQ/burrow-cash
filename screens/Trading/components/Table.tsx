@@ -57,6 +57,8 @@ const TradingTable = ({
   const [sortBy, setSortBy] = useState<string | null>("open_ts");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [isSelectedMobileTab, setSelectedMobileTab] = useState("positions");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const handleTabClick = (tab: string) => {
     dispatch(setSelectedTab(tab));
   };
@@ -171,6 +173,21 @@ const TradingTable = ({
       return sortDirection === "asc" ? timeA - timeB : timeB - timeA;
     });
   }, [positionsList, sortBy, sortDirection]);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = sortedPositionsList.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(sortedPositionsList.length / itemsPerPage);
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
   return (
     <div className="flex flex-col items-center justify-center w-full xsm:mx-2">
       {/* pc */}
@@ -212,88 +229,125 @@ const TradingTable = ({
         {/* content */}
         <div className="py-4">
           {selectedTab === "positions" && (
-            <table className="w-full text-left">
-              <thead>
-                <tr className="text-gray-300 text-sm font-normal">
-                  <th className="pl-5">Market</th>
-                  <th>Size</th>
-                  <th>Net Value</th>
-                  <th>Collateral</th>
-                  <th>Entry Price</th>
-                  <th>Index Price</th>
-                  <th>Liq. Price</th>
-                  <th>PNL & ROE</th>
-                  <th>
-                    <div
-                      onClick={() => handleSort("open_ts")}
-                      className="flex items-center cursor-pointer"
-                    >
-                      Opening time
-                      <SortButton
-                        activeColor="rgba(192, 196, 233, 1)"
-                        inactiveColor="rgba(192, 196, 233, 0.5)"
-                        sort={sortBy === "open_ts" ? sortDirection : null}
-                      />
-                    </div>
-                  </th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedPositionsList && Object.keys(sortedPositionsList).length > 0 ? (
-                  Object.entries(sortedPositionsList).map(([key, item], index) => (
-                    <PositionRow
-                      index={index}
-                      key={key}
-                      item={item}
-                      itemKey={item.itemKey}
-                      getAssetById={getAssetById}
-                      getPositionType={getPositionType}
-                      handleChangeCollateralButtonClick={handleChangeCollateralButtonClick}
-                      handleClosePositionButtonClick={handleClosePositionButtonClick}
-                      getAssetDetails={getAssetDetails}
-                      parseTokenValue={parseTokenValue}
-                      calculateLeverage={calculateLeverage}
-                      marginConfigTokens={marginConfigTokens}
-                      assets={assets}
-                      filterTitle={filterTitle}
-                      onPLNChange={handlePLNChange}
-                    />
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={100}>
-                      <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
-                        Your open positions will appear here
+            <>
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="text-gray-300 text-sm font-normal">
+                    <th className="pl-5">Market</th>
+                    <th>Size</th>
+                    <th>Net Value</th>
+                    <th>Collateral</th>
+                    <th>Entry Price</th>
+                    <th>Index Price</th>
+                    <th>Liq. Price</th>
+                    <th>PNL & ROE</th>
+                    <th>
+                      <div
+                        onClick={() => handleSort("open_ts")}
+                        className="flex items-center cursor-pointer"
+                      >
+                        Opening time
+                        <SortButton
+                          activeColor="rgba(192, 196, 233, 1)"
+                          inactiveColor="rgba(192, 196, 233, 0.5)"
+                          sort={sortBy === "open_ts" ? sortDirection : null}
+                        />
                       </div>
-                    </td>
+                    </th>
+                    <th>Action</th>
                   </tr>
-                )}
-                {isChangeCollateralMobileOpen && (
-                  <ChangeCollateralMobile
-                    open={isChangeCollateralMobileOpen}
-                    onClose={(e) => {
-                      // e.preventDefault();
-                      // e.stopPropagation();
-                      setIsChangeCollateralMobileOpen(false);
-                    }}
-                    rowData={selectedRowData}
-                    collateralTotal={totalCollateral}
-                  />
-                )}
-                {isClosePositionModalOpen && (
-                  <ClosePositionMobile
-                    open={isClosePositionModalOpen}
-                    onClose={(e) => {
-                      // e.preventDefault();
-                      // e.stopPropagation();
-                      setIsClosePositionMobileOpen(false);
-                    }}
-                    extraProps={closePositionModalProps}
-                  />
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {sortedPositionsList && Object.keys(sortedPositionsList).length > 0 ? (
+                    Object.entries(sortedPositionsList).map(([key, item], index) => (
+                      <PositionRow
+                        index={index}
+                        key={key}
+                        item={item}
+                        itemKey={item.itemKey}
+                        getAssetById={getAssetById}
+                        getPositionType={getPositionType}
+                        handleChangeCollateralButtonClick={handleChangeCollateralButtonClick}
+                        handleClosePositionButtonClick={handleClosePositionButtonClick}
+                        getAssetDetails={getAssetDetails}
+                        parseTokenValue={parseTokenValue}
+                        calculateLeverage={calculateLeverage}
+                        marginConfigTokens={marginConfigTokens}
+                        assets={assets}
+                        filterTitle={filterTitle}
+                        onPLNChange={handlePLNChange}
+                      />
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={100}>
+                        <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+                          Your open positions will appear here
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                  {isChangeCollateralMobileOpen && (
+                    <ChangeCollateralMobile
+                      open={isChangeCollateralMobileOpen}
+                      onClose={() => setIsChangeCollateralMobileOpen(false)}
+                      rowData={selectedRowData}
+                      collateralTotal={totalCollateral}
+                    />
+                  )}
+                  {isClosePositionModalOpen && (
+                    <ClosePositionMobile
+                      open={isClosePositionModalOpen}
+                      onClose={() => setIsClosePositionMobileOpen(false)}
+                      extraProps={closePositionModalProps}
+                    />
+                  )}
+                </tbody>
+              </table>
+              <div className="flex items-center justify-center mt-4">
+                {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => {
+                  if (
+                    page === 1 ||
+                    page === totalPages ||
+                    (page >= currentPage - 1 && page <= currentPage + 1)
+                  ) {
+                    return (
+                      <button
+                        type="button"
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
+                          currentPage === page ? "font-bold bg-dark-1200 bg-opacity-30" : ""
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  }
+                  if (page === 2 && currentPage > 3) {
+                    return <span key={page}>...</span>;
+                  }
+                  if (page === totalPages - 1 && currentPage < totalPages - 2) {
+                    return <span key={page}>...</span>;
+                  }
+                  return null;
+                })}
+                <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
+                <input
+                  type="text"
+                  min={1}
+                  max={totalPages}
+                  value={currentPage || ""}
+                  onChange={(e) => {
+                    const page = Number(e.target.value);
+                    if (page >= 1 && page <= totalPages) {
+                      setCurrentPage(page);
+                    }
+                  }}
+                  className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
+                />
+              </div>
+            </>
           )}
           {selectedTab === "history" && (
             <table className="w-full text-left">
