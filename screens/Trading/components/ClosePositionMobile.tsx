@@ -97,20 +97,25 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
         .times(2)
         .div(100 * 1440 * 365)
         .plus(item.token_d_info.balance)
+        .round()
         .toFixed(),
       tokenIn: item.token_p_id,
       tokenOut: item.token_d_info.token_id,
       slippage: ReduxSlippageTolerance,
     });
     const pBalance = res.result_data.amount_in;
-    const d = (shrinkToken(pBalance, assetP.metadata.decimals) as any) * priceP;
-    const p = (shrinkToken(item.token_p_amount, decimalsP) as any) * priceP;
-    const minus = d - p;
+    const d = Big(shrinkToken(pBalance, assetP.metadata.decimals)).times(priceP);
+    const p = Big(shrinkToken(item.token_p_amount, decimalsP)).times(priceP);
+    const minus = d.minus(p);
 
     let expandedValue = 0;
-    if (minus > 0) {
+    if (minus.toNumber() > 0) {
       // 需要c.balance + p
-      expandedValue = (minus / priceC) * 10 ** decimalsC + Number(item.token_p_amount);
+      expandedValue = minus
+        .div(priceC)
+        .times(Big(10).pow(decimalsC))
+        .plus(item.token_p_amount)
+        .toNumber();
     } else {
       // 需要 p
       expandedValue = Number(item.token_p_amount);
@@ -145,6 +150,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     stablePoolsDetail,
     slippageTolerance: ReduxSlippageTolerance / 100,
   });
+  // console.log(tokenInAmount, "estimateData");
 
   useEffect(() => {
     setIsDisabled(!estimateData?.swap_indication || !estimateData?.min_amount_out);
