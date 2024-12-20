@@ -5,8 +5,7 @@ import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
 import { CloseIcon } from "../../../components/Modal/svg";
-import { RefLogoIcon, RightShoulder, MaxPositionIcon } from "./TradingIcon";
-import { toInternationalCurrencySystem_number } from "../../../utils/uiNumber";
+import { RightShoulder, MaxPositionIcon } from "./TradingIcon";
 import { openPosition } from "../../../store/marginActions/openPosition";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";
@@ -19,7 +18,6 @@ import { beautifyPrice } from "../../../utils/beautyNumbet";
 import { getAccountId } from "../../../redux/accountSelectors";
 import { useRouterQuery } from "../../../utils/txhashContract";
 import { handleTransactionResults } from "../../../services/transaction";
-import { useToastMessage } from "../../../hooks/hooks";
 import { showPositionFailure } from "../../../components/HashResultModal";
 import { getBurrow } from "../../../utils";
 
@@ -63,136 +61,43 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
       ? getAssetById(confirmInfo.longOutputName?.token_id)
       : getAssetById(confirmInfo.longInputName?.token_id),
   );
-  // console.log(confirmInfo, "for nico");
-  const cateSymbol = getTokenSymbolOnly(ReduxcategoryAssets1?.metadata?.symbol);
-  // const confirmOpenPosition = async () => {
-  //   if (Object.values(marginAccountList).length >= max_active_user_margin_position) {
-  //     return showToast("User has exceeded the maximum number of open positions！");
-  //   }
-
-  //   setIsDisabled(true);
-  //   if (action === "Long") {
-  //     try {
-  //       const res: any = await openPosition({
-  //         token_c_amount: confirmInfo.longInput,
-  //         token_c_id: confirmInfo.longInputName?.token_id,
-  //         token_d_amount: confirmInfo.tokenInAmount,
-  //         token_d_id: confirmInfo.longInputName?.token_id,
-  //         token_p_id: confirmInfo.longOutputName?.token_id,
-  //         min_token_p_amount: confirmInfo.estimateData.min_amount_out,
-  //         swap_indication: confirmInfo.estimateData.swap_indication,
-  //         assets: confirmInfo.assets.data,
-  //       });
-  //       const k: any = [];
-  //       res.forEach((item: any) => {
-  //         k.push(item.transaction.hash);
-  //       });
-  //       handleTransactionResults(k);
-  //       // handleTransactionResultsYield(k);
-  //     } catch (error) {
-  //       console.log(error);
-  //       showPositionFailure({
-  //         title: "Open Position Failed",
-  //         errorMessage: JSON.stringify(error),
-  //         type: action,
-  //       });
-  //     } finally {
-  //       setIsDisabled(false);
-  //       onClose();
-  //     }
-  //   } else {
-  //     try {
-  //       const res: any = await openPosition({
-  //         token_c_amount: confirmInfo.longInput,
-  //         token_c_id: confirmInfo.longInputName?.token_id,
-  //         token_d_amount: confirmInfo.tokenInAmount,
-  //         token_d_id: confirmInfo.longOutputName?.token_id,
-  //         token_p_id: confirmInfo.longInputName?.token_id,
-  //         min_token_p_amount: confirmInfo.estimateData.min_amount_out,
-  //         swap_indication: confirmInfo.estimateData.swap_indication,
-  //         assets: confirmInfo.assets.data,
-  //       });
-  //       console.log(res);
-  //       const k: any = [];
-  //       res.forEach((item: any) => {
-  //         k.push(item.transaction.hash);
-  //       });
-  //       handleTransactionResults(k);
-  //     } catch (error) {
-  //       console.log(error);
-  //       showPositionFailure({
-  //         title: "Open Position Failed",
-  //         errorMessage: JSON.stringify(error),
-  //         type: action,
-  //       });
-  //     } finally {
-  //       setIsDisabled(false);
-  //       onClose();
-  //     }
-  //   }
-  // };
-  console.log(
-    {
-      token_c_amount: confirmInfo.longInput,
-      token_c_id: confirmInfo.longInputName?.token_id,
-      token_d_amount: confirmInfo.tokenInAmount,
-      token_d_id:
-        action === "Long"
-          ? confirmInfo.longInputName?.token_id
-          : confirmInfo.longOutputName?.token_id,
-      token_p_id:
-        action === "Long"
-          ? confirmInfo.longOutputName?.token_id
-          : confirmInfo.longInputName?.token_id,
-      min_token_p_amount:
-        action === "Long"
-          ? expandToken(
-              confirmInfo.estimateData.min_amount_out,
-              confirmInfo?.longOutputName?.config?.extra_decimals || 0,
-              0,
-            )
-          : expandToken(
-              confirmInfo.estimateData.min_amount_out,
-              confirmInfo?.longInputName?.config?.extra_decimals || 0,
-              0,
-            ),
-      swap_indication: confirmInfo.estimateData.swap_indication,
-      assets: confirmInfo.assets.data,
-    },
-    "for nico confirmOpenPosition",
+  const assetP = getAssetById(
+    action === "Long" ? confirmInfo.longOutputName?.token_id : confirmInfo.longInputName?.token_id,
   );
 
-  const confirmOpenPosition = async () => {
-    // console.log(marginAccountList, max_active_user_margin_position);
+  const cateSymbol = getTokenSymbolOnly(ReduxcategoryAssets1?.metadata?.symbol);
 
+  const openPositionParams = {
+    token_c_amount: confirmInfo.longInput,
+    token_c_id: confirmInfo.longInputName?.token_id,
+    token_d_amount: confirmInfo.tokenInAmount,
+    token_d_id:
+      action === "Long"
+        ? confirmInfo.longInputName?.token_id
+        : confirmInfo.longOutputName?.token_id,
+    token_p_id:
+      action === "Long"
+        ? confirmInfo.longOutputName?.token_id
+        : confirmInfo.longInputName?.token_id,
+    min_token_p_amount:
+      action === "Long"
+        ? expandToken(
+            confirmInfo.estimateData.min_amount_out,
+            confirmInfo?.longOutputName?.config?.extra_decimals || 0,
+            0,
+          )
+        : expandToken(
+            confirmInfo.estimateData.min_amount_out,
+            confirmInfo?.longInputName?.config?.extra_decimals || 0,
+            0,
+          ),
+    swap_indication: confirmInfo.estimateData.swap_indication,
+    assets: confirmInfo.assets.data,
+  };
+  console.log(openPositionParams, confirmInfo, assetP, "for nico confirmOpenPosition");
+
+  const confirmOpenPosition = async () => {
     setIsDisabled(true);
-    const openPositionParams = {
-      token_c_amount: confirmInfo.longInput,
-      token_c_id: confirmInfo.longInputName?.token_id,
-      token_d_amount: confirmInfo.tokenInAmount,
-      token_d_id:
-        action === "Long"
-          ? confirmInfo.longInputName?.token_id
-          : confirmInfo.longOutputName?.token_id,
-      token_p_id:
-        action === "Long"
-          ? confirmInfo.longOutputName?.token_id
-          : confirmInfo.longInputName?.token_id,
-      min_token_p_amount:
-        action === "Long"
-          ? expandToken(
-              confirmInfo.estimateData.min_amount_out,
-              confirmInfo?.longOutputName?.config?.extra_decimals || 0,
-              0,
-            )
-          : expandToken(
-              confirmInfo.estimateData.min_amount_out,
-              confirmInfo?.longInputName?.config?.extra_decimals || 0,
-              0,
-            ),
-      swap_indication: confirmInfo.estimateData.swap_indication,
-      assets: confirmInfo.assets.data,
-    };
     const { decimals: localDecimals } = getAssetDetails(
       getAssetById(
         action === "Long" ? openPositionParams.token_p_id : openPositionParams.token_d_id,
@@ -204,23 +109,14 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
     const tokenDPrice = confirmInfo.assets.data[openPositionParams.token_d_id].price.usd;
     const tokenPPrice = confirmInfo.assets.data[openPositionParams.token_p_id].price.usd;
     const slippageRate = 1 - max_slippage_rate / 10000;
-
     const calculatedValue = ((tokenDAmount * tokenDPrice) / tokenPPrice) * slippageRate;
 
-    console.log([
-      { Key: "minTokenPAmount", Value: minTokenPAmount },
-      { Key: "tokenDAmount", Value: tokenDAmount },
-      { Key: "tokenDPrice", Value: tokenDPrice },
-      { Key: "tokenPPrice", Value: tokenPPrice },
-      { Key: "slippageRate", Value: slippageRate },
-      { Key: "calculatedValue", Value: calculatedValue },
-    ]);
     if (!(minTokenPAmount >= calculatedValue)) {
       setIsDisabled(false);
       setIsMinTokenPAmount(true);
-      // return showToast("Token out does not meet contract requirements, unable to open position.");
       return;
     }
+
     localStorage.setItem(
       "cateSymbolAndDecimals",
       JSON.stringify({
@@ -265,23 +161,6 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
     }
   };
 
-  const [percentList, setPercentList] = useState([]);
-  useMemo(() => {
-    if (confirmInfo.estimateData?.identicalRoutes) {
-      const { identicalRoutes } = confirmInfo.estimateData;
-      let sum = 0;
-      const perArray = identicalRoutes.map((routes) => {
-        const k = routes.reduce((pre, cur) => {
-          return pre + (Number(cur.pool?.partialAmountIn) || 0);
-        }, 0);
-        sum += k; //
-        return k;
-      });
-
-      const perStrArray = perArray.map((item) => ((item * 100) / sum).toFixed(2)); //
-      setPercentList(perStrArray);
-    }
-  }, [confirmInfo.estimateData]);
   return (
     <MUIModal open={open} onClose={onClose}>
       <Wrapper
@@ -343,24 +222,24 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
                 {action === "Long"
                   ? beautifyPrice(
                       confirmInfo.tokenInAmount /
-                        Number(shrinkToken(confirmInfo.estimateData?.min_amount_out, decimalsP)),
+                        Number(
+                          shrinkToken(
+                            confirmInfo.estimateData?.min_amount_out,
+                            assetP.metadata.decimals,
+                          ),
+                        ),
                     )
                   : beautifyPrice(
-                      Number(shrinkToken(confirmInfo.estimateData?.min_amount_out, decimalsP)) /
-                        confirmInfo.tokenInAmount,
+                      Number(
+                        shrinkToken(
+                          confirmInfo.estimateData?.min_amount_out,
+                          assetP.metadata.decimals,
+                        ),
+                      ) / confirmInfo.tokenInAmount,
                     )}
               </div>
             </div>
 
-            {/* <div className="flex items-center justify-between text-sm mb-4">
-              <div className="text-gray-300">Index Price</div>
-              <div>${confirmInfo.indexPrice}</div>
-            </div>
-
-            <div className="flex items-center justify-between text-sm mb-4">
-              <div className="text-gray-300">Leverage</div>
-              <div>{confirmInfo.rangeMount}X</div>
-            </div> */}
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Collateral</div>
               <div className="text-right flex">
@@ -422,15 +301,6 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
                 </span>
               </div>
             )}
-            {/* <div
-              className={`flex items-center justify-between text-dark-200 text-base rounded-md h-12 text-center cursor-pointer ${
-                actionShowRedColor ? "bg-primary" : "bg-red-50"
-              }`}
-            >
-              <div onClick={confirmOpenPosition} className="flex-grow">
-                Confirm {action} NEAR {confirmInfo.rangeMount}X
-              </div>
-            </div> */}
 
             {actionShowRedColor ? (
               <YellowSolidButton
