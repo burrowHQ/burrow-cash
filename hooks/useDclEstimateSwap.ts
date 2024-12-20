@@ -31,7 +31,7 @@ export const useDclEstimateSwap = ({
     if (tokenIn_id && tokenOut_id && new Decimal(tokenIn_amount || 0).gt(0)) {
       estimateDclSwap();
     }
-  }, [tokenIn_id, tokenOut_id, tokenIn_amount, slippageTolerance]);
+  }, [tokenIn_id, tokenOut_id, tokenIn_amount, slippageTolerance, forceUpdate]);
   async function estimateDclSwap() {
     const [tokenIn_metadata, tokenOut_metadata] = getMetadatas([
       assets.data[tokenIn_id],

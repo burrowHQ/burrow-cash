@@ -265,7 +265,7 @@ const TradingOperate = () => {
     if (inputUsdCharcate2) {
       updateInputAmounts(activeTab, inputUsdCharcate2, inputUsdCharcate1);
     }
-  }, [longInput, shortInput, rangeMount, estimateData, slippageTolerance]);
+  }, [longInput, shortInput, rangeMount, estimateData, slippageTolerance, forceUpdate]);
 
   // update token in amount
   useEffect(() => {
@@ -332,7 +332,7 @@ const TradingOperate = () => {
       } else {
         setLastTokenInAmount(tokenInAmount);
       }
-    }, 20000);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [tokenInAmount, lastTokenInAmount]);
@@ -371,6 +371,7 @@ const TradingOperate = () => {
       setLiqPrice(0);
       setTokenInAmount(0);
     } else if (tab === "long") {
+      console.log("......", estimateData?.amount_out);
       outputSetter(+(estimateData?.amount_out || 0));
       outputUsdSetter(inputUsdCharcate * +(estimateData?.amount_out || 0));
     } else if (tab === "short") {
