@@ -131,6 +131,36 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
   //     }
   //   }
   // };
+  console.log(
+    {
+      token_c_amount: confirmInfo.longInput,
+      token_c_id: confirmInfo.longInputName?.token_id,
+      token_d_amount: confirmInfo.tokenInAmount,
+      token_d_id:
+        action === "Long"
+          ? confirmInfo.longInputName?.token_id
+          : confirmInfo.longOutputName?.token_id,
+      token_p_id:
+        action === "Long"
+          ? confirmInfo.longOutputName?.token_id
+          : confirmInfo.longInputName?.token_id,
+      min_token_p_amount:
+        action === "Long"
+          ? expandToken(
+              confirmInfo.estimateData.min_amount_out,
+              confirmInfo?.longOutputName?.config?.extra_decimals || 0,
+              0,
+            )
+          : expandToken(
+              confirmInfo.estimateData.min_amount_out,
+              confirmInfo?.longInputName?.config?.extra_decimals || 0,
+              0,
+            ),
+      swap_indication: confirmInfo.estimateData.swap_indication,
+      assets: confirmInfo.assets.data,
+    },
+    "for nico confirmOpenPosition",
+  );
 
   const confirmOpenPosition = async () => {
     // console.log(marginAccountList, max_active_user_margin_position);
