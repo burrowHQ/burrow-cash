@@ -1,4 +1,4 @@
-import { useState, createContext, useEffect, useMemo } from "react";
+import { useState, createContext, useEffect, useMemo, useRef } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
 import Decimal from "decimal.js";
@@ -47,8 +47,10 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
   const [tokenInAmount, setTokenInAmount] = useState<string | null>(null);
   const [isDisabled, setIsDisabled] = useState(false);
+  const [forceUpdate, setForceUpdate] = useState(0);
 
   const theme = useTheme();
+  const intervalRef = useRef<ReturnType<typeof setInterval>>();
   const assets = useAppSelector(getAssets);
   const { marginAccountList } = useMarginAccount();
   const {
@@ -79,10 +81,10 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
   const netValue = parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
   const collateral = parseTokenValue(item.token_c_info.balance, decimalsC);
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
-  console.log("-----------------assetD", assetD);
-  console.log("-----------------assetC", assetC);
-  console.log("-----------------assetP", assetP);
-  console.log("-----------------item", item);
+  // console.log("-----------------assetD", assetD);
+  // console.log("-----------------assetC", assetC);
+  // console.log("-----------------assetP", assetP);
+  // console.log("-----------------item", item);
   const actionShowRedColor = positionType.label === "Long";
 
   // get estimate token in amount
@@ -111,7 +113,14 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     stablePools,
     stablePoolsDetail,
     slippageTolerance: ReduxSlippageTolerance / 100,
+    forceUpdate,
   });
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      setForceUpdate((prev) => prev + 1);
+    }, 20_000);
+    return () => clearInterval(intervalRef.current);
+  }, []);
   useEffect(() => {
     setIsDisabled(!estimateData?.swap_indication || !estimateData?.min_amount_out);
   }, [estimateData]);

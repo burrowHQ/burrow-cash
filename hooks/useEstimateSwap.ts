@@ -53,7 +53,12 @@ export const useEstimateSwap = ({
     if (tokenIn_amount == "0") {
       setEstimateResult((prev: any) => ({ ...prev, amount_out: "0" }));
     }
-  }, [dclEstimateResult?.tag, v1EstimateResult?.tag, forceUpdate]);
+  }, [
+    dclEstimateResult?.tag,
+    v1EstimateResult?.tag,
+    dclEstimateResult?.amount_out,
+    v1EstimateResult?.amount_out,
+  ]);
   function getBestEstimateResult() {
     const { amount_out: dcl_amount_out } = dclEstimateResult!;
     const { amount_out: v1_amount_out } = v1EstimateResult!;
