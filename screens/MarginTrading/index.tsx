@@ -10,7 +10,12 @@ const MarginTrading = () => {
     const savedTab = localStorage.getItem("marginTradingTab");
     return savedTab || "market";
   });
-
+  useEffect(() => {
+    const savedTab = localStorage.getItem("marginTradingTab");
+    if (savedTab) {
+      setActiveTab(savedTab);
+    }
+  }, []);
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
     localStorage.setItem("marginTradingTab", tab);

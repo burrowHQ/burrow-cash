@@ -309,6 +309,9 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
     if (selectedLever === value) {
       setSelectedLever(null);
       setInputValue("");
+      setAddedValue(0);
+      setAddLeverage(0);
+      setAddPnl(0);
       return;
     }
     setSelectedLever(value);
@@ -327,6 +330,9 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
     if (selectedLever === value) {
       setSelectedLever(null);
       setInputValue("");
+      setAddedValue(0);
+      setAddLeverage(0);
+      setAddPnl(0);
       return;
     }
     setSelectedLever(value);
