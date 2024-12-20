@@ -723,9 +723,9 @@ const PositionRow = ({
   }
   return (
     <tr className="text-base hover:bg-dark-100 font-normal">
-      <td className="py-5 pl-5 ">
-        {marketTitle}
-        <span className={`text-xs ml-1.5 ${getPositionType(item.token_d_info.token_id).class}`}>
+      <td className="py-5 pl-5">
+        <div>{marketTitle}</div>
+        <span className={`text-xs ${getPositionType(item.token_d_info.token_id).class}`}>
           {getPositionType(item.token_d_info.token_id).label}
           <span className="ml-1.5">{toInternationalCurrencySystem_number(leverage)}x</span>
         </span>
@@ -775,7 +775,10 @@ const PositionRow = ({
           )}
         </span>
       </td>
-      <td>{new Date(openTime).toLocaleString()}</td>
+      <td>
+        <div>{new Date(openTime).toLocaleDateString()}</div>
+        <div>{new Date(openTime).toLocaleTimeString()}</div>
+      </td>
       <td className="pr-5">
         <div
           className="text-gray-300 text-sm border cursor-pointer  border-dark-300 text-center h-6 rounded flex justify-center items-center"
