@@ -16,11 +16,13 @@ export const useDclEstimateSwap = ({
   tokenOut_id,
   tokenIn_amount,
   slippageTolerance,
+  forceUpdate,
 }: {
   tokenIn_id: string;
   tokenOut_id: string;
   tokenIn_amount: string;
   slippageTolerance: number;
+  forceUpdate?: number;
 }) => {
   const [estimateData, setEstimateData] = useState<IEstimateResult>();
   const assets = useAppSelector(getAssets);

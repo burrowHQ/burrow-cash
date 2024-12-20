@@ -15,6 +15,7 @@ export const useEstimateSwap = ({
   simplePools,
   stablePools,
   stablePoolsDetail,
+  forceUpdate,
 }: {
   tokenIn_id: string;
   tokenOut_id: string;
@@ -24,6 +25,7 @@ export const useEstimateSwap = ({
   simplePools: any[];
   stablePools: any[];
   stablePoolsDetail: any[];
+  forceUpdate?: number;
 }) => {
   const [estimateResult, setEstimateResult] = useState<IEstimateResult>();
   const dclEstimateResult = useDclEstimateSwap({
@@ -31,6 +33,7 @@ export const useEstimateSwap = ({
     tokenOut_id,
     tokenIn_amount,
     slippageTolerance,
+    forceUpdate,
   });
   const v1EstimateResult = useV1EstimateSwap({
     tokenIn_id,
@@ -41,6 +44,7 @@ export const useEstimateSwap = ({
     simplePools,
     stablePools,
     stablePoolsDetail,
+    forceUpdate,
   });
   useEffect(() => {
     if (dclEstimateResult?.tag && v1EstimateResult?.tag && validator()) {
