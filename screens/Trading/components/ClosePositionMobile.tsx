@@ -38,7 +38,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     ReduxSlippageTolerance,
   } = useAppSelector((state) => state.category);
   const marginAccount = useAppSelector((state) => state.marginAccount);
-  const [forceUpdate, setForceUpdate] = useState(0);
+
   const {
     itemKey,
     index,
@@ -149,7 +149,6 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     stablePools,
     stablePoolsDetail,
     slippageTolerance: ReduxSlippageTolerance / 100,
-    forceUpdate,
   });
   // console.log(tokenInAmount, "estimateData");
 
@@ -220,14 +219,6 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
   };
 
   const [showFeeModal, setShowFeeModal] = useState(false);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setForceUpdate((prev) => prev + 1);
-    }, 20000);
-
-    return () => clearInterval(interval);
-  }, []);
   return (
     <MUIModal open={open} onClose={onClose}>
       <Wrapper
