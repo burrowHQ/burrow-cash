@@ -31,6 +31,9 @@ import { getConfig } from "../redux/appSelectors";
 import { fetchAllPools } from "../redux/poolSlice";
 import "./slip.css";
 import { get_blocked } from "../api/get-blocked";
+import Popup from "../components/popup";
+import { getMarginAccountSupplied } from "../redux/marginAccountSelectors";
+import BalanceReminder from "../components/BalanceReminder";
 
 ModalReact.defaultStyles = {
   overlay: {
@@ -98,6 +101,8 @@ const Init = () => {
 };
 function Upgrade({ Component, pageProps }) {
   const [upgrading, setUpgrading] = useState<boolean>(true);
+  const [showTip, setShowTip] = useState<boolean>(true);
+  const accountSupplied = useAppSelector(getMarginAccountSupplied);
   const dispatch = useAppDispatch();
   const accountId = useAppSelector(getAccountId);
   const portfolio = useAppSelector(getAccountPortfolio);
@@ -142,12 +147,13 @@ function Upgrade({ Component, pageProps }) {
         </div>
       ) : (
         <Layout>
-          {/* <Popup className="lg:hidden" /> */}
+          <Popup className="lg:hidden" />
           <Init />
           <Modal />
           <ToastMessage />
           <Component {...pageProps} />
-          {/* <Popup className="xsm:hidden" /> */}
+          <Popup className="xsm:hidden" />
+          {/* {accountSupplied && <BalanceReminder />} */}
           <RpcList />
           <PubTestModal />
         </Layout>

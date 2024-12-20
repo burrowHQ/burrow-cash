@@ -158,7 +158,10 @@ const TradingTable = ({
   };
   const sortedPositionsList = React.useMemo<any[]>(() => {
     if (!sortBy) return positionsList;
-    const positionsArray = Object.values(positionsList) as any[];
+    const positionsArray = Object.entries(positionsList).map(([key, value]) => ({
+      ...(value as Record<string, any>),
+      itemKey: key,
+    })) as any[];
     return positionsArray.sort((a, b) => {
       const timeA = Number(a.open_ts);
       const timeB = Number(b.open_ts);
@@ -240,7 +243,7 @@ const TradingTable = ({
                       index={index}
                       key={key}
                       item={item}
-                      itemKey={key}
+                      itemKey={item.itemKey}
                       getAssetById={getAssetById}
                       getPositionType={getPositionType}
                       handleChangeCollateralButtonClick={handleChangeCollateralButtonClick}
@@ -440,7 +443,7 @@ const TradingTable = ({
                   index={index}
                   key={key}
                   item={item}
-                  itemKey={key}
+                  itemKey={item.itemKey}
                   getAssetById={getAssetById}
                   getPositionType={getPositionType}
                   handleChangeCollateralButtonClick={handleChangeCollateralButtonClick}
