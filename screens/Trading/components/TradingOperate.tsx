@@ -199,7 +199,7 @@ const TradingOperate = () => {
   }, 10);
   let lastValue = "";
 
-  //
+  // validate input
   const isValidInput = (value: string): boolean => {
     //
     if (value === "") return true;
@@ -219,6 +219,7 @@ const TradingOperate = () => {
     return true;
   };
 
+  // handle input change
   const tokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     console.log(value, tokenInAmount, "for nico");
@@ -255,7 +256,6 @@ const TradingOperate = () => {
    * longInput shortInput deal start
    *  */
   useEffect(() => {
-    // console.log(longInput, tokenInAmount, estimateData);
     const inputUsdCharcate1 = getAssetPrice(ReduxcategoryAssets1);
     const inputUsdCharcate2 = getAssetPrice(ReduxcategoryAssets2);
     if (inputUsdCharcate1 && estimateData) {
@@ -267,6 +267,7 @@ const TradingOperate = () => {
     }
   }, [longInput, shortInput, rangeMount, estimateData, slippageTolerance]);
 
+  // update token in amount
   useEffect(() => {
     const inputUsdCharcate1 = getAssetPrice(ReduxcategoryAssets1);
     if (inputUsdCharcate1 && estimateData) {
@@ -274,6 +275,7 @@ const TradingOperate = () => {
     }
   }, [tokenInAmount, activeTab, estimateData, ReduxcategoryAssets1]);
 
+  // update liq price
   useEffect(() => {
     if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
       const assetC = getAssetById(ReduxcategoryAssets2?.token_id);
@@ -319,6 +321,7 @@ const TradingOperate = () => {
     }
   }, [longOutput, shortOutput]);
 
+  // interval refresh price
   const [lastTokenInAmount, setLastTokenInAmount] = useState(0);
 
   useEffect(() => {
