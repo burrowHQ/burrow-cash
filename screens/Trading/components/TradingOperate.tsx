@@ -332,7 +332,7 @@ const TradingOperate = () => {
       } else {
         setLastTokenInAmount(tokenInAmount);
       }
-    }, 2000);
+    }, 20000);
 
     return () => clearInterval(interval);
   }, [tokenInAmount, lastTokenInAmount]);

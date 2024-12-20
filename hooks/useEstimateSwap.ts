@@ -53,10 +53,11 @@ export const useEstimateSwap = ({
     if (tokenIn_amount == "0") {
       setEstimateResult((prev: any) => ({ ...prev, amount_out: "0" }));
     }
-  }, [dclEstimateResult?.tag, v1EstimateResult?.tag, tokenIn_amount]);
+  }, [dclEstimateResult?.tag, v1EstimateResult?.tag, forceUpdate]);
   function getBestEstimateResult() {
     const { amount_out: dcl_amount_out } = dclEstimateResult!;
     const { amount_out: v1_amount_out } = v1EstimateResult!;
+    console.log(dcl_amount_out, v1_amount_out, "dcl_amount_out, v1_amount_out");
     // best is v1
     if (new Decimal(v1_amount_out || 0).gt(dcl_amount_out || 0)) {
       setEstimateResult(v1EstimateResult);
