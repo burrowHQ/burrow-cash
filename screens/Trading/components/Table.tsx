@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { BeatLoader } from "react-spinners";
-import { AddCollateral, Export } from "../../MarginTrading/components/Icon";
+import {
+  AddCollateral,
+  ArrowDownIcon,
+  ArrowUpIcon,
+  Export,
+} from "../../MarginTrading/components/Icon";
 import ClosePositionMobile from "./ClosePositionMobile";
 import ChangeCollateralMobile from "./ChangeCollateralMobile";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";
@@ -47,6 +52,8 @@ const TradingTable = ({
   const accountSupplied = useAppSelector(getMarginAccountSupplied);
   const [isLoadingWithdraw, setIsLoadingWithdraw] = useState(false);
   const [isAccountDetailsOpen, setIsAccountDetailsOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<string | null>("open_ts");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const handleTabClick = (tabNumber) => {
     setSelectedTab(tabNumber);
   };
@@ -141,6 +148,23 @@ const TradingTable = ({
   const handleAccountDetailsClick = () => {
     setIsAccountDetailsOpen((prev) => !prev);
   };
+  const handleSort = (field: string) => {
+    if (sortBy === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(field);
+      setSortDirection("desc");
+    }
+  };
+  const sortedPositionsList = React.useMemo<any[]>(() => {
+    if (!sortBy) return positionsList;
+    const positionsArray = Object.values(positionsList) as any[];
+    return positionsArray.sort((a, b) => {
+      const timeA = Number(a.open_ts);
+      const timeB = Number(b.open_ts);
+      return sortDirection === "asc" ? timeA - timeB : timeB - timeA;
+    });
+  }, [positionsList, sortBy, sortDirection]);
   return (
     <div className="flex flex-col items-center justify-center w-full xsm:mx-2">
       {/* pc */}
@@ -193,12 +217,25 @@ const TradingTable = ({
                   <th>Index Price</th>
                   <th>Liq. Price</th>
                   <th>PNL & ROE</th>
+                  <th>
+                    <div
+                      onClick={() => handleSort("open_ts")}
+                      className="flex items-center cursor-pointer"
+                    >
+                      Opening time
+                      <SortButton
+                        activeColor="rgba(192, 196, 233, 1)"
+                        inactiveColor="rgba(192, 196, 233, 0.5)"
+                        sort={sortBy === "open_ts" ? sortDirection : null}
+                      />
+                    </div>
+                  </th>
                   <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {positionsList && Object.keys(positionsList).length > 0 ? (
-                  Object.entries(positionsList).map(([key, item], index) => (
+                {sortedPositionsList && Object.keys(sortedPositionsList).length > 0 ? (
+                  Object.entries(sortedPositionsList).map(([key, item], index) => (
                     <PositionRow
                       index={index}
                       key={key}
@@ -397,8 +434,8 @@ const TradingTable = ({
         {/* content */}
         {selectedTab === "positions" && (
           <>
-            {positionsList && Object.keys(positionsList).length > 0 ? (
-              Object.entries(positionsList).map(([key, item], index) => (
+            {sortedPositionsList && Object.keys(sortedPositionsList).length > 0 ? (
+              Object.entries(sortedPositionsList).map(([key, item], index) => (
                 <PositionMobileRow
                   index={index}
                   key={key}
@@ -632,6 +669,7 @@ const PositionRow = ({
   }
   const sizeValueLong = parseTokenValue(item.token_p_amount, decimalsP);
   const sizeValueShort = parseTokenValue(item.token_d_info.balance, decimalsD);
+  const size = positionType.label === "Long" ? sizeValueLong : sizeValueShort;
   const sizeValue =
     positionType.label === "Long" ? sizeValueLong * (priceP || 0) : sizeValueShort * (priceD || 0);
 
@@ -685,14 +723,21 @@ const PositionRow = ({
   }
   return (
     <tr className="text-base hover:bg-dark-100 font-normal">
-      <td className="py-5 pl-5 ">
-        {marketTitle}
-        <span className={`text-xs ml-1.5 ${getPositionType(item.token_d_info.token_id).class}`}>
+      <td className="py-5 pl-5">
+        <div>{marketTitle}</div>
+        <span className={`text-xs ${getPositionType(item.token_d_info.token_id).class}`}>
           {getPositionType(item.token_d_info.token_id).label}
           <span className="ml-1.5">{toInternationalCurrencySystem_number(leverage)}x</span>
         </span>
       </td>
-      <td>${toInternationalCurrencySystem_number(sizeValue)}</td>
+      <td>
+        <div className="flex mr-4 items-center">
+          <p className="mr-2"> {toInternationalCurrencySystem_number(size)}</p>
+          <span className="text-gray-300 text-sm">
+            (${toInternationalCurrencySystem_number(sizeValue)})
+          </span>
+        </div>
+      </td>
       <td>${toInternationalCurrencySystem_number(netValue)}</td>
       <td>
         <div className="flex items-center">
@@ -729,6 +774,10 @@ const PositionRow = ({
             <span className="text-gray-500">-</span>
           )}
         </span>
+      </td>
+      <td>
+        <div>{new Date(openTime).toLocaleDateString()}</div>
+        <div>{new Date(openTime).toLocaleTimeString()}</div>
       </td>
       <td className="pr-5">
         <div
@@ -813,6 +862,7 @@ const PositionMobileRow = ({
   }
   const sizeValueLong = parseTokenValue(item.token_p_amount, decimalsP);
   const sizeValueShort = parseTokenValue(item.token_d_info.balance, decimalsD);
+  const size = positionType.label === "Long" ? sizeValueLong : sizeValueShort;
   const sizeValue =
     positionType.label === "Long" ? sizeValueLong * (priceP || 0) : sizeValueShort * (priceD || 0);
 
@@ -890,7 +940,12 @@ const PositionMobileRow = ({
           </div>
         </div>
         <div className="text-right">
-          <p>${toInternationalCurrencySystem_number(sizeValue)}</p>
+          <div className="flex items-center">
+            <p className="mr-2"> {toInternationalCurrencySystem_number(size)}</p>
+            <span className="text-gray-300 text-sm">
+              (${toInternationalCurrencySystem_number(sizeValue)})
+            </span>
+          </div>
           <p className="text-xs text-gray-300">Size</p>
         </div>
       </div>
@@ -935,6 +990,10 @@ const PositionMobileRow = ({
           <p className="text-gray-300">Liq. Price</p>
           <p>${toInternationalCurrencySystem_number(LiqPrice)}</p>
         </div>
+        <div className="flex items-center justify-between text-sm mb-[18px]">
+          <p className="text-gray-300">Opening time</p>
+          <p>{new Date(openTime).toLocaleString()}</p>
+        </div>
         <div className="bg-dark-100 rounded-2xl flex items-center justify-center text-xs py-1 text-gray-300 mb-4">
           PNL & ROE{" "}
           <span className="text-primary ml-1.5">
@@ -971,5 +1030,14 @@ const PositionMobileRow = ({
     </div>
   );
 };
+
+function SortButton({ sort, activeColor, inactiveColor }) {
+  return (
+    <div className="flex flex-col items-center gap-0.5 ml-1.5">
+      <ArrowUpIcon fill={`${sort === "asc" ? activeColor : inactiveColor}`} />
+      <ArrowDownIcon fill={`${sort === "desc" ? activeColor : inactiveColor}`} />
+    </div>
+  );
+}
 
 export default TradingTable;
