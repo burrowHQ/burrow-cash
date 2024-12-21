@@ -123,6 +123,8 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
       JSON.stringify({
         cateSymbol,
         decimals: localDecimals,
+        amount: confirmInfo.longOutput,
+        totalPrice: confirmInfo.longOutputUsd,
       }),
     );
 

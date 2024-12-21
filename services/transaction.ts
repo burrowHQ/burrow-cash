@@ -93,17 +93,20 @@ export const handleTransactionResults = async (
             ).toString(),
             transactionHashes: txhash[0],
             positionSize: {
-              amount: isLong
-                ? shrinkToken(
-                    actions[0]?.OpenPosition?.min_token_p_amount,
-                    cateSymbolAndDecimals?.decimals || 24,
-                  )
-                : shrinkToken(
-                    actions[0]?.OpenPosition?.token_d_amount,
-                    cateSymbolAndDecimals?.decimals || 24,
-                  ),
+              // amount: isLong
+              //   ? shrinkToken(
+              //       actions[0]?.OpenPosition?.min_token_p_amount,
+              //       cateSymbolAndDecimals?.decimals || 24,
+              //     )
+              //   : shrinkToken(
+              //       actions[0]?.OpenPosition?.token_d_amount,
+              //       cateSymbolAndDecimals?.decimals || 24,
+              //     ),
+              // symbol: cateSymbolAndDecimals?.cateSymbol || "NEAR",
+              // usdValue: cateSymbolAndDecimals?.price || "1",
+              amount: cateSymbolAndDecimals?.amount || "",
+              totalPrice: cateSymbolAndDecimals?.totalPrice || "",
               symbol: cateSymbolAndDecimals?.cateSymbol || "NEAR",
-              usdValue: "1000",
             },
           });
         }

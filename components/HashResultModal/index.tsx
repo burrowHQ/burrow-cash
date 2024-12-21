@@ -14,7 +14,7 @@ interface ShowPositionResultParams {
   positionSize?: {
     amount: string;
     symbol: string;
-    usdValue: string;
+    totalPrice: string;
   };
 }
 
