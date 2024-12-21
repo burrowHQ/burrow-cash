@@ -224,137 +224,132 @@ const TradingTable = ({
         </div>
         {/* content */}
         <div className="py-4">
-          {selectedTab === "positions" && (
-            <>
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="text-gray-300 text-sm font-normal">
-                    <th className="pl-5">Market</th>
-                    <th>Size</th>
-                    <th>Net Value</th>
-                    <th>Collateral</th>
-                    <th>Entry Price</th>
-                    <th>Index Price</th>
-                    <th>Liq. Price</th>
-                    <th>PNL & ROE</th>
-                    <th>
-                      <div
-                        onClick={() => handleSort("open_ts")}
-                        className="flex items-center cursor-pointer"
-                      >
-                        Opening time
-                        <SortButton
-                          activeColor="rgba(192, 196, 233, 1)"
-                          inactiveColor="rgba(192, 196, 233, 0.5)"
-                          sort={sortBy === "open_ts" ? sortDirection : null}
-                        />
-                      </div>
-                    </th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Array.isArray(currentItems) && currentItems.length > 0 ? (
-                    currentItems.map((item, index) => (
-                      <PositionRow
-                        index={index}
-                        key={item.itemKey}
-                        item={item}
-                        itemKey={item.itemKey}
-                        getAssetById={getAssetById}
-                        getPositionType={getPositionType}
-                        handleChangeCollateralButtonClick={handleChangeCollateralButtonClick}
-                        handleClosePositionButtonClick={handleClosePositionButtonClick}
-                        getAssetDetails={getAssetDetails}
-                        parseTokenValue={parseTokenValue}
-                        calculateLeverage={calculateLeverage}
-                        marginConfigTokens={marginConfigTokens}
-                        assets={assets}
-                        filterTitle={filterTitle}
-                        onPLNChange={handlePLNChange}
+          <div className={selectedTab === "positions" ? "" : "hidden"}>
+            <table className="w-full text-left">
+              <thead>
+                <tr className="text-gray-300 text-sm font-normal">
+                  <th className="pl-5">Market</th>
+                  <th>Size</th>
+                  <th>Net Value</th>
+                  <th>Collateral</th>
+                  <th>Entry Price</th>
+                  <th>Index Price</th>
+                  <th>Liq. Price</th>
+                  <th>PNL & ROE</th>
+                  <th>
+                    <div
+                      onClick={() => handleSort("open_ts")}
+                      className="flex items-center cursor-pointer"
+                    >
+                      Opening time
+                      <SortButton
+                        activeColor="rgba(192, 196, 233, 1)"
+                        inactiveColor="rgba(192, 196, 233, 0.5)"
+                        sort={sortBy === "open_ts" ? sortDirection : null}
                       />
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={100}>
-                        <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
-                          Your open positions will appear here
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                  {isChangeCollateralMobileOpen && (
-                    <ChangeCollateralMobile
-                      open={isChangeCollateralMobileOpen}
-                      onClose={() => setIsChangeCollateralMobileOpen(false)}
-                      rowData={selectedRowData}
-                      collateralTotal={totalCollateral}
+                    </div>
+                  </th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.isArray(currentItems) && currentItems.length > 0 ? (
+                  currentItems.map((item, index) => (
+                    <PositionRow
+                      index={index}
+                      key={item.itemKey}
+                      item={item}
+                      itemKey={item.itemKey}
+                      getAssetById={getAssetById}
+                      getPositionType={getPositionType}
+                      handleChangeCollateralButtonClick={handleChangeCollateralButtonClick}
+                      handleClosePositionButtonClick={handleClosePositionButtonClick}
+                      getAssetDetails={getAssetDetails}
+                      parseTokenValue={parseTokenValue}
+                      calculateLeverage={calculateLeverage}
+                      marginConfigTokens={marginConfigTokens}
+                      assets={assets}
+                      filterTitle={filterTitle}
+                      onPLNChange={handlePLNChange}
                     />
-                  )}
-                  {isClosePositionModalOpen && (
-                    <ClosePositionMobile
-                      open={isClosePositionModalOpen}
-                      onClose={() => setIsClosePositionMobileOpen(false)}
-                      extraProps={closePositionModalProps}
-                    />
-                  )}
-                </tbody>
-              </table>
-              {Array.isArray(currentItems) && currentItems.length > 0 ? (
-                <div className="flex items-center justify-center mt-4">
-                  {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => {
-                    if (
-                      page === 1 ||
-                      page === totalPages ||
-                      (page >= currentPage - 1 && page <= currentPage + 1)
-                    ) {
-                      return (
-                        <button
-                          type="button"
-                          key={page}
-                          onClick={() => setCurrentPage(page)}
-                          className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
-                            currentPage === page ? "font-bold bg-dark-1200 bg-opacity-30" : ""
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      );
-                    }
-                    if (page === 2 && currentPage > 3) {
-                      return <span key={page}>...</span>;
-                    }
-                    if (page === totalPages - 1 && currentPage < totalPages - 2) {
-                      return <span key={page}>...</span>;
-                    }
-                    return null;
-                  })}
-                  <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
-                  <input
-                    className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
-                    type="text"
-                    value={inputPage}
-                    onChange={(e) => {
-                      const { value } = e.target;
-                      if (
-                        value === "" ||
-                        (Number.isInteger(Number(value)) && !value.includes("."))
-                      ) {
-                        setInputPage(value);
-                      }
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        const pageNumber = Number(inputPage);
-                        handlePageJump(pageNumber);
-                      }
-                    }}
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={100}>
+                      <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+                        Your open positions will appear here
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                {isChangeCollateralMobileOpen && (
+                  <ChangeCollateralMobile
+                    open={isChangeCollateralMobileOpen}
+                    onClose={() => setIsChangeCollateralMobileOpen(false)}
+                    rowData={selectedRowData}
+                    collateralTotal={totalCollateral}
                   />
-                </div>
-              ) : null}
-            </>
-          )}
-          {selectedTab === "history" && (
+                )}
+                {isClosePositionModalOpen && (
+                  <ClosePositionMobile
+                    open={isClosePositionModalOpen}
+                    onClose={() => setIsClosePositionMobileOpen(false)}
+                    extraProps={closePositionModalProps}
+                  />
+                )}
+              </tbody>
+            </table>
+            {Array.isArray(currentItems) && currentItems.length > 0 ? (
+              <div className="flex items-center justify-center mt-4">
+                {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => {
+                  if (
+                    page === 1 ||
+                    page === totalPages ||
+                    (page >= currentPage - 1 && page <= currentPage + 1)
+                  ) {
+                    return (
+                      <button
+                        type="button"
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
+                          currentPage === page ? "font-bold bg-dark-1200 bg-opacity-30" : ""
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  }
+                  if (page === 2 && currentPage > 3) {
+                    return <span key={page}>...</span>;
+                  }
+                  if (page === totalPages - 1 && currentPage < totalPages - 2) {
+                    return <span key={page}>...</span>;
+                  }
+                  return null;
+                })}
+                <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
+                <input
+                  className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
+                  type="text"
+                  value={inputPage}
+                  onChange={(e) => {
+                    const { value } = e.target;
+                    if (value === "" || (Number.isInteger(Number(value)) && !value.includes("."))) {
+                      setInputPage(value);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      const pageNumber = Number(inputPage);
+                      handlePageJump(pageNumber);
+                    }
+                  }}
+                />
+              </div>
+            ) : null}
+          </div>
+          <div className={selectedTab === "history" ? "" : "hidden"}>
             <table className="w-full text-left">
               <thead>
                 <tr className="text-gray-300 text-sm font-normal">
@@ -382,67 +377,67 @@ const TradingTable = ({
                 )}
               </tbody>
             </table>
-          )}
-          {selectedTab === "account" && (
-            <>
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="text-gray-300 text-sm font-normal">
-                    <th className="pl-5">Token</th>
-                    <th>Balance</th>
-                    <th>Price</th>
-                    <th>Value</th>
+          </div>
+          <div className={selectedTab === "account" ? "" : "hidden"}>
+            <table className="w-full text-left">
+              <thead>
+                <tr className="text-gray-300 text-sm font-normal">
+                  <th className="pl-5">Token</th>
+                  <th>Balance</th>
+                  <th>Price</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredAccountSupplied.length > 0 ? (
+                  filteredAccountSupplied.map((token, index) => {
+                    const assetDetails = getAssetById(token.token_id);
+                    const marginAssetDetails = getAssetDetails(assetDetails);
+                    return (
+                      <tr key={index} className="text-base hover:bg-dark-100 font-normal">
+                        <td className="py-5 pl-5">
+                          <div className="flex items-center">
+                            <img
+                              src={assetDetails.metadata.icon}
+                              alt=""
+                              className="w-4 h-4 rounded-2xl"
+                            />
+                            <p className="ml-1"> {assetDetails.metadata.symbol}</p>
+                          </div>
+                        </td>
+                        <td>
+                          {toInternationalCurrencySystem_number(
+                            parseTokenValue(token.balance, marginAssetDetails.decimals),
+                          )}
+                        </td>
+                        <td>
+                          {marginAssetDetails.price
+                            ? `$${toInternationalCurrencySystem_number(marginAssetDetails.price)}`
+                            : "/"}
+                        </td>
+                        <td>
+                          {marginAssetDetails.price
+                            ? `$${toInternationalCurrencySystem_number(
+                                parseTokenValue(token.balance, marginAssetDetails.decimals) *
+                                  marginAssetDetails.price,
+                              )}`
+                            : "/"}
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={4}>
+                      <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+                        No data
+                      </div>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {filteredAccountSupplied.length > 0 ? (
-                    filteredAccountSupplied.map((token, index) => {
-                      const assetDetails = getAssetById(token.token_id);
-                      const marginAssetDetails = getAssetDetails(assetDetails);
-                      return (
-                        <tr key={index} className="text-base hover:bg-dark-100 font-normal">
-                          <td className="py-5 pl-5">
-                            <div className="flex items-center">
-                              <img
-                                src={assetDetails.metadata.icon}
-                                alt=""
-                                className="w-4 h-4 rounded-2xl"
-                              />
-                              <p className="ml-1"> {assetDetails.metadata.symbol}</p>
-                            </div>
-                          </td>
-                          <td>
-                            {toInternationalCurrencySystem_number(
-                              parseTokenValue(token.balance, marginAssetDetails.decimals),
-                            )}
-                          </td>
-                          <td>
-                            {marginAssetDetails.price
-                              ? `$${toInternationalCurrencySystem_number(marginAssetDetails.price)}`
-                              : "/"}
-                          </td>
-                          <td>
-                            {marginAssetDetails.price
-                              ? `$${toInternationalCurrencySystem_number(
-                                  parseTokenValue(token.balance, marginAssetDetails.decimals) *
-                                    marginAssetDetails.price,
-                                )}`
-                              : "/"}
-                          </td>
-                        </tr>
-                      );
-                    })
-                  ) : (
-                    <tr>
-                      <td colSpan={4}>
-                        <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
-                          No data
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                )}
+              </tbody>
+            </table>
+            {filteredAccountSupplied.length > 0 ? (
               <div className="flex items-center justify-center mt-4">
                 {Array.from(
                   { length: Math.ceil(filteredAccountSupplied.length / itemsPerPage) },
@@ -496,8 +491,8 @@ const TradingTable = ({
                   }}
                 />
               </div>
-            </>
-          )}
+            ) : null}
+          </div>
         </div>
       </div>
       {/* mobile */}
@@ -546,110 +541,108 @@ const TradingTable = ({
           </div>
         </div>
         {/* content */}
-        {isSelectedMobileTab === "positions" && (
-          <>
-            {Array.isArray(currentItems) && currentItems.length > 0 ? (
-              currentItems.map((item, index) => (
-                <PositionMobileRow
-                  index={index}
-                  key={item.itemKey}
-                  item={item}
-                  itemKey={item.itemKey}
-                  getAssetById={getAssetById}
-                  getPositionType={getPositionType}
-                  handleChangeCollateralButtonClick={handleChangeCollateralButtonClick}
-                  handleClosePositionButtonClick={handleClosePositionButtonClick}
-                  getAssetDetails={getAssetDetails}
-                  parseTokenValue={parseTokenValue}
-                  calculateLeverage={calculateLeverage}
-                  marginConfigTokens={marginConfigTokens}
-                  assets={assets}
-                  filterTitle={filterTitle}
-                  onPLNChange={handlePLNChange}
-                />
-              ))
-            ) : (
-              <tr>
-                <td colSpan={100}>
-                  <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
-                    Your open positions will appear here
-                  </div>
-                </td>
-              </tr>
-            )}
-            {isChangeCollateralMobileOpen && (
-              <ChangeCollateralMobile
-                open={isChangeCollateralMobileOpen}
-                onClose={(e) => {
-                  // e.preventDefault();
-                  // e.stopPropagation();
-                  setIsChangeCollateralMobileOpen(false);
-                }}
-                rowData={selectedRowData}
-                collateralTotal={totalCollateral}
+        <div className={isSelectedMobileTab === "positions" ? "" : "hidden"}>
+          {Array.isArray(currentItems) && currentItems.length > 0 ? (
+            currentItems.map((item, index) => (
+              <PositionMobileRow
+                index={index}
+                key={item.itemKey}
+                item={item}
+                itemKey={item.itemKey}
+                getAssetById={getAssetById}
+                getPositionType={getPositionType}
+                handleChangeCollateralButtonClick={handleChangeCollateralButtonClick}
+                handleClosePositionButtonClick={handleClosePositionButtonClick}
+                getAssetDetails={getAssetDetails}
+                parseTokenValue={parseTokenValue}
+                calculateLeverage={calculateLeverage}
+                marginConfigTokens={marginConfigTokens}
+                assets={assets}
+                filterTitle={filterTitle}
+                onPLNChange={handlePLNChange}
               />
-            )}
-            {isClosePositionModalOpen && (
-              <ClosePositionMobile
-                open={isClosePositionModalOpen}
-                onClose={(e) => {
-                  // e.preventDefault();
-                  // e.stopPropagation();
-                  setIsClosePositionMobileOpen(false);
-                }}
-                extraProps={closePositionModalProps}
-              />
-            )}
-            <div className="flex items-center justify-center mt-4">
-              {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => {
-                if (
-                  page === 1 ||
-                  page === totalPages ||
-                  (page >= currentPage - 1 && page <= currentPage + 1)
-                ) {
-                  return (
-                    <button
-                      type="button"
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
-                        currentPage === page ? "font-bold bg-dark-1200 bg-opacity-30" : ""
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  );
+            ))
+          ) : (
+            <tr>
+              <td colSpan={100}>
+                <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+                  Your open positions will appear here
+                </div>
+              </td>
+            </tr>
+          )}
+          {isChangeCollateralMobileOpen && (
+            <ChangeCollateralMobile
+              open={isChangeCollateralMobileOpen}
+              onClose={(e) => {
+                // e.preventDefault();
+                // e.stopPropagation();
+                setIsChangeCollateralMobileOpen(false);
+              }}
+              rowData={selectedRowData}
+              collateralTotal={totalCollateral}
+            />
+          )}
+          {isClosePositionModalOpen && (
+            <ClosePositionMobile
+              open={isClosePositionModalOpen}
+              onClose={(e) => {
+                // e.preventDefault();
+                // e.stopPropagation();
+                setIsClosePositionMobileOpen(false);
+              }}
+              extraProps={closePositionModalProps}
+            />
+          )}
+          <div className="flex items-center justify-center mt-4">
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => {
+              if (
+                page === 1 ||
+                page === totalPages ||
+                (page >= currentPage - 1 && page <= currentPage + 1)
+              ) {
+                return (
+                  <button
+                    type="button"
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
+                      currentPage === page ? "font-bold bg-dark-1200 bg-opacity-30" : ""
+                    }`}
+                  >
+                    {page}
+                  </button>
+                );
+              }
+              if (page === 2 && currentPage > 3) {
+                return <span key={page}>...</span>;
+              }
+              if (page === totalPages - 1 && currentPage < totalPages - 2) {
+                return <span key={page}>...</span>;
+              }
+              return null;
+            })}
+            <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
+            <input
+              className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
+              type="text"
+              value={inputPage}
+              onChange={(e) => {
+                const { value } = e.target;
+                if (value === "" || (Number.isInteger(Number(value)) && !value.includes("."))) {
+                  setInputPage(value);
                 }
-                if (page === 2 && currentPage > 3) {
-                  return <span key={page}>...</span>;
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  const pageNumber = Number(inputPage);
+                  handlePageJump(pageNumber);
                 }
-                if (page === totalPages - 1 && currentPage < totalPages - 2) {
-                  return <span key={page}>...</span>;
-                }
-                return null;
-              })}
-              <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
-              <input
-                className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
-                type="text"
-                value={inputPage}
-                onChange={(e) => {
-                  const { value } = e.target;
-                  if (value === "" || (Number.isInteger(Number(value)) && !value.includes("."))) {
-                    setInputPage(value);
-                  }
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    const pageNumber = Number(inputPage);
-                    handlePageJump(pageNumber);
-                  }
-                }}
-              />
-            </div>
-          </>
-        )}
-        {isSelectedMobileTab === "history" && <div>history</div>}
+              }}
+            />
+          </div>
+        </div>
+        <div className={isSelectedMobileTab === "history" ? "" : "hidden"}>history</div>
         {!filterTitle && filteredAccountSupplied.length > 0 && (
           <div
             className="fixed rounded-t-xl bottom-0 left-0 right-0 z-50 bg-gray-1300 pt-[18px] px-[32px] pb-[52px] w-full"
