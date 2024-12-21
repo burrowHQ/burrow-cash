@@ -66,7 +66,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
     const newLeverage = calculateLeverage(tokenDInfoBalance, priceD, newValue, priceC);
     let newLiqPrice = 0;
     if (positionType.label === "Long") {
-      const k1 = Number(newNetValue) * leverage * priceC;
+      const k1 = Number(newNetValue) * newLeverage * priceC;
       const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
       newLiqPrice = (k1 / k2 - Number(newNetValue)) / sizeValueLong;
       if (Number.isNaN(newLiqPrice) || !Number.isFinite(newLiqPrice)) newLiqPrice = 0;
@@ -186,7 +186,7 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
     if (positionType.label === "Long") {
       const k1 = Number(netValue) * leverage * priceC;
       const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
-      LiqPrice = (k1 / k2 - Number(netValue)) / sizeValueLong;
+      LiqPrice = (k1 / k2 - Number(netValue) * priceC) / sizeValueLong;
       if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
     } else {
       LiqPrice =

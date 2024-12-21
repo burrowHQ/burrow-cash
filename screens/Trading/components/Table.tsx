@@ -828,7 +828,7 @@ const PositionRow = ({
     if (positionType.label === "Long") {
       const k1 = Number(netValue) * leverage * priceC;
       const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
-      LiqPrice = (k1 / k2 - Number(netValue)) / sizeValueLong;
+      LiqPrice = (k1 / k2 - Number(netValue) * priceC) / sizeValueLong;
       if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
     } else {
       LiqPrice =
@@ -1021,7 +1021,7 @@ const PositionMobileRow = ({
     if (positionType.label === "Long") {
       const k1 = Number(netValue) * leverage * priceC;
       const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
-      LiqPrice = (k1 / k2 - Number(netValue)) / sizeValueLong;
+      LiqPrice = (k1 / k2 - Number(netValue) * priceC) / sizeValueLong;
       if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
     } else {
       LiqPrice =
