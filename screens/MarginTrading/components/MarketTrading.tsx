@@ -12,7 +12,7 @@ import { shrinkToken } from "../../../store/helper";
 import DataSource from "../../../data/datasource";
 import { isMobileDevice } from "../../../helpers/helpers";
 
-const MarketMarginTrading = () => {
+const MarketMarginTrading = ({ hidden }) => {
   const isMobile = isMobileDevice();
   const { filterMarginConfigList } = useMarginConfigToken();
   const [totalLongUSD, setTotalLongUSD] = React.useState(0);
@@ -104,7 +104,7 @@ const MarketMarginTrading = () => {
     });
   }, [mergedData, sortBy, sortDirection]);
   return (
-    <div className="flex flex-col items-center justify-center w-full">
+    <div className={hidden ? "hidden" : "flex flex-col items-center justify-center w-full"}>
       {isMobile ? (
         <>
           <div className="w-full border-b border-dark-950 px-4">

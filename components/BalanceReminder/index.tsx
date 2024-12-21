@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { RemindCloseIcon, RemindIcon } from "./icon";
 import { useAppSelector } from "../../redux/hooks";
 import { getAccountId } from "../../redux/accountSelectors";
-import { setActiveTab, setSelectedTab } from "../../redux/marginTabSlice";
+import { setAccountDetailsOpen, setActiveTab, setSelectedTab } from "../../redux/marginTabSlice";
 
 const BalanceReminder = () => {
   const router = useRouter();
@@ -27,6 +27,7 @@ const BalanceReminder = () => {
   const handleClaim = () => {
     dispatch(setActiveTab("my"));
     dispatch(setSelectedTab("account"));
+    dispatch(setAccountDetailsOpen(true));
     router.push("/marginTrading");
   };
   function closeTip() {

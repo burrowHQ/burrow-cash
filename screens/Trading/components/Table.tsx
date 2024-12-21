@@ -22,7 +22,7 @@ import { withdrawActionsAll } from "../../../store/marginActions/withdrawAll";
 import { MarginAccountDetailIcon, YellowBallIcon } from "../../TokenDetail/svg";
 import { useRouterQuery } from "../../../utils/txhashContract";
 import { handleTransactionHash, handleTransactionResults } from "../../../services/transaction";
-import { setSelectedTab } from "../../../redux/marginTabSlice";
+import { setAccountDetailsOpen, setSelectedTab } from "../../../redux/marginTabSlice";
 
 const TradingTable = ({
   positionsList,
@@ -53,7 +53,7 @@ const TradingTable = ({
   const { getPositionType, marginConfigTokens } = useMarginConfigToken();
   const accountSupplied = useAppSelector(getMarginAccountSupplied);
   const [isLoadingWithdraw, setIsLoadingWithdraw] = useState(false);
-  const [isAccountDetailsOpen, setIsAccountDetailsOpen] = useState(false);
+  const isAccountDetailsOpen = useAppSelector((state) => state.tab.isAccountDetailsOpen);
   const [sortBy, setSortBy] = useState<string | null>("open_ts");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [isSelectedMobileTab, setSelectedMobileTab] = useState("positions");
@@ -152,7 +152,7 @@ const TradingTable = ({
     }
   };
   const handleAccountDetailsClick = () => {
-    setIsAccountDetailsOpen((prev) => !prev);
+    dispatch(setAccountDetailsOpen(!isAccountDetailsOpen));
   };
   const handleSort = (field: string) => {
     if (sortBy === field) {
@@ -184,6 +184,10 @@ const TradingTable = ({
       setCurrentPage(pageNumber);
     }
   };
+  const filteredAccountSupplied = accountSupplied.filter((token) => {
+    const assetDetails = getAssetById(token.token_id);
+    return token.balance.toString().length >= assetDetails.config.extra_decimals;
+  });
   return (
     <div className="flex flex-col items-center justify-center w-full xsm:mx-2">
       {/* pc */}
@@ -209,97 +213,93 @@ const TradingTable = ({
               />
             )}
           </div>
-          {selectedTab === "account" &&
-            accountSupplied.filter((token) => {
-              const assetDetails = getAssetById(token.token_id);
-              return token.balance.toString().length >= assetDetails.config.extra_decimals;
-            }).length > 0 && (
-              <div
-                className="w-[110px] h-6 px-1.5 mr-11 flex items-center justify-center bg-primary bg-opacity-5 border border-primary rounded-md text-primary text-sm cursor-pointer"
-                onClick={handleWithdrawAllClick}
-              >
-                {isLoadingWithdraw ? <BeatLoader size={5} color="#C0C4E9" /> : "Withdraw all"}
-              </div>
-            )}
+          {selectedTab === "account" && filteredAccountSupplied.length > 0 && (
+            <div
+              className="w-[110px] h-6 px-1.5 mr-11 flex items-center justify-center bg-primary bg-opacity-5 border border-primary rounded-md text-primary text-sm cursor-pointer"
+              onClick={handleWithdrawAllClick}
+            >
+              {isLoadingWithdraw ? <BeatLoader size={5} color="#C0C4E9" /> : "Withdraw all"}
+            </div>
+          )}
         </div>
         {/* content */}
         <div className="py-4">
-          {selectedTab === "positions" && (
-            <>
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="text-gray-300 text-sm font-normal">
-                    <th className="pl-5">Market</th>
-                    <th>Size</th>
-                    <th>Net Value</th>
-                    <th>Collateral</th>
-                    <th>Entry Price</th>
-                    <th>Index Price</th>
-                    <th>Liq. Price</th>
-                    <th>PNL & ROE</th>
-                    <th>
-                      <div
-                        onClick={() => handleSort("open_ts")}
-                        className="flex items-center cursor-pointer"
-                      >
-                        Opening time
-                        <SortButton
-                          activeColor="rgba(192, 196, 233, 1)"
-                          inactiveColor="rgba(192, 196, 233, 0.5)"
-                          sort={sortBy === "open_ts" ? sortDirection : null}
-                        />
-                      </div>
-                    </th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {Array.isArray(currentItems) && currentItems.length > 0 ? ( // 确保 currentItems 是一个数组
-                    currentItems.map((item, index) => (
-                      <PositionRow
-                        index={index}
-                        key={item.itemKey}
-                        item={item}
-                        itemKey={item.itemKey}
-                        getAssetById={getAssetById}
-                        getPositionType={getPositionType}
-                        handleChangeCollateralButtonClick={handleChangeCollateralButtonClick}
-                        handleClosePositionButtonClick={handleClosePositionButtonClick}
-                        getAssetDetails={getAssetDetails}
-                        parseTokenValue={parseTokenValue}
-                        calculateLeverage={calculateLeverage}
-                        marginConfigTokens={marginConfigTokens}
-                        assets={assets}
-                        filterTitle={filterTitle}
-                        onPLNChange={handlePLNChange}
+          <div className={selectedTab === "positions" ? "" : "hidden"}>
+            <table className="w-full text-left">
+              <thead>
+                <tr className="text-gray-300 text-sm font-normal">
+                  <th className="pl-5">Market</th>
+                  <th>Size</th>
+                  <th>Net Value</th>
+                  <th>Collateral</th>
+                  <th>Entry Price</th>
+                  <th>Index Price</th>
+                  <th>Liq. Price</th>
+                  <th>PNL & ROE</th>
+                  <th>
+                    <div
+                      onClick={() => handleSort("open_ts")}
+                      className="flex items-center cursor-pointer"
+                    >
+                      Opening time
+                      <SortButton
+                        activeColor="rgba(192, 196, 233, 1)"
+                        inactiveColor="rgba(192, 196, 233, 0.5)"
+                        sort={sortBy === "open_ts" ? sortDirection : null}
                       />
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={100}>
-                        <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
-                          Your open positions will appear here
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                  {isChangeCollateralMobileOpen && (
-                    <ChangeCollateralMobile
-                      open={isChangeCollateralMobileOpen}
-                      onClose={() => setIsChangeCollateralMobileOpen(false)}
-                      rowData={selectedRowData}
-                      collateralTotal={totalCollateral}
+                    </div>
+                  </th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.isArray(currentItems) && currentItems.length > 0 ? (
+                  currentItems.map((item, index) => (
+                    <PositionRow
+                      index={index}
+                      key={item.itemKey}
+                      item={item}
+                      itemKey={item.itemKey}
+                      getAssetById={getAssetById}
+                      getPositionType={getPositionType}
+                      handleChangeCollateralButtonClick={handleChangeCollateralButtonClick}
+                      handleClosePositionButtonClick={handleClosePositionButtonClick}
+                      getAssetDetails={getAssetDetails}
+                      parseTokenValue={parseTokenValue}
+                      calculateLeverage={calculateLeverage}
+                      marginConfigTokens={marginConfigTokens}
+                      assets={assets}
+                      filterTitle={filterTitle}
+                      onPLNChange={handlePLNChange}
                     />
-                  )}
-                  {isClosePositionModalOpen && (
-                    <ClosePositionMobile
-                      open={isClosePositionModalOpen}
-                      onClose={() => setIsClosePositionMobileOpen(false)}
-                      extraProps={closePositionModalProps}
-                    />
-                  )}
-                </tbody>
-              </table>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={100}>
+                      <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+                        Your open positions will appear here
+                      </div>
+                    </td>
+                  </tr>
+                )}
+                {isChangeCollateralMobileOpen && (
+                  <ChangeCollateralMobile
+                    open={isChangeCollateralMobileOpen}
+                    onClose={() => setIsChangeCollateralMobileOpen(false)}
+                    rowData={selectedRowData}
+                    collateralTotal={totalCollateral}
+                  />
+                )}
+                {isClosePositionModalOpen && (
+                  <ClosePositionMobile
+                    open={isClosePositionModalOpen}
+                    onClose={() => setIsClosePositionMobileOpen(false)}
+                    extraProps={closePositionModalProps}
+                  />
+                )}
+              </tbody>
+            </table>
+            {Array.isArray(currentItems) && currentItems.length > 0 ? (
               <div className="flex items-center justify-center mt-4">
                 {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => {
                   if (
@@ -347,9 +347,9 @@ const TradingTable = ({
                   }}
                 />
               </div>
-            </>
-          )}
-          {selectedTab === "history" && (
+            ) : null}
+          </div>
+          <div className={selectedTab === "history" ? "" : "hidden"}>
             <table className="w-full text-left">
               <thead>
                 <tr className="text-gray-300 text-sm font-normal">
@@ -377,8 +377,8 @@ const TradingTable = ({
                 )}
               </tbody>
             </table>
-          )}
-          {selectedTab === "account" && (
+          </div>
+          <div className={selectedTab === "account" ? "" : "hidden"}>
             <table className="w-full text-left">
               <thead>
                 <tr className="text-gray-300 text-sm font-normal">
@@ -389,16 +389,10 @@ const TradingTable = ({
                 </tr>
               </thead>
               <tbody>
-                {accountSupplied.filter((token) => {
-                  const assetDetails = getAssetById(token.token_id);
-                  return token.balance.toString().length >= assetDetails.config.extra_decimals;
-                }).length > 0 ? (
-                  accountSupplied.map((token, index) => {
+                {filteredAccountSupplied.length > 0 ? (
+                  filteredAccountSupplied.map((token, index) => {
                     const assetDetails = getAssetById(token.token_id);
                     const marginAssetDetails = getAssetDetails(assetDetails);
-                    if (token.balance.toString().length < assetDetails.config.extra_decimals) {
-                      return null;
-                    }
                     return (
                       <tr key={index} className="text-base hover:bg-dark-100 font-normal">
                         <td className="py-5 pl-5">
@@ -443,7 +437,62 @@ const TradingTable = ({
                 )}
               </tbody>
             </table>
-          )}
+            {filteredAccountSupplied.length > 0 ? (
+              <div className="flex items-center justify-center mt-4">
+                {Array.from(
+                  { length: Math.ceil(filteredAccountSupplied.length / itemsPerPage) },
+                  (_, index) => index + 1,
+                ).map((page) => {
+                  if (
+                    page === 1 ||
+                    page === Math.ceil(filteredAccountSupplied.length / itemsPerPage) ||
+                    (page >= currentPage - 1 && page <= currentPage + 1)
+                  ) {
+                    return (
+                      <button
+                        type="button"
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
+                          currentPage === page ? "font-bold bg-dark-1200 bg-opacity-30" : ""
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  }
+                  if (page === 2 && currentPage > 3) {
+                    return <span key={page}>...</span>;
+                  }
+                  if (
+                    page === Math.ceil(filteredAccountSupplied.length / itemsPerPage) - 1 &&
+                    currentPage < Math.ceil(filteredAccountSupplied.length / itemsPerPage) - 2
+                  ) {
+                    return <span key={page}>...</span>;
+                  }
+                  return null;
+                })}
+                <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
+                <input
+                  className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
+                  type="text"
+                  value={inputPage}
+                  onChange={(e) => {
+                    const { value } = e.target;
+                    if (value === "" || (Number.isInteger(Number(value)) && !value.includes("."))) {
+                      setInputPage(value);
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      const pageNumber = Number(inputPage);
+                      handlePageJump(pageNumber);
+                    }
+                  }}
+                />
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
       {/* mobile */}
@@ -492,177 +541,205 @@ const TradingTable = ({
           </div>
         </div>
         {/* content */}
-        {isSelectedMobileTab === "positions" && (
-          <>
-            {sortedPositionsList && Object.keys(sortedPositionsList).length > 0 ? (
-              Object.entries(sortedPositionsList).map(([key, item], index) => (
-                <PositionMobileRow
-                  index={index}
-                  key={key}
-                  item={item}
-                  itemKey={item.itemKey}
-                  getAssetById={getAssetById}
-                  getPositionType={getPositionType}
-                  handleChangeCollateralButtonClick={handleChangeCollateralButtonClick}
-                  handleClosePositionButtonClick={handleClosePositionButtonClick}
-                  getAssetDetails={getAssetDetails}
-                  parseTokenValue={parseTokenValue}
-                  calculateLeverage={calculateLeverage}
-                  marginConfigTokens={marginConfigTokens}
-                  assets={assets}
-                  filterTitle={filterTitle}
-                  onPLNChange={handlePLNChange}
-                />
-              ))
-            ) : (
-              <tr>
-                <td colSpan={100}>
-                  <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
-                    Your open positions will appear here
-                  </div>
-                </td>
-              </tr>
-            )}
-            {isChangeCollateralMobileOpen && (
-              <ChangeCollateralMobile
-                open={isChangeCollateralMobileOpen}
-                onClose={(e) => {
-                  // e.preventDefault();
-                  // e.stopPropagation();
-                  setIsChangeCollateralMobileOpen(false);
-                }}
-                rowData={selectedRowData}
-                collateralTotal={totalCollateral}
+        <div className={isSelectedMobileTab === "positions" ? "" : "hidden"}>
+          {Array.isArray(currentItems) && currentItems.length > 0 ? (
+            currentItems.map((item, index) => (
+              <PositionMobileRow
+                index={index}
+                key={item.itemKey}
+                item={item}
+                itemKey={item.itemKey}
+                getAssetById={getAssetById}
+                getPositionType={getPositionType}
+                handleChangeCollateralButtonClick={handleChangeCollateralButtonClick}
+                handleClosePositionButtonClick={handleClosePositionButtonClick}
+                getAssetDetails={getAssetDetails}
+                parseTokenValue={parseTokenValue}
+                calculateLeverage={calculateLeverage}
+                marginConfigTokens={marginConfigTokens}
+                assets={assets}
+                filterTitle={filterTitle}
+                onPLNChange={handlePLNChange}
               />
-            )}
-            {isClosePositionModalOpen && (
-              <ClosePositionMobile
-                open={isClosePositionModalOpen}
-                onClose={(e) => {
-                  // e.preventDefault();
-                  // e.stopPropagation();
-                  setIsClosePositionMobileOpen(false);
-                }}
-                extraProps={closePositionModalProps}
-              />
-            )}
-          </>
-        )}
-        {isSelectedMobileTab === "history" && <div>history</div>}
-        {!filterTitle &&
-          accountSupplied.filter((token) => {
-            const assetDetails = getAssetById(token.token_id);
-            return assetDetails.metadata.decimals >= assetDetails.config.extra_decimals;
-          }).length > 0 && (
-            <div
-              className="fixed rounded-t-xl bottom-0 left-0 right-0 z-50 bg-gray-1300 pt-[18px] px-[32px] pb-[52px] w-full"
-              style={{
-                boxShadow:
-                  "0px -5px 12px 0px #0000001A, 0px -21px 21px 0px #00000017, 0px -47px 28px 0px #0000000D, 0px -84px 33px 0px #00000003, 0px -131px 37px 0px #00000000",
-              }}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-lg">Account</p>
-                <div className="flex items-center" onClick={handleAccountDetailsClick}>
-                  <p className="text-base text-gray-300 mr-2">Detail</p>
-                  <MarginAccountDetailIcon
-                    className={`transform ${isAccountDetailsOpen ? "rotate-180" : ""}`}
-                  />
+            ))
+          ) : (
+            <tr>
+              <td colSpan={100}>
+                <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+                  Your open positions will appear here
                 </div>
-              </div>
-              {isAccountDetailsOpen ||
-                (selectedTab === "account" && (
-                  <div className="h-[50vh] overflow-y-auto -ml-[32px] -mr-[32px]">
-                    <table className="w-full text-left">
-                      <thead className="border-b border-gray-1350">
-                        <tr className="text-gray-300 text-sm font-normal">
-                          <th className="pb-[14px] pl-[30px]">Token</th>
-                          <th className="pb-[14px]">Balance</th>
-                          <th className="pb-[14px] text-right pr-[32px]">Value</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {accountSupplied.filter((token) => {
-                          const assetDetails = getAssetById(token.token_id);
-                          return (
-                            token.balance.toString().length >= assetDetails.config.extra_decimals
-                          );
-                        }).length > 0 ? (
-                          accountSupplied.map((token, index) => {
-                            const assetDetails = getAssetById(token.token_id);
-                            const marginAssetDetails = getAssetDetails(assetDetails);
-                            if (
-                              token.balance.toString().length < assetDetails.config.extra_decimals
-                            ) {
-                              return null;
-                            }
-                            return (
-                              <tr key={index} className="text-sm hover:bg-dark-100 font-normal ">
-                                <td className="pb-[10px] pl-[30px] pt-[10px]">
-                                  <div className="flex items-center">
-                                    <img
-                                      src={assetDetails.metadata.icon}
-                                      alt=""
-                                      className="w-[26px] h-[26px] rounded-2xl"
-                                    />
-                                    <div className="ml-2">
-                                      <p className="text-sm"> {assetDetails.metadata.symbol}</p>
-                                      <p className="text-xs text-gray-300 -mt-0.5">
-                                        {assetDetails.price
-                                          ? `$${toInternationalCurrencySystem_number(
-                                              assetDetails.price,
-                                            )}`
-                                          : "/"}
-                                      </p>
-                                    </div>
-                                  </div>
-                                </td>
-                                <td>
-                                  {toInternationalCurrencySystem_number(
-                                    parseTokenValue(token.balance, marginAssetDetails.decimals),
-                                  )}
-                                </td>
-                                <td className="text-right pr-[32px]">
-                                  {marginAssetDetails.price
-                                    ? `$${toInternationalCurrencySystem_number(
-                                        parseTokenValue(
-                                          token.balance,
-                                          marginAssetDetails.decimals,
-                                        ) * marginAssetDetails.price,
-                                      )}`
-                                    : "/"}
-                                </td>
-                              </tr>
-                            );
-                          })
-                        ) : (
-                          <tr>
-                            <td colSpan={4}>
-                              <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
-                                No data
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                ))}
-              <div
-                className="w-full bg-primary bg-opacity-5 text-primary h-[36px] rounded-md border border-marginWithdrawAllBtn flex items-center justify-center"
-                onClick={handleWithdrawAllClick}
-              >
-                {isLoadingWithdraw ? <BeatLoader size={5} color="#C0C4E9" /> : "Withdraw all"}
+              </td>
+            </tr>
+          )}
+          {isChangeCollateralMobileOpen && (
+            <ChangeCollateralMobile
+              open={isChangeCollateralMobileOpen}
+              onClose={(e) => {
+                // e.preventDefault();
+                // e.stopPropagation();
+                setIsChangeCollateralMobileOpen(false);
+              }}
+              rowData={selectedRowData}
+              collateralTotal={totalCollateral}
+            />
+          )}
+          {isClosePositionModalOpen && (
+            <ClosePositionMobile
+              open={isClosePositionModalOpen}
+              onClose={(e) => {
+                // e.preventDefault();
+                // e.stopPropagation();
+                setIsClosePositionMobileOpen(false);
+              }}
+              extraProps={closePositionModalProps}
+            />
+          )}
+          <div className="flex items-center justify-center mt-4">
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => {
+              if (
+                page === 1 ||
+                page === totalPages ||
+                (page >= currentPage - 1 && page <= currentPage + 1)
+              ) {
+                return (
+                  <button
+                    type="button"
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
+                      currentPage === page ? "font-bold bg-dark-1200 bg-opacity-30" : ""
+                    }`}
+                  >
+                    {page}
+                  </button>
+                );
+              }
+              if (page === 2 && currentPage > 3) {
+                return <span key={page}>...</span>;
+              }
+              if (page === totalPages - 1 && currentPage < totalPages - 2) {
+                return <span key={page}>...</span>;
+              }
+              return null;
+            })}
+            <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
+            <input
+              className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
+              type="text"
+              value={inputPage}
+              onChange={(e) => {
+                const { value } = e.target;
+                if (value === "" || (Number.isInteger(Number(value)) && !value.includes("."))) {
+                  setInputPage(value);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  const pageNumber = Number(inputPage);
+                  handlePageJump(pageNumber);
+                }
+              }}
+            />
+          </div>
+        </div>
+        <div className={isSelectedMobileTab === "history" ? "" : "hidden"}>history</div>
+        {!filterTitle && filteredAccountSupplied.length > 0 && (
+          <div
+            className="fixed rounded-t-xl bottom-0 left-0 right-0 z-50 bg-gray-1300 pt-[18px] px-[32px] pb-[52px] w-full"
+            style={{
+              boxShadow:
+                "0px -5px 12px 0px #0000001A, 0px -21px 21px 0px #00000017, 0px -47px 28px 0px #0000000D, 0px -84px 33px 0px #00000003, 0px -131px 37px 0px #00000000",
+            }}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-lg">Account</p>
+              <div className="flex items-center" onClick={handleAccountDetailsClick}>
+                <p className="text-base text-gray-300 mr-2">Detail</p>
+                <MarginAccountDetailIcon
+                  className={`transform ${isAccountDetailsOpen ? "rotate-180" : ""}`}
+                />
               </div>
             </div>
-          )}
+            {isAccountDetailsOpen && (
+              <div className="h-[50vh] overflow-y-auto -ml-[32px] -mr-[32px]">
+                <table className="w-full text-left">
+                  <thead className="border-b border-gray-1350">
+                    <tr className="text-gray-300 text-sm font-normal">
+                      <th className="pb-[14px] pl-[30px]">Token</th>
+                      <th className="pb-[14px]">Balance</th>
+                      <th className="pb-[14px] text-right pr-[32px]">Value</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredAccountSupplied.length > 0 ? (
+                      filteredAccountSupplied.map((token, index) => {
+                        const assetDetails = getAssetById(token.token_id);
+                        const marginAssetDetails = getAssetDetails(assetDetails);
+                        return (
+                          <tr key={index} className="text-sm hover:bg-dark-100 font-normal ">
+                            <td className="pb-[10px] pl-[30px] pt-[10px]">
+                              <div className="flex items-center">
+                                <img
+                                  src={assetDetails.metadata.icon}
+                                  alt=""
+                                  className="w-[26px] h-[26px] rounded-2xl"
+                                />
+                                <div className="ml-2">
+                                  <p className="text-sm"> {assetDetails.metadata.symbol}</p>
+                                  <p className="text-xs text-gray-300 -mt-0.5">
+                                    {marginAssetDetails.price
+                                      ? `$${toInternationalCurrencySystem_number(
+                                          marginAssetDetails.price,
+                                        )}`
+                                      : "/"}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              {toInternationalCurrencySystem_number(
+                                parseTokenValue(token.balance, marginAssetDetails.decimals),
+                              )}
+                            </td>
+                            <td className="text-right pr-[32px]">
+                              {marginAssetDetails.price
+                                ? `$${toInternationalCurrencySystem_number(
+                                    parseTokenValue(token.balance, marginAssetDetails.decimals) *
+                                      marginAssetDetails.price,
+                                  )}`
+                                : "/"}
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan={4}>
+                          <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+                            No data
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            <div
+              className="w-full bg-primary bg-opacity-5 text-primary h-[36px] rounded-md border border-marginWithdrawAllBtn flex items-center justify-center"
+              onClick={handleWithdrawAllClick}
+            >
+              {isLoadingWithdraw ? <BeatLoader size={5} color="#C0C4E9" /> : "Withdraw all"}
+            </div>
+          </div>
+        )}
+        {isAccountDetailsOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 overflow-hidden"
+            onClick={handleAccountDetailsClick}
+          />
+        )}
       </div>
-      {isAccountDetailsOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 overflow-hidden"
-          onClick={handleAccountDetailsClick}
-        />
-      )}
     </div>
   );
 };

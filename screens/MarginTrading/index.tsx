@@ -42,8 +42,8 @@ const MarginTrading = () => {
         </div>
       </div>
 
-      {activeTab === "market" && <MarketMarginTrading />}
-      {activeTab === "my" && <MyMarginTrading />}
+      <MarketMarginTrading hidden={activeTab !== "market"} />
+      <MyMarginTrading hidden={activeTab !== "my"} />
     </LayoutBox>
   );
 };
