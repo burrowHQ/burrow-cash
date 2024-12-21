@@ -6,7 +6,7 @@ import BookTokenSvg from "../../../../public/svg/Group 74.svg";
 import BookTokenMobileSvg from "../../../../public/svg/Group 75.svg";
 import MyMarginTradingPage from "./MyTradingPage";
 
-const MyMarginTrading = () => {
+const MyMarginTrading = ({ hidden }) => {
   const accountId = useAccountId();
   const isMobile = isMobileDevice();
   let overviewNode;
@@ -38,7 +38,11 @@ const MyMarginTrading = () => {
       </div>
     );
   }
-  return <div className="flex flex-col items-center justify-center w-full">{overviewNode}</div>;
+  return (
+    <div className={hidden ? "hidden" : "flex flex-col items-center justify-center w-full"}>
+      {overviewNode}
+    </div>
+  );
 };
 
 export default MyMarginTrading;
