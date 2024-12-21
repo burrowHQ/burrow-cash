@@ -40,7 +40,8 @@ const TradingOperate = () => {
     ReduxcategoryCurrentBalance2,
     ReduxSlippageTolerance,
   } = useAppSelector((state) => state.category);
-
+  const [slippageTolerance, setSlippageTolerance] = useState(0.5);
+  const [showFeeModal, setShowFeeModal] = useState(false);
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState("long");
 
@@ -69,11 +70,6 @@ const TradingOperate = () => {
   const balance = useAppSelector(getAccountBalance);
   const accountId = useAppSelector(getAccountId);
 
-  const getTokenSymbol = (assetId) => {
-    if (!assetId?.token_id) return "";
-    const asset = assets.data[assetId.token_id];
-    return asset?.metadata.symbol === "wNEAR" ? "NEAR" : asset?.metadata.symbol || "";
-  };
   const getTokenSymbolOnly = (assetId) => {
     return assetId === "wNEAR" ? "NEAR" : assetId || "";
   };
@@ -121,7 +117,7 @@ const TradingOperate = () => {
   useEffect(() => {
     dispatch(setSlippageToleranceFromRedux(0.5));
   }, []);
-  const [slippageTolerance, setSlippageTolerance] = useState(0.5);
+
   const handleSetUpOptionClick = (option) => {
     setSelectedSetUpOption(option);
     if (option === "auto") {
@@ -201,21 +197,11 @@ const TradingOperate = () => {
 
   // validate input
   const isValidInput = (value: string): boolean => {
-    //
     if (value === "") return true;
-
-    //
     const regex = /^\d*\.?\d*$/;
     if (!regex.test(value)) return false;
-
-    //
     const num = parseFloat(value);
     if (Number.isNaN(num)) return false;
-
-    //
-    // const decimals = value.includes(".") ? value.split(".")[1].length : 0;
-    // if (decimals > 18) return false;
-
     return true;
   };
 
@@ -279,44 +265,23 @@ const TradingOperate = () => {
   useEffect(() => {
     if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
       const assetC = getAssetById(ReduxcategoryAssets2?.token_id);
-      const assetD =
-        activeTab === "long"
-          ? getAssetById(ReduxcategoryAssets2?.token_id)
-          : getAssetById(ReduxcategoryAssets1?.token_id);
-      const assetP =
-        activeTab === "long"
-          ? getAssetById(ReduxcategoryAssets1?.token_id)
-          : getAssetById(ReduxcategoryAssets2?.token_id);
-
-      const { price: priceD, decimals: decimalsD } = getAssetDetails(assetD);
-      const { price: priceC, decimals: decimalsC } = getAssetDetails(assetC);
-      const { price: priceP, decimals: decimalsP } = getAssetDetails(assetP);
-
+      const { decimals: decimalsC } = getAssetDetails(assetC);
       let liqPriceX = 0;
+
       if (rangeMount > 1) {
-        if (activeTab == "long") {
-          const k1 = Number(longInput) * rangeMount * (getAssetPrice(ReduxcategoryAssets2) as any);
-          const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
-          liqPriceX = (k1 / k2 - Number(longInput)) / longOutput;
-        } else {
-          liqPriceX =
-            (((Number(shortInput) +
-              Number(shrinkToken(estimateData?.min_amount_out, decimalsC))) as any) *
-              (getAssetPrice(ReduxcategoryAssets2) as any) *
-              (1 - marginConfigTokens.min_safety_buffer / 10000)) /
-            shortOutput;
+        const safetyBufferFactor = 1 - marginConfigTokens.min_safety_buffer / 10000;
+        const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
+
+        if (activeTab === "long" && longInput) {
+          const k1 = Number(longInput) * rangeMount * assetPrice;
+          liqPriceX = (k1 / safetyBufferFactor - Number(longInput)) / longOutput;
+        } else if (activeTab === "short" && shortInput) {
+          const adjustedShortInput =
+            Number(shortInput) + Number(shrinkToken(estimateData?.min_amount_out, decimalsC));
+          liqPriceX = (adjustedShortInput * assetPrice * safetyBufferFactor) / shortOutput;
         }
       }
-      if (activeTab == "long") {
-        if (!longInput) {
-          liqPriceX = 0;
-        }
-      }
-      if (activeTab == "short") {
-        if (!shortInput) {
-          liqPriceX = 0;
-        }
-      }
+
       setLiqPrice(liqPriceX);
     }
   }, [longOutput, shortOutput]);
@@ -348,8 +313,6 @@ const TradingOperate = () => {
     };
   }, [longInput, shortInput, ReduxcategoryAssets1, estimateData, tokenInAmount]);
 
-  const [showFeeModal, setShowFeeModal] = useState(false);
-
   function getAssetPrice(categoryId) {
     return categoryId ? assets.data[categoryId["token_id"]].price?.usd : 0;
   }
@@ -359,7 +322,6 @@ const TradingOperate = () => {
      * @param inputUsdCharcate  category1 current price
      */
     const input = tab === "long" ? longInput : shortInput;
-    const inputUsd = tab === "long" ? longInputUsd : shortInputUsd;
     // set output
     const outputSetter = tab === "long" ? setLongOutput : setShortOutput;
     // set output usd
@@ -387,8 +349,6 @@ const TradingOperate = () => {
     const input = tab === "long" ? longInput : shortInput;
     const inputAmount = input ? Number(input) : 0;
     const openFeeAmount = (inputAmount * config.open_position_fee_rate) / 10000;
-    // console.log(inputAmount, openFeeAmount, rangeMount, inputUsdCharcate2);
-    // const adjustedInputAmount = (inputAmount - openFeeAmount) * inputUsdCharcate2 * rangeMount;
     const adjustedInputAmount =
       inputAmount * inputUsdCharcate2 * rangeMount - openFeeAmount * inputUsdCharcate2;
     const inputUsdSetter = tab === "long" ? setLongInputUsd : setShortInputUsd;
