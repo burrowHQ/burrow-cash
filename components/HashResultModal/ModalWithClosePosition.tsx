@@ -30,7 +30,7 @@ const ModalWithFailure = ({
   const [countdown, setCountdown] = useState(10);
   const [progress, setProgress] = useState(100);
 
-  // 使用 useRef 来存储 timer
+  //
   const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const ModalWithFailure = ({
       setIsModalVisible(true);
       startCountdown();
     } else {
-      // 使用 setTimeout 来延迟隐藏模态框
+      //
       const hideTimeout = setTimeout(() => {
         setIsModalVisible(false);
         clearTimeoutOrInterval(countdownTimerRef.current);
@@ -58,7 +58,7 @@ const ModalWithFailure = ({
   };
 
   const hideModal = () => {
-    // 使用 setTimeout 来避免同步卸载
+    //
     setTimeout(() => {
       setIsModalVisible(false);
       onClose();
