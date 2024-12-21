@@ -131,7 +131,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
       HPFee: leverageD * priceD * (uahpi * 1 - uahpi_at_open * 1),
       swapFee:
         ((estimateData?.fee ?? 0) / 10000) *
-        Number(tokenInAmount) *
+        +shrinkToken(tokenInAmount || "0", assetP.metadata.decimals) *
         (actionShowRedColor ? 1 : priceD || 0),
     };
   }, [collateral, ReduxcategoryAssets1, estimateData]);
