@@ -895,8 +895,11 @@ const PositionRow = ({
           </div>
         </div>
       </td>
-      <td title={`$${entryPrice?.toString()}`} className="cursor-default">
-        {entryPrice !== null ? (
+      <td
+        title={entryPrice !== null && entryPrice !== undefined ? `$${entryPrice}` : ""}
+        className="cursor-default"
+      >
+        {entryPrice !== null && entryPrice !== undefined ? (
           `$${toInternationalCurrencySystem_number(entryPrice)}`
         ) : (
           <span className="text-gray-500">-</span>
@@ -1116,7 +1119,7 @@ const PositionMobileRow = ({
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Entry Price</p>
-          <p title={entryPrice?.toString()}>
+          <p title={entryPrice !== null && entryPrice !== undefined ? `$${entryPrice}` : ""}>
             {entryPrice !== null ? (
               `$${toInternationalCurrencySystem_number(entryPrice)}`
             ) : (
