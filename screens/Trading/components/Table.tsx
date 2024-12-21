@@ -895,17 +895,17 @@ const PositionRow = ({
           </div>
         </div>
       </td>
-      <td title={entryPrice?.toString()} className="cursor-default">
+      <td title={`$${entryPrice?.toString()}`} className="cursor-default">
         {entryPrice !== null ? (
           `$${toInternationalCurrencySystem_number(entryPrice)}`
         ) : (
           <span className="text-gray-500">-</span>
         )}
       </td>
-      <td title={indexPrice?.toString()} className="cursor-default">
+      <td title={`$${indexPrice?.toString()}`} className="cursor-default">
         ${toInternationalCurrencySystem_number(indexPrice)}
       </td>
-      <td title={LiqPrice?.toString()} className="cursor-default">
+      <td title={`$${LiqPrice?.toString()}`} className="cursor-default">
         ${toInternationalCurrencySystem_number(LiqPrice)}
       </td>
       <td>
