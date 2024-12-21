@@ -731,12 +731,12 @@ const TradingTable = ({
             </div>
           </div>
         )}
-        {isAccountDetailsOpen && (
+        {/* {isAccountDetailsOpen && (
           <div
             className="fixed inset-0 bg-black bg-opacity-50 z-40 overflow-hidden"
             onClick={handleAccountDetailsClick}
           />
-        )}
+        )} */}
       </div>
     </div>
   );
