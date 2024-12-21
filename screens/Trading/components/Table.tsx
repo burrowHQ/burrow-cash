@@ -895,15 +895,19 @@ const PositionRow = ({
           </div>
         </div>
       </td>
-      <td>
+      <td title={entryPrice?.toString()} className="cursor-default">
         {entryPrice !== null ? (
           `$${toInternationalCurrencySystem_number(entryPrice)}`
         ) : (
           <span className="text-gray-500">-</span>
         )}
       </td>
-      <td>${toInternationalCurrencySystem_number(indexPrice)}</td>
-      <td>${toInternationalCurrencySystem_number(LiqPrice)}</td>
+      <td title={indexPrice?.toString()} className="cursor-default">
+        ${toInternationalCurrencySystem_number(indexPrice)}
+      </td>
+      <td title={LiqPrice?.toString()} className="cursor-default">
+        ${toInternationalCurrencySystem_number(LiqPrice)}
+      </td>
       <td>
         <span className="text-primary">
           {entryPrice !== null ? (
@@ -1112,7 +1116,7 @@ const PositionMobileRow = ({
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Entry Price</p>
-          <p>
+          <p title={entryPrice?.toString()}>
             {entryPrice !== null ? (
               `$${toInternationalCurrencySystem_number(entryPrice)}`
             ) : (
@@ -1122,11 +1126,11 @@ const PositionMobileRow = ({
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Index Price</p>
-          <p>${toInternationalCurrencySystem_number(indexPrice)}</p>
+          <p title={indexPrice?.toString()}>${toInternationalCurrencySystem_number(indexPrice)}</p>
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Liq. Price</p>
-          <p>${toInternationalCurrencySystem_number(LiqPrice)}</p>
+          <p title={LiqPrice?.toString()}>${toInternationalCurrencySystem_number(LiqPrice)}</p>
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Opening time</p>
