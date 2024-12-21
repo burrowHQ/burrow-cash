@@ -111,7 +111,7 @@ const getConfig = (env: string = defaultNetwork) => {
         nodeUrl: RPC_LIST[endPoint].url,
         walletUrl: "https://wallet.testnet.near.org",
         helperUrl: "https://helper.testnet.near.org",
-        explorerUrl: "https://explorer.testnet.near.org",
+        explorerUrl: "https://testnet.nearblocks.io",
         liquidationUrl: "https://dev.data-service.ref-finance.com",
         recordsUrl: "https://dev-indexer.ref-finance.com",
         txIdApiUrl: "https://api-testnet.nearblocks.io",
