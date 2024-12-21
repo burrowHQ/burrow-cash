@@ -175,11 +175,11 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     const accruedInterest = new Decimal(assetD.borrow_apr).mul(dAmount).div(365 * 24 * 60 * 5);
     const totalHpFee = get_total_hp_fee();
     const totalHpFeeBeforeOnCHain = new Decimal(totalHpFee).mul(2);
+    const slippage = Number(ReduxSlippageTolerance) / 100;
+    const min_amount_out = accruedInterest.plus(totalHpFeeBeforeOnCHain).plus(dAmount);
+    const amountOut = min_amount_out.div(1 - slippage);
     const res = await findPathReserve({
-      amountOut: accruedInterest
-        .plus(totalHpFeeBeforeOnCHain)
-        .plus(dAmount)
-        .toFixed(0, Decimal.ROUND_UP),
+      amountOut: amountOut.toFixed(0, Decimal.ROUND_UP),
       tokenIn: item.token_p_id,
       tokenOut: item.token_d_info.token_id,
       slippage: Number(ReduxSlippageTolerance) / 100,
