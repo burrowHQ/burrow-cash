@@ -702,3 +702,24 @@ export const ArrowRight = (props: any) => {
     </svg>
   );
 };
+
+export const TransactionSuccessfulIcon = (props: any) => {
+  return (
+    <svg
+      {...props}
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="8" cy="8" r="8" fill="#7FCE00" />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M11.5611 5.43047C11.8756 5.74078 11.879 6.2473 11.5687 6.56182L7.0578 11.1338L4.43482 8.52279C4.12169 8.21108 4.12054 7.70455 4.43225 7.39142C4.74395 7.07829 5.25048 7.07714 5.56361 7.38884L7.04759 8.86607L10.4297 5.43809C10.74 5.12357 11.2466 5.12016 11.5611 5.43047Z"
+        fill="white"
+      />
+    </svg>
+  );
+};

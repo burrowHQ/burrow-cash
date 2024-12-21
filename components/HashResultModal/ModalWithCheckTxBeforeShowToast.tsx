@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { CloseIcon } from "../Icons/Icons";
+import { CloseIcon, TransactionSuccessfulIcon } from "../Icons/Icons";
 import { FilledIcon } from "./ModalWithCountdown";
 import { toInternationalCurrencySystem_number } from "../../utils/uiNumber";
 import getConfig, { defaultNetwork } from "../../utils/config";
@@ -70,7 +70,7 @@ const ModalWithCheckTxBeforeShowToast = ({ show, onClose, txHash }: ShowChangeCo
     <div>
       {isModalVisible && (
         <div className="z-50 fixed lg:right-5 bottom-10 lg:w-93 xsm:w-[94vw] xsm:ml-[3vw] bg-dark-100 text-white  border border-gray-1250 rounded-sm">
-          <div className="relatvie w-full h-full p-6 flex flex-col justify-between">
+          <div className="relatvie w-full h-full p-4 flex flex-col justify-between">
             <div
               onClick={hideModal}
               className="absolute rounded-full bg-gray-1250 p-1.5 frcc cursor-pointer hover:opacity-90"
@@ -78,9 +78,10 @@ const ModalWithCheckTxBeforeShowToast = ({ show, onClose, txHash }: ShowChangeCo
             >
               <CloseIcon />
             </div>
-            <div className="fc mb-5">
+            <div className="fc mb-1">
               <div className="fc">
-                <span className="font-normal text-base pr-2"> Transaction successful</span>
+                <TransactionSuccessfulIcon />
+                <span className="font-normal text-base ml-2"> Transaction successful</span>
               </div>
               <div className="text-[#6FA300] text-sm ml-auto flex items-center">
                 <span className="mr-1">Filled</span>
@@ -89,7 +90,7 @@ const ModalWithCheckTxBeforeShowToast = ({ show, onClose, txHash }: ShowChangeCo
             </div>
             {txHash ? (
               <span
-                className="inline-flex decoration-1 hover:text-white text-base text-gray-60  mt-1 cursor-pointer underline"
+                className="inline-flex decoration-1 hover:text-white text-base text-gray-60  cursor-pointer underline"
                 style={{
                   textDecorationThickness: "1px",
                   paddingLeft: "24px",

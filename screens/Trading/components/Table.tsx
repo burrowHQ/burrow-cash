@@ -134,15 +134,19 @@ const TradingTable = ({
       onTotalPLNChange(totalPLN);
     }
   }, [totalPLN]);
+  const filteredAccountSupplied = accountSupplied.filter((token) => {
+    const assetDetails = getAssetById(token.token_id);
+    return token.balance.toString().length >= assetDetails.config.extra_decimals;
+  });
   const handleWithdrawAllClick = async () => {
     setIsLoadingWithdraw(true);
-    const accountSuppliedIds = accountSupplied.map((asset) => asset.token_id);
+    const accountSuppliedIds = filteredAccountSupplied.map((asset) => asset.token_id);
     try {
       const result = await withdrawActionsAll(accountSuppliedIds);
-      console.log("result", result);
-      // if (result !== undefined && result !== null) {
-      //   // showCheckTxBeforeShowToast({ txHash: result.txHash });
-      // }
+      if (result !== undefined && result !== null) {
+        showCheckTxBeforeShowToast({ txHash: result[0].transaction.hash });
+      }
+      localStorage.setItem("marginTransactionType", "claimRewards");
     } catch (error) {
       console.error("Withdraw failed:", error);
     } finally {
@@ -182,10 +186,6 @@ const TradingTable = ({
       setCurrentPage(pageNumber);
     }
   };
-  const filteredAccountSupplied = accountSupplied.filter((token) => {
-    const assetDetails = getAssetById(token.token_id);
-    return token.balance.toString().length >= assetDetails.config.extra_decimals;
-  });
   return (
     <div className="flex flex-col items-center justify-center w-full xsm:mx-2">
       {/* pc */}

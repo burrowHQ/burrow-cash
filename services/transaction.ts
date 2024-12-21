@@ -5,6 +5,7 @@ import {
   showPositionClose,
   showPositionFailure,
   showChangeCollateralPosition,
+  showCheckTxBeforeShowToast,
 } from "../components/HashResultModal";
 import { useMarginConfigToken } from "../hooks/useMarginConfig";
 
@@ -61,7 +62,10 @@ export const handleTransactionResults = async (
             symbol: collateralInfo.symbol,
             collateral: collateralInfo.addedValue,
           });
-          // localStorage.removeItem("marginTransactionType");
+          return;
+        }
+        if (marginTransactionType === "claimRewards") {
+          showCheckTxBeforeShowToast({ txHash: result.transaction.hash });
           return;
         }
         if (hasStorageDeposit) {
