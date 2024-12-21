@@ -340,6 +340,17 @@ const TradingOperate = () => {
     return () => clearInterval(interval);
   }, [tokenInAmount, lastTokenInAmount]);
 
+  // for same input, estimateLoading is true
+  useEffect(() => {
+    if (estimateLoading) {
+      const timer = setTimeout(() => {
+        setEstimateLoading(false);
+      }, 5000); // 5 seconds
+
+      return () => clearTimeout(timer); // Cleanup the timer on component unmount or when estimateLoading changes
+    }
+  }, [estimateLoading]);
+
   const Fee = useMemo(() => {
     return {
       openPFee: ((Number(longInput || shortInput) * config.open_position_fee_rate) / 10000) * 1,
