@@ -2,7 +2,14 @@ import React, { useMemo, useState, useEffect } from "react";
 import _, { range } from "lodash";
 import { BeatLoader } from "react-spinners";
 import TradingToken from "./tokenbox";
-import { RefLogoIcon, SetUp, ShrinkArrow, errorTipsIcon, MaxPositionIcon } from "./TradingIcon";
+import {
+  RefLogoIcon,
+  SetUp,
+  ShrinkArrow,
+  errorTipsIcon,
+  MaxPositionIcon,
+  RefreshIcon,
+} from "./TradingIcon";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import RangeSlider from "./RangeSlider";
 import ConfirmMobile from "./ConfirmMobile";
@@ -43,6 +50,7 @@ const TradingOperate = () => {
   } = useAppSelector((state) => state.category);
   const [slippageTolerance, setSlippageTolerance] = useState(0.5);
   const [showFeeModal, setShowFeeModal] = useState(false);
+  const [forceUpdateLoading, setForceUpdateLoading] = useState(false);
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState("long");
   const [estimateLoading, setEstimateLoading] = useState(false);
@@ -226,9 +234,7 @@ const TradingOperate = () => {
       return;
     }
     setEstimateLoading(true);
-    // 验证输入值
     if (!isValidInput(value)) return;
-    // 处理输入变化
     if (value.includes(".") && !lastValue.includes(".")) {
       inputPriceChange.cancel();
       setTimeout(() => {
@@ -262,22 +268,23 @@ const TradingOperate = () => {
     slippageTolerance,
     forceUpdate,
     tokenInAmount,
+    activeTab, // Add activeTab to dependencies if needed
+    ReduxcategoryAssets1,
   ]);
 
   // update token in amount
-  useEffect(() => {
-    const inputUsdCharcate1 = getAssetPrice(ReduxcategoryAssets1);
-    if (inputUsdCharcate1 && estimateData) {
-      updateOutput(activeTab, inputUsdCharcate1);
-    }
-  }, [tokenInAmount, activeTab, estimateData, ReduxcategoryAssets1]);
+  // useEffect(() => {
+  //   const inputUsdCharcate1 = getAssetPrice(ReduxcategoryAssets1);
+  //   if (inputUsdCharcate1 && estimateData) {
+  //     updateOutput(activeTab, inputUsdCharcate1);
+  //   }
+  // }, [tokenInAmount, activeTab, estimateData, ReduxcategoryAssets1]);
 
   // update liq price for short
   useEffect(() => {
     if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
       const assetC = getAssetById(ReduxcategoryAssets2?.token_id);
       let liqPriceX = 0;
-
       if (rangeMount > 1) {
         const safetyBufferFactor = 1 - marginConfigTokens.min_safety_buffer / 10000;
         const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
@@ -289,8 +296,10 @@ const TradingOperate = () => {
           liqPriceX = (adjustedShortInput * assetPrice * safetyBufferFactor) / shortOutput;
         }
       }
+      if (activeTab === "short") {
+        setLiqPrice(liqPriceX);
+      }
       setEstimateLoading(false);
-      setLiqPrice(liqPriceX);
     }
   }, [estimateData]);
 
@@ -308,8 +317,10 @@ const TradingOperate = () => {
           liqPriceX = (k1 / safetyBufferFactor - Number(longInput) * assetPrice) / longOutput;
         }
       }
+      if (activeTab === "long") {
+        setLiqPrice(liqPriceX);
+      }
       setEstimateLoading(false);
-      setLiqPrice(liqPriceX);
     }
   }, [longOutput]);
 
@@ -324,7 +335,7 @@ const TradingOperate = () => {
       } else {
         setLastTokenInAmount(tokenInAmount);
       }
-    }, 20000);
+    }, 20_000);
 
     return () => clearInterval(interval);
   }, [tokenInAmount, lastTokenInAmount]);
@@ -405,7 +416,7 @@ const TradingOperate = () => {
 
   const formatDecimal = (value: number) => {
     if (!value) return "0";
-    // 移除末尾的0和不必要的小数点
+    //
     return value.toFixed(6).replace(/\.?0+$/, "");
   };
 
@@ -427,9 +438,21 @@ const TradingOperate = () => {
             Short {cateSymbol}
           </div>
         </div>
+        <div />
+        {/* <div
+          className="cursor-pointer border border-dark-500 rounded-md p-[8px] flex items-center justify-center"
+          onClick={() => {
+            setForceUpdate((prev) => prev + 1);
+            setForceUpdateLoading(true);
+          }}
+        >
+          <RefreshIcon
+            className={` hover:text-white ${forceUpdateLoading ? "text-white" : "text-gray-300"}`}
+          />
+        </div> */}
         {/* slip start */}
         <div className="relative z-40 cursor-pointer slip-fater">
-          <SetUp />
+          <SetUp className="text-gray-300 hover:text-white" />
 
           <div className="slip-child absolute top-8 right-0 bg-dark-250 border border-dark-500 rounded-md py-6 px-4">
             <p className="text-base mb-6">Max. Slippage Setting</p>
@@ -550,14 +573,6 @@ const TradingOperate = () => {
                   >
                     ${beautifyPrice(Number(formatDecimal(Fee.swapFee + Fee.openPFee)))}
                   </p>
-                  {/* {cateSymbol} */}
-                  {/* <span className="text-xs text-gray-300 ml-1.5">
-                    ($
-                    {formatDecimal(
-                      (Fee.swapFee + Fee.openPFee) * (Fee.price || 0) * (longOutput || shortOutput),
-                    )}
-                    )
-                  </span> */}
 
                   {showFeeModal && (
                     <div className="absolute bg-[#14162B] text-white min-h-[50px] p-2 rounded text-xs top-[30px] left-[-60px] flex flex-col items-start justify-between z-[1] w-auto">
@@ -573,42 +588,7 @@ const TradingOperate = () => {
                   )}
                 </div>
               </div>
-              {/* <div className="flex items-baseline justify-between text-sm mb-4">
-                <div className="text-gray-300 flex items-center">
-                  <RefLogoIcon />
-                  <span className="ml-2">Route</span>
-                </div>
-                <div className="flex flex-col justify-end">
-                  {!isDisabled &&
-                    estimateData?.tokensPerRoute.map((item: any[], index: React.Key | null | undefined) => {
-                      return (
-                        <div key={index} className="flex mb-2 items-center">
-                          {item.map((ite, ind) => {
-                            return (
-                              <React.Fragment key={`${ite.symbol}-${ind}`}>
-                                {ind === 0 && (
-                                  <>
-                                    <div className="bg-opacity-10  text-xs py-0.5 pl-2.5 pr-1.5 rounded  bg-primary text-primary">{`${percentList[index]}%`}</div>
-                                    <span className="mx-2">|</span>
-                                  </>
-                                )}
-                                <div className="flex items-center">
-                                  <span>{ite.symbol === "wNEAR" ? "NEAR" : ite.symbol}</span>
-                                  {ind + 1 < estimateData?.tokensPerRoute[index].length ? (
-                                    <span className="mx-2">&gt;</span>
-                                  ) : (
-                                    ""
-                                  )}
-                                </div>
-                              </React.Fragment>
-                            );
-                          })}
-                        </div>
-                      );
-                    })}
-                </div>
-              </div>
-              {/* <div className=" text-red-150 text-xs font-normal">{estimateData?.swapError}</div> */}
+
               {isMaxPosition && accountId && (
                 <div className=" text-[#EA3F68] text-sm font-normal flex items-start my-1">
                   <MaxPositionIcon />
@@ -721,14 +701,6 @@ const TradingOperate = () => {
                   >
                     ${beautifyPrice(Number(formatDecimal(Fee.swapFee + Fee.openPFee)))}
                   </p>
-                  {/* {cateSymbol} */}
-                  {/* <span className="text-xs text-gray-300 ml-1.5">
-                    ($
-                    {formatDecimal(
-                      (Fee.swapFee + Fee.openPFee) * (Fee.price || 0) * (longOutput || shortOutput),
-                    )}
-                    )
-                  </span> */}
                   {showFeeModal && (
                     <div className="absolute bg-[#14162B] text-white h-[50px] p-2 rounded text-xs top-[30px] left-[-60px] flex flex-col items-start justify-between z-[1] w-auto">
                       <p>
@@ -743,56 +715,12 @@ const TradingOperate = () => {
                   )}
                 </div>
               </div>
-              {/* <div className="flex items-baseline justify-between text-sm mb-4">
-                <div className="text-gray-300 flex items-center">
-                  <RefLogoIcon />
-                  <span className="ml-2">Route</span>
-                </div>
-                <div className="flex flex-col justify-end">
-                  {!isDisabled &&
-                    estimateData?.tokensPerRoute.map((item, index) => {
-                      return (
-                        <div key={index} className="flex mb-2 items-center">
-                          {item.map((ite, ind) => {
-                            return (
-                              <React.Fragment key={`${ite.symbol}-${ind}`}>
-                                {ind === 0 && (
-                                  <>
-                                    <div className="bg-opacity-10  text-xs py-0.5 pl-2.5 pr-1.5 rounded  bg-red-50 text-red-50">{`${percentList[index]}%`}</div>
-                                    <span className="mx-2">|</span>
-                                  </>
-                                )}
-                                <div className="flex items-center">
-                                  <span>{ite.symbol === "wNEAR" ? "NEAR" : ite.symbol}</span>
-                                  {ind + 1 < estimateData?.tokensPerRoute[index].length ? (
-                                    <span className="mx-2">&gt;</span>
-                                  ) : (
-                                    ""
-                                  )}
-                                </div>
-                              </React.Fragment>
-                            );
-                          })}
-                        </div>
-                      );
-                    })}
-                </div>
-              </div> */}
-
               {isMaxPosition && accountId && (
                 <div className=" text-[#EA3F68] text-sm font-normal flex items-start my-1">
                   <MaxPositionIcon />
                   <span className="ml-1">Exceeded the maximum number of open positions.</span>
                 </div>
               )}
-              {/* <div
-                className={`flex items-center justify-between  text-dark-200 text-base rounded-md h-12 text-center  ${
-                  isDisabled ? "bg-slate-700 cursor-default" : "bg-red-50 cursor-pointer"
-                }`}
-                onClick={handleConfirmButtonClick}
-              >
-                <div className="flex-grow">Short NEAR {rangeMount}x</div>
-              </div> */}
               {accountId ? (
                 <RedSolidButton
                   className="w-full"
