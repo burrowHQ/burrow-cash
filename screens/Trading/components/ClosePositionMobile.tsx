@@ -189,7 +189,14 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
       item.token_p_amount,
       assetP.config.extra_decimals,
     ).toFixed(0, Decimal.ROUND_UP);
-    const requiredPAmountOnShort = Decimal.max(requiredPAmount, token_p_amount).toFixed(0);
+    const balance_c_plus_p = shrinkTokenDecimal(
+      new Decimal(item?.token_c_info?.balance || 0).plus(item.token_p_amount || 0).toFixed(0),
+      assetP.config.extra_decimals,
+    ).toFixed(0, Decimal.ROUND_DOWN);
+    const requiredPAmountOnShort = Decimal.min(
+      balance_c_plus_p,
+      Decimal.max(requiredPAmount, token_p_amount),
+    ).toFixed(0);
     return requiredPAmountOnShort;
   }
   function get_total_hp_fee() {
