@@ -23,6 +23,7 @@ import { MarginAccountDetailIcon, YellowBallIcon } from "../../TokenDetail/svg";
 import { useRouterQuery } from "../../../utils/txhashContract";
 import { handleTransactionHash, handleTransactionResults } from "../../../services/transaction";
 import { setAccountDetailsOpen, setSelectedTab } from "../../../redux/marginTabSlice";
+import { showCheckTxBeforeShowToast } from "../../../components/HashResultModal";
 
 const TradingTable = ({
   positionsList,
@@ -87,13 +88,6 @@ const TradingTable = ({
     );
   }, [query?.transactionHashes, query?.errorMessage]);
   useEffect(() => {
-    if (isAccountDetailsOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-  }, [isAccountDetailsOpen]);
-  useEffect(() => {
     fetchAssets();
   }, []);
   const fetchPositionHistory = async () => {
@@ -144,7 +138,11 @@ const TradingTable = ({
     setIsLoadingWithdraw(true);
     const accountSuppliedIds = accountSupplied.map((asset) => asset.token_id);
     try {
-      await withdrawActionsAll(accountSuppliedIds);
+      const result = await withdrawActionsAll(accountSuppliedIds);
+      console.log("result", result);
+      // if (result !== undefined && result !== null) {
+      //   // showCheckTxBeforeShowToast({ txHash: result.txHash });
+      // }
     } catch (error) {
       console.error("Withdraw failed:", error);
     } finally {

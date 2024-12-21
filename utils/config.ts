@@ -22,6 +22,7 @@ interface IAppConfig {
   recordsUrl: string;
   findPathUrl: string;
   indexUrl: string;
+  explorerUrl: string;
 }
 export const STABLE_POOL_IDS = [
   "4179",

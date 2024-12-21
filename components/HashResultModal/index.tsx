@@ -4,6 +4,7 @@ import ModalWithCountdown from "./ModalWithCountdown";
 import ModalWithFailure from "./ModalWithFailure";
 import ModalWithClosePosition from "./ModalWithClosePosition";
 import ModalWithChangeCollateral from "./ModalWithChangeCollateral";
+import ModalWithCheckTxBeforeShowToast from "./ModalWithCheckTxBeforeShowToast";
 
 interface ShowPositionResultParams {
   title?: string;
@@ -117,7 +118,7 @@ interface ShowChangeCollateralParams {
 export const showChangeCollateralPosition = (params: ShowChangeCollateralParams) => {
   if (!container) {
     container = document.createElement("div");
-    container.id = "change-collateral-container";
+    container.id = "position-result-container";
     document.body.appendChild(container);
     root = createRoot(container);
   }
@@ -135,4 +136,31 @@ export const showChangeCollateralPosition = (params: ShowChangeCollateralParams)
   };
 
   root?.render(<ModalWithChangeCollateral show onClose={handleClose} {...params} />);
+};
+
+interface ShowCheckTxBeforeShowToast {
+  txHash: string;
+}
+
+export const showCheckTxBeforeShowToast = (params: ShowCheckTxBeforeShowToast) => {
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "position-result-container";
+    document.body.appendChild(container);
+    root = createRoot(container);
+  }
+
+  const handleClose = () => {
+    if (root) {
+      root.unmount();
+    }
+    if (container) {
+      container.remove();
+      container = null;
+      root = null;
+    }
+    localStorage?.removeItem("marginTransactionType");
+  };
+
+  root?.render(<ModalWithCheckTxBeforeShowToast show onClose={handleClose} {...params} />);
 };
