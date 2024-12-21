@@ -166,20 +166,40 @@ const TradingTable = ({
   };
   const sortedPositionsList = React.useMemo<any[]>(() => {
     if (!sortBy) return positionsList;
+
+    // add itemKey
     const positionsArray = Object.entries(positionsList).map(([key, value]) => ({
       ...(value as Record<string, any>),
       itemKey: key,
     })) as any[];
-    return positionsArray.sort((a, b) => {
+
+    // if filterTitle
+    const filteredArray = filterTitle
+      ? positionsArray.filter((item) => {
+          const assetD = getAssetById(item.token_d_info.token_id);
+          const assetC = getAssetById(item.token_c_info.token_id);
+          const assetP = getAssetById(item.token_p_id);
+          const { symbol: symbolC } = getAssetDetails(assetC);
+          const { symbol: symbolP } = getAssetDetails(assetP);
+          const { symbol: symbolD } = getAssetDetails(assetD);
+          const positionType = getPositionType(item.token_d_info.token_id);
+          const marketTitle =
+            positionType.label === "Long" ? `${symbolP}/${symbolC}` : `${symbolD}/${symbolC}`;
+          return marketTitle === filterTitle;
+        })
+      : positionsArray;
+
+    // sort
+    return filteredArray.sort((a, b) => {
       const timeA = Number(a.open_ts);
       const timeB = Number(b.open_ts);
       return sortDirection === "asc" ? timeA - timeB : timeB - timeA;
     });
-  }, [positionsList, sortBy, sortDirection]);
+  }, [positionsList, sortBy, sortDirection, filterTitle]);
+  const totalPages = Math.ceil(sortedPositionsList.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = sortedPositionsList.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(sortedPositionsList.length / itemsPerPage);
   const handlePageJump = (newPage) => {
     const pageNumber = parseInt(newPage, 10);
     if (!Number.isNaN(pageNumber) && pageNumber > 0 && pageNumber <= totalPages) {
