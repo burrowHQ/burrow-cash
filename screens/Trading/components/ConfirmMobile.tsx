@@ -17,9 +17,10 @@ import { shrinkToken, expandToken } from "../../../store";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
 import { getAccountId } from "../../../redux/accountSelectors";
 import { useRouterQuery } from "../../../utils/txhashContract";
-import { handleTransactionResults } from "../../../services/transaction";
+import { handleTransactionResults, handleTransactionHash } from "../../../services/transaction";
 import { showPositionFailure } from "../../../components/HashResultModal";
 import { getBurrow } from "../../../utils";
+import DataSource from "../../../data/datasource";
 
 const getTokenSymbolOnly = (assetId) => {
   return assetId === "wNEAR" ? "NEAR" : assetId || "";
@@ -142,6 +143,20 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
         }
         return item.transaction.hash;
       });
+      const txHash = await handleTransactionHash(transactionHashes);
+      txHash
+        .filter((item) => !item.hasStorageDeposit)
+        .forEach(async (item) => {
+          try {
+            await DataSource.shared.getMarginTradingPosition({
+              addr: accountId,
+              process_type: "open",
+              tx_hash: item.txHash,
+            });
+          } catch (error) {
+            console.error("Failed to get margin trading position:", error);
+          }
+        });
 
       await handleTransactionResults(
         transactionHashes,

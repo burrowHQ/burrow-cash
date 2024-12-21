@@ -5,7 +5,6 @@ import {
   showPositionClose,
   showPositionFailure,
   showChangeCollateralPosition,
-  showCheckTxBeforeShowToast,
 } from "../components/HashResultModal";
 import { useMarginConfigToken } from "../hooks/useMarginConfig";
 
@@ -62,10 +61,7 @@ export const handleTransactionResults = async (
             symbol: collateralInfo.symbol,
             collateral: collateralInfo.addedValue,
           });
-          return;
-        }
-        if (marginTransactionType === "claimRewards") {
-          showCheckTxBeforeShowToast({ txHash: result.transaction.hash });
+          // localStorage.removeItem("marginTransactionType");
           return;
         }
         if (hasStorageDeposit) {
@@ -147,23 +143,23 @@ export const handleTransactionHash = async (
           if (isMarginExecute) {
             const args = parsedArgs(result?.transaction?.actions?.[0]?.FunctionCall?.args || "");
             const { actions } = JSON.parse(args || "");
-            hasStorageDeposit = !actions[0]?.CloseMTPosition;
+            hasStorageDeposit = Reflect.has(actions[0], "OpenPosition");
           }
 
           return { txHash, result, hasStorageDeposit };
         }),
       );
 
-      // 检查是否有任何一个交易的 hasStorageDeposit 为 false
-      const hasAnyFalseStorageDeposit = results.some((result) => !result.hasStorageDeposit);
+      // // 检查是否有任何一个交易的 hasStorageDeposit 为 false
+      // const hasAnyFalseStorageDeposit = results.some((result) => !result.hasStorageDeposit);
 
-      // 如果有任何一个为 false，则所有结果的 hasStorageDeposit 都设为 false
-      if (hasAnyFalseStorageDeposit) {
-        return results.map((result) => ({
-          ...result,
-          hasStorageDeposit: false,
-        }));
-      }
+      // // 如果有任何一个为 false，则所有结果的 hasStorageDeposit 都设为 false
+      // if (hasAnyFalseStorageDeposit) {
+      //   return results.map((result) => ({
+      //     ...result,
+      //     hasStorageDeposit: false,
+      //   }));
+      // }
 
       return results;
     } catch (error) {
