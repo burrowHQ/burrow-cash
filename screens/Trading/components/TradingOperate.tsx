@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
 import _, { range } from "lodash";
+import { BeatLoader } from "react-spinners";
 import TradingToken from "./tokenbox";
 import { RefLogoIcon, SetUp, ShrinkArrow, errorTipsIcon, MaxPositionIcon } from "./TradingIcon";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
@@ -44,6 +45,7 @@ const TradingOperate = () => {
   const [showFeeModal, setShowFeeModal] = useState(false);
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState("long");
+  const [estimateLoading, setEstimateLoading] = useState(false);
 
   // for slip
   // const [showSetUpPopup, setShowSetUpPopup] = useState(false);
@@ -104,6 +106,7 @@ const TradingOperate = () => {
   const handleTabClick = (tabString) => {
     setActiveTab(tabString);
     initCateState(tabString);
+    setForceUpdate((prev) => prev + 1);
   };
 
   const getTabClassName = (tabName) => {
@@ -222,7 +225,7 @@ const TradingOperate = () => {
       setLiqPrice(0);
       return;
     }
-
+    setEstimateLoading(true);
     // 验证输入值
     if (!isValidInput(value)) return;
     // 处理输入变化
@@ -251,7 +254,15 @@ const TradingOperate = () => {
     if (inputUsdCharcate2) {
       updateInputAmounts(activeTab, inputUsdCharcate2, inputUsdCharcate1);
     }
-  }, [longInput, shortInput, rangeMount, estimateData, slippageTolerance, forceUpdate]);
+  }, [
+    longInput,
+    shortInput,
+    rangeMount,
+    estimateData,
+    slippageTolerance,
+    forceUpdate,
+    tokenInAmount,
+  ]);
 
   // update token in amount
   useEffect(() => {
@@ -261,11 +272,31 @@ const TradingOperate = () => {
     }
   }, [tokenInAmount, activeTab, estimateData, ReduxcategoryAssets1]);
 
-  // update liq price
+  // update liq price for short
   useEffect(() => {
     if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
       const assetC = getAssetById(ReduxcategoryAssets2?.token_id);
-      const { decimals: decimalsC } = getAssetDetails(assetC);
+      let liqPriceX = 0;
+
+      if (rangeMount > 1) {
+        const safetyBufferFactor = 1 - marginConfigTokens.min_safety_buffer / 10000;
+        const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
+
+        if (activeTab === "short" && shortInput) {
+          const adjustedShortInput =
+            Number(shortInput) +
+            Number(shrinkToken(estimateData?.min_amount_out, assetC.metadata.decimals));
+          liqPriceX = (adjustedShortInput * assetPrice * safetyBufferFactor) / shortOutput;
+        }
+      }
+      setEstimateLoading(false);
+      setLiqPrice(liqPriceX);
+    }
+  }, [estimateData]);
+
+  // update liq price for long
+  useEffect(() => {
+    if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
       let liqPriceX = 0;
 
       if (rangeMount > 1) {
@@ -274,17 +305,13 @@ const TradingOperate = () => {
 
         if (activeTab === "long" && longInput) {
           const k1 = Number(longInput) * rangeMount * assetPrice;
-          liqPriceX = (k1 / safetyBufferFactor - Number(longInput)) / longOutput;
-        } else if (activeTab === "short" && shortInput) {
-          const adjustedShortInput =
-            Number(shortInput) + Number(shrinkToken(estimateData?.min_amount_out, decimalsC));
-          liqPriceX = (adjustedShortInput * assetPrice * safetyBufferFactor) / shortOutput;
+          liqPriceX = (k1 / safetyBufferFactor - Number(longInput) * assetPrice) / longOutput;
         }
       }
-
+      setEstimateLoading(false);
       setLiqPrice(liqPriceX);
     }
-  }, [longOutput, shortOutput]);
+  }, [longOutput]);
 
   // interval refresh price
   const [lastTokenInAmount, setLastTokenInAmount] = useState(0);
@@ -505,7 +532,13 @@ const TradingOperate = () => {
               </div>
               <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Liq. Price</div>
-                <div>${toInternationalCurrencySystem_number(LiqPrice)}</div>
+                <div>
+                  {estimateLoading ? (
+                    <BeatLoader size={5} color="white" />
+                  ) : (
+                    `$${toInternationalCurrencySystem_number(LiqPrice)}`
+                  )}
+                </div>
               </div>
               <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Fee</div>
@@ -670,7 +703,13 @@ const TradingOperate = () => {
               </div>
               <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Liq. Price</div>
-                <div>${toInternationalCurrencySystem_number(LiqPrice)}</div>
+                <div>
+                  {estimateLoading ? (
+                    <BeatLoader size={5} color="white" />
+                  ) : (
+                    `$${toInternationalCurrencySystem_number(LiqPrice)}`
+                  )}
+                </div>
               </div>
               <div className="flex items-center justify-between text-sm mb-4">
                 <div className="text-gray-300">Fee</div>
