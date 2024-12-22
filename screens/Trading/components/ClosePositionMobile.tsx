@@ -168,18 +168,18 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     }
   };
   async function getMinRequiredPAmount() {
+    const mins = 5;
     const dAmount = shrinkTokenDecimal(
       item.token_d_info.balance,
       assetD.config.extra_decimals,
     ).toFixed(0, Decimal.ROUND_UP);
-    const accruedInterest = new Decimal(assetD.borrow_apr).mul(dAmount).div(365 * 24 * 60 * 5);
+    const accruedInterest = new Decimal(assetD.borrow_apr).mul(dAmount).div(365 * 24 * 60 * mins);
     const totalHpFee = get_total_hp_fee();
-    const totalHpFeeBeforeOnCHain = new Decimal(totalHpFee).mul(2);
+    const slippage = Number(ReduxSlippageTolerance) / 100;
+    const min_amount_out = accruedInterest.plus(totalHpFee).plus(dAmount);
+    const amountOut = min_amount_out.div(1 - slippage);
     const res = await findPathReserve({
-      amountOut: accruedInterest
-        .plus(totalHpFeeBeforeOnCHain)
-        .plus(dAmount)
-        .toFixed(0, Decimal.ROUND_UP),
+      amountOut: amountOut.toFixed(0, Decimal.ROUND_UP),
       tokenIn: item.token_p_id,
       tokenOut: item.token_d_info.token_id,
       slippage: Number(ReduxSlippageTolerance) / 100,
@@ -200,13 +200,25 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     return requiredPAmountOnShort;
   }
   function get_total_hp_fee() {
-    const uahpi_at_current = assetD.uahpi;
+    const uahpi = assetD.uahpi;
     const { uahpi_at_open, debt_cap } = item;
     return shrinkTokenDecimal(
-      new Decimal(uahpi_at_current).minus(uahpi_at_open).mul(debt_cap).toFixed(0, Decimal.ROUND_UP),
+      new Decimal(uahpi).minus(uahpi_at_open).mul(debt_cap).toFixed(0, Decimal.ROUND_UP),
       18,
     ).toFixed(0, Decimal.ROUND_UP);
   }
+  // for js decimal issue TODO
+  function calculateUnitAccHpInterest(holdingPositionFeeRate: string, timeDiffMs: number) {
+    const UNIT = new Decimal(10).pow(18);
+    const DIVISOR = new Decimal(10).pow(27);
+    const HALF_DIVISOR = DIVISOR.div(2);
+    const realRate = new Decimal(holdingPositionFeeRate).div(DIVISOR);
+    const hp_rate = realRate.pow(timeDiffMs);
+    const round_mul_u128 = UNIT.plus(HALF_DIVISOR).div(DIVISOR);
+    const result = hp_rate.mul(round_mul_u128).minus(UNIT);
+    return result;
+  }
+
   const formatDecimal = (value: number) => {
     if (!value) return "0";
     return value.toFixed(6).replace(/\.?0+$/, "");
