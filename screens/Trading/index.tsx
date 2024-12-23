@@ -24,6 +24,7 @@ import { standardizeAsset } from "../../utils";
 import { isMobileDevice } from "../../helpers/helpers";
 import TradingOperateMobile from "./components/TradingOperateMobile";
 import getAssets from "../../api/get-assets";
+import { beautifyPrice } from "../../utils/beautyNumbet";
 
 init_env("dev");
 
@@ -49,52 +50,72 @@ const Trading = () => {
   const [longAndShortPosition, setLongAndShortPosition] = useState<any>([]);
 
   let timer;
-  // computed currentTokenCate1 dropdown
-  useEffect(() => {
-    const fetchAssetsAndUpdatePrice = async () => {
-      try {
-        const assetsData: any = await getAssets();
-        if (id) {
-          const updatedTokenCate1 = assetsData.data[id];
-          setCurrentTokenCate1(updatedTokenCate1);
-          dispatch(setCategoryAssets1(updatedTokenCate1));
-          dispatch(setCategoryAssets2(currentTokenCate2 || categoryAssets2[0]));
-        }
-      } catch (error) {
-        console.error("Failed to fetch assets:", error);
-      }
-    };
-
-    fetchAssetsAndUpdatePrice(); // Initial fetch
-
-    const intervalId = setInterval(fetchAssetsAndUpdatePrice, 10000); // Fetch every 10 seconds
-
-    return () => clearInterval(intervalId); // Cleanup on unmount
-  }, [id, currentTokenCate2, categoryAssets2]);
 
   useEffect(() => {
     if (id) {
       setCurrentTokenCate1(assets.data[id]);
       dispatch(setCategoryAssets1(assets.data[id]));
       dispatch(setCategoryAssets2(currentTokenCate2 || categoryAssets2[0]));
-    }
 
-    // deal long & short position
-    if (id && currentTokenCate1?.metadata) {
-      //
-      const { margin_position, metadata, config, margin_debt } = currentTokenCate1;
+      const { margin_position, metadata, config, margin_debt } = assets.data[id] as any;
       const { decimals } = metadata;
       const { extra_decimals } = config;
 
       setLongAndShortPosition([
         toInternationalCurrencySystem_number(
-          shrinkToken(margin_position, decimals + extra_decimals),
+          +shrinkToken(margin_position, decimals + extra_decimals) *
+            (assets.data[id]?.price?.usd || 0),
         ),
         toInternationalCurrencySystem_number(
-          shrinkToken(margin_debt?.balance, decimals + extra_decimals),
+          +shrinkToken(margin_debt?.balance, decimals + extra_decimals) *
+            (assets.data[id]?.price?.usd || 0),
         ),
       ]);
     }
+  }, [id]);
+
+  useEffect(() => {
+    const fetchAssetsAndUpdate = async () => {
+      try {
+        const assetsData: any = await getAssets();
+        if (id) {
+          const updatedTokenCate1 = assetsData.assets.find((item: any) => item.token_id === id);
+          const updatedTokenCate1WithMetadata = {
+            ...updatedTokenCate1,
+            metadata: currentTokenCate1.metadata,
+          };
+          setCurrentTokenCate1(updatedTokenCate1WithMetadata);
+          dispatch(setCategoryAssets1(updatedTokenCate1WithMetadata));
+          dispatch(setCategoryAssets2(currentTokenCate2 || categoryAssets2[0]));
+
+          // deal long & short position
+          if (updatedTokenCate1WithMetadata?.metadata) {
+            const { margin_position, metadata, config, margin_debt } =
+              updatedTokenCate1WithMetadata;
+            const { decimals } = metadata;
+            const { extra_decimals } = config;
+            setLongAndShortPosition([
+              toInternationalCurrencySystem_number(
+                +shrinkToken(margin_position, decimals + extra_decimals) *
+                  updatedTokenCate1.price.usd,
+              ),
+              toInternationalCurrencySystem_number(
+                +shrinkToken(margin_debt?.balance, decimals + extra_decimals) *
+                  updatedTokenCate1.price.usd,
+              ),
+            ]);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch assets:", error);
+      }
+    };
+
+    fetchAssetsAndUpdate(); // Initial fetch
+
+    const intervalId = setInterval(fetchAssetsAndUpdate, 10000); // Fetch every 2 seconds
+
+    return () => clearInterval(intervalId); // Cleanup on unmount
   }, [id, currentTokenCate1]);
 
   useMemo(() => {
@@ -269,7 +290,7 @@ const Trading = () => {
                   )}
                 </div>
               </div>
-              <span>${currentTokenCate1?.price?.usd}</span>
+              <span>${currentTokenCate1?.price?.usd || 0}</span>
             </div>
             {/* total v */}
             <div className="text-sm">
@@ -285,7 +306,7 @@ const Trading = () => {
             <div className="text-sm">
               <p className="text-gray-300 mb-1.5">Long / Short Positions</p>
               <span>
-                ${longAndShortPosition[0]} / ${longAndShortPosition[1]}
+                ${longAndShortPosition[0] || "-"} / ${longAndShortPosition[1] || "-"}
               </span>
             </div>
           </div>
@@ -366,7 +387,7 @@ const Trading = () => {
             <div className="text-sm flex items-center justify-between">
               <p className="text-gray-300 mb-1.5">Long / Short Positions</p>
               <span>
-                ${longAndShortPosition[0]} / ${longAndShortPosition[1]}
+                ${longAndShortPosition[0] || "-"} / ${longAndShortPosition[1] || "-"}
               </span>
             </div>
           </div>
