@@ -207,7 +207,7 @@ const TradingTable = ({
     }
   };
   return (
-    <div className="flex flex-col items-center justify-center w-full xsm:mx-2">
+    <div className="flex flex-col items-center justify-center lg:w-full xsm:w-[100vw] xsm:px-2">
       {/* pc */}
       <div className="w-full border border-dark-50 bg-gray-800 rounded-md  xsm:hidden">
         {/* title */}
@@ -514,7 +514,7 @@ const TradingTable = ({
         </div>
       </div>
       {/* mobile */}
-      <div className="md:hidden w-full px-4 pb-[150px]">
+      <div className="md:hidden w-[100vw] px-2 pb-[150px]">
         {/* title */}
         <div className="grid grid-cols-2 bg-gray-800 rounded-md h-[42px] text-white text-base items-center justify-items-stretch mt-6 mb-6">
           <div className="relative flex items-center justify-center border-r border-dark-1000">
