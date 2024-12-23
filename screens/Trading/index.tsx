@@ -8,7 +8,7 @@ import { ComeBackIcon, ShrinkArrow, TokenArrow } from "./components/TradingIcon"
 import { NearIcon } from "../MarginTrading/components/Icon";
 import TradingTable from "./components/Table";
 import TradingOperate from "./components/TradingOperate";
-import { getAssets } from "../../redux/assetsSelectors";
+import { getAssets as getAssetsSelector } from "../../redux/assetsSelectors";
 import { shrinkToken } from "../../store";
 import { getMarginConfig } from "../../redux/marginConfigSelectors";
 import { formatWithCommas_usd, toInternationalCurrencySystem_number } from "../../utils/uiNumber";
@@ -23,6 +23,7 @@ import TradingViewChart from "../../components/marginTrading/TradingViewChart";
 import { standardizeAsset } from "../../utils";
 import { isMobileDevice } from "../../helpers/helpers";
 import TradingOperateMobile from "./components/TradingOperateMobile";
+import getAssets from "../../api/get-assets";
 
 init_env("dev");
 
@@ -37,7 +38,7 @@ const Trading = () => {
   const router = useRouter();
   const { id }: any = router.query;
   const dispatch = useAppDispatch();
-  const assets = useAppSelector(getAssets);
+  const assets = useAppSelector(getAssetsSelector);
   const [showPopupCate1, setShowPopup1] = useState(false);
   const [showPopupCate2, setShowPopup2] = useState(false);
 
@@ -50,6 +51,28 @@ const Trading = () => {
   let timer;
   console.log(currentTokenCate1);
   // computed currentTokenCate1 dropdown
+  useEffect(() => {
+    const fetchAssetsAndUpdatePrice = async () => {
+      try {
+        const assetsData: any = await getAssets();
+        if (id) {
+          const updatedTokenCate1 = assetsData.data[id];
+          setCurrentTokenCate1(updatedTokenCate1);
+          dispatch(setCategoryAssets1(updatedTokenCate1));
+          dispatch(setCategoryAssets2(currentTokenCate2 || categoryAssets2[0]));
+        }
+      } catch (error) {
+        console.error("Failed to fetch assets:", error);
+      }
+    };
+
+    fetchAssetsAndUpdatePrice(); // Initial fetch
+
+    const intervalId = setInterval(fetchAssetsAndUpdatePrice, 10000); // Fetch every 10 seconds
+
+    return () => clearInterval(intervalId); // Cleanup on unmount
+  }, [id, currentTokenCate2, categoryAssets2]);
+
   useEffect(() => {
     if (id) {
       setCurrentTokenCate1(assets.data[id]);
@@ -165,7 +188,11 @@ const Trading = () => {
       }
     };
 
-    fetchVolumeStats();
+    fetchVolumeStats(); // Initial fetch
+
+    const intervalId = setInterval(fetchVolumeStats, 1000); // Fetch every 10 seconds
+
+    return () => clearInterval(intervalId); // Cleanup on unmount
   }, []);
 
   const [open, setOpen] = useState(false);
