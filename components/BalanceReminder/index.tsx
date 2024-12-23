@@ -40,7 +40,7 @@ const BalanceReminder = () => {
   }
   return (
     <div
-      className="fixed lg:top-[80px] lg:right-[24px] xsm:top-[76px] xsm:left-[14px] border border-gray-1250 bg-dark-100 shadow-lg py-4 pl-3 pr-4
+      className="fixed lg:top-[80px] lg:right-[24px] xsm:top-[64px] xsm:left-[14px] border border-gray-1250 bg-dark-100 shadow-lg py-4 pl-3 pr-4
      border border-dark-300 w-96 rounded-md flex 
      xsm:border-0 xsm:rounded-md xsm:rounded-t-md xsm:bg-dark-230 "
       style={{ zIndex: "98" }}
