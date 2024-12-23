@@ -67,8 +67,13 @@ const MarketMarginTrading = ({ hidden }) => {
     fetchAllVolumeStats();
   }, []);
   const handleSort = (field: string) => {
-    setSortBy((prev) => field);
-    setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+    if (isMobile) {
+      setSortBy(field);
+      setSortDirection("desc");
+    } else {
+      setSortBy((prev) => field);
+      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+    }
   };
   const sortedData = React.useMemo(() => {
     if (!sortBy || !sortDirection) {
