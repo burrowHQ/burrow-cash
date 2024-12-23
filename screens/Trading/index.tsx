@@ -383,7 +383,7 @@ const Trading = () => {
           <TradingOperate />
         </div>
       </div>
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 w-full h-[137px] rounded-t-[8px] px-[26px] flex flex-col justify-center items-center bg-[#383A56] z-[12]">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 w-full h-[116px] rounded-t-[8px] px-[26px] flex flex-col justify-center items-center bg-[#383A56] z-[12]">
         <div
           className="w-full flex items-center justify-center h-[46px] bg-primary rounded-[6px] text-[#14162B] text-base font-bold"
           onClick={() => {
@@ -392,9 +392,6 @@ const Trading = () => {
         >
           Long/Short
         </div>
-        <p className="w-full text-[#6F7188] text-xs relative bottom-[-22px] left-[-12px]">
-          Declaration and Disclaimers
-        </p>
       </div>
       {accountId && <TradingTable positionsList={marginAccountList} filterTitle={filterTitle} />}
       <TradingOperateMobile open={open} onClose={() => setOpen(false)} />
