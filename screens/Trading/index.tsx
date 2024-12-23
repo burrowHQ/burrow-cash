@@ -49,7 +49,6 @@ const Trading = () => {
   const [longAndShortPosition, setLongAndShortPosition] = useState<any>([]);
 
   let timer;
-  console.log(currentTokenCate1);
   // computed currentTokenCate1 dropdown
   useEffect(() => {
     const fetchAssetsAndUpdatePrice = async () => {

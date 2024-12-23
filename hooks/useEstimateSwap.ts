@@ -28,14 +28,14 @@ export const useEstimateSwap = ({
   forceUpdate?: number;
 }) => {
   const [estimateResult, setEstimateResult] = useState<IEstimateResult>();
-  const dclEstimateResult = useDclEstimateSwap({
+  const dclEstimateResult: any = useDclEstimateSwap({
     tokenIn_id,
     tokenOut_id,
     tokenIn_amount,
     slippageTolerance,
     forceUpdate,
   });
-  const v1EstimateResult = useV1EstimateSwap({
+  const v1EstimateResult: any = useV1EstimateSwap({
     tokenIn_id,
     tokenOut_id,
     tokenIn_amount,
@@ -50,8 +50,13 @@ export const useEstimateSwap = ({
     if (dclEstimateResult?.tag && v1EstimateResult?.tag && validator()) {
       getBestEstimateResult();
     }
-    if (tokenIn_amount == "0") {
-      setEstimateResult((prev: any) => ({ ...prev, amount_out: "0" }));
+    if (tokenIn_amount == "0" || !tokenIn_amount) {
+      setEstimateResult((prev: any) => {
+        if (prev?.amount_out !== "0" || !prev?.loadingComplete) {
+          return { ...prev, amount_out: "0", loadingComplete: true };
+        }
+        return prev;
+      });
     }
   }, [
     dclEstimateResult?.tag,
@@ -66,10 +71,10 @@ export const useEstimateSwap = ({
     console.log(dcl_amount_out, v1_amount_out, "dcl_amount_out, v1_amount_out");
     // best is v1
     if (new Decimal(v1_amount_out || 0).gt(dcl_amount_out || 0)) {
-      setEstimateResult(v1EstimateResult);
+      setEstimateResult({ ...v1EstimateResult, loadingComplete: true });
     } else if (new Decimal(dcl_amount_out || 0).gt(v1_amount_out || 0)) {
       // best is dcl
-      setEstimateResult(dclEstimateResult);
+      setEstimateResult({ ...dclEstimateResult, loadingComplete: true });
     }
   }
   function validator() {

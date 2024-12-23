@@ -300,6 +300,8 @@ const TradingOperate = ({ onMobileClose }: { onMobileClose?: () => void }) => {
       }
       setEstimateLoading(false);
     }
+    console.log(estimateData, "....estimateData");
+    setForceUpdateLoading(!estimateData?.loadingComplete);
   }, [estimateData]);
 
   // update liq price for long
@@ -326,11 +328,13 @@ const TradingOperate = ({ onMobileClose }: { onMobileClose?: () => void }) => {
   // interval refresh price
   const [lastTokenInAmount, setLastTokenInAmount] = useState(0);
 
+  // update price and make refresh icon spin
   useEffect(() => {
     const interval = setInterval(() => {
       if (tokenInAmount === lastTokenInAmount) {
         setTokenInAmount((prev) => prev);
         setForceUpdate((prev) => prev + 1);
+        setForceUpdateLoading(true);
       } else {
         setLastTokenInAmount(tokenInAmount);
       }
@@ -339,12 +343,22 @@ const TradingOperate = ({ onMobileClose }: { onMobileClose?: () => void }) => {
     return () => clearInterval(interval);
   }, [tokenInAmount, lastTokenInAmount]);
 
-  // for same input, estimateLoading is true
+  // for same input, estimateLoading or forceUpdateLoading is true
+  useEffect(() => {
+    if (forceUpdateLoading) {
+      const timer = setTimeout(() => {
+        setForceUpdateLoading(false);
+      }, 4000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [forceUpdateLoading]);
+
   useEffect(() => {
     if (estimateLoading) {
       const timer = setTimeout(() => {
         setEstimateLoading(false);
-      }, 5000); // 5 seconds
+      }, 4000); // 3 seconds
 
       return () => clearTimeout(timer); // Cleanup the timer on component unmount or when estimateLoading changes
     }
@@ -449,17 +463,22 @@ const TradingOperate = ({ onMobileClose }: { onMobileClose?: () => void }) => {
           </div>
         </div>
         <div />
-        {/* <div
+        <div
           className="cursor-pointer border border-dark-500 rounded-md p-[8px] flex items-center justify-center"
           onClick={() => {
+            if (!tokenInAmount || forceUpdateLoading) {
+              return;
+            }
             setForceUpdate((prev) => prev + 1);
             setForceUpdateLoading(true);
           }}
         >
           <RefreshIcon
-            className={` hover:text-white ${forceUpdateLoading ? "text-white" : "text-gray-300"}`}
+            className={` hover:text-white ${
+              forceUpdateLoading ? "text-white animate-spin" : "text-gray-300"
+            }`}
           />
-        </div> */}
+        </div>
         {/* slip start */}
         <div className="relative z-40 cursor-pointer slip-fater">
           <SetUp className="text-gray-300 hover:text-white" />
