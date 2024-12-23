@@ -32,7 +32,7 @@ import { beautifyPrice } from "../../../utils/beautyNumbet";
 import { ConnectWalletButton } from "../../../components/Header/WalletButton";
 
 // main components
-const TradingOperate = () => {
+const TradingOperate = ({ onMobileClose }: { onMobileClose?: () => void }) => {
   const assets = useAppSelector(getAssets);
   const config = useAppSelector(getMarginConfig);
   const { categoryAssets1, categoryAssets2 } = useMarginConfigToken();
@@ -54,7 +54,6 @@ const TradingOperate = () => {
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState("long");
   const [estimateLoading, setEstimateLoading] = useState(false);
-
   // for slip
   // const [showSetUpPopup, setShowSetUpPopup] = useState(false);
 
@@ -621,7 +620,10 @@ const TradingOperate = () => {
               {isConfirmModalOpen && (
                 <ConfirmMobile
                   open={isConfirmModalOpen}
-                  onClose={() => setIsConfirmModalOpen(false)}
+                  onClose={() => {
+                    setIsConfirmModalOpen(false);
+                    if (onMobileClose) onMobileClose();
+                  }}
                   action="Long"
                   confirmInfo={{
                     longInput,
@@ -746,7 +748,10 @@ const TradingOperate = () => {
               {isConfirmModalOpen && (
                 <ConfirmMobile
                   open={isConfirmModalOpen}
-                  onClose={() => setIsConfirmModalOpen(false)}
+                  onClose={() => {
+                    setIsConfirmModalOpen(false);
+                    if (onMobileClose) onMobileClose();
+                  }}
                   action="Short"
                   confirmInfo={{
                     longInput: shortInput,

@@ -357,7 +357,7 @@ const Trading = () => {
           <TradingOperate />
         </div>
       </div>
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 w-full h-[137px] rounded-t-[8px] px-[26px] flex flex-col justify-center items-center bg-[#383A56] z-10">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 w-full h-[137px] rounded-t-[8px] px-[26px] flex flex-col justify-center items-center bg-[#383A56] z-[12]">
         <div
           className="w-full flex items-center justify-center h-[46px] bg-primary rounded-[6px] text-[#14162B] text-base font-bold"
           onClick={() => {

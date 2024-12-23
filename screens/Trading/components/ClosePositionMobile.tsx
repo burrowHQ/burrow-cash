@@ -329,7 +329,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
                 </p>
 
                 {showFeeModal && (
-                  <div className="absolute bg-[#14162B] text-white h-[50px] p-2 rounded text-xs top-[30px] left-[-60px] flex flex-col items-start justify-between z-[1] w-auto">
+                  <div className="absolute bg-[#14162B] text-white h-[50px] p-2 rounded text-xs top-[30px] left-[-66px] flex flex-col items-start justify-between z-[1] w-auto">
                     <p>
                       <span className="mr-1 whitespace-nowrap">Hold Fee:</span>$
                       {beautifyPrice(Fee.HPFee)}
