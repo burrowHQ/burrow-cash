@@ -231,7 +231,7 @@ const TradingTable = ({
               />
             )}
           </div>
-          {selectedTab === "account" && filteredAccountSupplied.length > 0 && (
+          {!filterTitle && selectedTab === "account" && filteredAccountSupplied.length > 0 && (
             <div
               className="w-[110px] h-6 px-1.5 mr-11 flex items-center justify-center bg-primary bg-opacity-5 border border-primary rounded-md text-primary text-sm cursor-pointer"
               onClick={handleWithdrawAllClick}
@@ -396,7 +396,7 @@ const TradingTable = ({
               </tbody>
             </table>
           </div>
-          <div className={selectedTab === "account" ? "" : "hidden"}>
+          <div className={selectedTab === "account" && !filterTitle ? "" : "hidden"}>
             <table className="w-full text-left">
               <thead>
                 <tr className="text-gray-300 text-sm font-normal">
