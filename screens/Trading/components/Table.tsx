@@ -37,7 +37,7 @@ const TradingTable = ({
   const { query } = useRouterQuery();
   const { filterMarginConfigList } = useMarginConfigToken();
   const dispatch = useAppDispatch();
-  const selectedTab = useAppSelector((state) => state.tab.selectedTab);
+  const selectedTab = filterTitle ? "positions" : useAppSelector((state) => state.tab.selectedTab);
   const [isClosePositionModalOpen, setIsClosePositionMobileOpen] = useState(false);
   const [isChangeCollateralMobileOpen, setIsChangeCollateralMobileOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
