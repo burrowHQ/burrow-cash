@@ -34,6 +34,7 @@ const Trading = () => {
   const { query } = useRouterQuery();
   const accountId = useAccountId();
   const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
+  console.log("-0000000000000=marginAccountList", marginAccountList);
   const { categoryAssets1, categoryAssets2, filterMarginConfigList } = useMarginConfigToken();
   const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
   const router = useRouter();
@@ -154,7 +155,9 @@ const Trading = () => {
 
   const filterTitle = `${
     currentTokenCate1?.metadata?.symbol == "wNEAR" ? "NEAR" : currentTokenCate1?.metadata?.symbol
-  }/${currentTokenCate2?.metadata?.symbol}`;
+  }/${
+    currentTokenCate2?.metadata?.symbol == "wNEAR" ? "NEAR" : currentTokenCate2?.metadata?.symbol
+  }`;
 
   const [volumeStats, setVolumeStats] = useState<any>({});
   useEffect(() => {
