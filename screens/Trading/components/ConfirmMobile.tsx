@@ -1,7 +1,8 @@
-import React, { useState, createContext, useMemo, useEffect } from "react";
+import React, { useState, createContext, useEffect } from "react";
+import Decimal from "decimal.js";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
-import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { useAppSelector } from "../../../redux/hooks";
 import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
 import { CloseIcon } from "../../../components/Modal/svg";
@@ -16,7 +17,6 @@ import {
 import { shrinkToken, expandToken } from "../../../store";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
 import { getAccountId } from "../../../redux/accountSelectors";
-import { useRouterQuery } from "../../../utils/txhashContract";
 import { handleTransactionResults, handleTransactionHash } from "../../../services/transaction";
 import { showPositionFailure } from "../../../components/HashResultModal";
 import { getBurrow } from "../../../utils";
@@ -41,36 +41,29 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
     };
     initBurrow();
   }, []);
-  const { query } = useRouterQuery();
   const accountId = useAppSelector(getAccountId);
-  const dispatch = useAppDispatch();
   const theme = useTheme();
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
   const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
   const actionShowRedColor = action === "Long";
   const [isDisabled, setIsDisabled] = useState(false);
   const [isMinTokenPAmount, setIsMinTokenPAmount] = useState(false);
+  const [hasLiquidationRisk, setHasLiquidationRisk] = useState(false);
   const { marginConfigTokens, filterMarginConfigList } = useMarginConfigToken();
-  const { max_active_user_margin_position, max_slippage_rate } = marginConfigTokens;
+  const { max_active_user_margin_position, max_slippage_rate, min_safety_buffer } =
+    marginConfigTokens;
   const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
-  const {
-    price: priceP,
-    symbol: symbolP,
-    decimals: decimalsP,
-  } = getAssetDetails(
-    action === "Long"
-      ? getAssetById(confirmInfo.longOutputName?.token_id)
-      : getAssetById(confirmInfo.longInputName?.token_id),
-  );
   const assetP = getAssetById(
     action === "Long" ? confirmInfo.longOutputName?.token_id : confirmInfo.longInputName?.token_id,
   );
   const assetD = getAssetById(
     action === "Long" ? confirmInfo.longInputName?.token_id : confirmInfo.longOutputName?.token_id,
   );
+  const assetC = action === "Long" ? assetD : assetP;
   const decimalsD = +assetD.config.extra_decimals + +assetD.metadata.decimals;
+  const decimalsP = +assetP.config.extra_decimals + +assetP.metadata.decimals;
+  const decimalsC = action === "Long" ? decimalsD : decimalsP;
   const cateSymbol = getTokenSymbolOnly(ReduxcategoryAssets1?.metadata?.symbol);
-
   const min_amount_out_estimate = confirmInfo.estimateData.min_amount_out;
   const expand_amount_in_estimate = confirmInfo.estimateData.expand_amount_in;
   const in_extra_decimals = confirmInfo?.longInputName?.config?.extra_decimals || 0;
@@ -106,17 +99,27 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
         action === "Long" ? openPositionParams.token_p_id : openPositionParams.token_d_id,
       ),
     );
-
+    // Swap Out Trial Calculation Result Verification
     const minTokenPAmount = Number(shrinkToken(openPositionParams.min_token_p_amount, decimalsP));
     const tokenDAmount = shrinkToken(openPositionParams.token_d_amount, decimalsD);
     const tokenDPrice = confirmInfo.assets.data[openPositionParams.token_d_id].price.usd;
     const tokenPPrice = confirmInfo.assets.data[openPositionParams.token_p_id].price.usd;
     const slippageRate = 1 - max_slippage_rate / 10000;
     const calculatedValue = ((+tokenDAmount * tokenDPrice) / tokenPPrice) * slippageRate;
-
     if (!(minTokenPAmount >= calculatedValue)) {
       setIsDisabled(false);
       setIsMinTokenPAmount(true);
+      return;
+    }
+    // Position Verification
+    const total_c_value = new Decimal(confirmInfo.longInput || 0).mul(assetC.price?.usd || 0);
+    const total_p_value = new Decimal(minTokenPAmount || 0).mul(assetP.price?.usd || 0);
+    const total_d_value = new Decimal(tokenDAmount || 0).mul(assetD.price?.usd || 0);
+    const total_cap = total_c_value.plus(total_p_value);
+    const saft_value = total_cap.mul(1 - min_safety_buffer / 10000);
+    if (saft_value.lte(total_d_value)) {
+      setIsDisabled(false);
+      setHasLiquidationRisk(true);
       return;
     }
 
@@ -320,11 +323,20 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
                 </span>
               </div>
             )}
+            {hasLiquidationRisk && (
+              <div className=" text-[#EA3F68] text-sm font-normal flex items-start mb-1">
+                <MaxPositionIcon />
+                <span className="ml-1">
+                  You have a risk of liquidation. Please wait a moment before trying to open a
+                  position again.
+                </span>
+              </div>
+            )}
 
             {actionShowRedColor ? (
               <YellowSolidButton
                 className="w-full"
-                disabled={isDisabled || isMinTokenPAmount}
+                disabled={isDisabled || isMinTokenPAmount || hasLiquidationRisk}
                 onClick={confirmOpenPosition}
               >
                 {isDisabled ? (
@@ -336,7 +348,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
             ) : (
               <RedSolidButton
                 className="w-full"
-                disabled={isDisabled || isMinTokenPAmount}
+                disabled={isDisabled || isMinTokenPAmount || hasLiquidationRisk}
                 onClick={confirmOpenPosition}
               >
                 {isDisabled ? (
