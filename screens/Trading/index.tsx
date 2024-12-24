@@ -112,7 +112,6 @@ const Trading = () => {
     };
 
     fetchAssetsAndUpdate(); // Initial fetch
-
     const intervalId = setInterval(fetchAssetsAndUpdate, 10000); // Fetch every 2 seconds
 
     return () => clearInterval(intervalId); // Cleanup on unmount
@@ -210,7 +209,7 @@ const Trading = () => {
 
     fetchVolumeStats(); // Initial fetch
 
-    const intervalId = setInterval(fetchVolumeStats, 1000); // Fetch every 10 seconds
+    const intervalId = setInterval(fetchVolumeStats, 10000); // Fetch every 10 seconds
 
     return () => clearInterval(intervalId); // Cleanup on unmount
   }, []);
