@@ -37,7 +37,9 @@ const TradingTable = ({
   const { query } = useRouterQuery();
   const { filterMarginConfigList } = useMarginConfigToken();
   const dispatch = useAppDispatch();
-  const selectedTab = filterTitle ? "positions" : useAppSelector((state) => state.tab.selectedTab);
+  const [selectedTab, setStateSelectedTab] = useState(
+    filterTitle ? "positions" : useAppSelector((state) => state.tab.selectedTab),
+  );
   const [isClosePositionModalOpen, setIsClosePositionMobileOpen] = useState(false);
   const [isChangeCollateralMobileOpen, setIsChangeCollateralMobileOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
@@ -62,7 +64,10 @@ const TradingTable = ({
   const [inputPage, setInputPage] = useState<string>("");
   const itemsPerPage = 10;
   const handleTabClick = (tab: string) => {
-    dispatch(setSelectedTab(tab));
+    if (!filterTitle) {
+      dispatch(setSelectedTab(tab));
+    }
+    setStateSelectedTab(tab);
   };
   const handleClosePositionButtonClick = (key) => {
     setClosePositionModalProps(key);
