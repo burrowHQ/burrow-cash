@@ -24,6 +24,10 @@ const MarketMarginTrading = ({ hidden }) => {
     totalVolume: 0,
     volume24h: 0,
   });
+  const [prevFilterMarginConfigList, setPrevFilterMarginConfigList] = useState<Record<
+    string,
+    any
+  > | null>(null);
 
   useEffect(() => {
     const fetchVolumeStats = async () => {
@@ -64,8 +68,13 @@ const MarketMarginTrading = ({ hidden }) => {
       }
     };
 
-    fetchAllVolumeStats();
-  }, []);
+    if (filterMarginConfigList && Object.keys(filterMarginConfigList).length > 0) {
+      if (JSON.stringify(filterMarginConfigList) !== JSON.stringify(prevFilterMarginConfigList)) {
+        fetchAllVolumeStats();
+        setPrevFilterMarginConfigList(filterMarginConfigList);
+      }
+    }
+  }, [filterMarginConfigList, prevFilterMarginConfigList]);
   const handleSort = (field: string) => {
     if (isMobile) {
       setSortBy(field);
