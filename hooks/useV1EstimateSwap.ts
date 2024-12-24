@@ -202,10 +202,7 @@ export const useV1EstimateSwap = ({
     // );
     setEstimateData({
       amount_out: amountOut,
-      min_amount_out: expandTokenDecimal(
-        min_amount_out,
-        assets.data[tokenOut_id].config.extra_decimals,
-      ).toFixed(0),
+      min_amount_out,
       swap_indication: {
         dex_id,
         swap_action_text: msg,
