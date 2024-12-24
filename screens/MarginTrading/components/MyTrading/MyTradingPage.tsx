@@ -44,11 +44,6 @@ const MyMarginTradingPage = () => {
   };
   useEffect(() => {
     calculateTotalSizeValues();
-    const interval = setInterval(() => {
-      calculateTotalSizeValues();
-    }, 10000);
-
-    return () => clearInterval(interval);
   }, [marginAccountList]);
   let timer;
   const handleMouseEnter = () => {
