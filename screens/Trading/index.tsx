@@ -49,9 +49,13 @@ const Trading = () => {
 
   const [longAndShortPosition, setLongAndShortPosition] = useState<any>([]);
 
-  const { margin_position, metadata, config, margin_debt } = assets.data[id] as any;
-  const { decimals } = metadata;
-  const { extra_decimals } = config;
+  const assetData: any = assets.data[id];
+  const margin_position = assetData ? assetData?.margin_position : null;
+  const metadata = assetData ? assetData?.metadata : {};
+  const config = assetData ? assetData?.config : {};
+  const margin_debt = assetData ? assetData?.margin_debt : {};
+  const decimals = metadata?.decimals || 0;
+  const extra_decimals = config?.extra_decimals || 0;
 
   let timer;
 
