@@ -331,7 +331,7 @@ const TradingOperate = ({ onMobileClose }: { onMobileClose?: () => void }) => {
   // update price and make refresh icon spin
   useEffect(() => {
     const interval = setInterval(() => {
-      if (tokenInAmount === lastTokenInAmount) {
+      if (tokenInAmount === lastTokenInAmount && longInput) {
         setTokenInAmount((prev) => prev);
         setForceUpdate((prev) => prev + 1);
         setForceUpdateLoading(true);
