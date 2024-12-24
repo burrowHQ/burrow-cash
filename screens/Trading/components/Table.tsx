@@ -28,16 +28,16 @@ import { showCheckTxBeforeShowToast } from "../../../components/HashResultModal"
 const TradingTable = ({
   positionsList,
   filterTitle = "",
-  onTotalPLNChange,
 }: {
   positionsList: any;
   filterTitle?: string;
-  onTotalPLNChange?: (totalPLN: number) => void;
 }) => {
   const { query } = useRouterQuery();
   const { filterMarginConfigList } = useMarginConfigToken();
   const dispatch = useAppDispatch();
-  const selectedTab = useAppSelector((state) => state.tab.selectedTab);
+  const [selectedTab, setStateSelectedTab] = useState(
+    filterTitle ? "positions" : useAppSelector((state) => state.tab.selectedTab),
+  );
   const [isClosePositionModalOpen, setIsClosePositionMobileOpen] = useState(false);
   const [isChangeCollateralMobileOpen, setIsChangeCollateralMobileOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
@@ -62,7 +62,10 @@ const TradingTable = ({
   const [inputPage, setInputPage] = useState<string>("");
   const itemsPerPage = 10;
   const handleTabClick = (tab: string) => {
-    dispatch(setSelectedTab(tab));
+    if (!filterTitle) {
+      dispatch(setSelectedTab(tab));
+    }
+    setStateSelectedTab(tab);
   };
   const handleClosePositionButtonClick = (key) => {
     setClosePositionModalProps(key);
@@ -129,11 +132,6 @@ const TradingTable = ({
   const handlePLNChange = (pln: number) => {
     setTotalPLN((prev) => prev + pln);
   };
-  useEffect(() => {
-    if (onTotalPLNChange) {
-      onTotalPLNChange(totalPLN);
-    }
-  }, [totalPLN]);
   const filteredAccountSupplied = accountSupplied.filter((token) => {
     const assetDetails = getAssetById(token.token_id);
     return token.balance.toString().length >= assetDetails.config.extra_decimals;
@@ -207,7 +205,7 @@ const TradingTable = ({
     }
   };
   return (
-    <div className="flex flex-col items-center justify-center w-full xsm:mx-2">
+    <div className="flex flex-col items-center justify-center lg:w-full xsm:w-[100vw] xsm:px-2">
       {/* pc */}
       <div className="w-full border border-dark-50 bg-gray-800 rounded-md  xsm:hidden">
         {/* title */}
@@ -231,7 +229,7 @@ const TradingTable = ({
               />
             )}
           </div>
-          {selectedTab === "account" && filteredAccountSupplied.length > 0 && (
+          {!filterTitle && selectedTab === "account" && filteredAccountSupplied.length > 0 && (
             <div
               className="w-[110px] h-6 px-1.5 mr-11 flex items-center justify-center bg-primary bg-opacity-5 border border-primary rounded-md text-primary text-sm cursor-pointer"
               onClick={handleWithdrawAllClick}
@@ -288,7 +286,6 @@ const TradingTable = ({
                       marginConfigTokens={marginConfigTokens}
                       assets={assets}
                       filterTitle={filterTitle}
-                      onPLNChange={handlePLNChange}
                     />
                   ))
                 ) : (
@@ -396,7 +393,7 @@ const TradingTable = ({
               </tbody>
             </table>
           </div>
-          <div className={selectedTab === "account" ? "" : "hidden"}>
+          <div className={selectedTab === "account" && !filterTitle ? "" : "hidden"}>
             <table className="w-full text-left">
               <thead>
                 <tr className="text-gray-300 text-sm font-normal">
@@ -514,7 +511,7 @@ const TradingTable = ({
         </div>
       </div>
       {/* mobile */}
-      <div className="md:hidden w-full px-4 pb-[150px]">
+      <div className="md:hidden w-[100vw] px-2 pb-[150px]">
         {/* title */}
         <div className="grid grid-cols-2 bg-gray-800 rounded-md h-[42px] text-white text-base items-center justify-items-stretch mt-6 mb-6">
           <div className="relative flex items-center justify-center border-r border-dark-1000">
@@ -577,7 +574,6 @@ const TradingTable = ({
                 marginConfigTokens={marginConfigTokens}
                 assets={assets}
                 filterTitle={filterTitle}
-                onPLNChange={handlePLNChange}
               />
             ))
           ) : (
@@ -786,7 +782,6 @@ const PositionRow = ({
   assets,
   marginConfigTokens,
   filterTitle,
-  onPLNChange,
 }) => {
   // console.log(itemKey, item, index);
   const [entryPrice, setEntryPrice] = useState<number | null>(null);
@@ -876,9 +871,6 @@ const PositionRow = ({
     Math.abs(currentTime.getTime() - openTime.getTime()) / (1000 * 60 * 60);
   const holdingFee = totalHpFee * holdingDurationInHours;
   const pnl = profitOrLoss === 0 ? 0 : profitOrLoss - holdingFee;
-  if (onPLNChange) {
-    onPLNChange(pnl);
-  }
   return (
     <tr className="text-base hover:bg-dark-100 font-normal">
       <td className="py-5 pl-5">
@@ -985,7 +977,6 @@ const PositionMobileRow = ({
   assets,
   marginConfigTokens,
   filterTitle,
-  onPLNChange,
 }) => {
   // console.log(itemKey, item, index);
   const [entryPrice, setEntryPrice] = useState<number | null>(null);
@@ -1075,9 +1066,6 @@ const PositionMobileRow = ({
     Math.abs(currentTime.getTime() - openTime.getTime()) / (1000 * 60 * 60);
   const holdingFee = totalHpFee * holdingDurationInHours;
   const pnl = profitOrLoss === 0 ? 0 : profitOrLoss - holdingFee;
-  if (onPLNChange) {
-    onPLNChange(pnl);
-  }
   return (
     <div className="bg-gray-800 rounded-xl mb-4">
       <div className="pt-5 px-4 pb-4 border-b border-dark-950 flex justify-between">

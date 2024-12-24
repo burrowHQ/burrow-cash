@@ -8,7 +8,7 @@ import { ComeBackIcon, ShrinkArrow, TokenArrow } from "./components/TradingIcon"
 import { NearIcon } from "../MarginTrading/components/Icon";
 import TradingTable from "./components/Table";
 import TradingOperate from "./components/TradingOperate";
-import { getAssets } from "../../redux/assetsSelectors";
+import { getAssets as getAssetsSelector } from "../../redux/assetsSelectors";
 import { shrinkToken } from "../../store";
 import { getMarginConfig } from "../../redux/marginConfigSelectors";
 import { formatWithCommas_usd, toInternationalCurrencySystem_number } from "../../utils/uiNumber";
@@ -23,6 +23,8 @@ import TradingViewChart from "../../components/marginTrading/TradingViewChart";
 import { standardizeAsset } from "../../utils";
 import { isMobileDevice } from "../../helpers/helpers";
 import TradingOperateMobile from "./components/TradingOperateMobile";
+import getAssets from "../../api/get-assets";
+import { beautifyPrice } from "../../utils/beautyNumbet";
 
 init_env("dev");
 
@@ -37,7 +39,7 @@ const Trading = () => {
   const router = useRouter();
   const { id }: any = router.query;
   const dispatch = useAppDispatch();
-  const assets = useAppSelector(getAssets);
+  const assets = useAppSelector(getAssetsSelector);
   const [showPopupCate1, setShowPopup1] = useState(false);
   const [showPopupCate2, setShowPopup2] = useState(false);
 
@@ -47,33 +49,36 @@ const Trading = () => {
 
   const [longAndShortPosition, setLongAndShortPosition] = useState<any>([]);
 
+  const assetData: any = assets.data[id];
+  const margin_position = assetData ? assetData?.margin_position : null;
+  const metadata = assetData ? assetData?.metadata : {};
+  const config = assetData ? assetData?.config : {};
+  const margin_debt = assetData ? assetData?.margin_debt : {};
+  const decimals = metadata?.decimals || 0;
+  const extra_decimals = config?.extra_decimals || 0;
+
   let timer;
-  console.log(currentTokenCate1);
-  // computed currentTokenCate1 dropdown
+
   useEffect(() => {
     if (id) {
       setCurrentTokenCate1(assets.data[id]);
       dispatch(setCategoryAssets1(assets.data[id]));
       dispatch(setCategoryAssets2(currentTokenCate2 || categoryAssets2[0]));
     }
-
-    // deal long & short position
-    if (id && currentTokenCate1?.metadata) {
-      //
-      const { margin_position, metadata, config, margin_debt } = currentTokenCate1;
-      const { decimals } = metadata;
-      const { extra_decimals } = config;
-
-      setLongAndShortPosition([
-        toInternationalCurrencySystem_number(
-          shrinkToken(margin_position, decimals + extra_decimals),
-        ),
-        toInternationalCurrencySystem_number(
-          shrinkToken(margin_debt?.balance, decimals + extra_decimals),
-        ),
-      ]);
-    }
   }, [id, currentTokenCate1]);
+
+  useMemo(() => {
+    setLongAndShortPosition([
+      toInternationalCurrencySystem_number(
+        +shrinkToken(margin_position, decimals + extra_decimals) *
+          (assets.data[id]?.price?.usd || 0),
+      ),
+      toInternationalCurrencySystem_number(
+        +shrinkToken(margin_debt?.balance, decimals + extra_decimals) *
+          (assets.data[id]?.price?.usd || 0),
+      ),
+    ]);
+  }, [assets.data[id]?.price?.usd]);
 
   useMemo(() => {
     setCurrentTokenCate1(ReduxcategoryAssets1);
@@ -165,7 +170,11 @@ const Trading = () => {
       }
     };
 
-    fetchVolumeStats();
+    fetchVolumeStats(); // Initial fetch
+
+    const intervalId = setInterval(fetchVolumeStats, 10000); // Fetch every 10 seconds
+
+    return () => clearInterval(intervalId); // Cleanup on unmount
   }, []);
 
   const [open, setOpen] = useState(false);
@@ -243,7 +252,7 @@ const Trading = () => {
                   )}
                 </div>
               </div>
-              <span>${currentTokenCate1?.price?.usd}</span>
+              <span>${assets.data[id]?.price?.usd || 0}</span>
             </div>
             {/* total v */}
             <div className="text-sm">
@@ -259,7 +268,7 @@ const Trading = () => {
             <div className="text-sm">
               <p className="text-gray-300 mb-1.5">Long / Short Positions</p>
               <span>
-                ${longAndShortPosition[0]} / ${longAndShortPosition[1]}
+                ${longAndShortPosition[0] || "-"} / ${longAndShortPosition[1] || "-"}
               </span>
             </div>
           </div>
@@ -340,7 +349,7 @@ const Trading = () => {
             <div className="text-sm flex items-center justify-between">
               <p className="text-gray-300 mb-1.5">Long / Short Positions</p>
               <span>
-                ${longAndShortPosition[0]} / ${longAndShortPosition[1]}
+                ${longAndShortPosition[0] || "-"} / ${longAndShortPosition[1] || "-"}
               </span>
             </div>
           </div>
@@ -357,7 +366,7 @@ const Trading = () => {
           <TradingOperate />
         </div>
       </div>
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 w-full h-[137px] rounded-t-[8px] px-[26px] flex flex-col justify-center items-center bg-[#383A56] z-10">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 w-full h-[116px] rounded-t-[8px] px-[26px] flex flex-col justify-center items-center bg-[#383A56] z-[12]">
         <div
           className="w-full flex items-center justify-center h-[46px] bg-primary rounded-[6px] text-[#14162B] text-base font-bold"
           onClick={() => {
@@ -366,9 +375,6 @@ const Trading = () => {
         >
           Long/Short
         </div>
-        <p className="w-full text-[#6F7188] text-xs relative bottom-[-22px] left-[-12px]">
-          Declaration and Disclaimers
-        </p>
       </div>
       {accountId && <TradingTable positionsList={marginAccountList} filterTitle={filterTitle} />}
       <TradingOperateMobile open={open} onClose={() => setOpen(false)} />

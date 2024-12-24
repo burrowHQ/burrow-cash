@@ -19,7 +19,7 @@ export default function TradingOperateMobile({ open, onClose }) {
           <div className="cursor-pointer  w-full flex items-center justify-end">
             <CloseIcon onClick={onClose} />
           </div>
-          <TradingOperate />
+          <TradingOperate onMobileClose={onClose} />
         </Box>
       </Wrapper>
     </MUIModal>

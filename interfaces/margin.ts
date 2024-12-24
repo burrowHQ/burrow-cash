@@ -41,6 +41,7 @@ export interface IEstimateResult {
   fee: number;
   tag: string;
   from: "v1" | "dcl";
+  loadingComplete?: boolean;
 }
 export interface IPool {
   amount_in?: string;

@@ -24,6 +24,10 @@ const MarketMarginTrading = ({ hidden }) => {
     totalVolume: 0,
     volume24h: 0,
   });
+  const [prevFilterMarginConfigList, setPrevFilterMarginConfigList] = useState<Record<
+    string,
+    any
+  > | null>(null);
 
   useEffect(() => {
     const fetchVolumeStats = async () => {
@@ -64,11 +68,21 @@ const MarketMarginTrading = ({ hidden }) => {
       }
     };
 
-    fetchAllVolumeStats();
-  }, []);
+    if (filterMarginConfigList && Object.keys(filterMarginConfigList).length > 0) {
+      if (JSON.stringify(filterMarginConfigList) !== JSON.stringify(prevFilterMarginConfigList)) {
+        fetchAllVolumeStats();
+        setPrevFilterMarginConfigList(filterMarginConfigList);
+      }
+    }
+  }, [filterMarginConfigList, prevFilterMarginConfigList]);
   const handleSort = (field: string) => {
-    setSortBy((prev) => field);
-    setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+    if (isMobile) {
+      setSortBy(field);
+      setSortDirection("desc");
+    } else {
+      setSortBy((prev) => field);
+      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+    }
   };
   const sortedData = React.useMemo(() => {
     if (!sortBy || !sortDirection) {
@@ -102,7 +116,7 @@ const MarketMarginTrading = ({ hidden }) => {
       }
       return sortDirection === "asc" ? valueA - valueB : valueB - valueA;
     });
-  }, [mergedData, sortBy, sortDirection]);
+  }, [mergedData, sortBy, sortDirection, filterMarginConfigList]);
   return (
     <div className={hidden ? "hidden" : "flex flex-col items-center justify-center w-full"}>
       {isMobile ? (
