@@ -49,6 +49,10 @@ const Trading = () => {
 
   const [longAndShortPosition, setLongAndShortPosition] = useState<any>([]);
 
+  const { margin_position, metadata, config, margin_debt } = assets.data[id] as any;
+  const { decimals } = metadata;
+  const { extra_decimals } = config;
+
   let timer;
 
   useEffect(() => {
@@ -56,66 +60,21 @@ const Trading = () => {
       setCurrentTokenCate1(assets.data[id]);
       dispatch(setCategoryAssets1(assets.data[id]));
       dispatch(setCategoryAssets2(currentTokenCate2 || categoryAssets2[0]));
-
-      const { margin_position, metadata, config, margin_debt } = assets.data[id] as any;
-      const { decimals } = metadata;
-      const { extra_decimals } = config;
-
-      setLongAndShortPosition([
-        toInternationalCurrencySystem_number(
-          +shrinkToken(margin_position, decimals + extra_decimals) *
-            (assets.data[id]?.price?.usd || 0),
-        ),
-        toInternationalCurrencySystem_number(
-          +shrinkToken(margin_debt?.balance, decimals + extra_decimals) *
-            (assets.data[id]?.price?.usd || 0),
-        ),
-      ]);
     }
-  }, [id]);
-
-  useEffect(() => {
-    const fetchAssetsAndUpdate = async () => {
-      try {
-        const assetsData: any = await getAssets();
-        if (id) {
-          const updatedTokenCate1 = assetsData.assets.find((item: any) => item.token_id === id);
-          const updatedTokenCate1WithMetadata = {
-            ...updatedTokenCate1,
-            metadata: currentTokenCate1.metadata,
-          };
-          setCurrentTokenCate1(updatedTokenCate1WithMetadata);
-          dispatch(setCategoryAssets1(updatedTokenCate1WithMetadata));
-          dispatch(setCategoryAssets2(currentTokenCate2 || categoryAssets2[0]));
-
-          // deal long & short position
-          if (updatedTokenCate1WithMetadata?.metadata) {
-            const { margin_position, metadata, config, margin_debt } =
-              updatedTokenCate1WithMetadata;
-            const { decimals } = metadata;
-            const { extra_decimals } = config;
-            setLongAndShortPosition([
-              toInternationalCurrencySystem_number(
-                +shrinkToken(margin_position, decimals + extra_decimals) *
-                  updatedTokenCate1.price.usd,
-              ),
-              toInternationalCurrencySystem_number(
-                +shrinkToken(margin_debt?.balance, decimals + extra_decimals) *
-                  updatedTokenCate1.price.usd,
-              ),
-            ]);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to fetch assets:", error);
-      }
-    };
-
-    fetchAssetsAndUpdate(); // Initial fetch
-    const intervalId = setInterval(fetchAssetsAndUpdate, 10000); // Fetch every 2 seconds
-
-    return () => clearInterval(intervalId); // Cleanup on unmount
   }, [id, currentTokenCate1]);
+
+  useMemo(() => {
+    setLongAndShortPosition([
+      toInternationalCurrencySystem_number(
+        +shrinkToken(margin_position, decimals + extra_decimals) *
+          (assets.data[id]?.price?.usd || 0),
+      ),
+      toInternationalCurrencySystem_number(
+        +shrinkToken(margin_debt?.balance, decimals + extra_decimals) *
+          (assets.data[id]?.price?.usd || 0),
+      ),
+    ]);
+  }, [assets.data[id]?.price?.usd]);
 
   useMemo(() => {
     setCurrentTokenCate1(ReduxcategoryAssets1);
@@ -289,7 +248,7 @@ const Trading = () => {
                   )}
                 </div>
               </div>
-              <span>${currentTokenCate1?.price?.usd || 0}</span>
+              <span>${assets.data[id]?.price?.usd || 0}</span>
             </div>
             {/* total v */}
             <div className="text-sm">
