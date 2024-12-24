@@ -50,6 +50,7 @@ export const useDclEstimateSwap = ({
     });
     if (!exist_pool_ids.length) {
       setEstimateData({
+        expand_amount_in: "0",
         amount_out: "0",
         min_amount_out: "0",
         swap_indication: {
@@ -96,6 +97,7 @@ export const useDclEstimateSwap = ({
       swap_action_text: msg,
     };
     setEstimateData({
+      expand_amount_in: expandAmount,
       amount_out: shrinkToken(bestEstimate.amount || "0", tokenOut_metadata.decimals),
       min_amount_out: min_output_amount,
       swap_indication,

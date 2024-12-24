@@ -20,7 +20,7 @@ import { shrinkToken, expandToken } from "../store/helper";
 import {
   getMetadatas,
   get_swap_indication_info,
-  get_min_amount_out,
+  get_amount_from_msg,
   get_registered_dexes,
 } from "../utils/margin";
 
@@ -100,12 +100,9 @@ export const useV1EstimateSwap = ({
     if (!(resultFromServer?.result_code !== 0 || !resultFromServer?.result_data?.routes?.length)) {
       const result: IFindPathResult = resultFromServer.result_data;
       let min_output_amount = new Decimal(0);
-      // const min_output_amount = new Decimal(1 - slippageTolerance || 0)
-      //   .mul(result.amount_out || "0")
-      //   .toFixed(0);
       const dexMap = get_registered_dexes();
       const dex = dexMap["1"];
-      const { routes } = result;
+      const { routes, amount_in } = result;
       const actionsList: IServerPool[] = [];
       routes.forEach((route) => {
         route.pools.forEach((pool) => {
@@ -126,6 +123,7 @@ export const useV1EstimateSwap = ({
         tokenInAmount: tokenIn_amount,
       });
       setEstimateData({
+        expand_amount_in: amount_in,
         amount_out: shrinkToken(result.amount_out, tokenOut_metadata.decimals),
         min_amount_out: min_output_amount.toFixed(0),
         swap_indication: {
@@ -179,7 +177,7 @@ export const useV1EstimateSwap = ({
     });
     const swapTransaction = transactionsRef.pop() as any;
     const [dex_id, msg] = get_swap_indication_info(swapTransaction, marginConfig.registered_dexes);
-    const min_amount_out = get_min_amount_out(msg);
+    const { min_amount_out, expand_amount_in } = get_amount_from_msg(msg);
     const fee = getAvgFee(
       swapTodos,
       tokenOut_id,
@@ -201,6 +199,7 @@ export const useV1EstimateSwap = ({
     //   swapTodos[swapTodos.length - 1]?.outputToken || "",
     // );
     setEstimateData({
+      expand_amount_in,
       amount_out: amountOut,
       min_amount_out,
       swap_indication: {

@@ -65,13 +65,23 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
   const assetP = getAssetById(
     action === "Long" ? confirmInfo.longOutputName?.token_id : confirmInfo.longInputName?.token_id,
   );
-
+  const assetD = getAssetById(
+    action === "Long" ? confirmInfo.longInputName?.token_id : confirmInfo.longOutputName?.token_id,
+  );
+  const decimalsD = +assetD.config.extra_decimals + +assetD.metadata.decimals;
   const cateSymbol = getTokenSymbolOnly(ReduxcategoryAssets1?.metadata?.symbol);
 
+  const min_amount_out_estimate = confirmInfo.estimateData.min_amount_out;
+  const expand_amount_in_estimate = confirmInfo.estimateData.expand_amount_in;
+  const in_extra_decimals = confirmInfo?.longInputName?.config?.extra_decimals || 0;
+  const out_extra_decimals = confirmInfo?.longOutputName?.config?.extra_decimals || 0;
   const openPositionParams = {
     token_c_amount: confirmInfo.longInput,
     token_c_id: confirmInfo.longInputName?.token_id,
-    token_d_amount: confirmInfo.tokenInAmount,
+    token_d_amount:
+      action === "Long"
+        ? expandToken(expand_amount_in_estimate, in_extra_decimals, 0)
+        : expandToken(expand_amount_in_estimate, out_extra_decimals, 0),
     token_d_id:
       action === "Long"
         ? confirmInfo.longInputName?.token_id
@@ -82,16 +92,8 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
         : confirmInfo.longInputName?.token_id,
     min_token_p_amount:
       action === "Long"
-        ? expandToken(
-            confirmInfo.estimateData.min_amount_out,
-            confirmInfo?.longOutputName?.config?.extra_decimals || 0,
-            0,
-          )
-        : expandToken(
-            confirmInfo.estimateData.min_amount_out,
-            confirmInfo?.longInputName?.config?.extra_decimals || 0,
-            0,
-          ),
+        ? expandToken(min_amount_out_estimate, out_extra_decimals, 0)
+        : expandToken(min_amount_out_estimate, in_extra_decimals, 0),
     swap_indication: confirmInfo.estimateData.swap_indication,
     assets: confirmInfo.assets.data,
   };
@@ -106,11 +108,11 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
     );
 
     const minTokenPAmount = Number(shrinkToken(openPositionParams.min_token_p_amount, decimalsP));
-    const tokenDAmount = openPositionParams.token_d_amount;
+    const tokenDAmount = shrinkToken(openPositionParams.token_d_amount, decimalsD);
     const tokenDPrice = confirmInfo.assets.data[openPositionParams.token_d_id].price.usd;
     const tokenPPrice = confirmInfo.assets.data[openPositionParams.token_p_id].price.usd;
     const slippageRate = 1 - max_slippage_rate / 10000;
-    const calculatedValue = ((tokenDAmount * tokenDPrice) / tokenPPrice) * slippageRate;
+    const calculatedValue = ((+tokenDAmount * tokenDPrice) / tokenPPrice) * slippageRate;
 
     if (!(minTokenPAmount >= calculatedValue)) {
       setIsDisabled(false);

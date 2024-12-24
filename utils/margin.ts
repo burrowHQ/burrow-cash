@@ -29,17 +29,24 @@ export function get_swap_indication_info(swapTransaction, registered_dexes) {
   }
   return [dex, JSON.stringify(msgObj)];
 }
-export function get_min_amount_out(msg) {
-  const { actions, Swap } = JSON.parse(msg);
+export function get_amount_from_msg(msg) {
+  const { actions } = JSON.parse(msg);
   if (!isEmpty(actions)) {
-    return actions
+    const min_amount_out = actions
       .reduce((sum, action) => sum.plus(action.min_amount_out), new Decimal(0))
       .toFixed();
+    const expand_amount_in = actions
+      .reduce((sum, action) => sum.plus(action.amount_in), new Decimal(0))
+      .toFixed();
+    return {
+      min_amount_out,
+      expand_amount_in,
+    };
   }
-  if (!isEmpty(Swap)) {
-    return Swap.min_output_amount;
-  }
-  return "0";
+  return {
+    min_amount_out: "0",
+    expand_amount_in: "0",
+  };
 }
 
 export function get_registered_dexes() {
