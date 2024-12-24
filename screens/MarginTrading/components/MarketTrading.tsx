@@ -107,7 +107,7 @@ const MarketMarginTrading = ({ hidden }) => {
       }
       return sortDirection === "asc" ? valueA - valueB : valueB - valueA;
     });
-  }, [mergedData, sortBy, sortDirection]);
+  }, [mergedData, sortBy, sortDirection, filterMarginConfigList]);
   return (
     <div className={hidden ? "hidden" : "flex flex-col items-center justify-center w-full"}>
       {isMobile ? (
