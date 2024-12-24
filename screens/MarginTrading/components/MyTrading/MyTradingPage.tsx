@@ -4,6 +4,8 @@ import { useMarginAccount } from "../../../../hooks/useMarginAccount";
 import { useMarginConfigToken } from "../../../../hooks/useMarginConfig";
 import { toInternationalCurrencySystem_number } from "../../../../utils/uiNumber";
 import { isMobileDevice } from "../../../../helpers/helpers";
+import { getAssets } from "../../../../store/assets";
+import DataSource from "../../../../data/datasource";
 
 const MyMarginTradingPage = () => {
   const isMobile = isMobileDevice();
@@ -18,7 +20,8 @@ const MyMarginTradingPage = () => {
     let longTotal = 0;
     let shortTotal = 0;
     let collateralTotal = 0;
-    Object.values(marginAccountList).forEach((item) => {
+    let pnlTotal = 0;
+    Object.values(marginAccountList).forEach(async (item) => {
       const positionType = getPositionType(item.token_d_info.token_id).label;
       const assetD = getAssetById(item.token_d_info.token_id);
       const assetC = getAssetById(item.token_c_info.token_id);
@@ -37,10 +40,33 @@ const MyMarginTradingPage = () => {
       }
       const netValue = parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
       collateralTotal += netValue;
+      const fetchedAssets = await getAssets();
+      const debt_assets_d = fetchedAssets.find(
+        (asset) => asset.token_id === item.token_d_info.token_id,
+      );
+      const entryPriceResponse = await DataSource.shared.getMarginTradingRecordEntryPrice(
+        item.token_d_info.token_id,
+      );
+      const entryPrice = entryPriceResponse.data;
+      const indexPrice = positionType === "Long" ? priceP : priceD;
+      const debtCap = parseFloat(item.debt_cap);
+      const unitAccHpInterest = parseFloat(debt_assets_d?.unit_acc_hp_interest ?? "0");
+      const uahpiAtOpen = parseFloat(item.uahpi_at_open);
+      const interestDifference = unitAccHpInterest - uahpiAtOpen;
+      const totalHpFee = (debtCap * interestDifference) / 10 ** 18;
+      const profitOrLoss = entryPrice !== null ? (indexPrice - entryPrice) * sizeValue : 0;
+      const openTime = new Date(Number(item.open_ts) / 1e6);
+      const currentTime = new Date();
+      const holdingDurationInHours =
+        Math.abs(currentTime.getTime() - openTime.getTime()) / (1000 * 60 * 60);
+      const holdingFee = totalHpFee * holdingDurationInHours;
+      const pnl = profitOrLoss === 0 ? 0 : profitOrLoss - holdingFee;
+      pnlTotal += pnl;
     });
     setTotalLongSizeValue(longTotal);
     setTotalShortSizeValue(shortTotal);
     setTotalCollateral(collateralTotal);
+    setTotalPLN(pnlTotal);
   };
   useEffect(() => {
     calculateTotalSizeValues();
@@ -241,7 +267,7 @@ const MyMarginTradingPage = () => {
           </div>
         </div>
       )}
-      <TradingTable positionsList={marginAccountList} onTotalPLNChange={setTotalPLN} />
+      <TradingTable positionsList={marginAccountList} />
     </div>
   );
 };

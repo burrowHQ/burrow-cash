@@ -28,11 +28,9 @@ import { showCheckTxBeforeShowToast } from "../../../components/HashResultModal"
 const TradingTable = ({
   positionsList,
   filterTitle = "",
-  onTotalPLNChange,
 }: {
   positionsList: any;
   filterTitle?: string;
-  onTotalPLNChange?: (totalPLN: number) => void;
 }) => {
   const { query } = useRouterQuery();
   const { filterMarginConfigList } = useMarginConfigToken();
@@ -134,11 +132,6 @@ const TradingTable = ({
   const handlePLNChange = (pln: number) => {
     setTotalPLN((prev) => prev + pln);
   };
-  useEffect(() => {
-    if (onTotalPLNChange) {
-      onTotalPLNChange(totalPLN);
-    }
-  }, [totalPLN]);
   const filteredAccountSupplied = accountSupplied.filter((token) => {
     const assetDetails = getAssetById(token.token_id);
     return token.balance.toString().length >= assetDetails.config.extra_decimals;
@@ -293,7 +286,6 @@ const TradingTable = ({
                       marginConfigTokens={marginConfigTokens}
                       assets={assets}
                       filterTitle={filterTitle}
-                      onPLNChange={handlePLNChange}
                     />
                   ))
                 ) : (
@@ -582,7 +574,6 @@ const TradingTable = ({
                 marginConfigTokens={marginConfigTokens}
                 assets={assets}
                 filterTitle={filterTitle}
-                onPLNChange={handlePLNChange}
               />
             ))
           ) : (
@@ -791,7 +782,6 @@ const PositionRow = ({
   assets,
   marginConfigTokens,
   filterTitle,
-  onPLNChange,
 }) => {
   // console.log(itemKey, item, index);
   const [entryPrice, setEntryPrice] = useState<number | null>(null);
@@ -881,9 +871,6 @@ const PositionRow = ({
     Math.abs(currentTime.getTime() - openTime.getTime()) / (1000 * 60 * 60);
   const holdingFee = totalHpFee * holdingDurationInHours;
   const pnl = profitOrLoss === 0 ? 0 : profitOrLoss - holdingFee;
-  if (onPLNChange) {
-    onPLNChange(pnl);
-  }
   return (
     <tr className="text-base hover:bg-dark-100 font-normal">
       <td className="py-5 pl-5">
@@ -990,7 +977,6 @@ const PositionMobileRow = ({
   assets,
   marginConfigTokens,
   filterTitle,
-  onPLNChange,
 }) => {
   // console.log(itemKey, item, index);
   const [entryPrice, setEntryPrice] = useState<number | null>(null);
@@ -1080,9 +1066,6 @@ const PositionMobileRow = ({
     Math.abs(currentTime.getTime() - openTime.getTime()) / (1000 * 60 * 60);
   const holdingFee = totalHpFee * holdingDurationInHours;
   const pnl = profitOrLoss === 0 ? 0 : profitOrLoss - holdingFee;
-  if (onPLNChange) {
-    onPLNChange(pnl);
-  }
   return (
     <div className="bg-gray-800 rounded-xl mb-4">
       <div className="pt-5 px-4 pb-4 border-b border-dark-950 flex justify-between">
