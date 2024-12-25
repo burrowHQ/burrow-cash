@@ -19,7 +19,7 @@ export async function supply({
   amount: string;
   isMax: boolean;
 }): Promise<void> {
-  const { account, logicContract } = await getBurrow();
+  const { account, logicContract, hideModal } = await getBurrow();
   const { decimals } = (await getMetadata(tokenId))!;
   const tokenContract = await getTokenContract(tokenId);
   let expandedAmount;
@@ -51,12 +51,16 @@ export async function supply({
   //     msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
   //   },
   // });
-  await executeBTCDepositAndAction({
-    action: {
-      receiver_id: logicContract.contractId,
-      amount: expandedAmount.toFixed(0),
-      msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
-    },
-    isDev: true,
-  });
+  try {
+    await executeBTCDepositAndAction({
+      action: {
+        receiver_id: logicContract.contractId,
+        amount: expandedAmount.toFixed(0),
+        msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
+      },
+      isDev: true,
+    });
+  } catch (error) {
+    if (hideModal) hideModal();
+  }
 }

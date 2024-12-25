@@ -47,10 +47,10 @@ export const executeMultipleTransactions = async (transactions) => {
     });
     if (fetchData) fetchData(account.accountId);
   } catch (e: any) {
+    if (hideModal) hideModal();
     if (/reject/.test(e)) {
       // eslint-disable-next-line no-alert
       alert("Transaction was rejected in wallet. Please try again!");
-      hideModal();
       return;
     }
     if (!/No accounts available/.test(e)) {
