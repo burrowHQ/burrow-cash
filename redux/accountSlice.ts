@@ -66,9 +66,10 @@ export const accountSlice = createSlice({
 
       state.accountId = accountId;
       state.balances = balances;
-
       if (portfolio) {
         state.portfolio = portfolio;
+      } else {
+        state.portfolio = initialState.portfolio;
       }
     });
   },
