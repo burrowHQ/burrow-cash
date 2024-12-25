@@ -32,6 +32,7 @@ export interface IMarginAccountDetailedView {
 }
 
 export interface IEstimateResult {
+  expand_amount_in: string;
   amount_out: string;
   min_amount_out: string;
   swap_indication: {
