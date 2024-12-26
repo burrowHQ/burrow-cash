@@ -94,12 +94,6 @@ const Trading = () => {
     setShowPopup2(!showPopupCate2);
   };
 
-  const handleTokenSelectCate1 = (item) => {
-    dispatch(setCategoryAssets1(item));
-    setCurrentTokenCate1(item);
-    setShowPopup1(false);
-  };
-
   const handleTokenSelectCate2 = (item) => {
     // setSelectedItem(item);
     dispatch(setCategoryAssets2(item));
@@ -152,6 +146,7 @@ const Trading = () => {
       Object.keys(filterMarginConfigList || []),
     );
   }, [query?.transactionHashes, query?.errorMessage]);
+
   const filterTitle = `${getSymbolById(
     currentTokenCate1?.token_id,
     currentTokenCate1?.metadata?.symbol,

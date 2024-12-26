@@ -93,17 +93,6 @@ export const handleTransactionResults = async (
             ).toString(),
             transactionHashes: txhash[0],
             positionSize: {
-              // amount: isLong
-              //   ? shrinkToken(
-              //       actions[0]?.OpenPosition?.min_token_p_amount,
-              //       cateSymbolAndDecimals?.decimals || 24,
-              //     )
-              //   : shrinkToken(
-              //       actions[0]?.OpenPosition?.token_d_amount,
-              //       cateSymbolAndDecimals?.decimals || 24,
-              //     ),
-              // symbol: cateSymbolAndDecimals?.cateSymbol || "NEAR",
-              // usdValue: cateSymbolAndDecimals?.price || "1",
               amount: cateSymbolAndDecimals?.amount || "",
               totalPrice: cateSymbolAndDecimals?.totalPrice || "",
               symbol: cateSymbolAndDecimals?.cateSymbol || "NEAR",
@@ -152,18 +141,6 @@ export const handleTransactionHash = async (
           return { txHash, result, hasStorageDeposit };
         }),
       );
-
-      // // 检查是否有任何一个交易的 hasStorageDeposit 为 false
-      // const hasAnyFalseStorageDeposit = results.some((result) => !result.hasStorageDeposit);
-
-      // // 如果有任何一个为 false，则所有结果的 hasStorageDeposit 都设为 false
-      // if (hasAnyFalseStorageDeposit) {
-      //   return results.map((result) => ({
-      //     ...result,
-      //     hasStorageDeposit: false,
-      //   }));
-      // }
-
       return results;
     } catch (error) {
       console.error("Error processing transactions:", error);
