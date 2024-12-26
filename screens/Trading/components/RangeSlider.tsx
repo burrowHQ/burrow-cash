@@ -44,9 +44,14 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRang
 
   // add center
   useEffect(() => {
-    setValue(splitList[2]);
-    setRangeMount(splitList[2]);
-  }, []);
+    if (defaultValue) {
+      setValue(defaultValue);
+      setRangeMount(defaultValue);
+    } else {
+      setValue(splitList[2]);
+      setRangeMount(splitList[2]);
+    }
+  }, [defaultValue]);
 
   function changeValue(v: string | number) {
     const numValue = Number(v);

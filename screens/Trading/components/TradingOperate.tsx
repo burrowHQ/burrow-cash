@@ -56,7 +56,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
   //
   const [selectedSetUpOption, setSelectedSetUpOption] = useState<string>("auto");
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
-  const [rangeMount, setRangeMount] = useState<number>(1);
+  const [rangeMount, setRangeMount] = useState<number>(0);
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [isMaxPosition, setIsMaxPosition] = useState<boolean>(false);
 
@@ -89,7 +89,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
   // for tab change
   const initCateState = (tabString: string) => {
     setLiqPrice(0);
-    setRangeMount(1);
+    // setRangeMount(1);
     if (tabString == "long") {
       setShortInput("");
       setShortInputUsd(0);
@@ -641,7 +641,11 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
                   <span className="ml-1">Exceeded the maximum number of open positions.</span>
                 </div>
               )}
-
+              {rangeMount <= 1 && (
+                <span className="text-[#EA3F68] text-sm font-normal flex items-start mb-1">
+                  Leverage must be greater than 1
+                </span>
+              )}
               {accountId ? (
                 <YellowSolidButton
                   className="w-full"
@@ -769,6 +773,11 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
                   <MaxPositionIcon />
                   <span className="ml-1">Exceeded the maximum number of open positions.</span>
                 </div>
+              )}
+              {rangeMount <= 1 && (
+                <span className="text-[#EA3F68] text-sm font-normal flex items-start mb-1">
+                  Leverage must be greater than 1
+                </span>
               )}
               {accountId ? (
                 <RedSolidButton
