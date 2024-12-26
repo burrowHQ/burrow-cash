@@ -431,8 +431,12 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
                       <p className="text-xs text-gray-300 mt-1.5">
                         Max Available:{" "}
                         <span className="text-white">
-                          {" "}
-                          ${toInternationalCurrencySystem_number(getMaxAvailableAmount() * priceC)}
+                          $
+                          {Number.isNaN(getMaxAvailableAmount()) || getMaxAvailableAmount() === null
+                            ? "-"
+                            : toInternationalCurrencySystem_number(
+                                getMaxAvailableAmount() * priceC,
+                              )}
                         </span>
                       </p>
                     </div>
