@@ -11,6 +11,8 @@ import { ArrowLineDownIcon, CheckIcon, NewTagIcon } from "../../Market/svg";
 import { shrinkToken } from "../../../store/helper";
 import DataSource from "../../../data/datasource";
 import { isMobileDevice } from "../../../helpers/helpers";
+import { nearTokenId } from "../../../utils";
+import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 
 const MarketMarginTrading = ({ hidden }) => {
   const isMobile = isMobileDevice();
@@ -344,7 +346,7 @@ function TableBody({
           <Link href={`/trading/${item.token_id}`} key={item.token_id}>
             <div className="w-full grid grid-cols-5 bg-gray-800 hover:bg-dark-100 cursor-pointer mt-0.5 h-[60px]">
               <div className="relative col-span-1 flex items-center justify-self-start pl-14">
-                {item.metadata?.symbol === "wNEAR" ? (
+                {item.token_id == nearTokenId ? (
                   <NearIcon />
                 ) : (
                   <img alt="" src={item.metadata?.icon} style={{ width: "26px", height: "26px" }} />
@@ -358,7 +360,7 @@ function TableBody({
                 ) : null}
                 <div className="flex flex-col items-start ml-3">
                   <div className="flex items-center flex-wrap">
-                    {item.metadata?.symbol === "wNEAR" ? "NEAR" : item.metadata?.symbol}
+                    {getSymbolById(item.token_id, item.metadata?.symbol)}
                     {is_native ? (
                       <span
                         style={{ zoom: 0.85 }}
@@ -452,7 +454,7 @@ function TableBodyMobile({
             <div className="mb-4 bg-gray-800 rounded-xl w-full">
               <div className="flex items-center justify-between pt-6 pb-4 px-4 border-b border-dark-950 relative">
                 <div className="flex items-center">
-                  {item.metadata?.symbol === "wNEAR" ? (
+                  {item.token_id == nearTokenId ? (
                     <NearIcon />
                   ) : (
                     <img
@@ -463,7 +465,7 @@ function TableBodyMobile({
                   )}
                   <div className="flex flex-col items-start ml-2">
                     <div className="flex items-center flex-wrap text-sm">
-                      {item.metadata?.symbol === "wNEAR" ? "NEAR" : item.metadata?.symbol}
+                      {getSymbolById(item.token_id, item.metadata?.symbol)}
                       {is_native ? (
                         <span
                           style={{ zoom: 0.85 }}

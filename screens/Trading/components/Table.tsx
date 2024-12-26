@@ -305,7 +305,7 @@ const TradingTable = ({
                     collateralTotal={totalCollateral}
                   />
                 )}
-                {isClosePositionModalOpen && (
+                {isClosePositionModalOpen && closePositionModalProps && (
                   <ClosePositionMobile
                     open={isClosePositionModalOpen}
                     onClose={() => setIsClosePositionMobileOpen(false)}
@@ -597,10 +597,10 @@ const TradingTable = ({
               collateralTotal={totalCollateral}
             />
           )}
-          {isClosePositionModalOpen && (
+          {isClosePositionModalOpen && closePositionModalProps && (
             <ClosePositionMobile
               open={isClosePositionModalOpen}
-              onClose={(e) => {
+              onClose={() => {
                 // e.preventDefault();
                 // e.stopPropagation();
                 setIsClosePositionMobileOpen(false);

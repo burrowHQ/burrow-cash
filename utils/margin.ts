@@ -33,10 +33,10 @@ export function get_amount_from_msg(msg) {
   const { actions } = JSON.parse(msg);
   if (!isEmpty(actions)) {
     const min_amount_out = actions
-      .reduce((sum, action) => sum.plus(action.min_amount_out), new Decimal(0))
+      .reduce((sum, action) => sum.plus(action.min_amount_out || 0), new Decimal(0))
       .toFixed();
     const expand_amount_in = actions
-      .reduce((sum, action) => sum.plus(action.amount_in), new Decimal(0))
+      .reduce((sum, action) => sum.plus(action.amount_in || 0), new Decimal(0))
       .toFixed();
     return {
       min_amount_out,

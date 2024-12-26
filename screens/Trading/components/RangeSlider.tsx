@@ -2,14 +2,20 @@ import React, { useRef, useState, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
 
-const RangeSlider = ({ defaultValue, action, setRangeMount }) => {
+interface RangeSliderProps {
+  defaultValue: number;
+  action: string;
+  setRangeMount: (value: number) => void;
+}
+
+const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRangeMount }) => {
   //
-  const generateArithmeticSequence = (value: any) => {
+  const generateArithmeticSequence = (value: number) => {
     const increment = (value - 1) / 4;
-    const sequence: any = [];
+    const sequence: number[] = [];
 
     for (let i = 0; i <= 4; i++) {
-      sequence.push((1 + i * increment).toFixed(2));
+      sequence.push(+(1 + i * increment).toFixed(2));
     }
 
     return sequence;
@@ -42,7 +48,7 @@ const RangeSlider = ({ defaultValue, action, setRangeMount }) => {
     setRangeMount(splitList[2]);
   }, []);
 
-  function changeValue(v) {
+  function changeValue(v: string | number) {
     const numValue = Number(v);
     const nearestValue = allowedValues.reduce((prev, curr) => {
       return Math.abs(curr - numValue) < Math.abs(prev - numValue) ? curr : prev;

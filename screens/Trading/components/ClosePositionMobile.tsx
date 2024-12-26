@@ -10,7 +10,7 @@ import { RefLogoIcon, RightArrow, RightShoulder } from "./TradingIcon";
 import { toInternationalCurrencySystem_number, toDecimal } from "../../../utils/uiNumber";
 import { closePosition } from "../../../store/marginActions/closePosition";
 import { useEstimateSwap } from "../../../hooks/useEstimateSwap";
-import { useAccountId, useAvailableAssets } from "../../../hooks/hooks";
+import { useAccountId } from "../../../hooks/hooks";
 import { usePoolsData } from "../../../hooks/useGetPoolsData";
 import {
   expandToken,
@@ -25,42 +25,41 @@ import {
 import { showPositionClose } from "../../../components/HashResultModal";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
 import { findPathReserve } from "../../../api/get-swap-path";
-import { getMarginConfig } from "../../../redux/marginConfigSelectors";
 import { getAssets } from "../../../redux/assetsSelectors";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";
+import { IClosePositionMobileProps } from "../comInterface";
+import { IAssetDetailed } from "../../../interfaces/asset";
 
 export const ModalContext = createContext(null) as any;
-const ClosePositionMobile = ({ open, onClose, extraProps }) => {
+const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
+  open,
+  onClose,
+  extraProps,
+}) => {
   const {
     itemKey,
-    index,
     item,
     getAssetById,
     getPositionType,
     getAssetDetails,
     parseTokenValue,
     calculateLeverage,
-    LiqPrice,
     entryPrice,
   } = extraProps;
-  const [showFeeModal, setShowFeeModal] = useState(false);
-  const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
+
+  const [showFeeModal, setShowFeeModal] = useState<boolean>(false);
+  const [selectedCollateralType, setSelectedCollateralType] = useState<string>(DEFAULT_POSITION);
   const [tokenInAmount, setTokenInAmount] = useState<string | null>(null);
-  const [isDisabled, setIsDisabled] = useState(false);
-  const [forceUpdate, setForceUpdate] = useState(0);
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
+  const [forceUpdate, setForceUpdate] = useState<number>(0);
 
   const theme = useTheme();
   const intervalRef = useRef<ReturnType<typeof setInterval>>();
   const assets = useAppSelector(getAssets);
   const { marginAccountList } = useMarginAccount();
-  const {
-    ReduxcategoryAssets1,
-    ReduxcategoryAssets2,
-    ReduxcategoryCurrentBalance1,
-    ReduxcategoryCurrentBalance2,
-    ReduxSlippageTolerance,
-  } = useAppSelector((state) => state.category);
-  const marginAccount = useAppSelector((state) => state.marginAccount);
+  const { ReduxcategoryAssets1, ReduxSlippageTolerance } = useAppSelector(
+    (state) => state.category,
+  );
   const accountId = useAccountId();
   const { simplePools, stablePools, stablePoolsDetail } = usePoolsData();
 
@@ -70,27 +69,26 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
   const { price: priceD, symbol: symbolD, decimals: decimalsD } = getAssetDetails(assetD);
   const { price: priceC, symbol: symbolC, decimals: decimalsC } = getAssetDetails(assetC);
   const { price: priceP, symbol: symbolP, decimals: decimalsP } = getAssetDetails(assetP);
+
   const leverageD = parseTokenValue(item.token_d_info.balance, decimalsD);
   const leverageC = parseTokenValue(item.token_c_info.balance, decimalsC);
   const leverage = calculateLeverage(leverageD, priceD, leverageC, priceC);
   const positionType = getPositionType(item.token_d_info.token_id);
+
   const sizeValueLong = parseTokenValue(item.token_p_amount, decimalsP);
   const sizeValueShort = parseTokenValue(item.token_d_info.balance, decimalsD);
   const sizeValue =
     positionType.label === "Long" ? sizeValueLong * (priceP || 0) : sizeValueShort * (priceD || 0);
+
   const netValue = parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
   const collateral = parseTokenValue(item.token_c_info.balance, decimalsC);
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
-  // console.log("-----------------assetD", assetD);
-  // console.log("-----------------assetC", assetC);
-  // console.log("-----------------assetP", assetP);
-  // console.log("-----------------item", item);
+
   const actionShowRedColor = positionType.label === "Long";
 
   // get estimate token in amount
   useEffect(() => {
     if (positionType.label === "Short") {
-      // quote to get how much p is needed to pay off the debt
       getMinRequiredPAmount().then((res) => {
         setTokenInAmount(res || "0");
       });
@@ -103,6 +101,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
       );
     }
   }, [positionType.label]);
+
   // estimate
   const estimateData = useEstimateSwap({
     tokenIn_id: item.token_p_id,
@@ -115,15 +114,18 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     slippageTolerance: ReduxSlippageTolerance / 100,
     forceUpdate,
   });
+
   useEffect(() => {
     intervalRef.current = setInterval(() => {
       setForceUpdate((prev) => prev + 1);
     }, 20_000);
     return () => clearInterval(intervalRef.current);
   }, []);
+
   useEffect(() => {
     setIsDisabled(!estimateData?.swap_indication || !estimateData?.min_amount_out);
   }, [estimateData]);
+
   const Fee = useMemo(() => {
     const uahpi: any = shrinkToken((assets as any).data[item.token_p_id]?.uahpi, 18) ?? 0;
     const uahpi_at_open: any = shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
@@ -137,7 +139,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     };
   }, [collateral, ReduxcategoryAssets1, estimateData]);
 
-  // close position action
+  // Methods
   const handleCloseOpsitionEvt = async () => {
     setIsDisabled(true);
     try {
@@ -158,7 +160,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
       onClose();
       if (res !== undefined && res !== null) {
         showPositionClose({
-          type: positionType.label,
+          type: positionType.label as "Long" | "Short",
         });
       }
     } catch (error) {
@@ -167,6 +169,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
       setIsDisabled(false);
     }
   };
+
   async function getMinRequiredPAmount() {
     const mins = 5;
     const dAmount = shrinkTokenDecimal(
@@ -199,6 +202,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     ).toFixed(0);
     return requiredPAmountOnShort;
   }
+
   function get_total_hp_fee() {
     const uahpi = assetD.uahpi;
     const { uahpi_at_open, debt_cap } = item;
@@ -207,6 +211,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
       18,
     ).toFixed(0, Decimal.ROUND_UP);
   }
+
   // for js decimal issue TODO
   function calculateUnitAccHpInterest(holdingPositionFeeRate: string, timeDiffMs: number) {
     const UNIT = new Decimal(10).pow(18);
@@ -273,25 +278,6 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
               <div className="text-gray-300">Index Price</div>
               <div>${indexPrice}</div>
             </div>
-
-            {/* <div className="flex items-center justify-between text-sm mb-4">
-              <div className="text-gray-300">Leverage</div>
-              <div className="flex items-center justify-center">
-                <span className="text-gray-300 mr-2 line-through">{leverage.toFixed(2)}X</span>
-                <RightArrow />
-                <p className="ml-2"> 0.0X</p>
-              </div>
-            </div>
-            <div className="flex items-center justify-between text-sm mb-4">
-              <div className="text-gray-300">Liq. Price</div>
-              <div className="flex items-center justify-center">
-                <span className="text-gray-300 mr-2 line-through">
-                  ${toInternationalCurrencySystem_number(LiqPrice)}
-                </span>
-                <RightArrow />
-                <p className="ml-2"> $0.00</p>
-              </div>
-            </div> */}
             {/*  */}
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Collateral</div>

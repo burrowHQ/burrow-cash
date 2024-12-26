@@ -20,11 +20,12 @@ import { useRouterQuery } from "../../utils/txhashContract";
 import { handleTransactionResults, handleTransactionHash } from "../../services/transaction";
 import DataSource from "../../data/datasource";
 import TradingViewChart from "../../components/marginTrading/TradingViewChart";
-import { standardizeAsset } from "../../utils";
+import { standardizeAsset, nearTokenId } from "../../utils";
 import { isMobileDevice } from "../../helpers/helpers";
 import TradingOperateMobile from "./components/TradingOperateMobile";
 import getAssets from "../../api/get-assets";
 import { beautifyPrice } from "../../utils/beautyNumbet";
+import { getSymbolById } from "../../transformers/nearSymbolTrans";
 
 init_env("dev");
 
@@ -152,12 +153,10 @@ const Trading = () => {
       Object.keys(filterMarginConfigList || []),
     );
   }, [query?.transactionHashes, query?.errorMessage]);
-
-  const filterTitle = `${
-    currentTokenCate1?.metadata?.symbol == "wNEAR" ? "NEAR" : currentTokenCate1?.metadata?.symbol
-  }/${
-    currentTokenCate2?.metadata?.symbol == "wNEAR" ? "NEAR" : currentTokenCate2?.metadata?.symbol
-  }`;
+  const filterTitle = `${getSymbolById(
+    currentTokenCate1?.token_id,
+    currentTokenCate1?.metadata?.symbol,
+  )}/${getSymbolById(currentTokenCate2?.token_id, currentTokenCate2?.metadata?.symbol)}`;
 
   const [volumeStats, setVolumeStats] = useState<any>({});
   useEffect(() => {
@@ -200,7 +199,7 @@ const Trading = () => {
             {/* cate1 */}
             <div onMouseLeave={() => handleMouseLeave("1")} className="cursor-pointer relative ">
               <div onMouseEnter={() => handleMouseEnter("1")} className="flex items-center">
-                {currentTokenCate1?.metadata?.symbol === "wNEAR" ? (
+                {currentTokenCate1?.token_id == nearTokenId ? (
                   <NearIcon />
                 ) : (
                   <img
@@ -210,9 +209,7 @@ const Trading = () => {
                   />
                 )}
                 <p className="ml-2 mr-3.5 text-lg">
-                  {currentTokenCate1?.metadata?.symbol === "wNEAR"
-                    ? "NEAR"
-                    : currentTokenCate1?.metadata?.symbol}
+                  {getSymbolById(currentTokenCate1?.token_id, currentTokenCate1?.metadata?.symbol)}
                 </p>
                 {/* <TokenArrow /> */}
               </div>
@@ -248,7 +245,7 @@ const Trading = () => {
                           className="py-1 pl-1.5 hover:bg-gray-950"
                           onClick={() => handleTokenSelectCate2(item)}
                         >
-                          {item?.metadata?.symbol === "wNEAR" ? "NEAR" : item?.metadata?.symbol}
+                          {getSymbolById(item.token_id, item.metadata?.symbol)}
                         </div>
                       ))}
                     </div>
@@ -289,11 +286,12 @@ const Trading = () => {
                 />
                 <div className="flex flex-col">
                   <p className="text-base text-white">
-                    {currentTokenCate1?.metadata?.symbol === "wNEAR"
-                      ? "NEAR"
-                      : currentTokenCate1?.metadata?.symbol}
+                    {getSymbolById(
+                      currentTokenCate1?.token_id,
+                      currentTokenCate1?.metadata?.symbol,
+                    )}
                   </p>
-                  <p className="text-[#C0C4E9] text-xs">${currentTokenCate1?.price?.usd}</p>
+                  <p className="text-[#C0C4E9] text-xs">${assets.data[id]?.price?.usd || 0}</p>
                 </div>
 
                 {/* cate2 */}
@@ -326,7 +324,7 @@ const Trading = () => {
                               className="py-1 pl-1.5 hover:bg-gray-950"
                               onClick={() => handleTokenSelectCate2(item)}
                             >
-                              {item?.metadata?.symbol === "wNEAR" ? "NEAR" : item?.metadata?.symbol}
+                              {getSymbolById(item.token_id, item.metadata?.symbol)}
                             </div>
                           ))}
                         </div>
