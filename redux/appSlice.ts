@@ -132,6 +132,8 @@ export const initialState: AppState = {
     boost_suppress_factor: 0,
     enable_price_oracle: false,
     enable_pyth_oracle: true,
+    meme_oracle_account_id: "",
+    meme_ref_exchange_id: "",
   },
 };
 
