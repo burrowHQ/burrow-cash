@@ -46,6 +46,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     calculateLeverage,
     entryPrice,
   } = extraProps;
+
   const [showFeeModal, setShowFeeModal] = useState<boolean>(false);
   const [selectedCollateralType, setSelectedCollateralType] = useState<string>(DEFAULT_POSITION);
   const [tokenInAmount, setTokenInAmount] = useState<string | null>(null);
@@ -68,27 +69,26 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   const { price: priceD, symbol: symbolD, decimals: decimalsD } = getAssetDetails(assetD);
   const { price: priceC, symbol: symbolC, decimals: decimalsC } = getAssetDetails(assetC);
   const { price: priceP, symbol: symbolP, decimals: decimalsP } = getAssetDetails(assetP);
+
   const leverageD = parseTokenValue(item.token_d_info.balance, decimalsD);
   const leverageC = parseTokenValue(item.token_c_info.balance, decimalsC);
   const leverage = calculateLeverage(leverageD, priceD, leverageC, priceC);
   const positionType = getPositionType(item.token_d_info.token_id);
+
   const sizeValueLong = parseTokenValue(item.token_p_amount, decimalsP);
   const sizeValueShort = parseTokenValue(item.token_d_info.balance, decimalsD);
   const sizeValue =
     positionType.label === "Long" ? sizeValueLong * (priceP || 0) : sizeValueShort * (priceD || 0);
+
   const netValue = parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
   const collateral = parseTokenValue(item.token_c_info.balance, decimalsC);
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
-  // console.log("-----------------assetD", assetD);
-  // console.log("-----------------assetC", assetC);
-  // console.log("-----------------assetP", assetP);
-  // console.log("-----------------item", item);
+
   const actionShowRedColor = positionType.label === "Long";
 
   // get estimate token in amount
   useEffect(() => {
     if (positionType.label === "Short") {
-      // quote to get how much p is needed to pay off the debt
       getMinRequiredPAmount().then((res) => {
         setTokenInAmount(res || "0");
       });
@@ -101,6 +101,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
       );
     }
   }, [positionType.label]);
+
   // estimate
   const estimateData = useEstimateSwap({
     tokenIn_id: item.token_p_id,
@@ -113,15 +114,18 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     slippageTolerance: ReduxSlippageTolerance / 100,
     forceUpdate,
   });
+
   useEffect(() => {
     intervalRef.current = setInterval(() => {
       setForceUpdate((prev) => prev + 1);
     }, 20_000);
     return () => clearInterval(intervalRef.current);
   }, []);
+
   useEffect(() => {
     setIsDisabled(!estimateData?.swap_indication || !estimateData?.min_amount_out);
   }, [estimateData]);
+
   const Fee = useMemo(() => {
     const uahpi: any = shrinkToken((assets as any).data[item.token_p_id]?.uahpi, 18) ?? 0;
     const uahpi_at_open: any = shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
@@ -135,7 +139,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     };
   }, [collateral, ReduxcategoryAssets1, estimateData]);
 
-  // close position action
+  // Methods
   const handleCloseOpsitionEvt = async () => {
     setIsDisabled(true);
     try {
@@ -165,6 +169,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
       setIsDisabled(false);
     }
   };
+
   async function getMinRequiredPAmount() {
     const mins = 5;
     const dAmount = shrinkTokenDecimal(
@@ -197,6 +202,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     ).toFixed(0);
     return requiredPAmountOnShort;
   }
+
   function get_total_hp_fee() {
     const uahpi = assetD.uahpi;
     const { uahpi_at_open, debt_cap } = item;
@@ -205,6 +211,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
       18,
     ).toFixed(0, Decimal.ROUND_UP);
   }
+
   // for js decimal issue TODO
   function calculateUnitAccHpInterest(holdingPositionFeeRate: string, timeDiffMs: number) {
     const UNIT = new Decimal(10).pow(18);
