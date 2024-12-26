@@ -42,10 +42,7 @@ export async function openPosition({
     token_c_amount,
     assets[token_c_id].metadata.decimals,
   );
-  const expanded_d_amount = expandTokenDecimal(
-    token_d_amount,
-    assets[token_d_id].metadata.decimals + assets[token_d_id].config.extra_decimals,
-  );
+  const expanded_d_amount = token_d_amount;
   const transactions: Transaction[] = [];
   transactions.push({
     receiverId: token_c_id,
@@ -77,7 +74,7 @@ export async function openPosition({
           token_c_id,
           token_c_amount: expanded_c_amount.toFixed(0),
           token_d_id,
-          token_d_amount: expanded_d_amount.toFixed(0),
+          token_d_amount: expanded_d_amount,
           token_p_id,
           min_token_p_amount,
           swap_indication,

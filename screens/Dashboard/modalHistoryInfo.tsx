@@ -4,13 +4,13 @@ import CustomModal from "../../components/CustomModal/CustomModal";
 import Liquidations from "./liquidations";
 import { CloseIcon } from "../../components/Icons/Icons";
 import Records from "./records";
-import { useAccountId, useUnreadLiquidation } from "../../hooks/hooks";
+import { useUnreadLiquidation } from "../../hooks/hooks";
 import Datasource from "../../data/datasource";
 
 const ModalHistoryInfo = ({ isOpen, onClose, tab }) => {
-  const accountId = useAccountId();
   const [tabIndex, setTabIndex] = useState(tab);
-  const { unreadLiquidation, fetchUnreadLiquidation } = useUnreadLiquidation();
+  const [liquidationPage, setLiquidationPage] = useState(1);
+  const { unreadLiquidation, fetchUnreadLiquidation } = useUnreadLiquidation(liquidationPage);
 
   useEffect(() => {
     if (tab !== undefined) {
@@ -25,9 +25,9 @@ const ModalHistoryInfo = ({ isOpen, onClose, tab }) => {
     }
   };
 
-  const markReads = async (ids) => {
+  const markReads = async (unreadIds) => {
     try {
-      await Promise.allSettled(ids.map((d) => Datasource.shared.markLiquidationRead(d, accountId)));
+      await Datasource.shared.markLiquidationRead(unreadIds);
       await fetchUnreadLiquidation();
     } catch (e) {
       console.error("markReadsErr", e);
@@ -44,7 +44,9 @@ const ModalHistoryInfo = ({ isOpen, onClose, tab }) => {
   let node;
   switch (tabIndex) {
     case 1:
-      node = <Liquidations isShow={tabIndex === 1 && isOpen} />;
+      node = (
+        <Liquidations isShow={tabIndex === 1 && isOpen} setLiquidationPage={setLiquidationPage} />
+      );
       break;
     default:
       node = <Records isShow={tabIndex === 0 && isOpen} />;

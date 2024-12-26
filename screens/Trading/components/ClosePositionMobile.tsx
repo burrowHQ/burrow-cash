@@ -1,6 +1,7 @@
-import { useState, createContext, useEffect } from "react";
+import { useState, createContext, useEffect, useMemo, useRef } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
+import Decimal from "decimal.js";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
@@ -11,38 +12,60 @@ import { closePosition } from "../../../store/marginActions/closePosition";
 import { useEstimateSwap } from "../../../hooks/useEstimateSwap";
 import { useAccountId } from "../../../hooks/hooks";
 import { usePoolsData } from "../../../hooks/useGetPoolsData";
-import { shrinkToken } from "../../../store/helper";
+import {
+  expandToken,
+  shrinkToken,
+  shrinkTokenDecimal,
+  expandTokenDecimal,
+} from "../../../store/helper";
 import {
   YellowSolidSubmitButton as YellowSolidButton,
   RedSolidSubmitButton as RedSolidButton,
 } from "../../../components/Modal/button";
 import { showPositionClose } from "../../../components/HashResultModal";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
+import { findPathReserve } from "../../../api/get-swap-path";
+import { getAssets } from "../../../redux/assetsSelectors";
+import { useMarginAccount } from "../../../hooks/useMarginAccount";
+import { IClosePositionMobileProps } from "../comInterface";
+import { IAssetDetailed } from "../../../interfaces/asset";
 
 export const ModalContext = createContext(null) as any;
-const ClosePositionMobile = ({ open, onClose, extraProps }) => {
-  const { ReduxSlippageTolerance } = useAppSelector((state) => state.category);
+const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
+  open,
+  onClose,
+  extraProps,
+}) => {
   const {
     itemKey,
-    index,
     item,
     getAssetById,
     getPositionType,
     getAssetDetails,
     parseTokenValue,
     calculateLeverage,
-    LiqPrice,
     entryPrice,
   } = extraProps;
 
-  //
+  const [showFeeModal, setShowFeeModal] = useState<boolean>(false);
+  const [selectedCollateralType, setSelectedCollateralType] = useState<string>(DEFAULT_POSITION);
+  const [tokenInAmount, setTokenInAmount] = useState<string | null>(null);
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
+  const [forceUpdate, setForceUpdate] = useState<number>(0);
+
+  const theme = useTheme();
+  const intervalRef = useRef<ReturnType<typeof setInterval>>();
+  const assets = useAppSelector(getAssets);
+  const { marginAccountList } = useMarginAccount();
+  const { ReduxcategoryAssets1, ReduxSlippageTolerance } = useAppSelector(
+    (state) => state.category,
+  );
   const accountId = useAccountId();
   const { simplePools, stablePools, stablePoolsDetail } = usePoolsData();
 
   const assetD = getAssetById(item.token_d_info.token_id);
   const assetC = getAssetById(item.token_c_info.token_id);
   const assetP = getAssetById(item.token_p_id);
-
   const { price: priceD, symbol: symbolD, decimals: decimalsD } = getAssetDetails(assetD);
   const { price: priceC, symbol: symbolC, decimals: decimalsC } = getAssetDetails(assetC);
   const { price: priceP, symbol: symbolP, decimals: decimalsP } = getAssetDetails(assetP);
@@ -50,7 +73,6 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
   const leverageD = parseTokenValue(item.token_d_info.balance, decimalsD);
   const leverageC = parseTokenValue(item.token_c_info.balance, decimalsC);
   const leverage = calculateLeverage(leverageD, priceD, leverageC, priceC);
-
   const positionType = getPositionType(item.token_d_info.token_id);
 
   const sizeValueLong = parseTokenValue(item.token_p_amount, decimalsP);
@@ -60,64 +82,85 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
 
   const netValue = parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
   const collateral = parseTokenValue(item.token_c_info.balance, decimalsC);
-  // const entryPrice =
-  //   positionType.label === "Long"
-  //     ? sizeValueLong === 0
-  //       ? 0
-  //       : (leverageD * priceD) / sizeValueLong
-  //     : sizeValueShort === 0
-  //     ? 0
-  //     : netValue / sizeValueShort;
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
-  const rowData = {
-    pos_id: itemKey,
-    data: item,
-  };
 
-  const dispatch = useAppDispatch();
-  const theme = useTheme();
-  const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
   const actionShowRedColor = positionType.label === "Long";
 
+  // get estimate token in amount
+  useEffect(() => {
+    if (positionType.label === "Short") {
+      getMinRequiredPAmount().then((res) => {
+        setTokenInAmount(res || "0");
+      });
+    } else {
+      setTokenInAmount(
+        shrinkTokenDecimal(item.token_p_amount, assetP.config.extra_decimals).toFixed(
+          0,
+          Decimal.ROUND_DOWN,
+        ),
+      );
+    }
+  }, [positionType.label]);
+
+  // estimate
   const estimateData = useEstimateSwap({
     tokenIn_id: item.token_p_id,
     tokenOut_id: item.token_d_info.token_id,
-    tokenIn_amount:
-      item.token_p_id === item.token_c_info.token_id
-        ? shrinkToken(Number(item.token_p_amount) + Number(item.token_c_info.balance), decimalsP)
-        : shrinkToken(item.token_p_amount, decimalsP),
+    tokenIn_amount: shrinkToken(tokenInAmount || "0", assetP.metadata.decimals),
     account_id: accountId,
     simplePools,
     stablePools,
     stablePoolsDetail,
     slippageTolerance: ReduxSlippageTolerance / 100,
+    forceUpdate,
   });
+
+  useEffect(() => {
+    intervalRef.current = setInterval(() => {
+      setForceUpdate((prev) => prev + 1);
+    }, 20_000);
+    return () => clearInterval(intervalRef.current);
+  }, []);
 
   useEffect(() => {
     setIsDisabled(!estimateData?.swap_indication || !estimateData?.min_amount_out);
   }, [estimateData]);
-  const [isDisabled, setIsDisabled] = useState(false);
+
+  const Fee = useMemo(() => {
+    const uahpi: any = shrinkToken((assets as any).data[item.token_p_id]?.uahpi, 18) ?? 0;
+    const uahpi_at_open: any = shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
+    const { debt_cap } = item;
+    return {
+      HPFee: +shrinkToken(debt_cap, decimalsD) * priceD * (uahpi * 1 - uahpi_at_open * 1),
+      swapFee:
+        ((estimateData?.fee ?? 0) / 10000) *
+        +shrinkToken(tokenInAmount || "0", assetP.metadata.decimals) *
+        (actionShowRedColor ? 1 : priceD || 0),
+    };
+  }, [collateral, ReduxcategoryAssets1, estimateData]);
+
+  // Methods
   const handleCloseOpsitionEvt = async () => {
     setIsDisabled(true);
     try {
       const res = await closePosition({
         isLong: positionType.label === "Long",
-        swap_indication: estimateData.swap_indication,
-        min_token_d_amount: estimateData.min_amount_out,
+        swap_indication: estimateData!.swap_indication,
+        min_token_d_amount: expandToken(
+          estimateData!.min_amount_out,
+          assetD.config.extra_decimals || 0,
+          0,
+        ),
         pos_id: itemKey,
         token_p_id: item.token_p_id,
         token_d_id: item.token_d_info.token_id,
-        token_p_amount:
-          item.token_p_id === item.token_c_info.token_id
-            ? toDecimal(Number(item.token_p_amount) + Number(item.token_c_info.balance))
-            : item.token_p_amount,
+        token_p_amount: expandToken(tokenInAmount || "0", assetP.config.extra_decimals, 0),
       });
 
       onClose();
-      console.log(res);
       if (res !== undefined && res !== null) {
         showPositionClose({
-          type: positionType.label,
+          type: positionType.label as "Long" | "Short",
         });
       }
     } catch (error) {
@@ -125,6 +168,65 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
     } finally {
       setIsDisabled(false);
     }
+  };
+
+  async function getMinRequiredPAmount() {
+    const mins = 5;
+    const dAmount = shrinkTokenDecimal(
+      item.token_d_info.balance,
+      assetD.config.extra_decimals,
+    ).toFixed(0, Decimal.ROUND_UP);
+    const accruedInterest = new Decimal(assetD.borrow_apr).mul(dAmount).div(365 * 24 * 60 * mins);
+    const totalHpFee = get_total_hp_fee();
+    const slippage = Number(ReduxSlippageTolerance) / 100;
+    const min_amount_out = accruedInterest.plus(totalHpFee).plus(dAmount);
+    const amountOut = min_amount_out.div(1 - slippage);
+    const res = await findPathReserve({
+      amountOut: amountOut.toFixed(0, Decimal.ROUND_UP),
+      tokenIn: item.token_p_id,
+      tokenOut: item.token_d_info.token_id,
+      slippage: Number(ReduxSlippageTolerance) / 100,
+    });
+    const requiredPAmount = res.result_data.amount_in;
+    const token_p_amount = shrinkTokenDecimal(
+      item.token_p_amount,
+      assetP.config.extra_decimals,
+    ).toFixed(0, Decimal.ROUND_UP);
+    const balance_c_plus_p = shrinkTokenDecimal(
+      new Decimal(item?.token_c_info?.balance || 0).plus(item.token_p_amount || 0).toFixed(0),
+      assetP.config.extra_decimals,
+    ).toFixed(0, Decimal.ROUND_DOWN);
+    const requiredPAmountOnShort = Decimal.min(
+      balance_c_plus_p,
+      Decimal.max(requiredPAmount, token_p_amount),
+    ).toFixed(0);
+    return requiredPAmountOnShort;
+  }
+
+  function get_total_hp_fee() {
+    const uahpi = assetD.uahpi;
+    const { uahpi_at_open, debt_cap } = item;
+    return shrinkTokenDecimal(
+      new Decimal(uahpi).minus(uahpi_at_open).mul(debt_cap).toFixed(0, Decimal.ROUND_UP),
+      18,
+    ).toFixed(0, Decimal.ROUND_UP);
+  }
+
+  // for js decimal issue TODO
+  function calculateUnitAccHpInterest(holdingPositionFeeRate: string, timeDiffMs: number) {
+    const UNIT = new Decimal(10).pow(18);
+    const DIVISOR = new Decimal(10).pow(27);
+    const HALF_DIVISOR = DIVISOR.div(2);
+    const realRate = new Decimal(holdingPositionFeeRate).div(DIVISOR);
+    const hp_rate = realRate.pow(timeDiffMs);
+    const round_mul_u128 = UNIT.plus(HALF_DIVISOR).div(DIVISOR);
+    const result = hp_rate.mul(round_mul_u128).minus(UNIT);
+    return result;
+  }
+
+  const formatDecimal = (value: number) => {
+    if (!value) return "0";
+    return value.toFixed(6).replace(/\.?0+$/, "");
   };
   return (
     <MUIModal open={open} onClose={onClose}>
@@ -176,25 +278,6 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
               <div className="text-gray-300">Index Price</div>
               <div>${indexPrice}</div>
             </div>
-
-            {/* <div className="flex items-center justify-between text-sm mb-4">
-              <div className="text-gray-300">Leverage</div>
-              <div className="flex items-center justify-center">
-                <span className="text-gray-300 mr-2 line-through">{leverage.toFixed(2)}X</span>
-                <RightArrow />
-                <p className="ml-2"> 0.0X</p>
-              </div>
-            </div>
-            <div className="flex items-center justify-between text-sm mb-4">
-              <div className="text-gray-300">Liq. Price</div>
-              <div className="flex items-center justify-center">
-                <span className="text-gray-300 mr-2 line-through">
-                  ${toInternationalCurrencySystem_number(LiqPrice)}
-                </span>
-                <RightArrow />
-                <p className="ml-2"> $0.00</p>
-              </div>
-            </div> */}
             {/*  */}
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Collateral</div>
@@ -219,6 +302,33 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
                 </span>
               </div>
             </div>
+
+            <div className="flex items-center justify-between text-sm mb-4">
+              <div className="text-gray-300">Fee</div>
+              <div className="flex items-center justify-center relative">
+                <p
+                  className="border-b border-dashed border-dark-800 cursor-pointer"
+                  onMouseEnter={() => setShowFeeModal(true)}
+                  onMouseLeave={() => setShowFeeModal(false)}
+                >
+                  ${beautifyPrice(Number(formatDecimal(Fee.swapFee + Fee.HPFee)))}
+                </p>
+
+                {showFeeModal && (
+                  <div className="absolute bg-[#14162B] text-white h-[50px] p-2 rounded text-xs top-[30px] left-[-66px] flex flex-col items-start justify-between z-[1] w-auto">
+                    <p>
+                      <span className="mr-1 whitespace-nowrap">Hold Fee:</span>$
+                      {beautifyPrice(Fee.HPFee)}
+                    </p>
+                    <p>
+                      <span className="mr-1 whitespace-nowrap">Trade Fee:</span>$
+                      {beautifyPrice(Fee.swapFee)}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* <div
               className={`flex items-center justify-between text-dark-200 text-base rounded-md h-12 text-center cursor-pointer ${
                 actionShowRedColor ? "bg-primary" : "bg-red-50"

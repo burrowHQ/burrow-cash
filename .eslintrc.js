@@ -3,6 +3,7 @@ module.exports = {
     browser: true,
     es2021: true,
   },
+  ignorePatterns: ["node_modules/"],
   extends: [
     "airbnb",
     "plugin:react/recommended",
@@ -78,6 +79,7 @@ module.exports = {
     "array-callback-return": "off",
     "prefer-template": "off",
     "no-restricted-syntax": "off",
+    "prefer-destructuring": "off",
   },
   settings: {
     react: {

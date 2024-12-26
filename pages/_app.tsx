@@ -24,13 +24,19 @@ import { fetchConfig } from "../redux/appSlice";
 import { fetchMarginAccount } from "../redux/marginAccountSlice";
 import { fetchMarginConfig } from "../redux/marginConfigSlice";
 import { ToastMessage } from "../components/ToastMessage";
-import Popup from "../components/popup";
+// import Popup from "../components/popup";
 import RpcList from "../components/Rpc";
 import PubTestModal from "../components/PubTestModal";
 import { getAccountId, getAccountPortfolio } from "../redux/accountSelectors";
 import { getAssets } from "../redux/assetsSelectors";
 import { getConfig } from "../redux/appSelectors";
+import { fetchAllPools } from "../redux/poolSlice";
 import "./slip.css";
+import { get_blocked } from "../api/get-blocked";
+import Popup from "../components/popup";
+import { getMarginAccountSupplied } from "../redux/marginAccountSelectors";
+import BalanceReminder from "../components/BalanceReminder";
+import { useMarginAccount } from "../hooks/useMarginAccount";
 
 ModalReact.defaultStyles = {
   overlay: {
@@ -91,6 +97,7 @@ const Init = () => {
     dispatch(fetchConfig());
     dispatch(fetchMarginAccount());
     dispatch(fetchMarginConfig());
+    dispatch(fetchAllPools());
   };
   useEffect(fetchData, []);
   useInterval(fetchData, !isIdle ? REFETCH_INTERVAL : null);
@@ -98,12 +105,21 @@ const Init = () => {
   return null;
 };
 function Upgrade({ Component, pageProps }) {
+  const { getAssetById } = useMarginAccount();
   const [upgrading, setUpgrading] = useState<boolean>(true);
+  const [showTip, setShowTip] = useState<boolean>(true);
+  const accountSupplied = useAppSelector(getMarginAccountSupplied);
   const dispatch = useAppDispatch();
   const accountId = useAppSelector(getAccountId);
   const portfolio = useAppSelector(getAccountPortfolio);
   const assets = useAppSelector(getAssets);
   const config = useAppSelector(getConfig);
+  const hasValidAccountSupplied =
+    accountSupplied.length > 0 &&
+    accountSupplied.some((token) => {
+      const assetDetails = getAssetById(token.token_id);
+      return token.balance.toString().length >= assetDetails.config.extra_decimals;
+    });
   useEffect(() => {
     if (
       !portfolio.positions ||
@@ -145,12 +161,13 @@ function Upgrade({ Component, pageProps }) {
         </div>
       ) : (
         <Layout>
-          <Popup className="lg:hidden" />
+          {/* <Popup className="lg:hidden" /> */}
           <Init />
           <Modal />
           <ToastMessage />
           <Component {...pageProps} />
-          <Popup className="xsm:hidden" />
+          {/* <Popup className="xsm:hidden" /> */}
+          {hasValidAccountSupplied && <BalanceReminder />}
           <RpcList />
           <PubTestModal />
         </Layout>
@@ -160,7 +177,15 @@ function Upgrade({ Component, pageProps }) {
 }
 export default function MyApp({ Component, pageProps }: AppProps) {
   const [progress, setProgress] = useState(0);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const blockFeatureEnabled = true;
+  // const blockFeatureEnabled = false;
   const router = useRouter();
+  useEffect(() => {
+    if (blockFeatureEnabled) {
+      checkBlockedStatus();
+    }
+  }, [blockFeatureEnabled]);
   useEffect(() => {
     router.events.on("routeChangeStart", () => {
       setProgress(30);
@@ -169,6 +194,29 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       setProgress(100);
     });
   }, []);
+  function checkBlockedStatus() {
+    get_blocked().then((res) => {
+      if (res.blocked === true) {
+        const blockConfirmationTime = localStorage.getItem("blockConfirmationTime");
+        if (blockConfirmationTime) {
+          const currentTime = new Date().getTime();
+          const weekInMilliseconds = 7 * 24 * 60 * 60 * 1000;
+          if (currentTime - parseInt(blockConfirmationTime, 10) < weekInMilliseconds) {
+            setIsBlocked(false);
+          } else {
+            setIsBlocked(true);
+          }
+        } else {
+          setIsBlocked(true);
+        }
+      }
+    });
+  }
+  function handleBlockConfirmation() {
+    const currentTime = new Date().getTime();
+    localStorage.setItem("blockConfirmationTime", currentTime.toString());
+    setIsBlocked(false);
+  }
   return (
     <ErrorBoundary fallback={FallbackError}>
       <LoadingBar
@@ -186,6 +234,33 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           <Upgrade Component={Component} pageProps={pageProps} />
         </PersistGate>
       </Provider>
+      {isBlocked && blockFeatureEnabled && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center"
+          style={{
+            zIndex: "999999999",
+            backdropFilter: "blur(6px)",
+            height: "100vh",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            className="text-white text-center bg-dark-100 px-5 pt-9 pb-7 rounded-md border border-dark-300"
+            style={{ width: "278px" }}
+          >
+            <p className="text-sm">
+              You are prohibited from accessing app.burrow.finance due to your location or other
+              infringement of the Terms of Services.
+            </p>
+            <div
+              onClick={handleBlockConfirmation}
+              className="mt-6 border border-primary h-9 flex items-center justify-center rounded-md text-sm text-black text-primary cursor-pointer ml-1.5 mr-1.5"
+            >
+              Confirm
+            </div>
+          </div>
+        </div>
+      )}
     </ErrorBoundary>
   );
 }

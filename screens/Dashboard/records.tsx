@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useRef, useState } from "react";
 import CustomTable from "../../components/CustomTable/CustomTable";
 import Datasource from "../../data/datasource";

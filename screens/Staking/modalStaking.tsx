@@ -47,7 +47,7 @@ const ModalStaking = ({ isOpen, onClose }) => {
   const selectedMonths = stakingTimestamp ? Math.round(unstakeDate.diffNow().as("months")) : months;
   const invalidAmount = +amount > +total;
   const invalidMonths = months === maxMonth ? false : months < selectedMonths;
-  const disabledStake = !amount || invalidAmount || invalidMonths;
+  const disabledStake = !amount || invalidAmount || invalidMonths || Number(amount) === 0;
   const { avgStakeSupplyAPY, avgStakeBorrowAPY, avgStakeNetAPY, totalTokenNetMap } =
     useStakeRewardApy();
   const [, , multiplier] = useAppSelector(getAccountBoostRatioData);
@@ -58,30 +58,37 @@ const ModalStaking = ({ isOpen, onClose }) => {
     .replace(/(?!^)-/g, "")
     .replace(/^0+(\d)/gm, "$1");
 
-  const sliderValue = Math.round((amount * 100) / Number(total)) || 0;
+  const sliderValue = useMemo(() => {
+    if (Number(amount) > Number(total)) {
+      return 100;
+    }
+    return Math.round((Number(amount) * 100) / Number(total)) || 0;
+  }, [amount, total]);
 
   const handleMaxClick = () => {
     trackMaxStaking({ total: totalToken });
     setAmount(totalToken);
   };
   const handleInputChange = (e) => {
-    let { value } = e?.target || {};
+    const { value } = e?.target || {};
     const numRegex = /^([0-9]*\.?[0-9]*$)/;
     if (!numRegex.test(value)) {
       e.preventDefault();
       return;
     }
-    if (Number(value) > Number(total)) {
-      value = total;
-    }
     setAmount(value);
   };
 
   const handleRangeSliderChange = (percent) => {
-    if (Number(percent) >= 99.7) {
+    if (Number(total) === 0) {
+      setAmount("0");
+    } else if (percent >= 100) {
+      setAmount(totalToken);
+    } else if (Number(percent) >= 99.7) {
       setAmount(totalToken);
     } else {
-      setAmount((Number(total) * percent) / 100);
+      const calculatedAmount = (Number(total) * percent) / 100;
+      setAmount(Number(calculatedAmount) === 0 ? "0" : calculatedAmount);
     }
   };
 
@@ -210,7 +217,7 @@ const ModalStaking = ({ isOpen, onClose }) => {
           isLoading={loadingStake}
           className="w-full mt-2 mb-4"
         >
-          Stake
+          {Number(amount) > Number(total) ? "Insufficient Balance" : "Stake"}
         </CustomButton>
 
         <div className="text-primary h5 mb-4 text-center">

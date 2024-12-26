@@ -8,7 +8,7 @@ import { ComeBackIcon, ShrinkArrow, TokenArrow } from "./components/TradingIcon"
 import { NearIcon } from "../MarginTrading/components/Icon";
 import TradingTable from "./components/Table";
 import TradingOperate from "./components/TradingOperate";
-import { getAssets } from "../../redux/assetsSelectors";
+import { getAssets as getAssetsSelector } from "../../redux/assetsSelectors";
 import { shrinkToken } from "../../store";
 import { getMarginConfig } from "../../redux/marginConfigSelectors";
 import { formatWithCommas_usd, toInternationalCurrencySystem_number } from "../../utils/uiNumber";
@@ -20,9 +20,12 @@ import { useRouterQuery } from "../../utils/txhashContract";
 import { handleTransactionResults, handleTransactionHash } from "../../services/transaction";
 import DataSource from "../../data/datasource";
 import TradingViewChart from "../../components/marginTrading/TradingViewChart";
-import { standardizeAsset } from "../../utils";
+import { standardizeAsset, nearTokenId } from "../../utils";
 import { isMobileDevice } from "../../helpers/helpers";
 import TradingOperateMobile from "./components/TradingOperateMobile";
+import getAssets from "../../api/get-assets";
+import { beautifyPrice } from "../../utils/beautyNumbet";
+import { getSymbolById } from "../../transformers/nearSymbolTrans";
 
 init_env("dev");
 
@@ -37,7 +40,7 @@ const Trading = () => {
   const router = useRouter();
   const { id }: any = router.query;
   const dispatch = useAppDispatch();
-  const assets = useAppSelector(getAssets);
+  const assets = useAppSelector(getAssetsSelector);
   const [showPopupCate1, setShowPopup1] = useState(false);
   const [showPopupCate2, setShowPopup2] = useState(false);
 
@@ -47,33 +50,36 @@ const Trading = () => {
 
   const [longAndShortPosition, setLongAndShortPosition] = useState<any>([]);
 
+  const assetData: any = assets.data[id];
+  const margin_position = assetData ? assetData?.margin_position : null;
+  const metadata = assetData ? assetData?.metadata : {};
+  const config = assetData ? assetData?.config : {};
+  const margin_debt = assetData ? assetData?.margin_debt : {};
+  const decimals = metadata?.decimals || 0;
+  const extra_decimals = config?.extra_decimals || 0;
+
   let timer;
-  console.log(currentTokenCate1);
-  // computed currentTokenCate1 dropdown
+
   useEffect(() => {
     if (id) {
       setCurrentTokenCate1(assets.data[id]);
       dispatch(setCategoryAssets1(assets.data[id]));
       dispatch(setCategoryAssets2(currentTokenCate2 || categoryAssets2[0]));
     }
-
-    // deal long & short position
-    if (id && currentTokenCate1?.metadata) {
-      //
-      const { margin_position, metadata, config, margin_debt } = currentTokenCate1;
-      const { decimals } = metadata;
-      const { extra_decimals } = config;
-
-      setLongAndShortPosition([
-        toInternationalCurrencySystem_number(
-          shrinkToken(margin_position, decimals + extra_decimals),
-        ),
-        toInternationalCurrencySystem_number(
-          shrinkToken(margin_debt?.balance, decimals + extra_decimals),
-        ),
-      ]);
-    }
   }, [id, currentTokenCate1]);
+
+  useMemo(() => {
+    setLongAndShortPosition([
+      toInternationalCurrencySystem_number(
+        +shrinkToken(margin_position, decimals + extra_decimals) *
+          (assets.data[id]?.price?.usd || 0),
+      ),
+      toInternationalCurrencySystem_number(
+        +shrinkToken(margin_debt?.balance, decimals + extra_decimals) *
+          (assets.data[id]?.price?.usd || 0),
+      ),
+    ]);
+  }, [assets.data[id]?.price?.usd]);
 
   useMemo(() => {
     setCurrentTokenCate1(ReduxcategoryAssets1);
@@ -126,7 +132,7 @@ const Trading = () => {
       (async () => {
         const txHash = await handleTransactionHash(query?.transactionHashes);
         txHash
-          .filter((item) => item.hasStorageDeposit)
+          .filter((item) => !item.hasStorageDeposit)
           .forEach(async (item) => {
             try {
               await DataSource.shared.getMarginTradingPosition({
@@ -146,10 +152,10 @@ const Trading = () => {
       Object.keys(filterMarginConfigList || []),
     );
   }, [query?.transactionHashes, query?.errorMessage]);
-
-  const filterTitle = `${
-    currentTokenCate1?.metadata?.symbol == "wNEAR" ? "NEAR" : currentTokenCate1?.metadata?.symbol
-  }/${currentTokenCate2?.metadata?.symbol}`;
+  const filterTitle = `${getSymbolById(
+    currentTokenCate1?.token_id,
+    currentTokenCate1?.metadata?.symbol,
+  )}/${getSymbolById(currentTokenCate2?.token_id, currentTokenCate2?.metadata?.symbol)}`;
 
   const [volumeStats, setVolumeStats] = useState<any>({});
   useEffect(() => {
@@ -165,7 +171,11 @@ const Trading = () => {
       }
     };
 
-    fetchVolumeStats();
+    fetchVolumeStats(); // Initial fetch
+
+    const intervalId = setInterval(fetchVolumeStats, 10000); // Fetch every 10 seconds
+
+    return () => clearInterval(intervalId); // Cleanup on unmount
   }, []);
 
   const [open, setOpen] = useState(false);
@@ -188,7 +198,7 @@ const Trading = () => {
             {/* cate1 */}
             <div onMouseLeave={() => handleMouseLeave("1")} className="cursor-pointer relative ">
               <div onMouseEnter={() => handleMouseEnter("1")} className="flex items-center">
-                {currentTokenCate1?.metadata?.symbol === "wNEAR" ? (
+                {currentTokenCate1?.token_id == nearTokenId ? (
                   <NearIcon />
                 ) : (
                   <img
@@ -198,9 +208,7 @@ const Trading = () => {
                   />
                 )}
                 <p className="ml-2 mr-3.5 text-lg">
-                  {currentTokenCate1?.metadata?.symbol === "wNEAR"
-                    ? "NEAR"
-                    : currentTokenCate1?.metadata?.symbol}
+                  {getSymbolById(currentTokenCate1?.token_id, currentTokenCate1?.metadata?.symbol)}
                 </p>
                 {/* <TokenArrow /> */}
               </div>
@@ -236,14 +244,14 @@ const Trading = () => {
                           className="py-1 pl-1.5 hover:bg-gray-950"
                           onClick={() => handleTokenSelectCate2(item)}
                         >
-                          {item?.metadata?.symbol === "wNEAR" ? "NEAR" : item?.metadata?.symbol}
+                          {getSymbolById(item.token_id, item.metadata?.symbol)}
                         </div>
                       ))}
                     </div>
                   )}
                 </div>
               </div>
-              <span>${currentTokenCate1?.price?.usd}</span>
+              <span>${assets.data[id]?.price?.usd || 0}</span>
             </div>
             {/* total v */}
             <div className="text-sm">
@@ -259,7 +267,7 @@ const Trading = () => {
             <div className="text-sm">
               <p className="text-gray-300 mb-1.5">Long / Short Positions</p>
               <span>
-                ${longAndShortPosition[0]} / ${longAndShortPosition[1]}
+                ${longAndShortPosition[0] || "-"} / ${longAndShortPosition[1] || "-"}
               </span>
             </div>
           </div>
@@ -277,11 +285,12 @@ const Trading = () => {
                 />
                 <div className="flex flex-col">
                   <p className="text-base text-white">
-                    {currentTokenCate1?.metadata?.symbol === "wNEAR"
-                      ? "NEAR"
-                      : currentTokenCate1?.metadata?.symbol}
+                    {getSymbolById(
+                      currentTokenCate1?.token_id,
+                      currentTokenCate1?.metadata?.symbol,
+                    )}
                   </p>
-                  <p className="text-[#C0C4E9] text-xs">${currentTokenCate1?.price?.usd}</p>
+                  <p className="text-[#C0C4E9] text-xs">${assets.data[id]?.price?.usd || 0}</p>
                 </div>
 
                 {/* cate2 */}
@@ -314,7 +323,7 @@ const Trading = () => {
                               className="py-1 pl-1.5 hover:bg-gray-950"
                               onClick={() => handleTokenSelectCate2(item)}
                             >
-                              {item?.metadata?.symbol === "wNEAR" ? "NEAR" : item?.metadata?.symbol}
+                              {getSymbolById(item.token_id, item.metadata?.symbol)}
                             </div>
                           ))}
                         </div>
@@ -340,7 +349,7 @@ const Trading = () => {
             <div className="text-sm flex items-center justify-between">
               <p className="text-gray-300 mb-1.5">Long / Short Positions</p>
               <span>
-                ${longAndShortPosition[0]} / ${longAndShortPosition[1]}
+                ${longAndShortPosition[0] || "-"} / ${longAndShortPosition[1] || "-"}
               </span>
             </div>
           </div>
@@ -357,7 +366,7 @@ const Trading = () => {
           <TradingOperate />
         </div>
       </div>
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 w-full h-[137px] rounded-t-[8px] px-[26px] flex flex-col justify-center items-center bg-[#383A56] z-10">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 w-full h-[116px] rounded-t-[8px] px-[26px] flex flex-col justify-center items-center bg-[#383A56] z-[12]">
         <div
           className="w-full flex items-center justify-center h-[46px] bg-primary rounded-[6px] text-[#14162B] text-base font-bold"
           onClick={() => {
@@ -366,9 +375,6 @@ const Trading = () => {
         >
           Long/Short
         </div>
-        <p className="w-full text-[#6F7188] text-xs relative bottom-[-22px] left-[-12px]">
-          Declaration and Disclaimers
-        </p>
       </div>
       {accountId && <TradingTable positionsList={marginAccountList} filterTitle={filterTitle} />}
       <TradingOperateMobile open={open} onClose={() => setOpen(false)} />

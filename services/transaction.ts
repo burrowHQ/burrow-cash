@@ -4,6 +4,7 @@ import {
   showPositionResult,
   showPositionClose,
   showPositionFailure,
+  showChangeCollateralPosition,
 } from "../components/HashResultModal";
 import { useMarginConfigToken } from "../hooks/useMarginConfig";
 
@@ -50,6 +51,19 @@ export const handleTransactionResults = async (
       }
 
       results.forEach(({ result, hasStorageDeposit }: TransactionResult) => {
+        const marginTransactionType = localStorage.getItem("marginTransactionType");
+        if (marginTransactionType === "changeCollateral") {
+          const collateralInfo = JSON.parse(localStorage.getItem("collateralInfo") || "{}");
+          showChangeCollateralPosition({
+            title: "Change Collateral",
+            icon: collateralInfo.iconC,
+            type: collateralInfo.positionType,
+            symbol: collateralInfo.symbol,
+            collateral: collateralInfo.addedValue,
+          });
+          // localStorage.removeItem("marginTransactionType");
+          return;
+        }
         if (hasStorageDeposit) {
           const args = parsedArgs(result?.transaction?.actions?.[0]?.FunctionCall?.args || "");
           const { actions } = JSON.parse(args || "");
@@ -79,17 +93,20 @@ export const handleTransactionResults = async (
             ).toString(),
             transactionHashes: txhash[0],
             positionSize: {
-              amount: isLong
-                ? shrinkToken(
-                    actions[0]?.OpenPosition?.min_token_p_amount,
-                    cateSymbolAndDecimals?.decimals || 24,
-                  )
-                : shrinkToken(
-                    actions[0]?.OpenPosition?.token_d_amount,
-                    cateSymbolAndDecimals?.decimals || 24,
-                  ),
+              // amount: isLong
+              //   ? shrinkToken(
+              //       actions[0]?.OpenPosition?.min_token_p_amount,
+              //       cateSymbolAndDecimals?.decimals || 24,
+              //     )
+              //   : shrinkToken(
+              //       actions[0]?.OpenPosition?.token_d_amount,
+              //       cateSymbolAndDecimals?.decimals || 24,
+              //     ),
+              // symbol: cateSymbolAndDecimals?.cateSymbol || "NEAR",
+              // usdValue: cateSymbolAndDecimals?.price || "1",
+              amount: cateSymbolAndDecimals?.amount || "",
+              totalPrice: cateSymbolAndDecimals?.totalPrice || "",
               symbol: cateSymbolAndDecimals?.cateSymbol || "NEAR",
-              usdValue: "1000",
             },
           });
         }
@@ -129,23 +146,23 @@ export const handleTransactionHash = async (
           if (isMarginExecute) {
             const args = parsedArgs(result?.transaction?.actions?.[0]?.FunctionCall?.args || "");
             const { actions } = JSON.parse(args || "");
-            hasStorageDeposit = !actions[0]?.CloseMTPosition;
+            hasStorageDeposit = Reflect.has(actions[0], "OpenPosition");
           }
 
           return { txHash, result, hasStorageDeposit };
         }),
       );
 
-      // 检查是否有任何一个交易的 hasStorageDeposit 为 false
-      const hasAnyFalseStorageDeposit = results.some((result) => !result.hasStorageDeposit);
+      // // 检查是否有任何一个交易的 hasStorageDeposit 为 false
+      // const hasAnyFalseStorageDeposit = results.some((result) => !result.hasStorageDeposit);
 
-      // 如果有任何一个为 false，则所有结果的 hasStorageDeposit 都设为 false
-      if (hasAnyFalseStorageDeposit) {
-        return results.map((result) => ({
-          ...result,
-          hasStorageDeposit: false,
-        }));
-      }
+      // // 如果有任何一个为 false，则所有结果的 hasStorageDeposit 都设为 false
+      // if (hasAnyFalseStorageDeposit) {
+      //   return results.map((result) => ({
+      //     ...result,
+      //     hasStorageDeposit: false,
+      //   }));
+      // }
 
       return results;
     } catch (error) {

@@ -12,7 +12,7 @@ interface PositionResultProps {
   positionSize?: {
     amount: string;
     symbol: string;
-    usdValue: string;
+    totalPrice: string;
   };
 }
 
@@ -34,7 +34,7 @@ const ModalWithCountdown = ({
   positionSize = {
     amount: "0",
     symbol: "NEAR",
-    usdValue: "$0.00",
+    totalPrice: "$0.00",
   },
 }: PositionResultProps) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -95,7 +95,7 @@ const ModalWithCountdown = ({
   return (
     <div>
       {isModalVisible && (
-        <div className="z-50 fixed right-5 bottom-10 w-93 h-36 bg-dark-100 text-white border-gray-1250 border rounded-sm">
+        <div className="z-50 fixed lg:right-5 bottom-10 lg:w-93 xsm:w-[94vw] xsm:ml-[3vw] bg-dark-100 text-white  border border-gray-1250 rounded-sm">
           <div className="relatvie w-full h-full p-6 flex flex-col justify-between">
             <div
               onClick={hideModal}
@@ -131,7 +131,7 @@ const ModalWithCountdown = ({
               <span>
                 {beautifyPrice(Number(positionSize.amount))} {positionSize.symbol}
                 <span className="text-xs text-gray-300">
-                  (${beautifyPrice(Number(positionSize.amount) * Number(price))})
+                  (${beautifyPrice(Number(positionSize.totalPrice))})
                 </span>
               </span>
             </div>

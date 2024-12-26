@@ -15,8 +15,10 @@ import {
   ChangeMethodsREFV1,
   ViewMethodsPyth,
   ChangeMethodsPyth,
+  ViewMethodsDcl,
+  ChangeMethodsDcl,
 } from "../interfaces/contract-methods";
-import { IBurrow, IConfig } from "../interfaces/burrow";
+import { IBurrow, IViewReturnType } from "../interfaces/burrow";
 import { getContract } from "../store";
 
 import { getWalletSelector, getAccount, functionCall } from "./wallet-selector-compat";
@@ -24,6 +26,7 @@ import { IAssetFarmReward } from "../interfaces/asset";
 import { FarmData, Portfolio, Farm } from "../redux/accountState";
 // eslint-disable-next-line import/no-cycle
 import { IPortfolioReward } from "../redux/selectors/getAccountRewards";
+import { IConfig } from "../interfaces";
 
 export const getViewAs = () => {
   if (window.location.href.includes("#instant-url")) {
@@ -106,7 +109,7 @@ export const getBurrow = async ({
     methodName: string,
     args: Record<string, unknown> = {},
     json = true,
-  ): Promise<Record<string, any> | string> => {
+  ): Promise<IViewReturnType> => {
     try {
       const viewAccount = await getAccount(getViewAs());
       return await viewAccount.viewFunction(contract.contractId, methodName, args, {
@@ -168,15 +171,17 @@ export const getBurrow = async ({
     ViewMethodsLogic[ViewMethodsLogic.get_config],
   )) as IConfig;
 
+  const oracle_account_id = getConfig().ORACLE_ACCOUNT_ID;
+  const ref_exchange_id = getConfig().REF_EXCHANGE_ID;
   const oracleContract: Contract = await getContract(
     account,
-    config.oracle_account_id,
+    oracle_account_id,
     ViewMethodsOracle,
     ChangeMethodsOracle,
   );
   const refv1Contract: Contract = await getContract(
     account,
-    config.ref_exchange_id,
+    ref_exchange_id,
     ViewMethodsREFV1,
     ChangeMethodsREFV1,
   );
@@ -185,6 +190,12 @@ export const getBurrow = async ({
     getConfig().PYTH_ORACLE_CONTRACT_ID,
     ViewMethodsPyth,
     ChangeMethodsPyth,
+  );
+  const dclContract: Contract = await getContract(
+    account,
+    getConfig().DCL_SWAP_CONTRACT_ID,
+    ViewMethodsDcl,
+    ChangeMethodsDcl,
   );
 
   if (localStorage.getItem("near-wallet-selector:selectedWalletId") == null) {
@@ -209,6 +220,7 @@ export const getBurrow = async ({
     oracleContract,
     refv1Contract,
     pythContract,
+    dclContract,
     view,
     call,
     config,

@@ -1,6 +1,6 @@
 import BN from "bn.js";
 import { getBurrow } from "../../utils";
-import { expandTokenDecimal } from "../helper";
+import { expandToken } from "../helper";
 import { ChangeMethodsLogic, ChangeMethodsToken, ChangeMethodsOracle } from "../../interfaces";
 import { Transaction } from "../wallet";
 import { prepareAndExecuteTransactions } from "../tokens";
@@ -21,11 +21,7 @@ export async function increaseCollateral({
   const { logicContract, oracleContract } = await getBurrow();
   const { enable_pyth_oracle } = await getConfig();
   const transactions: Transaction[] = [];
-  const expanded_c_amount = expandTokenDecimal(
-    amount,
-    assets[token_c_id].metadata.decimals + assets[token_c_id].config.extra_decimals,
-  );
-  const expanded_token_c_amount = expandTokenDecimal(amount, assets[token_c_id].metadata.decimals);
+  const expanded_supply_amount = expandToken(amount, assets[token_c_id].metadata.decimals, 0);
   transactions.push({
     receiverId: token_c_id,
     functionCalls: [
@@ -34,7 +30,7 @@ export async function increaseCollateral({
         gas: new BN("100000000000000"),
         args: {
           receiver_id: logicContract.contractId,
-          amount: expanded_token_c_amount.toFixed(0),
+          amount: expanded_supply_amount,
           msg: '"DepositToMargin"',
         },
       },
@@ -45,7 +41,7 @@ export async function increaseCollateral({
       {
         IncreaseCollateral: {
           pos_id,
-          amount: expanded_c_amount.toFixed(0),
+          amount: expandToken(expanded_supply_amount, assets[token_c_id].config.extra_decimals, 0),
         },
       },
     ],
@@ -71,5 +67,7 @@ export async function increaseCollateral({
       },
     ],
   });
-  await prepareAndExecuteTransactions(transactions);
+  const result = await prepareAndExecuteTransactions(transactions);
+
+  return result;
 }

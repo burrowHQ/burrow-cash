@@ -234,6 +234,9 @@ export const expandToken = (
   return expandTokenDecimal(value, decimals).toFixed(fixed);
 };
 
+export const shrinkTokenDecimal = (value: string | number, decimals: string | number): Decimal => {
+  return new Decimal(value).div(new Decimal(10).pow(decimals));
+};
 export const shrinkToken = (
   value: string | number,
   decimals: string | number,

@@ -395,9 +395,11 @@ const ClaimButtonInAccount = (props) => {
 export const ConnectWalletButton = ({
   accountId,
   className,
+  isShort,
 }: {
   accountId;
   className?: string;
+  isShort?: boolean;
 }) => {
   const [isDisclaimerOpen, setDisclaimer] = useState(false);
   const { getDisclaimer: hasAgreedDisclaimer } = useDisclaimer();
@@ -425,12 +427,13 @@ export const ConnectWalletButton = ({
           textTransform: "none",
           fontSize: "16px",
           padding: "0 20px",
-          height: "42px",
+          height: className?.includes("h-") ? undefined : "42px",
           borderRadius: "6px",
           ":hover": {
             backgroundColor: "#D2FF3A",
             opacity: "0.8",
           },
+          backgroundColor: isShort ? "#FF6BA9" : "#D2FF3A",
         }}
         variant={accountId ? "outlined" : "contained"}
         onClick={onWalletButtonClick}

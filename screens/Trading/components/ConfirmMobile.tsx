@@ -1,12 +1,12 @@
-import React, { useState, createContext, useMemo, useEffect } from "react";
+import React, { useState, createContext, useEffect } from "react";
+import Decimal from "decimal.js";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
-import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { useAppSelector } from "../../../redux/hooks";
 import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
 import { CloseIcon } from "../../../components/Modal/svg";
-import { RefLogoIcon, RightShoulder, MaxPositionIcon } from "./TradingIcon";
-import { toInternationalCurrencySystem_number } from "../../../utils/uiNumber";
+import { RightShoulder, MaxPositionIcon } from "./TradingIcon";
 import { openPosition } from "../../../store/marginActions/openPosition";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";
@@ -14,21 +14,23 @@ import {
   YellowSolidSubmitButton as YellowSolidButton,
   RedSolidSubmitButton as RedSolidButton,
 } from "../../../components/Modal/button";
-import { shrinkToken } from "../../../store";
+import { shrinkToken, expandToken } from "../../../store";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
 import { getAccountId } from "../../../redux/accountSelectors";
-import { useRouterQuery } from "../../../utils/txhashContract";
-import { handleTransactionResults } from "../../../services/transaction";
-import { useToastMessage } from "../../../hooks/hooks";
+import { handleTransactionResults, handleTransactionHash } from "../../../services/transaction";
 import { showPositionFailure } from "../../../components/HashResultModal";
 import { getBurrow } from "../../../utils";
-
-const getTokenSymbolOnly = (assetId) => {
-  return assetId === "wNEAR" ? "NEAR" : assetId || "";
-};
+import DataSource from "../../../data/datasource";
+import { getSymbolById } from "../../../transformers/nearSymbolTrans";
+import { IConfirmMobileProps } from "../comInterface";
 
 export const ModalContext = createContext(null) as any;
-const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
+const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
+  open,
+  onClose,
+  action,
+  confirmInfo,
+}) => {
   const [burrowData, setBurrowData] = useState<{
     selector?: {
       wallet: () => Promise<{ id: string }>;
@@ -42,142 +44,99 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
     };
     initBurrow();
   }, []);
-  const { query } = useRouterQuery();
   const accountId = useAppSelector(getAccountId);
-  const dispatch = useAppDispatch();
   const theme = useTheme();
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
   const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
   const actionShowRedColor = action === "Long";
-  const [isDisabled, setIsDisabled] = useState(false);
-  const [isMinTokenPAmount, setIsMinTokenPAmount] = useState(false);
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
+  const [isMinTokenPAmount, setIsMinTokenPAmount] = useState<boolean>(false);
+  const [hasLiquidationRisk, setHasLiquidationRisk] = useState<boolean>(false);
   const { marginConfigTokens, filterMarginConfigList } = useMarginConfigToken();
-  const { max_active_user_margin_position, max_slippage_rate } = marginConfigTokens;
+  const { max_active_user_margin_position, max_slippage_rate, min_safety_buffer } =
+    marginConfigTokens;
   const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
-  const {
-    price: priceP,
-    symbol: symbolP,
-    decimals: decimalsP,
-  } = getAssetDetails(
-    action === "Long"
-      ? getAssetById(confirmInfo.longOutputName?.token_id)
-      : getAssetById(confirmInfo.longInputName?.token_id),
+  const assetP = getAssetById(
+    action === "Long" ? confirmInfo.longOutputName?.token_id : confirmInfo.longInputName?.token_id,
   );
-  const cateSymbol = getTokenSymbolOnly(ReduxcategoryAssets1?.metadata?.symbol);
-  // const confirmOpenPosition = async () => {
-  //   if (Object.values(marginAccountList).length >= max_active_user_margin_position) {
-  //     return showToast("User has exceeded the maximum number of open positions！");
-  //   }
+  const assetD = getAssetById(
+    action === "Long" ? confirmInfo.longInputName?.token_id : confirmInfo.longOutputName?.token_id,
+  );
+  const assetC = action === "Long" ? assetD : assetP;
+  const decimalsD = +assetD.config.extra_decimals + +assetD.metadata.decimals;
+  const decimalsP = +assetP.config.extra_decimals + +assetP.metadata.decimals;
+  const decimalsC = action === "Long" ? decimalsD : decimalsP;
 
-  //   setIsDisabled(true);
-  //   if (action === "Long") {
-  //     try {
-  //       const res: any = await openPosition({
-  //         token_c_amount: confirmInfo.longInput,
-  //         token_c_id: confirmInfo.longInputName?.token_id,
-  //         token_d_amount: confirmInfo.tokenInAmount,
-  //         token_d_id: confirmInfo.longInputName?.token_id,
-  //         token_p_id: confirmInfo.longOutputName?.token_id,
-  //         min_token_p_amount: confirmInfo.estimateData.min_amount_out,
-  //         swap_indication: confirmInfo.estimateData.swap_indication,
-  //         assets: confirmInfo.assets.data,
-  //       });
-  //       const k: any = [];
-  //       res.forEach((item: any) => {
-  //         k.push(item.transaction.hash);
-  //       });
-  //       handleTransactionResults(k);
-  //       // handleTransactionResultsYield(k);
-  //     } catch (error) {
-  //       console.log(error);
-  //       showPositionFailure({
-  //         title: "Open Position Failed",
-  //         errorMessage: JSON.stringify(error),
-  //         type: action,
-  //       });
-  //     } finally {
-  //       setIsDisabled(false);
-  //       onClose();
-  //     }
-  //   } else {
-  //     try {
-  //       const res: any = await openPosition({
-  //         token_c_amount: confirmInfo.longInput,
-  //         token_c_id: confirmInfo.longInputName?.token_id,
-  //         token_d_amount: confirmInfo.tokenInAmount,
-  //         token_d_id: confirmInfo.longOutputName?.token_id,
-  //         token_p_id: confirmInfo.longInputName?.token_id,
-  //         min_token_p_amount: confirmInfo.estimateData.min_amount_out,
-  //         swap_indication: confirmInfo.estimateData.swap_indication,
-  //         assets: confirmInfo.assets.data,
-  //       });
-  //       console.log(res);
-  //       const k: any = [];
-  //       res.forEach((item: any) => {
-  //         k.push(item.transaction.hash);
-  //       });
-  //       handleTransactionResults(k);
-  //     } catch (error) {
-  //       console.log(error);
-  //       showPositionFailure({
-  //         title: "Open Position Failed",
-  //         errorMessage: JSON.stringify(error),
-  //         type: action,
-  //       });
-  //     } finally {
-  //       setIsDisabled(false);
-  //       onClose();
-  //     }
-  //   }
-  // };
+  const cateSymbol = getSymbolById(
+    ReduxcategoryAssets1?.token_id,
+    ReduxcategoryAssets1?.metadata?.symbol,
+  );
+  const min_amount_out_estimate = confirmInfo.estimateData.min_amount_out;
+  const expand_amount_in_estimate = confirmInfo.estimateData.expand_amount_in;
+  const in_extra_decimals = confirmInfo?.longInputName?.config?.extra_decimals || 0;
+  const out_extra_decimals = confirmInfo?.longOutputName?.config?.extra_decimals || 0;
+  const openPositionParams = {
+    token_c_amount: confirmInfo.longInput,
+    token_c_id: confirmInfo.longInputName?.token_id,
+    token_d_amount:
+      action === "Long"
+        ? expandToken(expand_amount_in_estimate, in_extra_decimals, 0)
+        : expandToken(expand_amount_in_estimate, out_extra_decimals, 0),
+    token_d_id:
+      action === "Long"
+        ? confirmInfo.longInputName?.token_id
+        : confirmInfo.longOutputName?.token_id,
+    token_p_id:
+      action === "Long"
+        ? confirmInfo.longOutputName?.token_id
+        : confirmInfo.longInputName?.token_id,
+    min_token_p_amount:
+      action === "Long"
+        ? expandToken(min_amount_out_estimate, out_extra_decimals, 0)
+        : expandToken(min_amount_out_estimate, in_extra_decimals, 0),
+    swap_indication: confirmInfo.estimateData.swap_indication,
+    assets: confirmInfo.assets.data,
+  };
+  console.log(openPositionParams, confirmInfo, assetP, "for nico confirmOpenPosition");
 
   const confirmOpenPosition = async () => {
-    // console.log(marginAccountList, max_active_user_margin_position);
-
     setIsDisabled(true);
-    const openPositionParams = {
-      token_c_amount: confirmInfo.longInput,
-      token_c_id: confirmInfo.longInputName?.token_id,
-      token_d_amount: confirmInfo.tokenInAmount,
-      token_d_id:
-        action === "Long"
-          ? confirmInfo.longInputName?.token_id
-          : confirmInfo.longOutputName?.token_id,
-      token_p_id:
-        action === "Long"
-          ? confirmInfo.longOutputName?.token_id
-          : confirmInfo.longInputName?.token_id,
-      min_token_p_amount: confirmInfo.estimateData.min_amount_out,
-      swap_indication: confirmInfo.estimateData.swap_indication,
-      assets: confirmInfo.assets.data,
-    };
+    const { decimals: localDecimals } = getAssetDetails(
+      getAssetById(
+        action === "Long" ? openPositionParams.token_p_id : openPositionParams.token_d_id,
+      ),
+    );
+    // Swap Out Trial Calculation Result Verification
     const minTokenPAmount = Number(shrinkToken(openPositionParams.min_token_p_amount, decimalsP));
-    const tokenDAmount = openPositionParams.token_d_amount;
+    const tokenDAmount = shrinkToken(openPositionParams.token_d_amount, decimalsD);
     const tokenDPrice = confirmInfo.assets.data[openPositionParams.token_d_id].price.usd;
     const tokenPPrice = confirmInfo.assets.data[openPositionParams.token_p_id].price.usd;
     const slippageRate = 1 - max_slippage_rate / 10000;
-
-    const calculatedValue = ((tokenDAmount * tokenDPrice) / tokenPPrice) * slippageRate;
-
-    console.log([
-      { Key: "minTokenPAmount", Value: minTokenPAmount },
-      { Key: "tokenDAmount", Value: tokenDAmount },
-      { Key: "tokenDPrice", Value: tokenDPrice },
-      { Key: "tokenPPrice", Value: tokenPPrice },
-      { Key: "slippageRate", Value: slippageRate },
-      { Key: "calculatedValue", Value: calculatedValue },
-    ]);
+    const calculatedValue = ((+tokenDAmount * tokenDPrice) / tokenPPrice) * slippageRate;
     if (!(minTokenPAmount >= calculatedValue)) {
       setIsDisabled(false);
       setIsMinTokenPAmount(true);
-      // return showToast("Token out does not meet contract requirements, unable to open position.");
       return;
     }
+    // Position Verification
+    const total_c_value = new Decimal(confirmInfo.longInput || 0).mul(assetC.price?.usd || 0);
+    const total_p_value = new Decimal(minTokenPAmount || 0).mul(assetP.price?.usd || 0);
+    const total_d_value = new Decimal(tokenDAmount || 0).mul(assetD.price?.usd || 0);
+    const total_cap = total_c_value.plus(total_p_value);
+    const saft_value = total_cap.mul(1 - min_safety_buffer / 10000);
+    if (saft_value.lte(total_d_value)) {
+      setIsDisabled(false);
+      setHasLiquidationRisk(true);
+      return;
+    }
+
     localStorage.setItem(
       "cateSymbolAndDecimals",
       JSON.stringify({
         cateSymbol,
-        decimals: decimalsP,
+        decimals: localDecimals,
+        amount: confirmInfo.longOutput,
+        totalPrice: confirmInfo.longOutputUsd,
       }),
     );
 
@@ -198,6 +157,20 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
         }
         return item.transaction.hash;
       });
+      const txHash = await handleTransactionHash(transactionHashes);
+      txHash
+        .filter((item) => !item.hasStorageDeposit)
+        .forEach(async (item) => {
+          try {
+            await DataSource.shared.getMarginTradingPosition({
+              addr: accountId,
+              process_type: "open",
+              tx_hash: item.txHash,
+            });
+          } catch (error) {
+            console.error("Failed to get margin trading position:", error);
+          }
+        });
 
       await handleTransactionResults(
         transactionHashes,
@@ -216,24 +189,6 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
       onClose();
     }
   };
-
-  const [percentList, setPercentList] = useState([]);
-  useMemo(() => {
-    if (confirmInfo.estimateData?.identicalRoutes) {
-      const { identicalRoutes } = confirmInfo.estimateData;
-      let sum = 0;
-      const perArray = identicalRoutes.map((routes) => {
-        const k = routes.reduce((pre, cur) => {
-          return pre + (Number(cur.pool?.partialAmountIn) || 0);
-        }, 0);
-        sum += k; //
-        return k;
-      });
-
-      const perStrArray = perArray.map((item) => ((item * 100) / sum).toFixed(2)); //
-      setPercentList(perStrArray);
-    }
-  }, [confirmInfo.estimateData]);
   return (
     <MUIModal open={open} onClose={onClose}>
       <Wrapper
@@ -267,23 +222,24 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
             <div className="pt-10 pb-8 flex items-center justify-around  border-b border-dark-700 -mx-5 px-5 mb-5">
               <div className="text-center leading-3">
                 <p className="text-lg">
-                  {toInternationalCurrencySystem_number(confirmInfo.longInput)}{" "}
+                  {beautifyPrice(confirmInfo.longInput)}{" "}
                   {confirmInfo.longInputName?.metadata.symbol}
                 </p>
                 <span className="text-xs text-gray-300">
-                  ${toInternationalCurrencySystem_number(confirmInfo.longInputUsd)}
+                  ${beautifyPrice(confirmInfo.longInputUsd)}
                 </span>
               </div>
               <RightShoulder />
               <div className="text-center leading-3">
                 <p className="text-lg">
-                  {(+confirmInfo.longOutput).toFixed(6)}{" "}
-                  {confirmInfo.longOutputName?.metadata.symbol === "wNEAR"
-                    ? "NEAR"
-                    : confirmInfo.longOutputName?.metadata.symbol}
+                  {beautifyPrice(+confirmInfo.longOutput)}{" "}
+                  {getSymbolById(
+                    confirmInfo.longOutputName?.token_id,
+                    confirmInfo.longOutputName?.metadata.symbol,
+                  )}
                 </p>
                 <span className="text-xs text-gray-300">
-                  {action} ${toInternationalCurrencySystem_number(confirmInfo.longOutputUsd)}
+                  {action} ${beautifyPrice(confirmInfo.longOutputUsd)}
                 </span>
               </div>
             </div>
@@ -295,31 +251,30 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
                 {action === "Long"
                   ? beautifyPrice(
                       confirmInfo.tokenInAmount /
-                        Number(shrinkToken(confirmInfo.estimateData?.min_amount_out, decimalsP)),
+                        Number(
+                          shrinkToken(
+                            confirmInfo.estimateData?.min_amount_out,
+                            assetP.metadata.decimals,
+                          ),
+                        ),
                     )
                   : beautifyPrice(
-                      Number(shrinkToken(confirmInfo.estimateData?.min_amount_out, decimalsP)) /
-                        confirmInfo.tokenInAmount,
+                      Number(
+                        shrinkToken(
+                          confirmInfo.estimateData?.min_amount_out,
+                          assetP.metadata.decimals,
+                        ),
+                      ) / confirmInfo.tokenInAmount,
                     )}
               </div>
             </div>
 
-            {/* <div className="flex items-center justify-between text-sm mb-4">
-              <div className="text-gray-300">Index Price</div>
-              <div>${confirmInfo.indexPrice}</div>
-            </div>
-
-            <div className="flex items-center justify-between text-sm mb-4">
-              <div className="text-gray-300">Leverage</div>
-              <div>{confirmInfo.rangeMount}X</div>
-            </div> */}
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Collateral</div>
               <div className="text-right flex">
-                {toInternationalCurrencySystem_number(confirmInfo.longInput)}{" "}
-                {confirmInfo.longInputName?.metadata.symbol}
+                {beautifyPrice(confirmInfo.longInput)} {confirmInfo.longInputName?.metadata.symbol}
                 <span className="text-xs text-gray-300 ml-1.5">
-                  (${toInternationalCurrencySystem_number(confirmInfo.longInputUsd)})
+                  (${beautifyPrice(confirmInfo.longInputUsd)})
                 </span>
               </div>
             </div>
@@ -327,46 +282,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
               <div className="text-gray-300">Liq. Price</div>
               <div>${beautifyPrice(confirmInfo.LiqPrice)}</div>
             </div>
-            <div className="flex items-baseline justify-between text-sm mb-4">
-              <div className="text-gray-300 flex items-center">
-                <RefLogoIcon />
-                <span className="ml-2">Route</span>
-              </div>
-              <div className="flex flex-col justify-end">
-                {confirmInfo.estimateData?.tokensPerRoute.map((item, index) => {
-                  return (
-                    <div key={index + item.symbol} className="flex mb-2 items-center">
-                      {item.map((ite, ind) => {
-                        return (
-                          <React.Fragment key={`${index}-${ind}-${ite.symbol}`}>
-                            {ind === 0 && (
-                              <>
-                                <div
-                                  className={`bg-opacity-10  text-xs py-0.5 pl-2.5 pr-1.5 rounded ${
-                                    actionShowRedColor
-                                      ? "bg-primary text-primary"
-                                      : "bg-red-50 text-red-50"
-                                  }`}
-                                >{`${percentList[index]}%`}</div>
-                                <span className="mx-2">|</span>
-                              </>
-                            )}
-                            <div className="flex items-center">
-                              <span>{ite.symbol === "wNEAR" ? "NEAR" : ite.symbol}</span>
-                              {ind + 1 < confirmInfo.estimateData?.tokensPerRoute[index].length ? (
-                                <span className="mx-2">&gt;</span>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          </React.Fragment>
-                        );
-                      })}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+
             {isMinTokenPAmount && (
               <div className=" text-[#EA3F68] text-sm font-normal flex items-start mb-1">
                 <MaxPositionIcon />
@@ -375,20 +291,19 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
                 </span>
               </div>
             )}
-            {/* <div
-              className={`flex items-center justify-between text-dark-200 text-base rounded-md h-12 text-center cursor-pointer ${
-                actionShowRedColor ? "bg-primary" : "bg-red-50"
-              }`}
-            >
-              <div onClick={confirmOpenPosition} className="flex-grow">
-                Confirm {action} NEAR {confirmInfo.rangeMount}X
+            {hasLiquidationRisk && (
+              <div className=" text-[#EA3F68] text-sm font-normal flex items-start mb-1">
+                <MaxPositionIcon />
+                <span className="ml-1">
+                  The current price fluctuation is too high. Please try creating later.
+                </span>
               </div>
-            </div> */}
+            )}
 
             {actionShowRedColor ? (
               <YellowSolidButton
                 className="w-full"
-                disabled={isDisabled || isMinTokenPAmount}
+                disabled={isDisabled || isMinTokenPAmount || hasLiquidationRisk}
                 onClick={confirmOpenPosition}
               >
                 {isDisabled ? (
@@ -400,7 +315,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
             ) : (
               <RedSolidButton
                 className="w-full"
-                disabled={isDisabled || isMinTokenPAmount}
+                disabled={isDisabled || isMinTokenPAmount || hasLiquidationRisk}
                 onClick={confirmOpenPosition}
               >
                 {isDisabled ? (

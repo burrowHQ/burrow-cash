@@ -7,6 +7,7 @@ interface commonAssets {
   ReduxcategoryCurrentBalance2: any;
   ReduxSlippageTolerance: any;
   dashBoardActiveTab: string;
+  ReduxTotalPLN: any;
 }
 
 const initialState: commonAssets = {
@@ -16,6 +17,7 @@ const initialState: commonAssets = {
   ReduxcategoryCurrentBalance2: "",
   ReduxSlippageTolerance: 0.5,
   dashBoardActiveTab: "main",
+  ReduxTotalPLN: 0,
 };
 
 const marginCategory = createSlice({
@@ -40,6 +42,9 @@ const marginCategory = createSlice({
     setDashBoardActiveTab(state, action) {
       state.dashBoardActiveTab = action.payload;
     },
+    setReduxTotalPLN(state, action) {
+      state.ReduxTotalPLN += action.payload;
+    },
   },
 });
 
@@ -50,6 +55,7 @@ const {
   setReduxcategoryCurrentBalance2,
   setSlippageToleranceFromRedux,
   setDashBoardActiveTab,
+  setReduxTotalPLN,
 } = marginCategory.actions;
 const marginCategoryReducer = marginCategory.reducer;
 export {
@@ -59,5 +65,6 @@ export {
   setReduxcategoryCurrentBalance2,
   setSlippageToleranceFromRedux,
   setDashBoardActiveTab,
+  setReduxTotalPLN,
 };
 export default marginCategoryReducer;

@@ -2,20 +2,20 @@ import React, { useRef, useState, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
 
-const RangeSlider = ({ defaultValue, action, setRangeMount }) => {
+interface RangeSliderProps {
+  defaultValue: number;
+  action: string;
+  setRangeMount: (value: number) => void;
+}
+
+const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRangeMount }) => {
   //
-  const generateArithmeticSequence = (start, end, increment) => {
-    const sequence = [];
+  const generateArithmeticSequence = (value: number) => {
+    const increment = (value - 1) / 4;
+    const sequence: number[] = [];
 
-    const numItems = Math.ceil((end - start) / increment) + 1; //
-
-    for (let i = 0; i < numItems; i++) {
-      // @ts-ignore
-      sequence.push((start + i * increment).toFixed(2));
-    }
-
-    if (sequence[sequence.length - 1] > end) {
-      sequence.pop();
+    for (let i = 0; i <= 4; i++) {
+      sequence.push(+(1 + i * increment).toFixed(2));
     }
 
     return sequence;
@@ -23,11 +23,7 @@ const RangeSlider = ({ defaultValue, action, setRangeMount }) => {
   //
   const { marginConfigTokens } = useMarginConfigToken();
 
-  const allowedValues = generateArithmeticSequence(
-    1,
-    marginConfigTokens["max_leverage_rate"],
-    (marginConfigTokens["max_leverage_rate"] + 1) / 5,
-  );
+  const allowedValues = generateArithmeticSequence(marginConfigTokens["max_leverage_rate"]);
   const [value, setValue] = useState(defaultValue);
   const [splitList, setSplitList] = useState(allowedValues);
   const [matchValue, setMatchValue] = useState(value);
@@ -52,7 +48,7 @@ const RangeSlider = ({ defaultValue, action, setRangeMount }) => {
     setRangeMount(splitList[2]);
   }, []);
 
-  function changeValue(v) {
+  function changeValue(v: string | number) {
     const numValue = Number(v);
     const nearestValue = allowedValues.reduce((prev, curr) => {
       return Math.abs(curr - numValue) < Math.abs(prev - numValue) ? curr : prev;

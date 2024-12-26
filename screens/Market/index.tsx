@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 import MarketsTable from "./table";
 import MarketsOverview from "./overview";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
@@ -8,11 +10,17 @@ import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 import { setDashBoardActiveTab } from "../../redux/marginTrading";
 
 const Market = () => {
+  const router = useRouter();
   const dispatch = useAppDispatch();
   const { dashBoardActiveTab: activeTab = "main" } = useAppSelector((state) => state.category);
   const { dashBoardActiveTab } = useAppSelector((state) => state.category);
   const rows = dashBoardActiveTab == "main" ? useAvailableAssets() : useAvailableAssetsMEME();
   const { sorting, setSorting } = useTableSorting();
+  useEffect(() => {
+    if (router?.query?.vault === "true") {
+      setSorting("market", "depositApy", "desc");
+    }
+  }, [router?.query]);
   const handleOnRowClick = ({ tokenId }) => {
     dispatch(showModal({ action: "Supply", tokenId, amount: "0" }));
   };

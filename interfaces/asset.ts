@@ -27,6 +27,7 @@ export interface IAssetEntry {
   unit_acc_hp_interest: string;
   last_update_timestamp: string;
   config: IAssetConfig;
+  uahpi?: string;
 }
 
 export type AssetEntry = [string, IAssetEntry];

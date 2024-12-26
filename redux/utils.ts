@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Decimal from "decimal.js";
 import { pick, omit } from "ramda";
 
@@ -66,7 +67,9 @@ export const transformAsset = (
     .plus(new Decimal(asset.reserved))
     .plus(asset.prot_fee)
     .toFixed();
-  const totalBorrowedD = new Decimal(asset.borrowed.balance).toFixed();
+  const totalBorrowedD = new Decimal(asset.borrowed.balance)
+    .plus(new Decimal(asset.margin_debt.balance))
+    .toFixed();
   const totalSupply = Number(
     shrinkToken(totalSupplyD, asset.metadata.decimals + asset.config.extra_decimals),
   );

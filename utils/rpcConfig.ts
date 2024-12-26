@@ -35,6 +35,10 @@ export function getExtendConfig(
             url: "https://beta.rpc.mainnet.near.org",
             simpleName: "official beta rpc",
           },
+          fastnearRpc: {
+            url: "https://free.rpc.fastnear.com",
+            simpleName: "fastnear rpc",
+          },
           // pagodaRpc: {
           //   url: "https://rpc.mainnet.pagoda.co",
           //   simpleName: "pagoda rpc",
