@@ -6,8 +6,8 @@ import { useAppSelector } from "../../../redux/hooks";
 import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
 import { CloseIcon } from "../../../components/Modal/svg";
-import { RightArrow } from "./TradingIcon";
-import { toInternationalCurrencySystem_number } from "../../../utils/uiNumber";
+import { RefLogoIcon, RightArrow, MaxPositionIcon } from "./TradingIcon";
+import { toInternationalCurrencySystem_number, toDecimal } from "../../../utils/uiNumber";
 import { closePosition } from "../../../store/marginActions/closePosition";
 import { useEstimateSwap } from "../../../hooks/useEstimateSwap";
 import { useAccountId } from "../../../hooks/hooks";
@@ -28,6 +28,7 @@ import { findPathReserve } from "../../../api/get-swap-path";
 import { getAssets } from "../../../redux/assetsSelectors";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";
 import { IClosePositionMobileProps } from "../comInterface";
+import { getMarginConfig } from "../../../redux/marginConfigSelectors";
 
 export const ModalContext = createContext(null) as any;
 const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
@@ -51,6 +52,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   const [tokenInAmount, setTokenInAmount] = useState<string | null>(null);
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [forceUpdate, setForceUpdate] = useState<number>(0);
+  const [swapUnSecurity, setSwapUnSecurity] = useState<boolean>(false);
 
   const theme = useTheme();
   const intervalRef = useRef<ReturnType<typeof setInterval>>();
@@ -84,7 +86,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
 
   const actionShowRedColor = positionType.label === "Long";
-
+  const marginConfig = useAppSelector(getMarginConfig);
   // get estimate token in amount
   useEffect(() => {
     if (positionType.label === "Short") {
@@ -140,7 +142,22 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
 
   // Methods
   const handleCloseOpsitionEvt = async () => {
-    setIsDisabled(true);
+    // Swap Out Trial Calculation Result Verification
+    const regular_p_value = new Decimal(
+      shrinkToken(tokenInAmount || "0", assetP.metadata.decimals),
+    ).mul(assetP.price?.usd || 0);
+    const regular_d_min_value = new Decimal(
+      shrinkToken(estimateData!.min_amount_out || 0, assetD.metadata.decimals),
+    ).mul(assetD.price?.usd || 0);
+    const saft_p_value = regular_p_value.mul(1 - marginConfig.max_slippage_rate / 10000);
+    if (regular_d_min_value.lte(saft_p_value)) {
+      setIsDisabled(false);
+      setSwapUnSecurity(true);
+      return;
+    } else {
+      setIsDisabled(true);
+      setSwapUnSecurity(false);
+    }
     try {
       const res = await closePosition({
         isLong: positionType.label === "Long",
@@ -336,11 +353,18 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
             >
               <div className="flex-grow">Close</div>
             </div> */}
-
+            {swapUnSecurity && (
+              <div className=" text-[#EA3F68] text-sm font-normal flex items-start mb-1">
+                <MaxPositionIcon />
+                <span className="ml-1">
+                  Unable to close order, Oracle is abnormal or Ref liquidity is insufficient.
+                </span>
+              </div>
+            )}
             {actionShowRedColor ? (
               <YellowSolidButton
                 className="w-full"
-                disabled={isDisabled}
+                disabled={isDisabled || swapUnSecurity}
                 onClick={() => {
                   localStorage.setItem("marginPopType", "Long");
                   handleCloseOpsitionEvt();
@@ -351,7 +375,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
             ) : (
               <RedSolidButton
                 className="w-full"
-                disabled={isDisabled}
+                disabled={isDisabled || swapUnSecurity}
                 onClick={() => {
                   localStorage.setItem("marginPopType", "Short");
                   handleCloseOpsitionEvt();
