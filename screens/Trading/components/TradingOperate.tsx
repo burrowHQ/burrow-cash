@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import _, { range } from "lodash";
 import { BeatLoader } from "react-spinners";
 import TradingToken from "./tokenbox";
@@ -39,6 +39,8 @@ interface TradingOperateProps {
 
 // main components
 const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
+  const customInputRef = useRef<HTMLInputElement>(null);
+
   const assets = useAppSelector(getAssets);
   const config = useAppSelector(getMarginConfig);
   const { categoryAssets1, categoryAssets2 } = useMarginConfigToken();
@@ -141,6 +143,13 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
       dispatch(setSlippageToleranceFromRedux(0.5));
     }
   };
+  // for mobile focus
+  const handleSetUpFocus = () => {
+    if (selectedSetUpOption === "custom" && customInputRef.current) {
+      customInputRef.current.focus();
+    }
+  };
+
   const slippageToleranceChange = (e: any) => {
     setSlippageTolerance(e);
     dispatch(setSlippageToleranceFromRedux(e));
@@ -381,6 +390,18 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
     };
   }, [longInput, shortInput, ReduxcategoryAssets1, estimateData, tokenInAmount]);
 
+  useEffect(() => {
+    if (selectedSetUpOption === "custom" && customInputRef.current) {
+      customInputRef.current.focus();
+    }
+  }, [selectedSetUpOption]);
+
+  const handleMouseEnter = () => {
+    if (selectedSetUpOption === "custom" && customInputRef.current) {
+      customInputRef.current.focus();
+    }
+  };
+
   function getAssetPrice(categoryId) {
     return categoryId ? assets.data[categoryId["token_id"]].price?.usd : 0;
   }
@@ -486,8 +507,8 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
           />
         </div>
         {/* slip start */}
-        <div className="relative z-40 cursor-pointer slip-fater">
-          <SetUp className="text-gray-300 hover:text-white" />
+        <div className="relative z-40 cursor-pointer slip-fater" onMouseEnter={handleMouseEnter}>
+          <SetUp className="text-gray-300 hover:text-white" onClick={handleSetUpFocus} />
 
           <div className="slip-child absolute top-8 right-0 bg-dark-250 border border-dark-500 rounded-md py-6 px-4">
             <p className="text-base mb-6">Max. Slippage Setting</p>
@@ -512,6 +533,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
               </div>
               <div className="bg-dark-600 rounded-md py-2.5 px-4 flex items-center justify-between">
                 <input
+                  ref={customInputRef}
                   disabled={selectedSetUpOption === "auto"}
                   type="number"
                   onChange={(e) => slippageToleranceChange(e.target.value)}

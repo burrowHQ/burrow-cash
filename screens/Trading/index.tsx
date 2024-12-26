@@ -290,7 +290,7 @@ const Trading = () => {
                       currentTokenCate1?.metadata?.symbol,
                     )}
                   </p>
-                  <p className="text-[#C0C4E9] text-xs">${currentTokenCate1?.price?.usd}</p>
+                  <p className="text-[#C0C4E9] text-xs">${assets.data[id]?.price?.usd || 0}</p>
                 </div>
 
                 {/* cate2 */}
