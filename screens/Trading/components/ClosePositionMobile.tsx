@@ -2,12 +2,12 @@ import { useState, createContext, useEffect, useMemo, useRef } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
 import Decimal from "decimal.js";
-import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { useAppSelector } from "../../../redux/hooks";
 import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
 import { CloseIcon } from "../../../components/Modal/svg";
-import { RefLogoIcon, RightArrow, RightShoulder } from "./TradingIcon";
-import { toInternationalCurrencySystem_number, toDecimal } from "../../../utils/uiNumber";
+import { RightArrow } from "./TradingIcon";
+import { toInternationalCurrencySystem_number } from "../../../utils/uiNumber";
 import { closePosition } from "../../../store/marginActions/closePosition";
 import { useEstimateSwap } from "../../../hooks/useEstimateSwap";
 import { useAccountId } from "../../../hooks/hooks";
@@ -28,7 +28,6 @@ import { findPathReserve } from "../../../api/get-swap-path";
 import { getAssets } from "../../../redux/assetsSelectors";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";
 import { IClosePositionMobileProps } from "../comInterface";
-import { IAssetDetailed } from "../../../interfaces/asset";
 
 export const ModalContext = createContext(null) as any;
 const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
