@@ -289,8 +289,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
               <div className=" text-[#EA3F68] text-sm font-normal flex items-start mb-1">
                 <MaxPositionIcon />
                 <span className="ml-1">
-                  You have a risk of liquidation. Please wait a moment before trying to open a
-                  position again.
+                  The current price fluctuation is too high. Please try creating later.
                 </span>
               </div>
             )}
