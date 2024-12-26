@@ -16,25 +16,25 @@ import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { nearTokenId } from "../../../utils";
 
 interface TradingTokenInter {
-  tokenList: any;
-  type: any;
-  setOwnBanlance?: (key) => void;
+  tokenList: Array<any>;
+  type: string;
+  setOwnBanlance?: (key: string) => void;
 }
 const TradingToken: React.FC<TradingTokenInter> = ({ tokenList, type, setOwnBanlance }) => {
-  let timer;
+  let timer: NodeJS.Timeout;
   const dispatch = useAppDispatch();
   const account = useAppSelector((state) => state.account);
   const assets = useAppSelector(getAssets);
   const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
-  const [ownBalance, setOwnBalance] = useState("-");
-  const [ownBalanceDetail, setOwnBalanceDetail] = useState("");
-  const [showModal, setShowModal] = useState(false);
+  const [ownBalance, setOwnBalance] = useState<string>("-");
+  const [ownBalanceDetail, setOwnBalanceDetail] = useState<string>("");
+  const [showModal, setShowModal] = useState<boolean>(false);
   const accountId = useAppSelector(getAccountId);
   /*
     @type cate1: category.value == 1 
     @type cate2: category.value == 2 
   */
-  const [selectedItem, setSelectedItem] = useState(tokenList[0]);
+  const [selectedItem, setSelectedItem] = useState<any>(tokenList[0]);
 
   const sendBalance = () => {
     if (setOwnBanlance) {
@@ -44,7 +44,7 @@ const TradingToken: React.FC<TradingTokenInter> = ({ tokenList, type, setOwnBanl
   //
   useEffect(() => {
     let selectedAsset: any = null;
-    let setReduxcategoryCurrentBalance;
+    let setReduxcategoryCurrentBalance: any;
 
     if (type === "cate1" && ReduxcategoryAssets1) {
       selectedAsset = ReduxcategoryAssets1;

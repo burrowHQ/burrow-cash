@@ -10,7 +10,7 @@ import { RefLogoIcon, RightArrow, RightShoulder } from "./TradingIcon";
 import { toInternationalCurrencySystem_number, toDecimal } from "../../../utils/uiNumber";
 import { closePosition } from "../../../store/marginActions/closePosition";
 import { useEstimateSwap } from "../../../hooks/useEstimateSwap";
-import { useAccountId, useAvailableAssets } from "../../../hooks/hooks";
+import { useAccountId } from "../../../hooks/hooks";
 import { usePoolsData } from "../../../hooks/useGetPoolsData";
 import {
   expandToken,
@@ -25,42 +25,40 @@ import {
 import { showPositionClose } from "../../../components/HashResultModal";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
 import { findPathReserve } from "../../../api/get-swap-path";
-import { getMarginConfig } from "../../../redux/marginConfigSelectors";
 import { getAssets } from "../../../redux/assetsSelectors";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";
+import { IClosePositionMobileProps } from "../comInterface";
+import { IAssetDetailed } from "../../../interfaces/asset";
 
 export const ModalContext = createContext(null) as any;
-const ClosePositionMobile = ({ open, onClose, extraProps }) => {
+const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
+  open,
+  onClose,
+  extraProps,
+}) => {
   const {
     itemKey,
-    index,
     item,
     getAssetById,
     getPositionType,
     getAssetDetails,
     parseTokenValue,
     calculateLeverage,
-    LiqPrice,
     entryPrice,
   } = extraProps;
-  const [showFeeModal, setShowFeeModal] = useState(false);
-  const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
+  const [showFeeModal, setShowFeeModal] = useState<boolean>(false);
+  const [selectedCollateralType, setSelectedCollateralType] = useState<string>(DEFAULT_POSITION);
   const [tokenInAmount, setTokenInAmount] = useState<string | null>(null);
-  const [isDisabled, setIsDisabled] = useState(false);
-  const [forceUpdate, setForceUpdate] = useState(0);
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
+  const [forceUpdate, setForceUpdate] = useState<number>(0);
 
   const theme = useTheme();
   const intervalRef = useRef<ReturnType<typeof setInterval>>();
   const assets = useAppSelector(getAssets);
   const { marginAccountList } = useMarginAccount();
-  const {
-    ReduxcategoryAssets1,
-    ReduxcategoryAssets2,
-    ReduxcategoryCurrentBalance1,
-    ReduxcategoryCurrentBalance2,
-    ReduxSlippageTolerance,
-  } = useAppSelector((state) => state.category);
-  const marginAccount = useAppSelector((state) => state.marginAccount);
+  const { ReduxcategoryAssets1, ReduxSlippageTolerance } = useAppSelector(
+    (state) => state.category,
+  );
   const accountId = useAccountId();
   const { simplePools, stablePools, stablePoolsDetail } = usePoolsData();
 
@@ -158,7 +156,7 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
       onClose();
       if (res !== undefined && res !== null) {
         showPositionClose({
-          type: positionType.label,
+          type: positionType.label as "Long" | "Short",
         });
       }
     } catch (error) {
@@ -273,25 +271,6 @@ const ClosePositionMobile = ({ open, onClose, extraProps }) => {
               <div className="text-gray-300">Index Price</div>
               <div>${indexPrice}</div>
             </div>
-
-            {/* <div className="flex items-center justify-between text-sm mb-4">
-              <div className="text-gray-300">Leverage</div>
-              <div className="flex items-center justify-center">
-                <span className="text-gray-300 mr-2 line-through">{leverage.toFixed(2)}X</span>
-                <RightArrow />
-                <p className="ml-2"> 0.0X</p>
-              </div>
-            </div>
-            <div className="flex items-center justify-between text-sm mb-4">
-              <div className="text-gray-300">Liq. Price</div>
-              <div className="flex items-center justify-center">
-                <span className="text-gray-300 mr-2 line-through">
-                  ${toInternationalCurrencySystem_number(LiqPrice)}
-                </span>
-                <RightArrow />
-                <p className="ml-2"> $0.00</p>
-              </div>
-            </div> */}
             {/*  */}
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Collateral</div>

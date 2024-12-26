@@ -31,9 +31,14 @@ import {
 import { beautifyPrice } from "../../../utils/beautyNumbet";
 import { ConnectWalletButton } from "../../../components/Header/WalletButton";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
+import { IEstimateResult } from "../../../interfaces";
+
+interface TradingOperateProps {
+  onMobileClose?: () => void;
+}
 
 // main components
-const TradingOperate = ({ onMobileClose }: { onMobileClose?: () => void }) => {
+const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
   const assets = useAppSelector(getAssets);
   const config = useAppSelector(getMarginConfig);
   const { categoryAssets1, categoryAssets2 } = useMarginConfigToken();
@@ -49,32 +54,32 @@ const TradingOperate = ({ onMobileClose }: { onMobileClose?: () => void }) => {
     ReduxcategoryCurrentBalance2,
     ReduxSlippageTolerance,
   } = useAppSelector((state) => state.category);
-  const [slippageTolerance, setSlippageTolerance] = useState(0.5);
-  const [showFeeModal, setShowFeeModal] = useState(false);
-  const [forceUpdateLoading, setForceUpdateLoading] = useState(false);
+  const [slippageTolerance, setSlippageTolerance] = useState<number>(0.5);
+  const [showFeeModal, setShowFeeModal] = useState<boolean>(false);
+  const [forceUpdateLoading, setForceUpdateLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
-  const [activeTab, setActiveTab] = useState("long");
-  const [estimateLoading, setEstimateLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("long");
+  const [estimateLoading, setEstimateLoading] = useState<boolean>(false);
   // for slip
   // const [showSetUpPopup, setShowSetUpPopup] = useState(false);
 
-  const [selectedSetUpOption, setSelectedSetUpOption] = useState("auto");
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const [rangeMount, setRangeMount] = useState(1);
-  const [isDisabled, setIsDisabled] = useState(false);
-  const [isMaxPosition, setIsMaxPosition] = useState(false);
+  const [selectedSetUpOption, setSelectedSetUpOption] = useState<string>("auto");
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
+  const [rangeMount, setRangeMount] = useState<number>(1);
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
+  const [isMaxPosition, setIsMaxPosition] = useState<boolean>(false);
 
   //
-  const [longInput, setLongInput] = useState("");
-  const [shortInput, setShortInput] = useState("");
-  const [longOutput, setLongOutput] = useState(0);
-  const [shortOutput, setShortOutput] = useState(0);
+  const [longInput, setLongInput] = useState<string>("");
+  const [shortInput, setShortInput] = useState<string>("");
+  const [longOutput, setLongOutput] = useState<number>(0);
+  const [shortOutput, setShortOutput] = useState<number>(0);
 
   // amount
-  const [longInputUsd, setLongInputUsd] = useState(0);
-  const [longOutputUsd, setLongOutputUsd] = useState(0);
-  const [shortInputUsd, setShortInputUsd] = useState(0);
-  const [shortOutputUsd, setShortOutputUsd] = useState(0);
+  const [longInputUsd, setLongInputUsd] = useState<number>(0);
+  const [longOutputUsd, setLongOutputUsd] = useState<number>(0);
+  const [shortInputUsd, setShortInputUsd] = useState<number>(0);
+  const [shortOutputUsd, setShortOutputUsd] = useState<number>(0);
 
   //
   const balance = useAppSelector(getAccountBalance);
@@ -83,7 +88,7 @@ const TradingOperate = ({ onMobileClose }: { onMobileClose?: () => void }) => {
   // pools
   const { simplePools, stablePools, stablePoolsDetail } = usePoolsData();
 
-  const setOwnBanlance = (key) => {
+  const setOwnBanlance = (key: string) => {
     if (activeTab === "long") {
       setLongInput(key);
     } else {
@@ -92,7 +97,7 @@ const TradingOperate = ({ onMobileClose }: { onMobileClose?: () => void }) => {
   };
 
   // for tab change
-  const initCateState = (tabString) => {
+  const initCateState = (tabString: string) => {
     setLiqPrice(0);
     setRangeMount(1);
     if (tabString == "long") {
@@ -108,13 +113,13 @@ const TradingOperate = ({ onMobileClose }: { onMobileClose?: () => void }) => {
     }
   };
   // tab click event
-  const handleTabClick = (tabString) => {
+  const handleTabClick = (tabString: string) => {
     setActiveTab(tabString);
     initCateState(tabString);
     setForceUpdate((prev) => prev + 1);
   };
 
-  const getTabClassName = (tabName) => {
+  const getTabClassName = (tabName: string) => {
     return activeTab === tabName
       ? "bg-primary text-dark-200 py-2.5 px-5 rounded-md"
       : "text-gray-300 py-2.5 px-5";
@@ -129,14 +134,14 @@ const TradingOperate = ({ onMobileClose }: { onMobileClose?: () => void }) => {
     dispatch(setSlippageToleranceFromRedux(0.5));
   }, []);
 
-  const handleSetUpOptionClick = (option) => {
+  const handleSetUpOptionClick = (option: string) => {
     setSelectedSetUpOption(option);
     if (option === "auto") {
       setSlippageTolerance(0.5);
       dispatch(setSlippageToleranceFromRedux(0.5));
     }
   };
-  const slippageToleranceChange = (e) => {
+  const slippageToleranceChange = (e: any) => {
     setSlippageTolerance(e);
     dispatch(setSlippageToleranceFromRedux(e));
   };
@@ -181,10 +186,10 @@ const TradingOperate = ({ onMobileClose }: { onMobileClose?: () => void }) => {
   // pools end
 
   // get cate1 amount start
-  const [tokenInAmount, setTokenInAmount] = useState(0);
-  const [LiqPrice, setLiqPrice] = useState(0);
-  const [entryPrice, setEntryPrice] = useState(0);
-  const [forceUpdate, setForceUpdate] = useState(0);
+  const [tokenInAmount, setTokenInAmount] = useState<number>(0);
+  const [LiqPrice, setLiqPrice] = useState<number>(0);
+  const [entryPrice, setEntryPrice] = useState<number>(0);
+  const [forceUpdate, setForceUpdate] = useState<number>(0);
   const estimateData = useEstimateSwap({
     tokenIn_id:
       activeTab === "long" ? ReduxcategoryAssets2?.token_id : ReduxcategoryAssets1?.token_id,
@@ -200,7 +205,7 @@ const TradingOperate = ({ onMobileClose }: { onMobileClose?: () => void }) => {
   });
 
   // long & short input change fn.
-  const inputPriceChange = _.debounce((newValue) => {
+  const inputPriceChange = _.debounce((newValue: string) => {
     // eslint-disable-next-line no-unused-expressions
     activeTab === "long" ? setLongInput(newValue) : setShortInput(newValue);
   }, 10);
@@ -380,7 +385,7 @@ const TradingOperate = ({ onMobileClose }: { onMobileClose?: () => void }) => {
     return categoryId ? assets.data[categoryId["token_id"]].price?.usd : 0;
   }
 
-  function updateOutput(tab, inputUsdCharcate) {
+  function updateOutput(tab: string, inputUsdCharcate: number) {
     /**
      * @param inputUsdCharcate  category1 current price
      */
@@ -652,7 +657,7 @@ const TradingOperate = ({ onMobileClose }: { onMobileClose?: () => void }) => {
                     longOutputUsd,
                     rangeMount,
                     estimateData,
-                    indexPrice: assets.data[ReduxcategoryAssets1["token_id"]].price?.usd,
+                    // indexPrice: assets.data[ReduxcategoryAssets1["token_id"]].price?.usd,
                     longInputName: ReduxcategoryAssets2,
                     longOutputName: ReduxcategoryAssets1,
                     assets,
@@ -780,7 +785,7 @@ const TradingOperate = ({ onMobileClose }: { onMobileClose?: () => void }) => {
                     longOutputUsd: shortOutputUsd,
                     rangeMount,
                     estimateData,
-                    indexPrice: assets.data[ReduxcategoryAssets1["token_id"]].price?.usd,
+                    // indexPrice: assets.data[ReduxcategoryAssets1["token_id"]].price?.usd,
                     longInputName: ReduxcategoryAssets2,
                     longOutputName: ReduxcategoryAssets1,
                     assets,

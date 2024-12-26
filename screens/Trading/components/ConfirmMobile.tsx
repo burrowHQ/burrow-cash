@@ -19,12 +19,18 @@ import { beautifyPrice } from "../../../utils/beautyNumbet";
 import { getAccountId } from "../../../redux/accountSelectors";
 import { handleTransactionResults, handleTransactionHash } from "../../../services/transaction";
 import { showPositionFailure } from "../../../components/HashResultModal";
-import { getBurrow, nearTokenId } from "../../../utils";
+import { getBurrow } from "../../../utils";
 import DataSource from "../../../data/datasource";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
+import { IConfirmMobileProps } from "../comInterface";
 
 export const ModalContext = createContext(null) as any;
-const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
+const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
+  open,
+  onClose,
+  action,
+  confirmInfo,
+}) => {
   const [burrowData, setBurrowData] = useState<{
     selector?: {
       wallet: () => Promise<{ id: string }>;
@@ -43,9 +49,9 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
   const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
   const actionShowRedColor = action === "Long";
-  const [isDisabled, setIsDisabled] = useState(false);
-  const [isMinTokenPAmount, setIsMinTokenPAmount] = useState(false);
-  const [hasLiquidationRisk, setHasLiquidationRisk] = useState(false);
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
+  const [isMinTokenPAmount, setIsMinTokenPAmount] = useState<boolean>(false);
+  const [hasLiquidationRisk, setHasLiquidationRisk] = useState<boolean>(false);
   const { marginConfigTokens, filterMarginConfigList } = useMarginConfigToken();
   const { max_active_user_margin_position, max_slippage_rate, min_safety_buffer } =
     marginConfigTokens;
