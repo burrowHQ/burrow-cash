@@ -30,12 +30,7 @@ const TradingToken: React.FC<TradingTokenInter> = ({ tokenList, type, setOwnBanl
   const [ownBalanceDetail, setOwnBalanceDetail] = useState<string>("");
   const [showModal, setShowModal] = useState<boolean>(false);
   const accountId = useAppSelector(getAccountId);
-  /*
-    @type cate1: category.value == 1 
-    @type cate2: category.value == 2 
-  */
   const [selectedItem, setSelectedItem] = useState<any>(tokenList[0]);
-
   const sendBalance = () => {
     if (setOwnBanlance) {
       setOwnBanlance(ownBalanceDetail);
@@ -43,56 +38,67 @@ const TradingToken: React.FC<TradingTokenInter> = ({ tokenList, type, setOwnBanl
   };
   //
   useEffect(() => {
-    let selectedAsset: any = null;
-    let setReduxcategoryCurrentBalance: any;
+    const getSelectedAssetAndBalanceSetter = () => {
+      if (type === "cate1" && ReduxcategoryAssets1) {
+        return {
+          selectedAsset: ReduxcategoryAssets1,
+          setReduxcategoryCurrentBalance: (value: any) =>
+            dispatch(setReduxcategoryCurrentBalance1(value)),
+        };
+      } else if (type === "cate2" && ReduxcategoryAssets2) {
+        return {
+          selectedAsset: ReduxcategoryAssets2,
+          setReduxcategoryCurrentBalance: (value: any) =>
+            dispatch(setReduxcategoryCurrentBalance2(value)),
+        };
+      }
+      return { selectedAsset: null, setReduxcategoryCurrentBalance: null };
+    };
 
-    if (type === "cate1" && ReduxcategoryAssets1) {
-      selectedAsset = ReduxcategoryAssets1;
-      setReduxcategoryCurrentBalance = (value: any) =>
-        dispatch(setReduxcategoryCurrentBalance1(value));
-    } else if (type === "cate2" && ReduxcategoryAssets2) {
-      selectedAsset = ReduxcategoryAssets2;
-      setReduxcategoryCurrentBalance = (value: any) =>
-        dispatch(setReduxcategoryCurrentBalance2(value));
-    }
+    const { selectedAsset, setReduxcategoryCurrentBalance } = getSelectedAssetAndBalanceSetter();
 
     if (!selectedAsset) {
       setSelectedItem(tokenList[0]);
       setOwnBalance("-");
       return;
     }
+
     const tokenId = selectedAsset.metadata["token_id"];
-    if (!tokenId || !account.balances[tokenId]) {
+    const balance = account.balances[tokenId];
+
+    if (!tokenId || !balance) {
       setOwnBalance("-");
-      setReduxcategoryCurrentBalance("-");
+      setReduxcategoryCurrentBalance && setReduxcategoryCurrentBalance("-");
       setSelectedItem(selectedAsset);
       return;
     }
 
     const { decimals } = selectedAsset.metadata;
-    const waitUseKey = shrinkToken(account.balances[tokenId], decimals);
-    setOwnBalance(toInternationalCurrencySystem_number(waitUseKey));
+    const waitUseKey = shrinkToken(balance, decimals);
+    const formattedBalance = toInternationalCurrencySystem_number(waitUseKey);
+
+    setOwnBalance(formattedBalance);
     setOwnBalanceDetail(waitUseKey);
-    setReduxcategoryCurrentBalance(waitUseKey);
+    setReduxcategoryCurrentBalance && setReduxcategoryCurrentBalance(waitUseKey);
     setSelectedItem(selectedAsset);
   }, [type, accountId, account.balances, ReduxcategoryAssets1, ReduxcategoryAssets2]);
 
   //
-  const handleTokenClick = (item) => {
+  const handleTokenClick = (item: any) => {
     if (!item) return;
 
     setSelectedItem(item);
 
-    switch (type) {
-      case "cate1":
-        dispatch(setCategoryAssets1(item)); // update cate1
-        break;
-      case "cate2":
-        dispatch(setCategoryAssets2(item)); // update cate2
-        break;
-      default:
-        console.warn(`Unsupported type: ${type}`);
-        break;
+    const typeDispatchMap: Record<string, ((item: any) => any) | undefined> = {
+      cate1: setCategoryAssets1,
+      cate2: setCategoryAssets2,
+    };
+
+    const dispatchAction = typeDispatchMap[type];
+    if (dispatchAction) {
+      dispatch(dispatchAction(item));
+    } else {
+      console.warn(`Unsupported type: ${type}`);
     }
 
     setShowModal(false);

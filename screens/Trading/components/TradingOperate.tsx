@@ -1,15 +1,8 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
-import _, { range } from "lodash";
+import _ from "lodash";
 import { BeatLoader } from "react-spinners";
 import TradingToken from "./tokenbox";
-import {
-  RefLogoIcon,
-  SetUp,
-  ShrinkArrow,
-  errorTipsIcon,
-  MaxPositionIcon,
-  RefreshIcon,
-} from "./TradingIcon";
+import { SetUp, ShrinkArrow, MaxPositionIcon, RefreshIcon } from "./TradingIcon";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import RangeSlider from "./RangeSlider";
 import ConfirmMobile from "./ConfirmMobile";
@@ -20,10 +13,9 @@ import { usePoolsData } from "../../../hooks/useGetPoolsData";
 import { getMarginConfig } from "../../../redux/marginConfigSelectors";
 import { toInternationalCurrencySystem_number, toDecimal } from "../../../utils/uiNumber";
 import { useEstimateSwap } from "../../../hooks/useEstimateSwap";
-import { NearIcon, NearIconMini } from "../../MarginTrading/components/Icon";
 import { setSlippageToleranceFromRedux } from "../../../redux/marginTrading";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";
-import { expandTokenDecimal, expandToken, shrinkToken } from "../../../store/helper";
+import { shrinkToken } from "../../../store/helper";
 import {
   YellowSolidSubmitButton as YellowSolidButton,
   RedSolidSubmitButton as RedSolidButton,
@@ -31,7 +23,6 @@ import {
 import { beautifyPrice } from "../../../utils/beautyNumbet";
 import { ConnectWalletButton } from "../../../components/Header/WalletButton";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
-import { IEstimateResult } from "../../../interfaces";
 
 interface TradingOperateProps {
   onMobileClose?: () => void;

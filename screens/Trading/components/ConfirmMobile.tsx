@@ -47,21 +47,22 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
   const accountId = useAppSelector(getAccountId);
   const theme = useTheme();
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
-  const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
+  const { ReduxcategoryAssets1 } = useAppSelector((state) => state.category);
   const actionShowRedColor = action === "Long";
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [isMinTokenPAmount, setIsMinTokenPAmount] = useState<boolean>(false);
   const [hasLiquidationRisk, setHasLiquidationRisk] = useState<boolean>(false);
   const { marginConfigTokens, filterMarginConfigList } = useMarginConfigToken();
-  const { max_active_user_margin_position, max_slippage_rate, min_safety_buffer } =
-    marginConfigTokens;
-  const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
+  const { max_slippage_rate, min_safety_buffer } = marginConfigTokens;
+  const { getAssetDetails, getAssetById } = useMarginAccount();
+
   const assetP = getAssetById(
     action === "Long" ? confirmInfo.longOutputName?.token_id : confirmInfo.longInputName?.token_id,
   );
   const assetD = getAssetById(
     action === "Long" ? confirmInfo.longInputName?.token_id : confirmInfo.longOutputName?.token_id,
   );
+
   const assetC = action === "Long" ? assetD : assetP;
   const decimalsD = +assetD.config.extra_decimals + +assetD.metadata.decimals;
   const decimalsP = +assetP.config.extra_decimals + +assetP.metadata.decimals;
@@ -78,10 +79,11 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
   const openPositionParams = {
     token_c_amount: confirmInfo.longInput,
     token_c_id: confirmInfo.longInputName?.token_id,
-    token_d_amount:
-      action === "Long"
-        ? expandToken(expand_amount_in_estimate, in_extra_decimals, 0)
-        : expandToken(expand_amount_in_estimate, out_extra_decimals, 0),
+    token_d_amount: expandToken(
+      expand_amount_in_estimate,
+      action === "Long" ? in_extra_decimals : out_extra_decimals,
+      0,
+    ),
     token_d_id:
       action === "Long"
         ? confirmInfo.longInputName?.token_id
@@ -90,10 +92,11 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
       action === "Long"
         ? confirmInfo.longOutputName?.token_id
         : confirmInfo.longInputName?.token_id,
-    min_token_p_amount:
-      action === "Long"
-        ? expandToken(min_amount_out_estimate, out_extra_decimals, 0)
-        : expandToken(min_amount_out_estimate, in_extra_decimals, 0),
+    min_token_p_amount: expandToken(
+      min_amount_out_estimate,
+      action === "Long" ? out_extra_decimals : in_extra_decimals,
+      0,
+    ),
     swap_indication: confirmInfo.estimateData.swap_indication,
     assets: confirmInfo.assets.data,
   };
@@ -101,51 +104,55 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
 
   const confirmOpenPosition = async () => {
     setIsDisabled(true);
-    const { decimals: localDecimals } = getAssetDetails(
-      getAssetById(
-        action === "Long" ? openPositionParams.token_p_id : openPositionParams.token_d_id,
-      ),
-    );
-    // Swap Out Trial Calculation Result Verification
-    const minTokenPAmount = Number(shrinkToken(openPositionParams.min_token_p_amount, decimalsP));
-    const tokenDAmount = shrinkToken(openPositionParams.token_d_amount, decimalsD);
-    const tokenDPrice = confirmInfo.assets.data[openPositionParams.token_d_id].price.usd;
-    const tokenPPrice = confirmInfo.assets.data[openPositionParams.token_p_id].price.usd;
-    const slippageRate = 1 - max_slippage_rate / 10000;
-    const calculatedValue = ((+tokenDAmount * tokenDPrice) / tokenPPrice) * slippageRate;
-    if (!(minTokenPAmount >= calculatedValue)) {
-      setIsDisabled(false);
-      setIsMinTokenPAmount(true);
-      return;
-    }
-    // Position Verification
-    const total_c_value = new Decimal(confirmInfo.longInput || 0).mul(assetC.price?.usd || 0);
-    const total_p_value = new Decimal(minTokenPAmount || 0).mul(assetP.price?.usd || 0);
-    const total_d_value = new Decimal(tokenDAmount || 0).mul(assetD.price?.usd || 0);
-    const total_cap = total_c_value.plus(total_p_value);
-    const saft_value = total_cap.mul(1 - min_safety_buffer / 10000);
-    if (saft_value.lte(total_d_value)) {
-      setIsDisabled(false);
-      setHasLiquidationRisk(true);
-      return;
-    }
-
-    localStorage.setItem(
-      "cateSymbolAndDecimals",
-      JSON.stringify({
-        cateSymbol,
-        decimals: localDecimals,
-        amount: confirmInfo.longOutput,
-        totalPrice: confirmInfo.longOutputUsd,
-      }),
-    );
-
-    const wallet = await burrowData?.selector?.wallet();
-    if (wallet?.id && ["my-near-wallet", "mintbase-wallet", "bitte-wallet"].includes(wallet.id)) {
-      return openPosition(openPositionParams);
-    }
 
     try {
+      const { decimals: localDecimals } = getAssetDetails(
+        getAssetById(
+          action === "Long" ? openPositionParams.token_p_id : openPositionParams.token_d_id,
+        ),
+      );
+
+      // Swap Out Trial Calculation Result Verification
+      const minTokenPAmount = Number(shrinkToken(openPositionParams.min_token_p_amount, decimalsP));
+      const tokenDAmount = shrinkToken(openPositionParams.token_d_amount, decimalsD);
+      const tokenDPrice = confirmInfo.assets.data[openPositionParams.token_d_id].price.usd;
+      const tokenPPrice = confirmInfo.assets.data[openPositionParams.token_p_id].price.usd;
+      const slippageRate = 1 - max_slippage_rate / 10000;
+      const calculatedValue = ((+tokenDAmount * tokenDPrice) / tokenPPrice) * slippageRate;
+
+      if (minTokenPAmount < calculatedValue) {
+        setIsMinTokenPAmount(true);
+        return;
+      }
+
+      // Position Verification
+      const total_c_value = new Decimal(confirmInfo.longInput || 0).mul(assetC.price?.usd || 0);
+      const total_p_value = new Decimal(minTokenPAmount || 0).mul(assetP.price?.usd || 0);
+      const total_d_value = new Decimal(tokenDAmount || 0).mul(assetD.price?.usd || 0);
+      const total_cap = total_c_value.plus(total_p_value);
+      const saft_value = total_cap.mul(1 - min_safety_buffer / 10000);
+
+      if (saft_value.lte(total_d_value)) {
+        setHasLiquidationRisk(true);
+        return;
+      }
+
+      localStorage.setItem(
+        "cateSymbolAndDecimals",
+        JSON.stringify({
+          cateSymbol,
+          decimals: localDecimals,
+          amount: confirmInfo.longOutput,
+          totalPrice: confirmInfo.longOutputUsd,
+        }),
+      );
+
+      const wallet = await burrowData?.selector?.wallet();
+      if (wallet?.id && ["my-near-wallet", "mintbase-wallet", "bitte-wallet"].includes(wallet.id)) {
+        await openPosition(openPositionParams);
+        return;
+      }
+
       const res: any = await openPosition(openPositionParams);
       if (!res || !Array.isArray(res)) {
         throw new Error("Invalid response from openPosition");
@@ -157,20 +164,23 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
         }
         return item.transaction.hash;
       });
+
       const txHash = await handleTransactionHash(transactionHashes);
-      txHash
-        .filter((item) => !item.hasStorageDeposit)
-        .forEach(async (item) => {
-          try {
-            await DataSource.shared.getMarginTradingPosition({
-              addr: accountId,
-              process_type: "open",
-              tx_hash: item.txHash,
-            });
-          } catch (error) {
-            console.error("Failed to get margin trading position:", error);
-          }
-        });
+      await Promise.all(
+        txHash
+          .filter((item) => !item.hasStorageDeposit)
+          .map(async (item) => {
+            try {
+              await DataSource.shared.getMarginTradingPosition({
+                addr: accountId,
+                process_type: "open",
+                tx_hash: item.txHash,
+              });
+            } catch (error) {
+              console.error("Failed to get margin trading position:", error);
+            }
+          }),
+      );
 
       await handleTransactionResults(
         transactionHashes,
@@ -181,7 +191,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
       console.error("Open position error:", error);
       showPositionFailure({
         title: "Transactions error",
-        errorMessage: error instanceof Error ? error?.message : JSON.stringify(error),
+        errorMessage: error instanceof Error ? error.message : JSON.stringify(error),
         type: action,
       });
     } finally {

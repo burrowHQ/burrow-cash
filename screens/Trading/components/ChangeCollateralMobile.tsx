@@ -21,7 +21,6 @@ import { handleTransactionHash } from "../../../services/transaction";
 import { useRouterQuery } from "../../../utils/txhashContract";
 import { setActiveTab } from "../../../redux/marginTabSlice";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
-import { nearTokenId } from "../../../utils";
 
 export const ModalContext = createContext(null) as any;
 const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => {
@@ -431,8 +430,12 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
                       <p className="text-xs text-gray-300 mt-1.5">
                         Max Available:{" "}
                         <span className="text-white">
-                          {" "}
-                          ${toInternationalCurrencySystem_number(getMaxAvailableAmount() * priceC)}
+                          $
+                          {Number.isNaN(getMaxAvailableAmount()) || getMaxAvailableAmount() === null
+                            ? "-"
+                            : toInternationalCurrencySystem_number(
+                                getMaxAvailableAmount() * priceC,
+                              )}
                         </span>
                       </p>
                     </div>
