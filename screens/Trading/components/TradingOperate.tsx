@@ -30,15 +30,12 @@ interface TradingOperateProps {
 
 // main components
 const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
+  //
   const customInputRef = useRef<HTMLInputElement>(null);
-
   const assets = useAppSelector(getAssets);
   const config = useAppSelector(getMarginConfig);
-  const { categoryAssets1, categoryAssets2 } = useMarginConfigToken();
-  const marginConfig = useAppSelector(getMarginConfig);
-  const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
-  const { marginConfigTokens, filterMarginConfigList } = useMarginConfigToken();
-  const dataList = Object.values(filterMarginConfigList as Record<string, any>);
+  const { categoryAssets1, categoryAssets2, marginConfigTokens } = useMarginConfigToken();
+  const { marginAccountList, getAssetById } = useMarginAccount();
   const { max_active_user_margin_position } = marginConfigTokens;
   const {
     ReduxcategoryAssets1,
@@ -47,15 +44,16 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
     ReduxcategoryCurrentBalance2,
     ReduxSlippageTolerance,
   } = useAppSelector((state) => state.category);
+
+  //
   const [slippageTolerance, setSlippageTolerance] = useState<number>(0.5);
   const [showFeeModal, setShowFeeModal] = useState<boolean>(false);
   const [forceUpdateLoading, setForceUpdateLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState<string>("long");
   const [estimateLoading, setEstimateLoading] = useState<boolean>(false);
-  // for slip
-  // const [showSetUpPopup, setShowSetUpPopup] = useState(false);
 
+  //
   const [selectedSetUpOption, setSelectedSetUpOption] = useState<string>("auto");
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
   const [rangeMount, setRangeMount] = useState<number>(1);
@@ -75,7 +73,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
   const [shortOutputUsd, setShortOutputUsd] = useState<number>(0);
 
   //
-  const balance = useAppSelector(getAccountBalance);
   const accountId = useAppSelector(getAccountId);
 
   // pools
@@ -122,6 +119,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
     ReduxcategoryAssets1?.token_id,
     ReduxcategoryAssets1?.metadata?.symbol,
   );
+
   // slippageTolerance change ecent
   useEffect(() => {
     dispatch(setSlippageToleranceFromRedux(0.5));
