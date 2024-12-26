@@ -19,12 +19,9 @@ import { beautifyPrice } from "../../../utils/beautyNumbet";
 import { getAccountId } from "../../../redux/accountSelectors";
 import { handleTransactionResults, handleTransactionHash } from "../../../services/transaction";
 import { showPositionFailure } from "../../../components/HashResultModal";
-import { getBurrow } from "../../../utils";
+import { getBurrow, nearTokenId } from "../../../utils";
 import DataSource from "../../../data/datasource";
-
-const getTokenSymbolOnly = (assetId) => {
-  return assetId === "wNEAR" ? "NEAR" : assetId || "";
-};
+import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 
 export const ModalContext = createContext(null) as any;
 const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
@@ -63,7 +60,11 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
   const decimalsD = +assetD.config.extra_decimals + +assetD.metadata.decimals;
   const decimalsP = +assetP.config.extra_decimals + +assetP.metadata.decimals;
   const decimalsC = action === "Long" ? decimalsD : decimalsP;
-  const cateSymbol = getTokenSymbolOnly(ReduxcategoryAssets1?.metadata?.symbol);
+
+  const cateSymbol = getSymbolById(
+    ReduxcategoryAssets1?.token_id,
+    ReduxcategoryAssets1?.metadata?.symbol,
+  );
   const min_amount_out_estimate = confirmInfo.estimateData.min_amount_out;
   const expand_amount_in_estimate = confirmInfo.estimateData.expand_amount_in;
   const in_extra_decimals = confirmInfo?.longInputName?.config?.extra_decimals || 0;
@@ -182,7 +183,6 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
       onClose();
     }
   };
-
   return (
     <MUIModal open={open} onClose={onClose}>
       <Wrapper
@@ -227,9 +227,10 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
               <div className="text-center leading-3">
                 <p className="text-lg">
                   {beautifyPrice(+confirmInfo.longOutput)}{" "}
-                  {confirmInfo.longOutputName?.metadata.symbol === "wNEAR"
-                    ? "NEAR"
-                    : confirmInfo.longOutputName?.metadata.symbol}
+                  {getSymbolById(
+                    confirmInfo.longOutputName?.token_id,
+                    confirmInfo.longOutputName?.metadata.symbol,
+                  )}
                 </p>
                 <span className="text-xs text-gray-300">
                   {action} ${beautifyPrice(confirmInfo.longOutputUsd)}
@@ -275,46 +276,7 @@ const ConfirmMobile = ({ open, onClose, action, confirmInfo }) => {
               <div className="text-gray-300">Liq. Price</div>
               <div>${beautifyPrice(confirmInfo.LiqPrice)}</div>
             </div>
-            {/* <div className="flex items-baseline justify-between text-sm mb-4">
-              <div className="text-gray-300 flex items-center">
-                <RefLogoIcon />
-                <span className="ml-2">Route</span>
-              </div>
-              <div className="flex flex-col justify-end">
-                {confirmInfo.estimateData?.tokensPerRoute.map((item, index) => {
-                  return (
-                    <div key={index + item.symbol} className="flex mb-2 items-center">
-                      {item.map((ite, ind) => {
-                        return (
-                          <React.Fragment key={`${index}-${ind}-${ite.symbol}`}>
-                            {ind === 0 && (
-                              <>
-                                <div
-                                  className={`bg-opacity-10  text-xs py-0.5 pl-2.5 pr-1.5 rounded ${
-                                    actionShowRedColor
-                                      ? "bg-primary text-primary"
-                                      : "bg-red-50 text-red-50"
-                                  }`}
-                                >{`${percentList[index]}%`}</div>
-                                <span className="mx-2">|</span>
-                              </>
-                            )}
-                            <div className="flex items-center">
-                              <span>{ite.symbol === "wNEAR" ? "NEAR" : ite.symbol}</span>
-                              {ind + 1 < confirmInfo.estimateData?.tokensPerRoute[index].length ? (
-                                <span className="mx-2">&gt;</span>
-                              ) : (
-                                ""
-                              )}
-                            </div>
-                          </React.Fragment>
-                        );
-                      })}
-                    </div>
-                  );
-                })}
-              </div>
-            </div> */}
+
             {isMinTokenPAmount && (
               <div className=" text-[#EA3F68] text-sm font-normal flex items-start mb-1">
                 <MaxPositionIcon />

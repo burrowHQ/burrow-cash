@@ -20,6 +20,8 @@ import { showChangeCollateralPosition } from "../../../components/HashResultModa
 import { handleTransactionHash } from "../../../services/transaction";
 import { useRouterQuery } from "../../../utils/txhashContract";
 import { setActiveTab } from "../../../redux/marginTabSlice";
+import { getSymbolById } from "../../../transformers/nearSymbolTrans";
+import { nearTokenId } from "../../../utils";
 
 export const ModalContext = createContext(null) as any;
 const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => {
@@ -379,12 +381,8 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
                   {positionType.label}
                   <span className="ml-1.5">
                     {positionType.label === "Long"
-                      ? assetP.metadata?.symbol === "wNEAR"
-                        ? "NEAR"
-                        : assetP.metadata?.symbol
-                      : assetD.metadata?.symbol === "wNEAR"
-                      ? "NEAR"
-                      : assetD.metadata?.symbol}
+                      ? getSymbolById(assetP.token_id, assetP.metadata?.symbol)
+                      : getSymbolById(assetD.token_id, assetD.metadata?.symbol)}
                   </span>
                 </div>
               </div>
@@ -460,12 +458,8 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
                         : toInternationalCurrencySystem_number(leverageD)}
                       <span className="ml-1.5">
                         {positionType.label === "Long"
-                          ? assetP.metadata?.symbol === "wNEAR"
-                            ? "NEAR"
-                            : assetP.metadata?.symbol
-                          : assetD.metadata?.symbol === "wNEAR"
-                          ? "NEAR"
-                          : assetD.metadata?.symbol}
+                          ? getSymbolById(assetP.token_id, assetP.metadata?.symbol)
+                          : getSymbolById(assetD.token_id, assetD.metadata?.symbol)}
                       </span>
                       <span className="text-xs text-gray-300 ml-1.5">
                         (${toInternationalCurrencySystem_number(sizeValue)})
@@ -603,12 +597,8 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
                         : toInternationalCurrencySystem_number(leverageD)}
                       <span className="ml-1.5">
                         {positionType.label === "Long"
-                          ? assetP.metadata?.symbol === "wNEAR"
-                            ? "NEAR"
-                            : assetP.metadata?.symbol
-                          : assetD.metadata?.symbol === "wNEAR"
-                          ? "NEAR"
-                          : assetD.metadata?.symbol}
+                          ? getSymbolById(assetP.token_id, assetP.metadata?.symbol)
+                          : getSymbolById(assetD.token_id, assetD.metadata?.symbol)}
                       </span>
                       <span className="text-xs text-gray-300 ml-1.5">
                         (${toInternationalCurrencySystem_number(sizeValue)})

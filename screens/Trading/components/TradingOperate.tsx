@@ -30,6 +30,7 @@ import {
 } from "../../../components/Modal/button";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
 import { ConnectWalletButton } from "../../../components/Header/WalletButton";
+import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 
 // main components
 const TradingOperate = ({ onMobileClose }: { onMobileClose?: () => void }) => {
@@ -79,9 +80,6 @@ const TradingOperate = ({ onMobileClose }: { onMobileClose?: () => void }) => {
   const balance = useAppSelector(getAccountBalance);
   const accountId = useAppSelector(getAccountId);
 
-  const getTokenSymbolOnly = (assetId) => {
-    return assetId === "wNEAR" ? "NEAR" : assetId || "";
-  };
   // pools
   const { simplePools, stablePools, stablePoolsDetail } = usePoolsData();
 
@@ -122,7 +120,10 @@ const TradingOperate = ({ onMobileClose }: { onMobileClose?: () => void }) => {
       : "text-gray-300 py-2.5 px-5";
   };
 
-  const cateSymbol = getTokenSymbolOnly(ReduxcategoryAssets1?.metadata?.symbol);
+  const cateSymbol = getSymbolById(
+    ReduxcategoryAssets1?.token_id,
+    ReduxcategoryAssets1?.metadata?.symbol,
+  );
   // slippageTolerance change ecent
   useEffect(() => {
     dispatch(setSlippageToleranceFromRedux(0.5));
