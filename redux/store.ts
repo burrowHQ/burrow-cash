@@ -18,7 +18,9 @@ import assetsMEMEReducer from "./assetsSliceMEME";
 import accountReducer from "./accountSlice";
 import accountMEMEReducer from "./accountSliceMEME";
 import marginAccountReducer from "./marginAccountSlice";
+import marginAccountMEMEReducer from "./marginAccountSliceMEME";
 import marginConfigReducer from "./marginConfigSlice";
+import marginConfigMEMEReducer from "./marginConfigSliceMEME";
 import appReducer from "./appSlice";
 import appMEMEReducer from "./appSliceMEME";
 import feedReducer from "./feedSlice";
@@ -41,7 +43,9 @@ const rootReducer = combineReducers({
   account: accountReducer,
   accountMEME: accountMEMEReducer,
   marginAccount: marginAccountReducer,
+  marginAccountMEME: marginAccountMEMEReducer,
   marginConfig: marginConfigReducer,
+  marginConfigMEME: marginConfigMEMEReducer,
   app: appReducer,
   appMEME: appMEMEReducer,
   feed: feedReducer,

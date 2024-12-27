@@ -8,7 +8,6 @@ import { initialState } from "./assetState";
 
 export const fetchAssetsMEME = createAsyncThunk("assetsMEME/fetchAssets", async () => {
   const assets = await getAssetsMEME().then(transformAssets);
-  console.log(assets, "assets pppp");
   const netTvlFarm = await getFarmMEME("NetTvl");
   const allFarms = await getAllFarmsMEME().then(transformFarms);
   return { assets, netTvlFarm, allFarms };

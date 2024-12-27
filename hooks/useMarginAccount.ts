@@ -1,11 +1,17 @@
-import { getAssets } from "../redux/assetsSelectors";
+import { getAssets, getAssetsMEME } from "../redux/assetsSelectors";
 import { useAppSelector } from "../redux/hooks";
-import { getMarginAccount, getMarginAccountPositions } from "../redux/marginAccountSelectors";
+import {
+  getMarginAccount,
+  getMarginAccountPositions,
+  getMarginAccountPositionsMEME,
+} from "../redux/marginAccountSelectors";
 import { shrinkToken } from "../store/helper";
 
 export function useMarginAccount() {
   const assets = useAppSelector(getAssets);
+  const assetsMEME = useAppSelector(getAssetsMEME);
   const marginAccountList = useAppSelector(getMarginAccountPositions);
+  const marginAccountListMEME = useAppSelector(getMarginAccountPositionsMEME);
 
   const parseTokenValue = (tokenAmount, decimals) => {
     if (!tokenAmount || !decimals) return 0;
@@ -30,6 +36,7 @@ export function useMarginAccount() {
   };
   return {
     marginAccountList,
+    marginAccountListMEME,
     assets,
     parseTokenValue,
     getAssetDetails,

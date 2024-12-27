@@ -2,12 +2,12 @@ import { getBurrow } from "../utils";
 import { ViewMethodsLogic } from "../interfaces/contract-methods";
 import { IMarginConfig } from "../interfaces";
 
-const getMarginConfig = async (): Promise<IMarginConfig> => {
-  const { view, logicContract } = await getBurrow();
+const getMarginConfigMEME = async (): Promise<IMarginConfig> => {
+  const { view, logicMEMEContract } = await getBurrow();
 
   try {
     const config = (await view(
-      logicContract,
+      logicMEMEContract,
       ViewMethodsLogic[ViewMethodsLogic.get_margin_config],
     )) as IMarginConfig;
     return config;
@@ -17,4 +17,4 @@ const getMarginConfig = async (): Promise<IMarginConfig> => {
   }
 };
 
-export default getMarginConfig;
+export default getMarginConfigMEME;

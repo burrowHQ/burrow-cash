@@ -10,7 +10,13 @@ import DataSource from "../../../../data/datasource";
 const MyMarginTradingPage = () => {
   const isMobile = isMobileDevice();
   const [showCollateralPopup, setShowCollateralPopup] = useState(false);
-  const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
+  const {
+    marginAccountList,
+    marginAccountListMEME,
+    parseTokenValue,
+    getAssetDetails,
+    getAssetById,
+  } = useMarginAccount();
   const { getPositionType } = useMarginConfigToken();
   const [totalLongSizeValue, setTotalLongSizeValue] = useState(0);
   const [totalShortSizeValue, setTotalShortSizeValue] = useState(0);

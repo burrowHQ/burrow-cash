@@ -1,10 +1,13 @@
-import { getAssets } from "../redux/assetsSelectors";
+import { getAssets, getAssetsMEME } from "../redux/assetsSelectors";
 import { useAppSelector } from "../redux/hooks";
-import { getMarginConfig } from "../redux/marginConfigSelectors";
+import { getMarginConfig, getMarginConfigMEME } from "../redux/marginConfigSelectors";
 
 export function useMarginConfigToken() {
   const assets = useAppSelector(getAssets);
+  const assetsMEME = useAppSelector(getAssetsMEME);
   const marginConfigTokens = useAppSelector(getMarginConfig);
+  const marginConfigTokensMEME = useAppSelector(getMarginConfigMEME);
+  // console.log(marginConfigTokens, marginConfigTokensMEME, "for nico marginConfigTokensMEME");
   const assetsData = assets.data;
 
   // add by LuKe

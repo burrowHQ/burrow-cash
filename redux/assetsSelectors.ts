@@ -36,7 +36,6 @@ export const getAvailableAssetsMEME = (source?: "supply" | "borrow" | "") =>
       return assets_filter_by_source
         .filter((tokenId) => !hiddenAssets.includes(assets[tokenId].token_id))
         .map((tokenId) => {
-          console.log(assets[tokenId], account, assets, app, "assets[tokenId]");
           return transformAsset(assets[tokenId], account, assets, app);
         });
     },

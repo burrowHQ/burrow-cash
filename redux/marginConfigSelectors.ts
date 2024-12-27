@@ -7,3 +7,8 @@ export const getMarginConfig = createSelector(
   (state: RootState) => state.marginConfig,
   (marginConfig): IMarginConfigState => marginConfig,
 );
+
+export const getMarginConfigMEME = createSelector(
+  (state: RootState) => state.marginConfigMEME,
+  (marginConfigMEME): IMarginConfigState => marginConfigMEME,
+);
