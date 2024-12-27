@@ -45,6 +45,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     parseTokenValue,
     calculateLeverage,
     entryPrice,
+    pnl,
   } = extraProps;
 
   const [showFeeModal, setShowFeeModal] = useState<boolean>(false);
@@ -172,7 +173,6 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
         token_d_id: item.token_d_info.token_id,
         token_p_amount: expandToken(tokenInAmount || "0", assetP.config.extra_decimals, 0),
       });
-
       onClose();
       if (res !== undefined && res !== null) {
         showPositionClose({
@@ -239,7 +239,6 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     const result = hp_rate.mul(round_mul_u128).minus(UNIT);
     return result;
   }
-
   const formatDecimal = (value: number) => {
     if (!value) return "0";
     return value.toFixed(6).replace(/\.?0+$/, "");
@@ -288,7 +287,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Entry Price</div>
-              <div>{entryPrice ? `$${entryPrice.toFixed(2)}` : "-"}</div>
+              <div>{entryPrice != "-" ? beautifyPrice(entryPrice, true) : "-"}</div>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Index Price</div>
@@ -311,9 +310,10 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
               <div className="flex items-center justify-center">
                 {/* <span className="text-red-50">-$0.0689</span> */}
                 {/* <span className="text-xs text-gray-300 ml-1.5">(-2.01%)</span> */}
-                <span className="text-xs text-gray-300 ml-1.5">
-                  {entryPrice !== null
-                    ? `$${toInternationalCurrencySystem_number(entryPrice)}`
+                <span className="text-sm text-white ml-1.5">
+                  {" "}
+                  {entryPrice && entryPrice != "-"
+                    ? `$${toInternationalCurrencySystem_number(pnl)}`
                     : "-"}
                 </span>
               </div>

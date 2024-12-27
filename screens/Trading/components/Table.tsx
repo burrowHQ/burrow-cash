@@ -953,6 +953,7 @@ const PositionRow = ({
               calculateLeverage,
               LiqPrice,
               entryPrice,
+              pnl,
             });
           }}
         >
@@ -1174,6 +1175,7 @@ const PositionMobileRow = ({
               calculateLeverage,
               LiqPrice,
               entryPrice,
+              pnl,
             });
           }}
         >
