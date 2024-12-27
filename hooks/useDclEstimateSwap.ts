@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import _ from "lodash";
 import Decimal from "decimal.js";
 import { useAppSelector } from "../redux/hooks";
-import { getAssets } from "../redux/assetsSelectors";
+import { getAssets, getAssetsMEME } from "../redux/assetsSelectors";
 import { expandTokenDecimal, shrinkToken } from "../store";
 import { getDclPools } from "../redux/poolSelectors";
 import { DCL_POOL_FEE_LIST } from "../utils/constant";
@@ -26,6 +26,8 @@ export const useDclEstimateSwap = ({
 }) => {
   const [estimateData, setEstimateData] = useState<IEstimateResult>();
   const assets = useAppSelector(getAssets);
+  const assetsMEME = useAppSelector(getAssetsMEME);
+  const combinedAssetsData = { ...assets.data, ...assetsMEME.data };
   const allDclPools = useAppSelector(getDclPools);
   useEffect(() => {
     if (tokenIn_id && tokenOut_id && new Decimal(tokenIn_amount || 0).gt(0)) {
@@ -34,8 +36,8 @@ export const useDclEstimateSwap = ({
   }, [tokenIn_id, tokenOut_id, tokenIn_amount, slippageTolerance, forceUpdate]);
   async function estimateDclSwap() {
     const [tokenIn_metadata, tokenOut_metadata] = getMetadatas([
-      assets.data[tokenIn_id],
-      assets.data[tokenOut_id],
+      combinedAssetsData[tokenIn_id],
+      combinedAssetsData[tokenOut_id],
     ]);
     const expandAmount = expandTokenDecimal(tokenIn_amount, tokenIn_metadata.decimals).toFixed(0);
     const dclPoolIds = DCL_POOL_FEE_LIST.map((fee) => {

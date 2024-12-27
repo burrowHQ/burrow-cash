@@ -8,7 +8,7 @@ import { ComeBackIcon, ShrinkArrow, TokenArrow } from "./components/TradingIcon"
 import { NearIcon } from "../MarginTrading/components/Icon";
 import TradingTable from "./components/Table";
 import TradingOperate from "./components/TradingOperate";
-import { getAssets as getAssetsSelector } from "../../redux/assetsSelectors";
+import { getAssets as getAssetsSelector, getAssetsMEME } from "../../redux/assetsSelectors";
 import { shrinkToken } from "../../store";
 import { getMarginConfig } from "../../redux/marginConfigSelectors";
 import { formatWithCommas_usd, toInternationalCurrencySystem_number } from "../../utils/uiNumber";
@@ -41,16 +41,17 @@ const Trading = () => {
   const { id }: any = router.query;
   const dispatch = useAppDispatch();
   const assets = useAppSelector(getAssetsSelector);
+  const assetsMEME = useAppSelector(getAssetsMEME);
+  const combinedAssetsData = { ...assets.data, ...assetsMEME.data };
   const [showPopupCate1, setShowPopup1] = useState(false);
   const [showPopupCate2, setShowPopup2] = useState(false);
 
   //
   const [currentTokenCate1, setCurrentTokenCate1] = useState<any>({});
   const [currentTokenCate2, setCurrentTokenCate2] = useState<any>(categoryAssets2[0]);
-
   const [longAndShortPosition, setLongAndShortPosition] = useState<any>([]);
 
-  const assetData: any = assets.data[id];
+  const assetData: any = combinedAssetsData[id];
   const margin_position = assetData ? assetData?.margin_position : null;
   const metadata = assetData ? assetData?.metadata : {};
   const config = assetData ? assetData?.config : {};
@@ -62,8 +63,8 @@ const Trading = () => {
 
   useEffect(() => {
     if (id) {
-      setCurrentTokenCate1(assets.data[id]);
-      dispatch(setCategoryAssets1(assets.data[id]));
+      setCurrentTokenCate1(combinedAssetsData[id]);
+      dispatch(setCategoryAssets1(combinedAssetsData[id]));
       dispatch(setCategoryAssets2(currentTokenCate2 || categoryAssets2[0]));
     }
   }, [id, currentTokenCate1]);
@@ -72,14 +73,14 @@ const Trading = () => {
     setLongAndShortPosition([
       toInternationalCurrencySystem_number(
         +shrinkToken(margin_position, decimals + extra_decimals) *
-          (assets.data[id]?.price?.usd || 0),
+          (combinedAssetsData[id]?.price?.usd || 0),
       ),
       toInternationalCurrencySystem_number(
         +shrinkToken(margin_debt?.balance, decimals + extra_decimals) *
-          (assets.data[id]?.price?.usd || 0),
+          (combinedAssetsData[id]?.price?.usd || 0),
       ),
     ]);
-  }, [assets.data[id]?.price?.usd]);
+  }, [combinedAssetsData[id]?.price?.usd]);
 
   useMemo(() => {
     setCurrentTokenCate1(ReduxcategoryAssets1);
@@ -246,7 +247,7 @@ const Trading = () => {
                   )}
                 </div>
               </div>
-              <span>${assets.data[id]?.price?.usd || 0}</span>
+              <span>${combinedAssetsData[id]?.price?.usd || 0}</span>
             </div>
             {/* total v */}
             <div className="text-sm">
@@ -285,7 +286,9 @@ const Trading = () => {
                       currentTokenCate1?.metadata?.symbol,
                     )}
                   </p>
-                  <p className="text-[#C0C4E9] text-xs">${assets.data[id]?.price?.usd || 0}</p>
+                  <p className="text-[#C0C4E9] text-xs">
+                    ${combinedAssetsData[id]?.price?.usd || 0}
+                  </p>
                 </div>
 
                 {/* cate2 */}

@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import RangeSlider from "./RangeSlider";
 import ConfirmMobile from "./ConfirmMobile";
 import { getAccountBalance, getAccountId } from "../../../redux/accountSelectors";
-import { getAssets } from "../../../redux/assetsSelectors";
+import { getAssets, getAssetsMEME } from "../../../redux/assetsSelectors";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
 import { usePoolsData } from "../../../hooks/useGetPoolsData";
 import { getMarginConfig } from "../../../redux/marginConfigSelectors";
@@ -33,6 +33,8 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
   //
   const customInputRef = useRef<HTMLInputElement>(null);
   const assets = useAppSelector(getAssets);
+  const assetsMEME = useAppSelector(getAssetsMEME);
+  const combinedAssetsData = { ...assets.data, ...assetsMEME.data };
   const config = useAppSelector(getMarginConfig);
   const { categoryAssets1, categoryAssets2, marginConfigTokens } = useMarginConfigToken();
   const { marginAccountList, getAssetById } = useMarginAccount();
@@ -392,7 +394,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
   };
 
   function getAssetPrice(categoryId) {
-    return categoryId ? assets.data[categoryId["token_id"]].price?.usd : 0;
+    return categoryId ? combinedAssetsData[categoryId["token_id"]].price?.usd : 0;
   }
 
   function updateOutput(tab: string, inputUsdCharcate: number) {

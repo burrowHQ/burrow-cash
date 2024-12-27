@@ -7,14 +7,15 @@ export function useMarginConfigToken() {
   const assetsMEME = useAppSelector(getAssetsMEME);
   const marginConfigTokens = useAppSelector(getMarginConfig);
   const marginConfigTokensMEME = useAppSelector(getMarginConfigMEME);
-  // console.log(marginConfigTokens, marginConfigTokensMEME, "for nico marginConfigTokensMEME");
   const assetsData = assets.data;
-
+  const assetsDataMEME = assetsMEME.data;
+  const combinedAssetsData = { ...assetsData, ...assetsDataMEME };
   // add by LuKe
   const categoryAssets1: Array<any> = [];
   const categoryAssets2: Array<any> = [];
 
   const filteredMarginConfigTokens1 = Object.entries(marginConfigTokens.registered_tokens)
+    .concat(Object.entries(marginConfigTokensMEME.registered_tokens))
     .filter(([token, value]) => value === 1)
     .map(([token]) => token);
 
@@ -23,19 +24,18 @@ export function useMarginConfigToken() {
     .map(([token]) => token);
 
   const filterMarginConfigList = filteredMarginConfigTokens1.reduce((item, token) => {
-    if (assetsData[token]) {
-      item[token] = assetsData[token];
+    if (combinedAssetsData[token]) {
+      item[token] = combinedAssetsData[token];
       // get categoryAssets1
       categoryAssets1.push({
-        ...assetsData[token],
+        ...combinedAssetsData[token],
       });
     }
     return item;
   }, {});
-
   filteredMarginConfigTokens2.forEach((item: string) => {
     // security check
-    if (assets && assets.data && assets.data[item] && assets.data[item].metadata) {
+    if (combinedAssetsData[item]?.metadata) {
       // get categoryAssets2
       categoryAssets2.push({
         ...assets.data[item],

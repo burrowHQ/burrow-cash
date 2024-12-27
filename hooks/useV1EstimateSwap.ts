@@ -10,7 +10,7 @@ import {
 import { isEmpty } from "lodash";
 import Decimal from "decimal.js";
 import { useAppSelector } from "../redux/hooks";
-import { getAssets } from "../redux/assetsSelectors";
+import { getAssets, getAssetsMEME } from "../redux/assetsSelectors";
 import { getMarginConfig } from "../redux/marginConfigSelectors";
 import { getAllPools } from "../redux/poolSelectors";
 import { expandTokenDecimal } from "../store";
@@ -48,14 +48,16 @@ export const useV1EstimateSwap = ({
   forceUpdate?: number;
 }) => {
   const assets = useAppSelector(getAssets);
+  const assetsMEME = useAppSelector(getAssetsMEME);
+  const combinedAssetsData = { ...assets.data, ...assetsMEME.data };
   const marginConfig = useAppSelector(getMarginConfig);
   const allPools = useAppSelector(getAllPools);
   const [estimateData, setEstimateData] = useState<IEstimateResult>();
   const [tokenIn_metadata, tokenOut_metadata] = useMemo(() => {
     if (tokenIn_id && tokenOut_id) {
       const [tokenIn_metadata, tokenOut_metadata] = getMetadatas([
-        assets.data[tokenIn_id],
-        assets.data[tokenOut_id],
+        combinedAssetsData[tokenIn_id],
+        combinedAssetsData[tokenOut_id],
       ]);
       return [tokenIn_metadata, tokenOut_metadata];
     }
