@@ -19,8 +19,14 @@ interface TradingTokenInter {
   tokenList: Array<any>;
   type: string;
   setOwnBanlance?: (key: string) => void;
+  setForceUpdate?: () => void;
 }
-const TradingToken: React.FC<TradingTokenInter> = ({ tokenList, type, setOwnBanlance }) => {
+const TradingToken: React.FC<TradingTokenInter> = ({
+  tokenList,
+  type,
+  setOwnBanlance,
+  setForceUpdate,
+}) => {
   let timer: NodeJS.Timeout;
   const dispatch = useAppDispatch();
   const account = useAppSelector((state) => state.account);
@@ -86,7 +92,6 @@ const TradingToken: React.FC<TradingTokenInter> = ({ tokenList, type, setOwnBanl
   //
   const handleTokenClick = (item: any) => {
     if (!item) return;
-
     setSelectedItem(item);
 
     const typeDispatchMap: Record<string, ((item: any) => any) | undefined> = {
@@ -101,6 +106,7 @@ const TradingToken: React.FC<TradingTokenInter> = ({ tokenList, type, setOwnBanl
       console.warn(`Unsupported type: ${type}`);
     }
 
+    setForceUpdate && setForceUpdate();
     setShowModal(false);
   };
 

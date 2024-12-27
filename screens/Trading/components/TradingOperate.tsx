@@ -563,6 +563,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
                   setOwnBanlance={setOwnBanlance}
                   tokenList={categoryAssets2}
                   type="cate2"
+                  setForceUpdate={() => setForceUpdate((prev) => prev + 1)}
                 />
               </div>
               <p className="text-gray-300 mt-2 text-xs">${longInputUsd.toFixed(2)}</p>
@@ -699,6 +700,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
                   setOwnBanlance={setOwnBanlance}
                   tokenList={categoryAssets2}
                   type="cate2"
+                  setForceUpdate={() => setForceUpdate((prev) => prev + 1)}
                 />
               </div>
               <p className="text-gray-300 mt-2 text-xs">${shortInputUsd.toFixed(2)}</p>
