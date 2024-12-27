@@ -104,7 +104,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
 
   const confirmOpenPosition = async () => {
     setIsDisabled(true);
-
+    let hasError = false;
     try {
       const { decimals: localDecimals } = getAssetDetails(
         getAssetById(
@@ -119,9 +119,9 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
       const tokenPPrice = confirmInfo.assets.data[openPositionParams.token_p_id].price.usd;
       const slippageRate = 1 - max_slippage_rate / 10000;
       const calculatedValue = ((+tokenDAmount * tokenDPrice) / tokenPPrice) * slippageRate;
-
       if (minTokenPAmount < calculatedValue) {
         setIsMinTokenPAmount(true);
+        hasError = true;
         return;
       }
 
@@ -131,9 +131,9 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
       const total_d_value = new Decimal(tokenDAmount || 0).mul(assetD.price?.usd || 0);
       const total_cap = total_c_value.plus(total_p_value);
       const saft_value = total_cap.mul(1 - min_safety_buffer / 10000);
-
       if (saft_value.lte(total_d_value)) {
         setHasLiquidationRisk(true);
+        hasError = true;
         return;
       }
 
@@ -196,7 +196,9 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
       });
     } finally {
       setIsDisabled(false);
-      onClose();
+      if (!hasError) {
+        onClose(); // Only close the modal if there was no error
+      }
     }
   };
   return (
