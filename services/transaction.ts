@@ -72,38 +72,13 @@ export const handleTransactionResults = async (
           const cateSymbolAndDecimals = JSON.parse(
             localStorage.getItem("cateSymbolAndDecimals") || "{}",
           );
+          const price = calculatePrice(actions[0]?.OpenPosition, isLong, cateSymbolAndDecimals);
           showPositionResult({
             title: "Open Position",
             type: isLong ? "Long" : "Short",
-            price: (isLong
-              ? Number(shrinkToken(actions[0]?.OpenPosition?.token_d_amount, 18)) /
-                Number(
-                  shrinkToken(
-                    actions[0]?.OpenPosition?.min_token_p_amount,
-                    cateSymbolAndDecimals?.decimals || 24,
-                  ),
-                )
-              : Number(shrinkToken(actions[0]?.OpenPosition?.min_token_p_amount, 18)) /
-                Number(
-                  shrinkToken(
-                    actions[0]?.OpenPosition?.token_d_amount,
-                    cateSymbolAndDecimals?.decimals || 24,
-                  ),
-                )
-            ).toString(),
+            price: price.toString(),
             transactionHashes: txhash[0],
             positionSize: {
-              // amount: isLong
-              //   ? shrinkToken(
-              //       actions[0]?.OpenPosition?.min_token_p_amount,
-              //       cateSymbolAndDecimals?.decimals || 24,
-              //     )
-              //   : shrinkToken(
-              //       actions[0]?.OpenPosition?.token_d_amount,
-              //       cateSymbolAndDecimals?.decimals || 24,
-              //     ),
-              // symbol: cateSymbolAndDecimals?.cateSymbol || "NEAR",
-              // usdValue: cateSymbolAndDecimals?.price || "1",
               amount: cateSymbolAndDecimals?.amount || "",
               totalPrice: cateSymbolAndDecimals?.totalPrice || "",
               symbol: cateSymbolAndDecimals?.cateSymbol || "NEAR",
@@ -122,6 +97,18 @@ export const handleTransactionResults = async (
       errorMessage: decodeURIComponent(errorMessage as string),
     });
   }
+};
+
+const calculatePrice = (
+  openPosition: any,
+  isLong: boolean | undefined,
+  cateSymbolAndDecimals: any,
+) => {
+  const tokenAmount = Number(shrinkToken(openPosition?.token_d_amount, 18));
+  const minTokenAmount = Number(
+    shrinkToken(openPosition?.min_token_p_amount, cateSymbolAndDecimals?.decimals || 24),
+  );
+  return isLong ? tokenAmount / minTokenAmount : minTokenAmount / tokenAmount;
 };
 
 export const handleTransactionHash = async (
@@ -152,18 +139,6 @@ export const handleTransactionHash = async (
           return { txHash, result, hasStorageDeposit };
         }),
       );
-
-      // // 检查是否有任何一个交易的 hasStorageDeposit 为 false
-      // const hasAnyFalseStorageDeposit = results.some((result) => !result.hasStorageDeposit);
-
-      // // 如果有任何一个为 false，则所有结果的 hasStorageDeposit 都设为 false
-      // if (hasAnyFalseStorageDeposit) {
-      //   return results.map((result) => ({
-      //     ...result,
-      //     hasStorageDeposit: false,
-      //   }));
-      // }
-
       return results;
     } catch (error) {
       console.error("Error processing transactions:", error);

@@ -1,15 +1,8 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
-import _, { range } from "lodash";
+import _ from "lodash";
 import { BeatLoader } from "react-spinners";
 import TradingToken from "./tokenbox";
-import {
-  RefLogoIcon,
-  SetUp,
-  ShrinkArrow,
-  errorTipsIcon,
-  MaxPositionIcon,
-  RefreshIcon,
-} from "./TradingIcon";
+import { SetUp, ShrinkArrow, MaxPositionIcon, RefreshIcon } from "./TradingIcon";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import RangeSlider from "./RangeSlider";
 import ConfirmMobile from "./ConfirmMobile";
@@ -20,10 +13,9 @@ import { usePoolsData } from "../../../hooks/useGetPoolsData";
 import { getMarginConfig } from "../../../redux/marginConfigSelectors";
 import { toInternationalCurrencySystem_number, toDecimal } from "../../../utils/uiNumber";
 import { useEstimateSwap } from "../../../hooks/useEstimateSwap";
-import { NearIcon, NearIconMini } from "../../MarginTrading/components/Icon";
 import { setSlippageToleranceFromRedux } from "../../../redux/marginTrading";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";
-import { expandTokenDecimal, expandToken, shrinkToken } from "../../../store/helper";
+import { shrinkToken } from "../../../store/helper";
 import {
   YellowSolidSubmitButton as YellowSolidButton,
   RedSolidSubmitButton as RedSolidButton,
@@ -31,7 +23,6 @@ import {
 import { beautifyPrice } from "../../../utils/beautyNumbet";
 import { ConnectWalletButton } from "../../../components/Header/WalletButton";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
-import { IEstimateResult } from "../../../interfaces";
 
 interface TradingOperateProps {
   onMobileClose?: () => void;
@@ -39,15 +30,12 @@ interface TradingOperateProps {
 
 // main components
 const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
+  //
   const customInputRef = useRef<HTMLInputElement>(null);
-
   const assets = useAppSelector(getAssets);
   const config = useAppSelector(getMarginConfig);
-  const { categoryAssets1, categoryAssets2 } = useMarginConfigToken();
-  const marginConfig = useAppSelector(getMarginConfig);
-  const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
-  const { marginConfigTokens, filterMarginConfigList } = useMarginConfigToken();
-  const dataList = Object.values(filterMarginConfigList as Record<string, any>);
+  const { categoryAssets1, categoryAssets2, marginConfigTokens } = useMarginConfigToken();
+  const { marginAccountList, getAssetById } = useMarginAccount();
   const { max_active_user_margin_position } = marginConfigTokens;
   const {
     ReduxcategoryAssets1,
@@ -56,18 +44,19 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
     ReduxcategoryCurrentBalance2,
     ReduxSlippageTolerance,
   } = useAppSelector((state) => state.category);
+
+  //
   const [slippageTolerance, setSlippageTolerance] = useState<number>(0.5);
   const [showFeeModal, setShowFeeModal] = useState<boolean>(false);
   const [forceUpdateLoading, setForceUpdateLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState<string>("long");
   const [estimateLoading, setEstimateLoading] = useState<boolean>(false);
-  // for slip
-  // const [showSetUpPopup, setShowSetUpPopup] = useState(false);
 
-  const [selectedSetUpOption, setSelectedSetUpOption] = useState<string>("auto");
+  //
+  const [selectedSetUpOption, setSelectedSetUpOption] = useState<string>("custom");
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
-  const [rangeMount, setRangeMount] = useState<number>(1);
+  const [rangeMount, setRangeMount] = useState<number>(0);
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [isMaxPosition, setIsMaxPosition] = useState<boolean>(false);
 
@@ -84,7 +73,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
   const [shortOutputUsd, setShortOutputUsd] = useState<number>(0);
 
   //
-  const balance = useAppSelector(getAccountBalance);
   const accountId = useAppSelector(getAccountId);
 
   // pools
@@ -101,7 +89,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
   // for tab change
   const initCateState = (tabString: string) => {
     setLiqPrice(0);
-    setRangeMount(1);
+    // setRangeMount(1);
     if (tabString == "long") {
       setShortInput("");
       setShortInputUsd(0);
@@ -131,6 +119,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
     ReduxcategoryAssets1?.token_id,
     ReduxcategoryAssets1?.metadata?.symbol,
   );
+
   // slippageTolerance change ecent
   useEffect(() => {
     dispatch(setSlippageToleranceFromRedux(0.5));
@@ -652,7 +641,11 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
                   <span className="ml-1">Exceeded the maximum number of open positions.</span>
                 </div>
               )}
-
+              {rangeMount <= 1 && (
+                <span className="text-[#EA3F68] text-sm font-normal flex items-start mb-1">
+                  Leverage must be greater than 1
+                </span>
+              )}
               {accountId ? (
                 <YellowSolidButton
                   className="w-full"
@@ -780,6 +773,11 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
                   <MaxPositionIcon />
                   <span className="ml-1">Exceeded the maximum number of open positions.</span>
                 </div>
+              )}
+              {rangeMount <= 1 && (
+                <span className="text-[#EA3F68] text-sm font-normal flex items-start mb-1">
+                  Leverage must be greater than 1
+                </span>
               )}
               {accountId ? (
                 <RedSolidButton
