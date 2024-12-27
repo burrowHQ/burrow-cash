@@ -137,6 +137,10 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
         return;
       }
 
+      // for pop up localstorage
+      const minAmountOutForPopUp = Number(
+        shrinkToken(confirmInfo.estimateData?.min_amount_out, assetP.metadata.decimals),
+      );
       localStorage.setItem(
         "cateSymbolAndDecimals",
         JSON.stringify({
@@ -144,6 +148,10 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
           decimals: localDecimals,
           amount: confirmInfo.longOutput,
           totalPrice: confirmInfo.longOutputUsd,
+          entryPrice:
+            action === "Long"
+              ? confirmInfo.tokenInAmount / minAmountOutForPopUp
+              : minAmountOutForPopUp / confirmInfo.tokenInAmount,
         }),
       );
 

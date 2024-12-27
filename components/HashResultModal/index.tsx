@@ -9,12 +9,12 @@ import ModalWithCheckTxBeforeShowToast from "./ModalWithCheckTxBeforeShowToast";
 interface ShowPositionResultParams {
   title?: string;
   type?: "Long" | "Short";
-  price?: string;
   transactionHashes?: string;
   positionSize?: {
     amount: string;
     symbol: string;
     totalPrice: string;
+    entryPrice: string;
   };
 }
 

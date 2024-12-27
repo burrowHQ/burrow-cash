@@ -8,11 +8,11 @@ interface PositionResultProps {
   onClose: () => void;
   title?: string;
   type?: "Long" | "Short";
-  price?: string;
   positionSize?: {
     amount: string;
     symbol: string;
     totalPrice: string;
+    entryPrice: string;
   };
 }
 
@@ -30,11 +30,11 @@ const ModalWithCountdown = ({
   onClose,
   title = "Open Position",
   type = "Long",
-  price = "$0.00",
   positionSize = {
     amount: "0",
     symbol: "NEAR",
     totalPrice: "$0.00",
+    entryPrice: "0",
   },
 }: PositionResultProps) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -123,8 +123,8 @@ const ModalWithCountdown = ({
               </div>
             </div>
             <div className="fc justify-between text-sm font-normal">
-              <span className="text-gray-300">Price</span>
-              <span>${beautifyPrice(Number(price))}</span>
+              <span className="text-gray-300">Entry Price</span>
+              <span>${beautifyPrice(Number(positionSize.entryPrice))}</span>
             </div>
             <div className="fc justify-between text-sm font-normal">
               <span className="text-gray-300">Position Size</span>

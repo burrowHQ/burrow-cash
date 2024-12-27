@@ -72,16 +72,15 @@ export const handleTransactionResults = async (
           const cateSymbolAndDecimals = JSON.parse(
             localStorage.getItem("cateSymbolAndDecimals") || "{}",
           );
-          const price = calculatePrice(actions[0]?.OpenPosition, isLong, cateSymbolAndDecimals);
           showPositionResult({
             title: "Open Position",
             type: isLong ? "Long" : "Short",
-            price: price.toString(),
             transactionHashes: txhash[0],
             positionSize: {
               amount: cateSymbolAndDecimals?.amount || "",
               totalPrice: cateSymbolAndDecimals?.totalPrice || "",
               symbol: cateSymbolAndDecimals?.cateSymbol || "NEAR",
+              entryPrice: cateSymbolAndDecimals?.entryPrice || "0",
             },
           });
         }
@@ -97,18 +96,6 @@ export const handleTransactionResults = async (
       errorMessage: decodeURIComponent(errorMessage as string),
     });
   }
-};
-
-const calculatePrice = (
-  openPosition: any,
-  isLong: boolean | undefined,
-  cateSymbolAndDecimals: any,
-) => {
-  const tokenAmount = Number(shrinkToken(openPosition?.token_d_amount, 18));
-  const minTokenAmount = Number(
-    shrinkToken(openPosition?.min_token_p_amount, cateSymbolAndDecimals?.decimals || 24),
-  );
-  return isLong ? tokenAmount / minTokenAmount : minTokenAmount / tokenAmount;
 };
 
 export const handleTransactionHash = async (
