@@ -12,6 +12,7 @@ interface TransactionResult {
   txHash: string;
   result: any;
   hasStorageDeposit: boolean;
+  hasStorageDepositClosePosition?: boolean;
 }
 
 export const handleTransactionResults = async (
@@ -112,6 +113,7 @@ export const handleTransactionHash = async (
         txhash.map(async (txHash: string): Promise<TransactionResult> => {
           const result: any = await getTransactionResult(txHash);
           let hasStorageDeposit = false;
+          let hasStorageDepositClosePosition = false;
 
           const isMarginExecute = result.transaction.actions.some(
             (action: any) => action?.FunctionCall?.method_name === "margin_execute_with_pyth",
@@ -120,11 +122,11 @@ export const handleTransactionHash = async (
           if (isMarginExecute) {
             const args = parsedArgs(result?.transaction?.actions?.[0]?.FunctionCall?.args || "");
             const { actions } = JSON.parse(args || "");
-            hasStorageDeposit =
-              Reflect.has(actions[0], "OpenPosition") || Reflect.has(actions[0], "CloseMTPosition");
+            hasStorageDeposit = Reflect.has(actions[0], "OpenPosition");
+            hasStorageDepositClosePosition = Reflect.has(actions[0], "CloseMTPosition");
           }
 
-          return { txHash, result, hasStorageDeposit };
+          return { txHash, result, hasStorageDeposit, hasStorageDepositClosePosition };
         }),
       );
       return results;
