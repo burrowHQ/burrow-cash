@@ -29,6 +29,8 @@ import { getAssets } from "../../../redux/assetsSelectors";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";
 import { IClosePositionMobileProps } from "../comInterface";
 import { getMarginConfig } from "../../../redux/marginConfigSelectors";
+import { handleTransactionHash } from "../../../services/transaction";
+import DataSource from "../../../data/datasource";
 
 export const ModalContext = createContext(null) as any;
 const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
@@ -45,6 +47,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     parseTokenValue,
     calculateLeverage,
     entryPrice,
+    pnl,
   } = extraProps;
 
   const [showFeeModal, setShowFeeModal] = useState<boolean>(false);
@@ -146,18 +149,22 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     const regular_p_value = new Decimal(
       shrinkToken(tokenInAmount || "0", assetP.metadata.decimals),
     ).mul(assetP.price?.usd || 0);
+
     const regular_d_min_value = new Decimal(
       shrinkToken(estimateData!.min_amount_out || 0, assetD.metadata.decimals),
     ).mul(assetD.price?.usd || 0);
+
     const saft_p_value = regular_p_value.mul(1 - marginConfig.max_slippage_rate / 10000);
+
     if (regular_d_min_value.lte(saft_p_value)) {
       setIsDisabled(false);
       setSwapUnSecurity(true);
       return;
-    } else {
-      setIsDisabled(true);
-      setSwapUnSecurity(false);
     }
+
+    setIsDisabled(true);
+    setSwapUnSecurity(false);
+
     try {
       const res = await closePosition({
         isLong: positionType.label === "Long",
@@ -174,7 +181,33 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
       });
 
       onClose();
-      if (res !== undefined && res !== null) {
+
+      if (res) {
+        const transactionHashes = res.map((item) => {
+          if (!item?.transaction?.hash) {
+            throw new Error("Invalid transaction hash");
+          }
+          return item.transaction.hash;
+        });
+
+        const txHash = await handleTransactionHash(transactionHashes);
+
+        await Promise.all(
+          txHash
+            .filter((item) => item.hasStorageDeposit)
+            .map(async (item) => {
+              try {
+                await DataSource.shared.getMarginTradingPosition({
+                  addr: accountId,
+                  process_type: "open",
+                  tx_hash: item.txHash,
+                });
+              } catch (error) {
+                console.error("Failed to get margin trading position:", error);
+              }
+            }),
+        );
+
         showPositionClose({
           type: positionType.label as "Long" | "Short",
         });
@@ -239,7 +272,6 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     const result = hp_rate.mul(round_mul_u128).minus(UNIT);
     return result;
   }
-
   const formatDecimal = (value: number) => {
     if (!value) return "0";
     return value.toFixed(6).replace(/\.?0+$/, "");
@@ -288,7 +320,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Entry Price</div>
-              <div>{entryPrice ? `$${entryPrice.toFixed(2)}` : "-"}</div>
+              <div>{entryPrice != "-" ? beautifyPrice(entryPrice, true) : "-"}</div>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Index Price</div>
@@ -311,9 +343,10 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
               <div className="flex items-center justify-center">
                 {/* <span className="text-red-50">-$0.0689</span> */}
                 {/* <span className="text-xs text-gray-300 ml-1.5">(-2.01%)</span> */}
-                <span className="text-xs text-gray-300 ml-1.5">
-                  {entryPrice !== null
-                    ? `$${toInternationalCurrencySystem_number(entryPrice)}`
+                <span className="text-sm text-white ml-1.5">
+                  {" "}
+                  {entryPrice && entryPrice != "-"
+                    ? `$${toInternationalCurrencySystem_number(pnl)}`
                     : "-"}
                 </span>
               </div>

@@ -1,6 +1,7 @@
 import { twMerge } from "tailwind-merge";
 
-export const beautifyPrice = (num: number) => {
+export const beautifyPrice = (num: number, isDollar: boolean = false) => {
+  if (!num) return "-";
   //
   let numStr = num.toString();
   if (numStr.includes("e")) {
@@ -24,6 +25,7 @@ export const beautifyPrice = (num: number) => {
     //
     return (
       <span key={num} className="animate-flipIn">
+        {isDollar ? "$" : ""}
         {digits.endsWith("0") ? digits.slice(0, 4) : digits}
       </span>
     );
@@ -39,6 +41,7 @@ export const beautifyPrice = (num: number) => {
       }
       return (
         <span key={num} className="animate-flipIn">
+          {isDollar ? "$" : ""}
           {`0.${significantDigits}`}
         </span>
       );
@@ -50,7 +53,7 @@ export const beautifyPrice = (num: number) => {
     }
     return (
       <span key={num} className="animate-flipIn">
-        0.0
+        {isDollar ? "$" : ""}0.0
         <span
           className={twMerge("px-px need-small", "")}
           style={{
@@ -76,6 +79,7 @@ export const beautifyPrice = (num: number) => {
     } else {
       return (
         <span key={num} className="animate-flipIn">
+          {isDollar ? "$" : ""}
           {integerPart.slice(0, -1)}
         </span>
       );
@@ -84,6 +88,7 @@ export const beautifyPrice = (num: number) => {
 
   return (
     <span key={num} className="animate-flipIn">
+      {isDollar ? "$" : ""}
       {integerPart}
       {formattedDecimal ? `.${formattedDecimal}` : ""}
     </span>

@@ -48,7 +48,8 @@ export interface IExtraProps {
     priceC: number,
   ) => number;
   LiqPrice: number;
-  entryPrice: number;
+  entryPrice: number | "-";
+  pnl: number;
 }
 
 export interface IClosePositionMobileProps {

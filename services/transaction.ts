@@ -133,7 +133,8 @@ export const handleTransactionHash = async (
           if (isMarginExecute) {
             const args = parsedArgs(result?.transaction?.actions?.[0]?.FunctionCall?.args || "");
             const { actions } = JSON.parse(args || "");
-            hasStorageDeposit = Reflect.has(actions[0], "OpenPosition");
+            hasStorageDeposit =
+              Reflect.has(actions[0], "OpenPosition") || Reflect.has(actions[0], "CloseMTPosition");
           }
 
           return { txHash, result, hasStorageDeposit };
