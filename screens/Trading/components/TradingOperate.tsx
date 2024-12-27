@@ -54,7 +54,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
   const [estimateLoading, setEstimateLoading] = useState<boolean>(false);
 
   //
-  const [selectedSetUpOption, setSelectedSetUpOption] = useState<string>("auto");
+  const [selectedSetUpOption, setSelectedSetUpOption] = useState<string>("custom");
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
   const [rangeMount, setRangeMount] = useState<number>(0);
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
