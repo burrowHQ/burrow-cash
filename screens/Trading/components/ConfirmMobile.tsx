@@ -168,7 +168,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
       const txHash = await handleTransactionHash(transactionHashes);
       await Promise.all(
         txHash
-          .filter((item) => !item.hasStorageDeposit)
+          .filter((item) => item.hasStorageDeposit)
           .map(async (item) => {
             try {
               await DataSource.shared.getMarginTradingPosition({
