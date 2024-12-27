@@ -118,7 +118,7 @@ const TradingTable = ({
   };
 
   useEffect(() => {
-    if (selectedTab === "history") {
+    if (selectedTab === "history" || isSelectedMobileTab === "history") {
       fetchPositionHistory();
     }
   }, [selectedTab]);
@@ -196,7 +196,7 @@ const TradingTable = ({
       const timeB = Number(b.open_ts);
       return sortDirection === "asc" ? timeA - timeB : timeB - timeA;
     });
-  }, [positionsList, sortBy, sortDirection, filterTitle]);
+  }, [positionsList, positionsList.length, sortBy, sortDirection, filterTitle]);
   const totalPages = Math.ceil(sortedPositionsList.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -632,13 +632,9 @@ const TradingTable = ({
               />
             ))
           ) : (
-            <tr>
-              <td colSpan={100}>
-                <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
-                  Your open positions will appear here
-                </div>
-              </td>
-            </tr>
+            <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+              No data
+            </div>
           )}
           {isChangeCollateralMobileOpen && (
             <ChangeCollateralMobile
@@ -711,7 +707,115 @@ const TradingTable = ({
             />
           </div>
         </div>
-        <div className={isSelectedMobileTab === "history" ? "" : "hidden"}>history</div>
+        <div className={isSelectedMobileTab === "history" ? "" : "hidden"}>
+          {positionHistory && positionHistory.length > 0 ? (
+            positionHistory.map((record, index) => {
+              const assetD = getAssetById(record.token_d);
+              const assetP = getAssetById(record.token_p);
+              return (
+                <div className="bg-gray-800 rounded-xl mb-4" key={index}>
+                  <div className="pt-5 px-4 pb-4 border-b border-dark-950 flex justify-between">
+                    <div className="flex items-center">
+                      <div className="flex items-center justify-center mr-3.5">
+                        <img
+                          src={assetD.metadata.icon}
+                          alt=""
+                          className="rounded-2xl border border-gray-800"
+                          style={{ width: "26px", height: "26px" }}
+                        />
+                        <img
+                          src={assetP.metadata.icon}
+                          alt=""
+                          className="rounded-2xl border border-gray-800"
+                          style={{ width: "26px", height: "26px", marginLeft: "-6px" }}
+                        />
+                      </div>
+                      <div>
+                        <p>{`${getSymbolById(
+                          assetP.token_id,
+                          assetP.metadata?.symbol,
+                        )}/${getSymbolById(assetD.token_id, assetD.metadata?.symbol)}`}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-center justify-between text-sm mb-[18px]">
+                      <p className="text-gray-300">Operation</p>
+                      <p>{record.close_type}</p>
+                    </div>
+                    <div className="flex items-center justify-between text-sm mb-[18px]">
+                      <p className="text-gray-300">Side</p>
+                      <div className="flex items-center">
+                        <p
+                          className={
+                            record.trend === "long"
+                              ? "text-primary"
+                              : record.trend === "short"
+                              ? "text-red-50"
+                              : ""
+                          }
+                        >
+                          <span className="ml-1">{record.trend}</span>
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-sm mb-[18px]">
+                      <p className="text-gray-300">Price</p>
+                      <p>${beautifyPrice(record.price)}</p>
+                    </div>
+                    <div className="flex items-center justify-between text-sm mb-[18px]">
+                      <p className="text-gray-300">Amount</p>
+                      <p>
+                        {record.trend === "long"
+                          ? beautifyPrice(record.amount_d)
+                          : record.trend === "short"
+                          ? beautifyPrice(record.amount_p)
+                          : "-"}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between text-sm mb-[18px]">
+                      <p className="text-gray-300">Fee</p>
+                      <p>
+                        $
+                        {beautifyPrice(
+                          Number(
+                            shrinkToken(
+                              record.fee,
+                              assetD.metadata.decimals + assetD.config.extra_decimals,
+                            ),
+                          ),
+                        )}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between text-sm mb-[18px]">
+                      <p className="text-gray-300">PNL & ROE</p>
+                      <p>{record.pnl ? record.pnl : "-"}</p>
+                    </div>
+                    <div className="flex items-center justify-between text-sm mb-[18px]">
+                      <p className="text-gray-300">Opening time</p>
+                      <p>
+                        {record.open_timestamp !== 0
+                          ? new Date(record.open_timestamp * 1000).toLocaleString()
+                          : "-"}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between text-sm mb-[18px]">
+                      <p className="text-gray-300">Close time</p>
+                      <p>{new Date(record.close_timestamp).toLocaleString()}</p>
+                    </div>
+                    <div className="bg-dark-100 rounded-2xl flex items-center justify-center text-xs py-1 text-gray-300 mb-4">
+                      PNL & ROE <p>{record.pnl ? record.pnl : "-"}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+              No data
+            </div>
+          )}
+        </div>
         {!filterTitle && filteredAccountSupplied.length > 0 && (
           <div
             className="fixed rounded-t-xl bottom-0 left-0 right-0 z-50 bg-gray-1300 pt-[18px] px-[32px] pb-[52px] w-full"
