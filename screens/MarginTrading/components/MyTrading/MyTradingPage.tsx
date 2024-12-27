@@ -4,65 +4,67 @@ import { useMarginAccount } from "../../../../hooks/useMarginAccount";
 import { useMarginConfigToken } from "../../../../hooks/useMarginConfig";
 import { toInternationalCurrencySystem_number } from "../../../../utils/uiNumber";
 import { isMobileDevice } from "../../../../helpers/helpers";
-import { getAssets } from "../../../../store/assets";
 import DataSource from "../../../../data/datasource";
+import { shrinkToken } from "../../../../store/helper";
+import { useAppSelector } from "../../../../redux/hooks";
+import { getAssets } from "../../../../redux/assetsSelectors";
 
 const MyMarginTradingPage = () => {
   const isMobile = isMobileDevice();
   const [showCollateralPopup, setShowCollateralPopup] = useState(false);
+  const assets = useAppSelector(getAssets);
   const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
   const { getPositionType } = useMarginConfigToken();
   const [totalLongSizeValue, setTotalLongSizeValue] = useState(0);
   const [totalShortSizeValue, setTotalShortSizeValue] = useState(0);
   const [totalCollateral, setTotalCollateral] = useState(0);
   const [totalPLN, setTotalPLN] = useState(0);
-  const calculateTotalSizeValues = () => {
+  const calculateTotalSizeValues = async () => {
     let longTotal = 0;
     let shortTotal = 0;
     let collateralTotal = 0;
     let pnlTotal = 0;
-    Object.values(marginAccountList).forEach(async (item) => {
-      const positionType = getPositionType(item.token_d_info.token_id).label;
-      const assetD = getAssetById(item.token_d_info.token_id);
-      const assetC = getAssetById(item.token_c_info.token_id);
-      const assetP = getAssetById(item.token_p_id);
-      const { price: priceD, symbol: symbolD, decimals: decimalsD } = getAssetDetails(assetD);
-      const { price: priceC, symbol: symbolC, decimals: decimalsC } = getAssetDetails(assetC);
-      const { price: priceP, symbol: symbolP, decimals: decimalsP } = getAssetDetails(assetP);
-      const sizeValueLong = parseTokenValue(item.token_p_amount, decimalsP);
-      const sizeValueShort = parseTokenValue(item.token_d_info.balance, decimalsD);
-      const sizeValue =
-        positionType === "Long" ? sizeValueLong * (priceP || 0) : sizeValueShort * (priceD || 0);
-      if (positionType === "Long") {
-        longTotal += sizeValue;
-      } else {
-        shortTotal += sizeValue;
-      }
-      const netValue = parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
-      collateralTotal += netValue;
-      const fetchedAssets = await getAssets();
-      const debt_assets_d = fetchedAssets.find(
-        (asset) => asset.token_id === item.token_d_info.token_id,
-      );
-      const entryPriceResponse = await DataSource.shared.getMarginTradingRecordEntryPrice(
-        item.token_d_info.token_id,
-      );
-      const entryPrice = entryPriceResponse.data;
-      const indexPrice = positionType === "Long" ? priceP : priceD;
-      const debtCap = parseFloat(item.debt_cap);
-      const unitAccHpInterest = parseFloat(debt_assets_d?.unit_acc_hp_interest ?? "0");
-      const uahpiAtOpen = parseFloat(item.uahpi_at_open);
-      const interestDifference = unitAccHpInterest - uahpiAtOpen;
-      const totalHpFee = (debtCap * interestDifference) / 10 ** 18;
-      const profitOrLoss = entryPrice !== null ? (indexPrice - entryPrice) * sizeValue : 0;
-      const openTime = new Date(Number(item.open_ts) / 1e6);
-      const currentTime = new Date();
-      const holdingDurationInHours =
-        Math.abs(currentTime.getTime() - openTime.getTime()) / (1000 * 60 * 60);
-      const holdingFee = totalHpFee * holdingDurationInHours;
-      const pnl = profitOrLoss === 0 ? 0 : profitOrLoss - holdingFee;
-      pnlTotal += pnl;
-    });
+    const pnlArray: number[] = [];
+    await Promise.all(
+      Object.entries(marginAccountList).map(async ([itemKey, item]) => {
+        const positionType = getPositionType(item.token_d_info.token_id).label;
+        const assetD = getAssetById(item.token_d_info.token_id);
+        const assetC = getAssetById(item.token_c_info.token_id);
+        const assetP = getAssetById(item.token_p_id);
+        const { price: priceD, symbol: symbolD, decimals: decimalsD } = getAssetDetails(assetD);
+        const { price: priceC, symbol: symbolC, decimals: decimalsC } = getAssetDetails(assetC);
+        const { price: priceP, symbol: symbolP, decimals: decimalsP } = getAssetDetails(assetP);
+        const sizeValueLong = parseTokenValue(item.token_p_amount, decimalsP);
+        const sizeValueShort = parseTokenValue(item.token_d_info.balance, decimalsD);
+        const size = positionType === "Long" ? sizeValueLong : sizeValueShort;
+        const sizeValue =
+          positionType === "Long" ? sizeValueLong * (priceP || 0) : sizeValueShort * (priceD || 0);
+        if (positionType === "Long") {
+          longTotal += sizeValue;
+        } else {
+          shortTotal += sizeValue;
+        }
+        const netValue = parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
+        collateralTotal += netValue;
+        const entryPriceResponse = await DataSource.shared.getMarginTradingRecordEntryPrice(
+          itemKey,
+        );
+        const entryPrice =
+          entryPriceResponse && entryPriceResponse.data && entryPriceResponse.data.length > 0
+            ? entryPriceResponse.data[0].entry_price
+            : null;
+        const indexPrice = positionType === "Long" ? priceP : priceD;
+        const uahpi: any =
+          shrinkToken((assets as any).data[item.token_p_id as any]?.uahpi, 18) ?? 0;
+        const uahpi_at_open: any =
+          shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
+        const holdingFee =
+          +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi * 1 - uahpi_at_open * 1);
+        const profitOrLoss = entryPrice !== null ? (indexPrice - entryPrice) * size : 0;
+        const pnl = profitOrLoss - holdingFee;
+        pnlTotal += pnl;
+      }),
+    );
     setTotalLongSizeValue(longTotal);
     setTotalShortSizeValue(shortTotal);
     setTotalCollateral(collateralTotal);
@@ -173,7 +175,10 @@ const MyMarginTradingPage = () => {
             </div>
             <div className="flex-1">
               <p className="text-gray-300 text-sm">PLN</p>
-              <h2 className="text-h2">{formatCurrency(totalPLN)}</h2>
+              <h2 className="text-h2">
+                {totalPLN > 0 ? "+" : "-"}
+                {formatCurrency(totalPLN)}
+              </h2>
             </div>
           </div>
         </div>
@@ -262,7 +267,10 @@ const MyMarginTradingPage = () => {
           <div className="flex flex-1 justify-center">
             <div>
               <p className="text-gray-300 text-sm">PNL</p>
-              <h2 className="text-h2">{formatCurrency(totalPLN)}</h2>
+              <h2 className="text-h2">
+                {totalPLN > 0 ? "+" : "-"}
+                {formatCurrency(totalPLN)}
+              </h2>
             </div>
           </div>
         </div>

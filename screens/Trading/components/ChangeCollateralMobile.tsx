@@ -178,10 +178,6 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
   const sizeValue =
     positionType.label === "Long" ? sizeValueLong * (priceP || 0) : sizeValueShort * (priceD || 0);
   const netValue = parseTokenValue(rowData.data.token_c_info.balance, decimalsC) * (priceC || 0);
-  const debt_assets_d = rowData.assets.find(
-    (asset) => asset.token_id === rowData.data.token_d_info.token_id,
-  );
-  const total_cap = leverageC * priceC + sizeValueLong * priceP;
   let LiqPrice = 0;
   if (leverage > 1) {
     if (positionType.label === "Long") {
