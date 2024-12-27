@@ -344,10 +344,8 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
                 {/* <span className="text-red-50">-$0.0689</span> */}
                 {/* <span className="text-xs text-gray-300 ml-1.5">(-2.01%)</span> */}
                 <span className="text-sm text-white ml-1.5">
-                  {" "}
-                  {entryPrice && entryPrice != "-"
-                    ? `$${toInternationalCurrencySystem_number(pnl)}`
-                    : "-"}
+                  {pnl > 0 ? `+$` : `-$`}
+                  {beautifyPrice(pnl)}
                 </span>
               </div>
             </div>

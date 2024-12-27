@@ -26,6 +26,7 @@ import { showCheckTxBeforeShowToast } from "../../../components/HashResultModal"
 import { shrinkToken } from "../../../store/helper";
 import { getAssets } from "../../../redux/assetsSelectors";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
+import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 
 const TradingTable = ({
   positionsList,
@@ -36,17 +37,17 @@ const TradingTable = ({
 }) => {
   const { query } = useRouterQuery();
   const { filterMarginConfigList } = useMarginConfigToken();
+  const storeSelectedTab = useAppSelector((state) => state.tab.selectedTab);
+
   const dispatch = useAppDispatch();
-  const [selectedTab, setStateSelectedTab] = useState(
-    filterTitle ? "positions" : useAppSelector((state) => state.tab.selectedTab),
-  );
+  const [selectedTab, setStateSelectedTab] = useState(filterTitle ? "positions" : storeSelectedTab);
   const [isClosePositionModalOpen, setIsClosePositionMobileOpen] = useState(false);
   const [isChangeCollateralMobileOpen, setIsChangeCollateralMobileOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
   const assets = useAppSelector(getAssets);
   const [closePositionModalProps, setClosePositionModalProps] = useState(null);
   const [totalCollateral, setTotalCollateral] = useState(0);
-  const [positionHistory, setPositionHistory] = useState([]);
+  const [positionHistory, setPositionHistory] = useState<any[]>([]);
   const [nextPageToken, setNextPageToken] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [totalPLN, setTotalPLN] = useState(0);
@@ -63,12 +64,14 @@ const TradingTable = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [inputPage, setInputPage] = useState<string>("");
   const itemsPerPage = 10;
+
   const handleTabClick = (tab: string) => {
     if (!filterTitle) {
       dispatch(setSelectedTab(tab));
     }
     setStateSelectedTab(tab);
   };
+
   const handleClosePositionButtonClick = (key) => {
     setClosePositionModalProps(key);
     setIsClosePositionMobileOpen(true);
@@ -77,6 +80,16 @@ const TradingTable = ({
     setSelectedRowData(rowData);
     setIsChangeCollateralMobileOpen(true);
   };
+
+  // fix can not change tab after click claim
+  useEffect(() => {
+    if (!filterTitle) {
+      setStateSelectedTab(storeSelectedTab);
+    } else {
+      setStateSelectedTab("positions");
+    }
+  }, [storeSelectedTab]);
+
   useEffect(() => {
     handleTransactionResults(
       query?.transactionHashes,
@@ -92,7 +105,9 @@ const TradingTable = ({
         // next_page_token: nextPageToken,
       });
       setPositionHistory((prev) =>
-        nextPageToken ? [...prev, ...response.records] : response.records,
+        nextPageToken
+          ? [...prev, ...response.data.position_records]
+          : response.data.position_records,
       );
       setNextPageToken(response.next_page_token);
     } catch (error) {
@@ -120,9 +135,6 @@ const TradingTable = ({
   useEffect(() => {
     calculateTotalSizeValues();
   }, [marginAccountList]);
-  const handlePLNChange = (pln: number) => {
-    setTotalPLN((prev) => prev + pln);
-  };
   const filteredAccountSupplied = accountSupplied.filter((token) => {
     const assetDetails = getAssetById(token.token_id);
     return token.balance.toString().length >= assetDetails.config.extra_decimals;
@@ -366,13 +378,63 @@ const TradingTable = ({
                   <th>Price</th>
                   <th>Amount</th>
                   <th>Fee</th>
-                  <th>Realized PNL & ROE</th>
-                  <th>Time</th>
+                  <th>PNL & ROE</th>
+                  <th>Opening time</th>
+                  <th>Close time</th>
                 </tr>
               </thead>
               <tbody>
                 {positionHistory && positionHistory.length > 0 ? (
-                  positionHistory.map((record, index) => <>111</>)
+                  positionHistory.map((record, index) => {
+                    const assetD = getAssetById(record.token_d);
+                    const assetP = getAssetById(record.token_p);
+                    return (
+                      <tr key={index}>
+                        <td className="py-5 pl-5">{`${getSymbolById(
+                          assetP.token_id,
+                          assetP.metadata?.symbol,
+                        )}/${getSymbolById(assetD.token_id, assetD.metadata?.symbol)}`}</td>
+                        <td>{record.close_type}</td>
+                        <td
+                          className={
+                            record.trend === "long"
+                              ? "text-primary"
+                              : record.trend === "short"
+                              ? "text-red-50"
+                              : ""
+                          }
+                        >
+                          {record.trend}
+                        </td>
+                        <td>${beautifyPrice(record.price)}</td>
+                        <td>
+                          {record.trend === "long"
+                            ? beautifyPrice(record.amount_d)
+                            : record.trend === "short"
+                            ? beautifyPrice(record.amount_p)
+                            : "-"}
+                        </td>
+                        <td>
+                          $
+                          {beautifyPrice(
+                            Number(
+                              shrinkToken(
+                                record.fee,
+                                assetD.metadata.decimals + assetD.config.extra_decimals,
+                              ),
+                            ),
+                          )}
+                        </td>
+                        <td>{record.pnl ? record.pnl : "-"}</td>
+                        <td>
+                          {record.open_timestamp !== 0
+                            ? new Date(record.open_timestamp * 1000).toLocaleString()
+                            : "-"}
+                        </td>
+                        <td>{new Date(record.close_timestamp).toLocaleString()}</td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
                     <td colSpan={8}>
