@@ -376,13 +376,12 @@ const TradingTable = ({
                   positionHistory.map((record, index) => {
                     const assetD = getAssetById(record.token_d);
                     const assetP = getAssetById(record.token_p);
-                    const { symbol: symbolD, decimals: decimalsD } = getAssetDetails(assetD);
                     return (
                       <tr key={index}>
                         <td className="py-5 pl-5">{`${getSymbolById(
                           assetP.token_id,
                           assetP.metadata?.symbol,
-                        )}/${getSymbolById(assetD.token_id, symbolD)}`}</td>
+                        )}/${getSymbolById(assetD.token_id, assetD.metadata?.symbol)}`}</td>
                         <td>{record.close_type}</td>
                         <td
                           className={
@@ -403,7 +402,17 @@ const TradingTable = ({
                             ? beautifyPrice(record.amount_p)
                             : "-"}
                         </td>
-                        <td>${beautifyPrice(Number(shrinkToken(record.fee, decimalsD)))}</td>
+                        <td>
+                          $
+                          {beautifyPrice(
+                            Number(
+                              shrinkToken(
+                                record.fee,
+                                assetD.metadata.decimals + assetD.config.extra_decimals,
+                              ),
+                            ),
+                          )}
+                        </td>
                         <td>{record.pnl ? record.pnl : "-"}</td>
                         <td>
                           {record.open_timestamp !== 0
