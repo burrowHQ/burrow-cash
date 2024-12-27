@@ -126,7 +126,7 @@ const Trading = () => {
       (async () => {
         const txHash = await handleTransactionHash(query?.transactionHashes);
         txHash
-          .filter((item) => !item.hasStorageDeposit)
+          .filter((item) => item.hasStorageDeposit)
           .forEach(async (item) => {
             try {
               await DataSource.shared.getMarginTradingPosition({
