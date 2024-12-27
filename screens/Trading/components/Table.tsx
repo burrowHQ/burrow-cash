@@ -12,7 +12,6 @@ import ChangeCollateralMobile from "./ChangeCollateralMobile";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
 import { toInternationalCurrencySystem_number } from "../../../utils/uiNumber";
-import { getAssets } from "../../../store/assets";
 import { IAssetEntry } from "../../../interfaces";
 import DataSource from "../../../data/datasource";
 import { useAccountId } from "../../../hooks/hooks";
@@ -24,6 +23,9 @@ import { useRouterQuery } from "../../../utils/txhashContract";
 import { handleTransactionHash, handleTransactionResults } from "../../../services/transaction";
 import { setAccountDetailsOpen, setSelectedTab } from "../../../redux/marginTabSlice";
 import { showCheckTxBeforeShowToast } from "../../../components/HashResultModal";
+import { shrinkToken } from "../../../store/helper";
+import { getAssets } from "../../../redux/assetsSelectors";
+import { beautifyPrice } from "../../../utils/beautyNumbet";
 
 const TradingTable = ({
   positionsList,
@@ -41,7 +43,7 @@ const TradingTable = ({
   const [isClosePositionModalOpen, setIsClosePositionMobileOpen] = useState(false);
   const [isChangeCollateralMobileOpen, setIsChangeCollateralMobileOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
-  const [assets, setAssets] = useState<IAssetEntry[]>([]);
+  const assets = useAppSelector(getAssets);
   const [closePositionModalProps, setClosePositionModalProps] = useState(null);
   const [totalCollateral, setTotalCollateral] = useState(0);
   const [positionHistory, setPositionHistory] = useState([]);
@@ -75,14 +77,6 @@ const TradingTable = ({
     setSelectedRowData(rowData);
     setIsChangeCollateralMobileOpen(true);
   };
-  const fetchAssets = async () => {
-    try {
-      const fetchedAssets = await getAssets();
-      setAssets(fetchedAssets);
-    } catch (error) {
-      console.error("Error fetching assets:", error);
-    }
-  };
   useEffect(() => {
     handleTransactionResults(
       query?.transactionHashes,
@@ -90,9 +84,6 @@ const TradingTable = ({
       Object.keys(filterMarginConfigList || []),
     );
   }, [query?.transactionHashes, query?.errorMessage]);
-  useEffect(() => {
-    fetchAssets();
-  }, []);
   const fetchPositionHistory = async () => {
     try {
       setIsLoading(true);
@@ -286,6 +277,7 @@ const TradingTable = ({
                       marginConfigTokens={marginConfigTokens}
                       assets={assets}
                       filterTitle={filterTitle}
+                      marginAccountList={marginAccountList}
                     />
                   ))
                 ) : (
@@ -574,6 +566,7 @@ const TradingTable = ({
                 marginConfigTokens={marginConfigTokens}
                 assets={assets}
                 filterTitle={filterTitle}
+                marginAccountList={marginAccountList}
               />
             ))
           ) : (
@@ -782,6 +775,7 @@ const PositionRow = ({
   assets,
   marginConfigTokens,
   filterTitle,
+  marginAccountList,
 }) => {
   // console.log(itemKey, item, index);
   const [entryPrice, setEntryPrice] = useState<number | null>(null);
@@ -828,16 +822,7 @@ const PositionRow = ({
 
   const netValue = parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
   const collateral = parseTokenValue(item.token_c_info.balance, decimalsC);
-  // const entryPrice =
-  //   positionType.label === "Long"
-  //     ? sizeValueLong === 0
-  //       ? 0
-  //       : (leverageD * priceD) / sizeValueLong
-  //     : sizeValueShort === 0
-  //     ? 0
-  //     : netValue / sizeValueShort;
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
-  const debt_assets_d = assets.find((asset) => asset.token_id === item.token_d_info.token_id);
   let LiqPrice = 0;
   if (leverage > 1) {
     if (positionType.label === "Long") {
@@ -852,25 +837,27 @@ const PositionRow = ({
       if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
     }
   }
+  const openTime = new Date(Number(item.open_ts) / 1e6);
+  const uahpi: any = shrinkToken((assets as any).data[item.token_p_id]?.uahpi, 18) ?? 0;
+  const uahpi_at_open: any = shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
+  const holdingFee =
+    +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi * 1 - uahpi_at_open * 1);
+  const profitOrLoss = entryPrice !== null ? (indexPrice - entryPrice) * size : 0;
+  const pnl = profitOrLoss - holdingFee;
+  let amplitude = 0;
+  if (entryPrice !== null && entryPrice !== 0) {
+    if (positionType.label === "Long") {
+      amplitude = ((indexPrice - entryPrice) / entryPrice) * 100;
+    } else if (positionType.label === "Short") {
+      amplitude = ((entryPrice - indexPrice) / entryPrice) * 100;
+    }
+  }
   const rowData = {
     pos_id: itemKey,
     data: item,
-    assets,
     marginConfigTokens,
     entryPrice,
   };
-  const debtCap = parseFloat(item.debt_cap);
-  const unitAccHpInterest = parseFloat(debt_assets_d?.unit_acc_hp_interest ?? 0);
-  const uahpiAtOpen = parseFloat(item.uahpi_at_open);
-  const interestDifference = unitAccHpInterest - uahpiAtOpen;
-  const totalHpFee = (debtCap * interestDifference) / 10 ** 18;
-  const profitOrLoss = entryPrice !== null ? (indexPrice - entryPrice) * sizeValue : 0;
-  const openTime = new Date(Number(item.open_ts) / 1e6);
-  const currentTime = new Date();
-  const holdingDurationInHours =
-    Math.abs(currentTime.getTime() - openTime.getTime()) / (1000 * 60 * 60);
-  const holdingFee = totalHpFee * holdingDurationInHours;
-  const pnl = profitOrLoss === 0 ? 0 : profitOrLoss - holdingFee;
   return (
     <tr className="text-base hover:bg-dark-100 font-normal">
       <td className="py-5 pl-5">
@@ -924,13 +911,11 @@ const PositionRow = ({
         ${toInternationalCurrencySystem_number(LiqPrice)}
       </td>
       <td>
-        <span className="text-primary">
-          {entryPrice !== null ? (
-            `$${toInternationalCurrencySystem_number(pnl)}`
-          ) : (
-            <span className="text-gray-500">-</span>
-          )}
-        </span>
+        <p className={`text-primary ${pnl < 0 ? "text-red-150" : "text-green-150"}`}>
+          {pnl > 0 ? `+` : `-`}${beautifyPrice(pnl)}
+          {/* <span className="text-gray-400 text-xs ml-0.5">({beautifyPrice(amplitude)}%)</span> */}
+          <span className="text-gray-400 text-xs ml-0.5">(-%)</span>
+        </p>
       </td>
       <td>
         <div className="text-sm">{new Date(openTime).toLocaleDateString()}</div>
@@ -978,6 +963,7 @@ const PositionMobileRow = ({
   assets,
   marginConfigTokens,
   filterTitle,
+  marginAccountList,
 }) => {
   // console.log(itemKey, item, index);
   const [entryPrice, setEntryPrice] = useState<number | null>(null);
@@ -1034,7 +1020,6 @@ const PositionMobileRow = ({
   //     ? 0
   //     : netValue / sizeValueShort;
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
-  const debt_assets_d = assets.find((asset) => asset.token_id === item.token_d_info.token_id);
   let LiqPrice = 0;
   if (leverage > 1) {
     if (positionType.label === "Long") {
@@ -1052,21 +1037,23 @@ const PositionMobileRow = ({
   const rowData = {
     pos_id: itemKey,
     data: item,
-    assets,
     marginConfigTokens,
   };
-  const debtCap = parseFloat(item.debt_cap);
-  const unitAccHpInterest = parseFloat(debt_assets_d?.unit_acc_hp_interest ?? 0);
-  const uahpiAtOpen = parseFloat(item.uahpi_at_open);
-  const interestDifference = unitAccHpInterest - uahpiAtOpen;
-  const totalHpFee = (debtCap * interestDifference) / 10 ** 18;
-  const profitOrLoss = entryPrice !== null ? (indexPrice - entryPrice) * sizeValue : 0;
   const openTime = new Date(Number(item.open_ts) / 1e6);
-  const currentTime = new Date();
-  const holdingDurationInHours =
-    Math.abs(currentTime.getTime() - openTime.getTime()) / (1000 * 60 * 60);
-  const holdingFee = totalHpFee * holdingDurationInHours;
-  const pnl = profitOrLoss === 0 ? 0 : profitOrLoss - holdingFee;
+  const uahpi: any = shrinkToken((assets as any).data[item.token_p_id]?.uahpi, 18) ?? 0;
+  const uahpi_at_open: any = shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
+  const holdingFee =
+    +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi * 1 - uahpi_at_open * 1);
+  const profitOrLoss = entryPrice !== null ? (indexPrice - entryPrice) * size : 0;
+  const pnl = profitOrLoss - holdingFee;
+  let amplitude = 0;
+  if (entryPrice !== null && entryPrice !== 0) {
+    if (positionType.label === "Long") {
+      amplitude = ((indexPrice - entryPrice) / entryPrice) * 100;
+    } else if (positionType.label === "Short") {
+      amplitude = ((entryPrice - indexPrice) / entryPrice) * 100;
+    }
+  }
   return (
     <div className="bg-gray-800 rounded-xl mb-4">
       <div className="pt-5 px-4 pb-4 border-b border-dark-950 flex justify-between">
@@ -1150,14 +1137,11 @@ const PositionMobileRow = ({
         </div>
         <div className="bg-dark-100 rounded-2xl flex items-center justify-center text-xs py-1 text-gray-300 mb-4">
           PNL & ROE{" "}
-          <span className="text-primary ml-1.5">
-            {entryPrice !== null ? (
-              `$${toInternationalCurrencySystem_number(pnl)}`
-            ) : (
-              <span className="text-gray-500 ml-0.5">-</span>
-            )}
-          </span>
-          (-)
+          <p className={`text-primary ${pnl < 0 ? "text-red-150" : "text-green-150"}`}>
+            {pnl > 0 ? `+` : `-`}${beautifyPrice(pnl)}
+            {/* <span className="text-gray-400 text-xs ml-0.5">({beautifyPrice(amplitude)}%)</span> */}
+            <span className="text-gray-400 text-xs ml-0.5">(-%)</span>
+          </p>
         </div>
         <div
           className="w-full rounded-md h-9 flex items-center justify-center border border-marginCloseBtn text-gray-300"
