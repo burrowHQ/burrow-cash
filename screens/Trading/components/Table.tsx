@@ -37,10 +37,10 @@ const TradingTable = ({
 }) => {
   const { query } = useRouterQuery();
   const { filterMarginConfigList } = useMarginConfigToken();
+  const storeSelectedTab = useAppSelector((state) => state.tab.selectedTab);
+
   const dispatch = useAppDispatch();
-  const [selectedTab, setStateSelectedTab] = useState(
-    filterTitle ? "positions" : useAppSelector((state) => state.tab.selectedTab),
-  );
+  const [selectedTab, setStateSelectedTab] = useState(filterTitle ? "positions" : storeSelectedTab);
   const [isClosePositionModalOpen, setIsClosePositionMobileOpen] = useState(false);
   const [isChangeCollateralMobileOpen, setIsChangeCollateralMobileOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
@@ -64,12 +64,14 @@ const TradingTable = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [inputPage, setInputPage] = useState<string>("");
   const itemsPerPage = 10;
+
   const handleTabClick = (tab: string) => {
     if (!filterTitle) {
       dispatch(setSelectedTab(tab));
     }
     setStateSelectedTab(tab);
   };
+
   const handleClosePositionButtonClick = (key) => {
     setClosePositionModalProps(key);
     setIsClosePositionMobileOpen(true);
@@ -78,6 +80,16 @@ const TradingTable = ({
     setSelectedRowData(rowData);
     setIsChangeCollateralMobileOpen(true);
   };
+
+  // fix can not change tab after click claim
+  useEffect(() => {
+    if (!filterTitle) {
+      setStateSelectedTab(storeSelectedTab);
+    } else {
+      setStateSelectedTab("positions");
+    }
+  }, [storeSelectedTab]);
+
   useEffect(() => {
     handleTransactionResults(
       query?.transactionHashes,
