@@ -976,7 +976,7 @@ const PositionRow = ({
       }
     };
     fetchEntryPrice();
-  }, [item]);
+  }, [itemKey, item, index]);
   const assetD = getAssetById(item.token_d_info.token_id);
   const assetC = getAssetById(item.token_c_info.token_id);
   const assetP = getAssetById(item.token_p_id);
@@ -1166,7 +1166,7 @@ const PositionMobileRow = ({
       }
     };
     fetchEntryPrice();
-  }, [item]);
+  }, [itemKey, item, index]);
   const assetD = getAssetById(item.token_d_info.token_id);
   const assetC = getAssetById(item.token_c_info.token_id);
   const assetP = getAssetById(item.token_p_id);
