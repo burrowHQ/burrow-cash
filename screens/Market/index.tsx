@@ -17,6 +17,11 @@ const Market = () => {
   const rows = dashBoardActiveTab == "main" ? useAvailableAssets() : useAvailableAssetsMEME();
   const { sorting, setSorting } = useTableSorting();
   useEffect(() => {
+    return () => {
+      dispatch(setDashBoardActiveTab("main"));
+    };
+  }, [dispatch]);
+  useEffect(() => {
     if (router?.query?.vault === "true") {
       setSorting("market", "depositApy", "desc");
     }
@@ -28,11 +33,11 @@ const Market = () => {
   return (
     <LayoutBox className="flex flex-col items-center justify-center">
       <MarketsOverview />
-      <div className="w-full grid grid-cols-2 gap-x-1 cursor-pointer">
+      <div className="w-full grid grid-cols-2 gap-x-1 cursor-pointer xsm:mt-4 xsm:ml-4 xsm:mr-4">
         <div
           className={`${
             activeTab == "main" ? "bg-primary" : "bg-[#C0C4E94D]"
-          } text-center h-12 leading-[48px] text-black rounded-t-xl`}
+          } text-center h-12 leading-[48px] text-black rounded-t-xl xsm:rounded-xl xsm:ml-4`}
           onClick={() => dispatch(setDashBoardActiveTab("main"))}
         >
           Mainstream
@@ -40,7 +45,7 @@ const Market = () => {
         <div
           className={`${
             activeTab == "meme" ? "bg-primary" : "bg-[#C0C4E94D]"
-          } text-center h-12 leading-[48px] text-black rounded-t-xl`}
+          } text-center h-12 leading-[48px] text-black rounded-t-xl xsm:rounded-xl xsm:mr-4`}
           onClick={() => dispatch(setDashBoardActiveTab("meme"))}
         >
           Meme
