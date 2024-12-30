@@ -7,6 +7,7 @@ interface commonAssets {
   ReduxcategoryCurrentBalance2: any;
   ReduxSlippageTolerance: any;
   ReduxTotalPLN: any;
+  ReduxRangeMount: any;
 }
 
 const initialState: commonAssets = {
@@ -16,6 +17,7 @@ const initialState: commonAssets = {
   ReduxcategoryCurrentBalance2: "",
   ReduxSlippageTolerance: 0.5,
   ReduxTotalPLN: 0,
+  ReduxRangeMount: 1,
 };
 
 const marginCategory = createSlice({
@@ -40,6 +42,9 @@ const marginCategory = createSlice({
     setReduxTotalPLN(state, action) {
       state.ReduxTotalPLN += action.payload;
     },
+    setReduxRangeMount(state, action) {
+      state.ReduxRangeMount = action.payload;
+    },
   },
 });
 
@@ -50,6 +55,7 @@ const {
   setReduxcategoryCurrentBalance2,
   setSlippageToleranceFromRedux,
   setReduxTotalPLN,
+  setReduxRangeMount,
 } = marginCategory.actions;
 const marginCategoryReducer = marginCategory.reducer;
 export {
@@ -59,5 +65,6 @@ export {
   setReduxcategoryCurrentBalance2,
   setSlippageToleranceFromRedux,
   setReduxTotalPLN,
+  setReduxRangeMount,
 };
 export default marginCategoryReducer;

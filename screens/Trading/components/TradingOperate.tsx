@@ -43,6 +43,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
     ReduxcategoryCurrentBalance1,
     ReduxcategoryCurrentBalance2,
     ReduxSlippageTolerance,
+    ReduxRangeMount,
   } = useAppSelector((state) => state.category);
 
   //
@@ -56,7 +57,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
   //
   const [selectedSetUpOption, setSelectedSetUpOption] = useState<string>("custom");
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
-  const [rangeMount, setRangeMount] = useState<number>(0);
+  const [rangeMount, setRangeMount] = useState<number>(ReduxRangeMount || 0);
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [isMaxPosition, setIsMaxPosition] = useState<boolean>(false);
 
@@ -172,8 +173,10 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
   useEffect(() => {
     if (Object.values(marginAccountList).length >= max_active_user_margin_position) {
       setIsMaxPosition(true);
+    } else {
+      setIsMaxPosition(false);
     }
-  }, [marginAccountList]);
+  }, [marginAccountList, max_active_user_margin_position]);
 
   const isValidDecimalString = (str) => {
     if (str <= 0) return false;
@@ -642,7 +645,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
                   <span className="ml-1">Exceeded the maximum number of open positions.</span>
                 </div>
               )}
-              {rangeMount <= 1 && (
+              {rangeMount <= 1 && accountId && (
                 <span className="text-[#EA3F68] text-sm font-normal flex items-start mb-1">
                   Leverage must be greater than 1
                 </span>
@@ -776,7 +779,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
                   <span className="ml-1">Exceeded the maximum number of open positions.</span>
                 </div>
               )}
-              {rangeMount <= 1 && (
+              {rangeMount <= 1 && accountId && (
                 <span className="text-[#EA3F68] text-sm font-normal flex items-start mb-1">
                   Leverage must be greater than 1
                 </span>

@@ -388,6 +388,15 @@ const TradingTable = ({
                   positionHistory.map((record, index) => {
                     const assetD = getAssetById(record.token_d);
                     const assetP = getAssetById(record.token_p);
+                    const isFilter =
+                      filterTitle ===
+                      `${getSymbolById(assetP.token_id, assetP.metadata?.symbol)}/${getSymbolById(
+                        assetD.token_id,
+                        assetD.metadata?.symbol,
+                      )}`;
+                    if (!isFilter) {
+                      return null;
+                    }
                     return (
                       <tr key={index}>
                         <td className="py-5 pl-5">{`${getSymbolById(
