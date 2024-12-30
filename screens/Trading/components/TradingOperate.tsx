@@ -41,7 +41,13 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
   const combinedAssetsData = isMainStream ? assets.data : assetsMEME.data;
 
   const config = useAppSelector(getMarginConfig);
-  const { categoryAssets1, categoryAssets2, marginConfigTokens } = useMarginConfigToken();
+  const {
+    categoryAssets1,
+    categoryAssets1MEME,
+    categoryAssets2,
+    categoryAssets2MEME,
+    marginConfigTokens,
+  } = useMarginConfigToken();
   const { marginAccountList, getAssetById, getAssetByIdMEME } = useMarginAccount();
   const { max_active_user_margin_position } = marginConfigTokens;
   const {
@@ -564,7 +570,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
               <div className="absolute top-2 right-2">
                 <TradingToken
                   setOwnBanlance={setOwnBanlance}
-                  tokenList={categoryAssets2}
+                  tokenList={isMainStream ? categoryAssets2 : categoryAssets2MEME}
                   type="cate2"
                   setForceUpdate={() => setForceUpdate((prev) => prev + 1)}
                 />
@@ -579,7 +585,10 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
               <div>{longOutput && beautifyPrice(Number(longOutput))}</div>
               {/*  */}
               <div className="absolute top-2 right-2">
-                <TradingToken tokenList={categoryAssets1} type="cate1" />
+                <TradingToken
+                  tokenList={isMainStream ? categoryAssets1 : categoryAssets1MEME}
+                  type="cate1"
+                />
               </div>
               <p className="text-gray-300 mt-2 text-xs">
                 ${longOutputUsd && formatNumber(Number(longOutputUsd), 2)}
@@ -701,7 +710,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
               <div className="absolute top-2 right-2">
                 <TradingToken
                   setOwnBanlance={setOwnBanlance}
-                  tokenList={categoryAssets2}
+                  tokenList={isMainStream ? categoryAssets2 : categoryAssets2MEME}
                   type="cate2"
                   setForceUpdate={() => setForceUpdate((prev) => prev + 1)}
                 />
@@ -716,7 +725,10 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
               <div>{shortOutput && beautifyPrice(Number(shortOutput))}</div>
               {/*  */}
               <div className="absolute top-2 right-2">
-                <TradingToken tokenList={categoryAssets1} type="cate1" />
+                <TradingToken
+                  tokenList={isMainStream ? categoryAssets1 : categoryAssets1MEME}
+                  type="cate1"
+                />
               </div>
               <p className="text-gray-300 mt-2 text-xs">
                 ${shortOutputUsd && formatNumber(Number(shortOutputUsd), 2)}

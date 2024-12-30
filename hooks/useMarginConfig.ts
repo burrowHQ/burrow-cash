@@ -1,47 +1,59 @@
 import { getAssets, getAssetsMEME } from "../redux/assetsSelectors";
 import { useAppSelector } from "../redux/hooks";
 import { getMarginConfig, getMarginConfigMEME } from "../redux/marginConfigSelectors";
+import { Asset } from "../redux/assetState";
 
 export function useMarginConfigToken() {
   const assets = useAppSelector(getAssets);
   const assetsMEME = useAppSelector(getAssetsMEME);
   const marginConfigTokens = useAppSelector(getMarginConfig);
   const marginConfigTokensMEME = useAppSelector(getMarginConfigMEME);
-  const assetsData = assets.data;
-  const assetsDataMEME = assetsMEME.data;
-  const combinedAssetsData = { ...assetsData, ...assetsDataMEME };
-  // add by LuKe
-  const categoryAssets1: Array<any> = [];
-  const categoryAssets2: Array<any> = [];
+  const combinedAssetsData = { ...assets.data, ...assetsMEME.data };
 
-  const filteredMarginConfigTokens1 = Object.entries(marginConfigTokens.registered_tokens)
-    .concat(Object.entries(marginConfigTokensMEME.registered_tokens))
-    .filter(([token, value]) => value === 1)
-    .map(([token]) => token);
+  // Define a more specific type for category assets if possible
 
-  const filteredMarginConfigTokens2 = Object.entries(marginConfigTokens.registered_tokens)
-    .filter(([token, value]) => value === 2)
-    .map(([token]) => token);
+  const categoryAssets1: Asset[] = [];
+  const categoryAssets2: Asset[] = [];
+  const categoryAssets1MEME: Asset[] = [];
+  const categoryAssets2MEME: Asset[] = [];
 
-  const filterMarginConfigList = filteredMarginConfigTokens1.reduce((item, token) => {
-    if (combinedAssetsData[token]) {
-      item[token] = combinedAssetsData[token];
-      // get categoryAssets1
-      categoryAssets1.push({
-        ...combinedAssetsData[token],
-      });
-    }
-    return item;
-  }, {});
-  filteredMarginConfigTokens2.forEach((item: string) => {
-    // security check
-    if (combinedAssetsData[item]?.metadata) {
-      // get categoryAssets2
-      categoryAssets2.push({
-        ...assets.data[item],
-      });
-    }
-  });
+  const filterTokens = (tokens, value) =>
+    Object.entries(tokens.registered_tokens)
+      .filter(([_, v]) => v === value)
+      .map(([token]) => token);
+
+  const filteredMarginConfigTokens1 = filterTokens(marginConfigTokens, 1);
+  const filteredMarginConfigTokens1MEME = filterTokens(marginConfigTokensMEME, 1);
+  const filteredMarginConfigTokens2 = filterTokens(marginConfigTokens, 2);
+  const filteredMarginConfigTokens2MEME = filterTokens(marginConfigTokensMEME, 2);
+
+  const createFilteredMarginConfigList = (tokens, categoryAssets) =>
+    tokens.reduce((item, token) => {
+      if (combinedAssetsData[token]) {
+        item[token] = combinedAssetsData[token];
+        categoryAssets.push({ ...assets.data[token] });
+      }
+      return item;
+    }, {});
+  const filterMarginConfigList = createFilteredMarginConfigList(
+    filteredMarginConfigTokens1,
+    categoryAssets1,
+  );
+  const filterMarginConfigListMEME =
+    Object.entries(assetsMEME.data).length > 0
+      ? createFilteredMarginConfigList(filteredMarginConfigTokens1MEME, categoryAssets1MEME)
+      : {};
+
+  const processTokens = (tokens, categoryAssets) => {
+    tokens.forEach((item: string) => {
+      if (combinedAssetsData[item]?.metadata) {
+        categoryAssets.push({ ...assets.data[item] });
+      }
+    });
+  };
+
+  processTokens(filteredMarginConfigTokens2, categoryAssets2);
+  processTokens(filteredMarginConfigTokens2MEME, categoryAssets2MEME);
 
   const getPositionType = (token_id) => {
     const type = marginConfigTokens.registered_tokens[token_id];
@@ -52,11 +64,13 @@ export function useMarginConfigToken() {
   };
 
   return {
-    filterMarginConfigList,
+    filterMarginConfigList: { ...filterMarginConfigList, ...filterMarginConfigListMEME },
     marginConfigTokens,
     marginConfigTokensMEME,
     categoryAssets1,
     categoryAssets2,
+    categoryAssets1MEME,
+    categoryAssets2MEME,
     getPositionType,
   };
 }

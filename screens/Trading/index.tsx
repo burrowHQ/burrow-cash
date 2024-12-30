@@ -36,7 +36,7 @@ const Trading = () => {
   const { query } = useRouterQuery();
   const accountId = useAccountId();
   const { marginAccountList, marginAccountListMEME } = useMarginAccount();
-  const { categoryAssets1, categoryAssets2, filterMarginConfigList } = useMarginConfigToken();
+  const { categoryAssets2, categoryAssets2MEME, filterMarginConfigList } = useMarginConfigToken();
   const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
   const router = useRouter();
   const { id }: any = router.query;
@@ -51,7 +51,9 @@ const Trading = () => {
 
   //
   const [currentTokenCate1, setCurrentTokenCate1] = useState<any>({});
-  const [currentTokenCate2, setCurrentTokenCate2] = useState<any>(categoryAssets2[0]);
+  const [currentTokenCate2, setCurrentTokenCate2] = useState<any>(
+    isMainStream ? categoryAssets2[0] : categoryAssets2MEME[0],
+  );
   const [longAndShortPosition, setLongAndShortPosition] = useState<any>([]);
 
   const assetData: any = combinedAssetsData[id];
@@ -72,9 +74,13 @@ const Trading = () => {
 
   useEffect(() => {
     if (id) {
-      dispatch(setCategoryAssets2(currentTokenCate2 || categoryAssets2[0]));
+      dispatch(
+        setCategoryAssets2(
+          currentTokenCate2 || (isMainStream ? categoryAssets2[0] : categoryAssets2MEME[0]),
+        ),
+      );
     }
-  }, [id, categoryAssets2[0]]);
+  }, [id, currentTokenCate2]);
 
   useMemo(() => {
     setLongAndShortPosition([
@@ -231,7 +237,10 @@ const Trading = () => {
                     className="flex justify-center items-center"
                   >
                     <p className="mr-1">
-                      {currentTokenCate2?.metadata?.symbol || categoryAssets2[0]?.metadata.symbol}
+                      {currentTokenCate2?.metadata?.symbol ||
+                        (isMainStream
+                          ? categoryAssets2[0]?.metadata.symbol
+                          : categoryAssets2MEME[0]?.metadata.symbol)}
                     </p>
                     <TokenArrow />
                   </div>
@@ -241,7 +250,7 @@ const Trading = () => {
                       onMouseLeave={() => handleMouseLeave("2")}
                       className="bg-dark-250 border border-dark-500 rounded-sm absolute z-10 top-8 left-0 right-0 pt-0.5 text-gray-300 text-xs pb-1.5"
                     >
-                      {categoryAssets2.map((item, index) => (
+                      {(isMainStream ? categoryAssets2 : categoryAssets2MEME).map((item, index) => (
                         <div
                           key={index}
                           className="py-1 pl-1.5 hover:bg-gray-950"
@@ -312,7 +321,9 @@ const Trading = () => {
                       >
                         <p className="mr-1">
                           {currentTokenCate2?.metadata?.symbol ||
-                            categoryAssets2[0]?.metadata.symbol}
+                            (isMainStream
+                              ? categoryAssets2[0]?.metadata.symbol
+                              : categoryAssets2MEME[0]?.metadata.symbol)}
                         </p>
                         <TokenArrow />
                       </div>
@@ -322,15 +333,17 @@ const Trading = () => {
                           onMouseLeave={() => handleMouseLeave("2")}
                           className="bg-dark-250 border border-dark-500 rounded-sm absolute z-10 top-6 left-0 right-0 pt-0.5 text-gray-300 text-xs pb-1.5"
                         >
-                          {categoryAssets2.map((item, index) => (
-                            <div
-                              key={index}
-                              className="py-1 pl-1.5 hover:bg-gray-950"
-                              onClick={() => handleTokenSelectCate2(item)}
-                            >
-                              {getSymbolById(item.token_id, item.metadata?.symbol)}
-                            </div>
-                          ))}
+                          {(isMainStream ? categoryAssets2 : categoryAssets2MEME).map(
+                            (item, index) => (
+                              <div
+                                key={index}
+                                className="py-1 pl-1.5 hover:bg-gray-950"
+                                onClick={() => handleTokenSelectCate2(item)}
+                              >
+                                {getSymbolById(item.token_id, item.metadata?.symbol)}
+                              </div>
+                            ),
+                          )}
                         </div>
                       )}
                     </div>
