@@ -21,6 +21,7 @@ export async function openPosition({
   min_token_p_amount,
   swap_indication,
   assets,
+  isMeme,
 }: {
   token_c_id: string;
   token_c_amount: string;
@@ -30,8 +31,9 @@ export async function openPosition({
   min_token_p_amount: string;
   swap_indication: any;
   assets: Assets;
+  isMeme?: boolean;
 }) {
-  const { logicContract, oracleContract } = await getBurrow();
+  const { logicContract, oracleContract, logicMEMEContract } = await getBurrow();
   const { enable_pyth_oracle } = await getConfig();
   const isNEAR = token_c_id === nearTokenId;
   const expanded_c_amount = expandTokenDecimal(
@@ -44,6 +46,7 @@ export async function openPosition({
   );
   const expanded_d_amount = token_d_amount;
   const transactions: Transaction[] = [];
+  const logicContractId = isMeme ? logicMEMEContract.contractId : logicContract.contractId;
   transactions.push({
     receiverId: token_c_id,
     functionCalls: [
@@ -60,7 +63,7 @@ export async function openPosition({
         methodName: ChangeMethodsToken[ChangeMethodsToken.ft_transfer_call],
         gas: new BN("100000000000000"),
         args: {
-          receiver_id: logicContract.contractId,
+          receiver_id: logicContractId,
           amount: expanded_token_c_amount.toFixed(0),
           msg: '"DepositToMargin"',
         },
@@ -83,7 +86,7 @@ export async function openPosition({
     ],
   };
   transactions.push({
-    receiverId: enable_pyth_oracle ? logicContract.contractId : oracleContract.contractId,
+    receiverId: enable_pyth_oracle ? logicContractId : oracleContract.contractId,
     functionCalls: [
       {
         methodName: enable_pyth_oracle
@@ -93,7 +96,7 @@ export async function openPosition({
           ...(enable_pyth_oracle
             ? actionsTemplate
             : {
-                receiver_id: logicContract.contractId,
+                receiver_id: logicContractId,
                 msg: JSON.stringify({
                   MarginExecute: actionsTemplate,
                 }),
