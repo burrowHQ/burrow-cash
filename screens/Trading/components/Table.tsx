@@ -1044,7 +1044,6 @@ const PositionRow = ({
     marginConfigTokens,
     entryPrice,
   };
-  console.log(pnl);
   return (
     <tr className="text-base hover:bg-dark-100 font-normal">
       <td className="py-5 pl-5">
@@ -1219,11 +1218,6 @@ const PositionMobileRow = ({
       if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
     }
   }
-  const rowData = {
-    pos_id: itemKey,
-    data: item,
-    marginConfigTokens,
-  };
   const openTime = new Date(Number(item.open_ts) / 1e6);
   const uahpi: any = shrinkToken((assets as any).data[item.token_p_id]?.uahpi, 18) ?? 0;
   const uahpi_at_open: any = shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
@@ -1244,6 +1238,12 @@ const PositionMobileRow = ({
       amplitude = ((entryPrice - indexPrice) / entryPrice) * 100;
     }
   }
+  const rowData = {
+    pos_id: itemKey,
+    data: item,
+    marginConfigTokens,
+    entryPrice,
+  };
   return (
     <div className="bg-gray-800 rounded-xl mb-4">
       <div className="pt-5 px-4 pb-4 border-b border-dark-950 flex justify-between">
