@@ -26,6 +26,7 @@ import TradingOperateMobile from "./components/TradingOperateMobile";
 import getAssets from "../../api/get-assets";
 import { beautifyPrice } from "../../utils/beautyNumbet";
 import { getSymbolById } from "../../transformers/nearSymbolTrans";
+import { useRegisterTokenType } from "../../hooks/useRegisterTokenType";
 
 init_env("dev");
 
@@ -34,15 +35,17 @@ const Trading = () => {
   const marginConfig = useAppSelector(getMarginConfig);
   const { query } = useRouterQuery();
   const accountId = useAccountId();
-  const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
+  const { marginAccountList, marginAccountListMEME } = useMarginAccount();
   const { categoryAssets1, categoryAssets2, filterMarginConfigList } = useMarginConfigToken();
   const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
   const router = useRouter();
   const { id }: any = router.query;
+  const { filteredTokenTypeMap } = useRegisterTokenType();
+  const isMainStream = filteredTokenTypeMap.mainStream.includes(id);
   const dispatch = useAppDispatch();
   const assets = useAppSelector(getAssetsSelector);
   const assetsMEME = useAppSelector(getAssetsMEME);
-  const combinedAssetsData = { ...assets.data, ...assetsMEME.data };
+  const combinedAssetsData = isMainStream ? assets.data : assetsMEME.data;
   const [showPopupCate1, setShowPopup1] = useState(false);
   const [showPopupCate2, setShowPopup2] = useState(false);
 
@@ -60,11 +63,10 @@ const Trading = () => {
   const extra_decimals = config?.extra_decimals || 0;
 
   let timer;
-
   useEffect(() => {
     if (id) {
-      setCurrentTokenCate1(assets.data[id]);
-      dispatch(setCategoryAssets1(assets.data[id]));
+      setCurrentTokenCate1(combinedAssetsData[id]);
+      dispatch(setCategoryAssets1(combinedAssetsData[id]));
     }
   }, [id, currentTokenCate1]);
 
@@ -366,7 +368,7 @@ const Trading = () => {
         </div>
         {/* right tradingopts */}
         <div className="lg:col-span-2 bg-gray-800 border border-dark-50 rounded-md xsm:box-border xsm:mx-2 xsm:hidden">
-          <TradingOperate />
+          {id && <TradingOperate id={id} />}
         </div>
       </div>
       <div className="lg:hidden fixed bottom-0 left-0 right-0 w-full h-[116px] rounded-t-[8px] px-[26px] flex flex-col justify-center items-center bg-[#383A56] z-[12]">
@@ -379,8 +381,13 @@ const Trading = () => {
           Long/Short
         </div>
       </div>
-      {accountId && <TradingTable positionsList={marginAccountList} filterTitle={filterTitle} />}
-      <TradingOperateMobile open={open} onClose={() => setOpen(false)} />
+      {accountId && (
+        <TradingTable
+          positionsList={isMainStream ? marginAccountList : marginAccountListMEME}
+          filterTitle={filterTitle}
+        />
+      )}
+      {id && <TradingOperateMobile open={open} onClose={() => setOpen(false)} id={id} />}
     </LayoutBox>
   );
 };

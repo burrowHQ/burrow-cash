@@ -23,21 +23,26 @@ import {
 import { beautifyPrice } from "../../../utils/beautyNumbet";
 import { ConnectWalletButton } from "../../../components/Header/WalletButton";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
+import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
 
 interface TradingOperateProps {
   onMobileClose?: () => void;
+  id: string;
 }
 
 // main components
-const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
+const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) => {
   //
   const customInputRef = useRef<HTMLInputElement>(null);
+  const { filteredTokenTypeMap } = useRegisterTokenType();
+  const isMainStream = filteredTokenTypeMap.mainStream.includes(id);
   const assets = useAppSelector(getAssets);
   const assetsMEME = useAppSelector(getAssetsMEME);
-  const combinedAssetsData = { ...assets.data, ...assetsMEME.data };
+  const combinedAssetsData = isMainStream ? assets.data : assetsMEME.data;
+
   const config = useAppSelector(getMarginConfig);
   const { categoryAssets1, categoryAssets2, marginConfigTokens } = useMarginConfigToken();
-  const { marginAccountList, getAssetById } = useMarginAccount();
+  const { marginAccountList, getAssetById, getAssetByIdMEME } = useMarginAccount();
   const { max_active_user_margin_position } = marginConfigTokens;
   const {
     ReduxcategoryAssets1,
@@ -47,7 +52,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
     ReduxSlippageTolerance,
     ReduxRangeMount,
   } = useAppSelector((state) => state.category);
-
   //
   const [slippageTolerance, setSlippageTolerance] = useState<number>(0.5);
   const [showFeeModal, setShowFeeModal] = useState<boolean>(false);
@@ -227,7 +231,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
   // handle input change
   const tokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    console.log(value, tokenInAmount, "for nico");
     if (value === "") {
       setLongInput("");
       setShortInput("");

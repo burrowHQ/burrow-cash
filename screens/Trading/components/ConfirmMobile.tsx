@@ -23,6 +23,7 @@ import { getBurrow } from "../../../utils";
 import DataSource from "../../../data/datasource";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { IConfirmMobileProps } from "../comInterface";
+import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
 
 export const ModalContext = createContext(null) as any;
 const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
@@ -52,8 +53,16 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [isMinTokenPAmount, setIsMinTokenPAmount] = useState<boolean>(false);
   const [hasLiquidationRisk, setHasLiquidationRisk] = useState<boolean>(false);
-  const { marginConfigTokens, filterMarginConfigList } = useMarginConfigToken();
-  const { max_slippage_rate, min_safety_buffer } = marginConfigTokens;
+  const { filteredTokenTypeMap } = useRegisterTokenType();
+  const isMainStream = filteredTokenTypeMap.mainStream.includes(
+    confirmInfo.longOutputName?.token_id,
+  );
+  const { marginConfigTokens, marginConfigTokensMEME, filterMarginConfigList } =
+    useMarginConfigToken();
+  const { max_slippage_rate, min_safety_buffer } = isMainStream
+    ? marginConfigTokens
+    : marginConfigTokensMEME;
+
   const { getAssetDetails, getAssetById } = useMarginAccount();
 
   const assetP = getAssetById(
@@ -99,8 +108,8 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
     ),
     swap_indication: confirmInfo.estimateData.swap_indication,
     assets: confirmInfo.assets.data,
+    isMeme: isMainStream,
   };
-  console.log(openPositionParams, confirmInfo, assetP, "for nico confirmOpenPosition");
 
   const confirmOpenPosition = async () => {
     setIsDisabled(true);
@@ -119,6 +128,17 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
       const tokenPPrice = confirmInfo.assets.data[openPositionParams.token_p_id].price.usd;
       const slippageRate = 1 - max_slippage_rate / 10000;
       const calculatedValue = ((+tokenDAmount * tokenDPrice) / tokenPPrice) * slippageRate;
+      console.log(
+        openPositionParams,
+        decimalsP,
+        tokenDAmount,
+        tokenDPrice,
+        tokenPPrice,
+        slippageRate,
+        calculatedValue,
+        minTokenPAmount,
+        "for nico confirmOpenPosition",
+      );
       if (minTokenPAmount < calculatedValue) {
         setIsMinTokenPAmount(true);
         hasError = true;

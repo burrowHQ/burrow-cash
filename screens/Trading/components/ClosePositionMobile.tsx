@@ -25,12 +25,13 @@ import {
 import { showPositionClose } from "../../../components/HashResultModal";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
 import { findPathReserve } from "../../../api/get-swap-path";
-import { getAssets } from "../../../redux/assetsSelectors";
+import { getAssets, getAssetsMEME } from "../../../redux/assetsSelectors";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";
 import { IClosePositionMobileProps } from "../comInterface";
-import { getMarginConfig } from "../../../redux/marginConfigSelectors";
+import { getMarginConfig, getMarginConfigMEME } from "../../../redux/marginConfigSelectors";
 import { handleTransactionHash } from "../../../services/transaction";
 import DataSource from "../../../data/datasource";
+import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
 
 export const ModalContext = createContext(null) as any;
 const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
@@ -50,17 +51,22 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     pnl,
   } = extraProps;
 
+  const { filteredTokenTypeMap } = useRegisterTokenType();
+
   const [showFeeModal, setShowFeeModal] = useState<boolean>(false);
   const [selectedCollateralType, setSelectedCollateralType] = useState<string>(DEFAULT_POSITION);
   const [tokenInAmount, setTokenInAmount] = useState<string | null>(null);
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [forceUpdate, setForceUpdate] = useState<number>(0);
   const [swapUnSecurity, setSwapUnSecurity] = useState<boolean>(false);
-
+  const positionType = getPositionType(item.token_d_info.token_id);
+  const isMainStream = filteredTokenTypeMap.mainStream.includes(
+    positionType.label === "Long" ? item.token_p_id : item.token_d_info.token_id,
+  );
   const theme = useTheme();
   const intervalRef = useRef<ReturnType<typeof setInterval>>();
-  const assets = useAppSelector(getAssets);
-  const { marginAccountList } = useMarginAccount();
+  const assets = useAppSelector(isMainStream ? getAssets : getAssetsMEME);
+  const { marginAccountList, marginAccountListMEME } = useMarginAccount();
   const { ReduxcategoryAssets1, ReduxSlippageTolerance } = useAppSelector(
     (state) => state.category,
   );
@@ -77,7 +83,6 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   const leverageD = parseTokenValue(item.token_d_info.balance, decimalsD);
   const leverageC = parseTokenValue(item.token_c_info.balance, decimalsC);
   const leverage = calculateLeverage(leverageD, priceD, leverageC, priceC);
-  const positionType = getPositionType(item.token_d_info.token_id);
 
   const sizeValueLong = parseTokenValue(item.token_p_amount, decimalsP);
   const sizeValueShort = parseTokenValue(item.token_d_info.balance, decimalsD);
@@ -89,7 +94,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
 
   const actionShowRedColor = positionType.label === "Long";
-  const marginConfig = useAppSelector(getMarginConfig);
+  const marginConfig = useAppSelector(isMainStream ? getMarginConfig : getMarginConfigMEME);
   // get estimate token in amount
   useEffect(() => {
     if (positionType.label === "Short") {
@@ -132,7 +137,9 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
 
   const Fee = useMemo(() => {
     const uahpi: any = shrinkToken((assets as any).data[item.token_p_id]?.uahpi, 18) ?? 0;
-    const uahpi_at_open: any = shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
+    const uahpi_at_open: any = isMainStream
+      ? shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18)
+      : shrinkToken(marginAccountListMEME[itemKey]?.uahpi_at_open ?? 0, 18);
     const { debt_cap } = item;
     return {
       HPFee: +shrinkToken(debt_cap, decimalsD) * priceD * (uahpi * 1 - uahpi_at_open * 1),
@@ -178,6 +185,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
         token_p_id: item.token_p_id,
         token_d_id: item.token_d_info.token_id,
         token_p_amount: expandToken(tokenInAmount || "0", assetP.config.extra_decimals, 0),
+        isMeme: isMainStream,
       });
 
       onClose();
