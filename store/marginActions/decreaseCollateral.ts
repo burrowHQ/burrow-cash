@@ -6,6 +6,7 @@ import { Transaction } from "../wallet";
 import { prepareAndExecuteTransactions } from "../tokens";
 import { Assets } from "../../redux/assetState";
 import getConfig from "../../api/get-config";
+import getMemeConfig from "../../api/get-config-meme";
 
 export async function decreaseCollateral({
   pos_id,
@@ -20,8 +21,17 @@ export async function decreaseCollateral({
   assets: Assets;
   isMeme?: boolean;
 }) {
-  const { logicContract, oracleContract, logicMEMEContract } = await getBurrow();
-  const { enable_pyth_oracle } = await getConfig();
+  const { logicContract, oracleContract, memeOracleContract, logicMEMEContract } =
+    await getBurrow();
+  let enable_pyth_oracle;
+  let priceOracleContract;
+  if (isMeme) {
+    enable_pyth_oracle = (await getMemeConfig()).enable_pyth_oracle;
+    priceOracleContract = memeOracleContract.contractId;
+  } else {
+    enable_pyth_oracle = (await getConfig()).enable_pyth_oracle;
+    priceOracleContract = oracleContract.contractId;
+  }
   const transactions: Transaction[] = [];
   const expanded_c_amount = expandTokenDecimal(
     amount,
@@ -39,7 +49,7 @@ export async function decreaseCollateral({
   };
   const logicContractId = isMeme ? logicMEMEContract.contractId : logicContract.contractId;
   transactions.push({
-    receiverId: enable_pyth_oracle ? logicContractId : oracleContract.contractId,
+    receiverId: enable_pyth_oracle ? logicContractId : priceOracleContract,
     functionCalls: [
       {
         methodName: enable_pyth_oracle
@@ -69,7 +79,7 @@ export async function decreaseCollateral({
     ],
   };
   transactions.push({
-    receiverId: enable_pyth_oracle ? logicContractId : oracleContract.contractId,
+    receiverId: enable_pyth_oracle ? logicContractId : priceOracleContract,
     functionCalls: [
       {
         methodName: enable_pyth_oracle

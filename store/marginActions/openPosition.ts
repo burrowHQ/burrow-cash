@@ -11,6 +11,7 @@ import { Transaction } from "../wallet";
 import { prepareAndExecuteTransactions } from "../tokens";
 import { Assets } from "../../redux/assetState";
 import getConfig from "../../api/get-config";
+import getMemeConfig from "../../api/get-config-meme";
 
 export async function openPosition({
   token_c_id,
@@ -33,8 +34,17 @@ export async function openPosition({
   assets: Assets;
   isMeme?: boolean;
 }) {
-  const { logicContract, oracleContract, logicMEMEContract } = await getBurrow();
-  const { enable_pyth_oracle } = await getConfig();
+  const { logicContract, oracleContract, memeOracleContract, logicMEMEContract } =
+    await getBurrow();
+  let enable_pyth_oracle;
+  let priceOracleContract;
+  if (isMeme) {
+    enable_pyth_oracle = (await getMemeConfig()).enable_pyth_oracle;
+    priceOracleContract = memeOracleContract.contractId;
+  } else {
+    enable_pyth_oracle = (await getConfig()).enable_pyth_oracle;
+    priceOracleContract = oracleContract.contractId;
+  }
   const isNEAR = token_c_id === nearTokenId;
   const expanded_c_amount = expandTokenDecimal(
     token_c_amount,
@@ -86,7 +96,7 @@ export async function openPosition({
     ],
   };
   transactions.push({
-    receiverId: enable_pyth_oracle ? logicContractId : oracleContract.contractId,
+    receiverId: enable_pyth_oracle ? logicContractId : priceOracleContract,
     functionCalls: [
       {
         methodName: enable_pyth_oracle

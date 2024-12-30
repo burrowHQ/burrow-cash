@@ -68,6 +68,7 @@ export interface IBurrow {
   refv1Contract: Contract;
   pythContract: Contract;
   dclContract: Contract;
+  memeOracleContract: Contract;
   view: (contract: Contract, methodName: string, args?: any) => Promise<IViewReturnType>;
   call: (
     contract: Contract,
