@@ -160,7 +160,12 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
       const outputValue = activeTab === "long" ? longOutput : shortOutput;
       const isValidInput = isValidDecimalString(inputValue);
 
-      setIsDisabled(!isValidInput || !(Number(inputValue) <= currentBalance2) || !outputValue);
+      setIsDisabled(
+        !isValidInput ||
+          !(Number(inputValue) <= currentBalance2) ||
+          !outputValue ||
+          rangeMount == 1,
+      );
     };
     setDisableBasedOnInputs();
   }, [activeTab, ReduxcategoryCurrentBalance2, longInput, shortInput, longOutput, shortOutput]);
@@ -286,7 +291,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
     if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
       const assetC = getAssetById(ReduxcategoryAssets2?.token_id);
       let liqPriceX = 0;
-      if (rangeMount >= 1) {
+      if (rangeMount > 1) {
         const safetyBufferFactor = 1 - marginConfigTokens.min_safety_buffer / 10000;
         const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
 
@@ -311,7 +316,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
     if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
       let liqPriceX = 0;
 
-      if (rangeMount >= 1) {
+      if (rangeMount > 1) {
         const safetyBufferFactor = 1 - marginConfigTokens.min_safety_buffer / 10000;
         const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
 
@@ -640,11 +645,11 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
                   <span className="ml-1">Exceeded the maximum number of open positions.</span>
                 </div>
               )}
-              {/* {rangeMount <= 1 && accountId && (
+              {rangeMount <= 1 && accountId && (
                 <span className="text-[#EA3F68] text-sm font-normal flex items-start mb-1">
                   Leverage must be greater than 1
                 </span>
-              )} */}
+              )}
               {accountId ? (
                 <YellowSolidButton
                   className="w-full"
@@ -774,11 +779,11 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
                   <span className="ml-1">Exceeded the maximum number of open positions.</span>
                 </div>
               )}
-              {/* {rangeMount <= 1 && accountId && (
+              {rangeMount <= 1 && accountId && (
                 <span className="text-[#EA3F68] text-sm font-normal flex items-start mb-1">
                   Leverage must be greater than 1
                 </span>
-              )} */}
+              )}
               {accountId ? (
                 <RedSolidButton
                   className="w-full"
