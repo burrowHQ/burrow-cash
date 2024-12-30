@@ -5,7 +5,7 @@ import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 import MyMarginTrading from "./components/MyTrading";
 import MarketMarginTrading from "./components/MarketTrading";
 import { RootState } from "../../redux/store";
-import { setActiveTab } from "../../redux/marginTabSlice";
+import { setAccountDetailsOpen, setActiveTab } from "../../redux/marginTabSlice";
 
 const MarginTrading = () => {
   const dispatch = useAppDispatch();
@@ -13,6 +13,7 @@ const MarginTrading = () => {
 
   const handleTabChange = (tab: string) => {
     dispatch(setActiveTab(tab));
+    dispatch(setAccountDetailsOpen(false));
   };
 
   const getTabClassName = (tabName) => {
