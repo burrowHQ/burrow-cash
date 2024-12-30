@@ -354,7 +354,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
               <div className="flex items-center justify-center">
                 {/* <span className="text-red-50">-$0.0689</span> */}
                 {/* <span className="text-xs text-gray-300 ml-1.5">(-2.01%)</span> */}
-                <span className="text-sm text-white ml-1.5">
+                <span className={`text-sm ${pnl > 0 ? "text-gray-400" : "text-red-150"} ml-1.5`}>
                   {pnl > 0 ? `+$` : `-$`}
                   {beautifyPrice(pnl)}
                 </span>
