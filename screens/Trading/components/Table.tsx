@@ -1102,13 +1102,11 @@ const PositionRow = ({
           {pnl === 0 ? "" : `${pnl > 0 ? `+$` : `-$`}`}
           {beautifyPrice(Math.abs(pnl))}
           <span className="text-gray-400 text-xs ml-0.5">
-            (
             {amplitude !== null && amplitude !== 0
-              ? `${amplitude > 0 ? `+` : `-`}${toInternationalCurrencySystem_number(
+              ? `(${amplitude > 0 ? `+` : `-`}${toInternationalCurrencySystem_number(
                   Math.abs(amplitude),
-                )}%`
-              : `-`}
-            )
+                )}%)`
+              : ``}
           </span>
         </p>
       </td>
@@ -1337,13 +1335,11 @@ const PositionMobileRow = ({
             {pnl === 0 ? "" : `${pnl > 0 ? `+$` : `-$`}`}
             {beautifyPrice(Math.abs(pnl))}
             <span className="text-gray-400 text-xs ml-0.5">
-              (
               {amplitude !== null && amplitude !== 0
-                ? `${amplitude > 0 ? `+` : `-`}${toInternationalCurrencySystem_number(
+                ? `(${amplitude > 0 ? `+` : `-`}${toInternationalCurrencySystem_number(
                     Math.abs(amplitude),
-                  )}%`
-                : `-`}
-              )
+                  )}%)`
+                : ``}
             </span>
             {/* <span className="text-gray-400 text-xs ml-0.5">(-%)</span> */}
           </p>
