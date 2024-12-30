@@ -12,13 +12,15 @@ export async function decreaseCollateral({
   token_c_id,
   amount,
   assets,
+  isMeme,
 }: {
   pos_id: string;
   token_c_id: string;
   amount: string;
   assets: Assets;
+  isMeme?: boolean;
 }) {
-  const { logicContract, oracleContract } = await getBurrow();
+  const { logicContract, oracleContract, logicMEMEContract } = await getBurrow();
   const { enable_pyth_oracle } = await getConfig();
   const transactions: Transaction[] = [];
   const expanded_c_amount = expandTokenDecimal(
@@ -35,8 +37,9 @@ export async function decreaseCollateral({
       },
     ],
   };
+  const logicContractId = isMeme ? logicMEMEContract.contractId : logicContract.contractId;
   transactions.push({
-    receiverId: enable_pyth_oracle ? logicContract.contractId : oracleContract.contractId,
+    receiverId: enable_pyth_oracle ? logicContractId : oracleContract.contractId,
     functionCalls: [
       {
         methodName: enable_pyth_oracle
@@ -46,7 +49,7 @@ export async function decreaseCollateral({
           ...(enable_pyth_oracle
             ? decreaseCollateralTemplate
             : {
-                receiver_id: logicContract.contractId,
+                receiver_id: logicContractId,
                 msg: JSON.stringify({
                   MarginExecute: decreaseCollateralTemplate,
                 }),
@@ -66,7 +69,7 @@ export async function decreaseCollateral({
     ],
   };
   transactions.push({
-    receiverId: enable_pyth_oracle ? logicContract.contractId : oracleContract.contractId,
+    receiverId: enable_pyth_oracle ? logicContractId : oracleContract.contractId,
     functionCalls: [
       {
         methodName: enable_pyth_oracle
@@ -76,7 +79,7 @@ export async function decreaseCollateral({
           ...(enable_pyth_oracle
             ? withDrawActionsTemplate
             : {
-                receiver_id: logicContract.contractId,
+                receiver_id: logicContractId,
                 msg: JSON.stringify({
                   MarginExecute: withDrawActionsTemplate,
                 }),

@@ -12,16 +12,19 @@ export async function increaseCollateral({
   token_c_id,
   amount,
   assets,
+  isMeme,
 }: {
   pos_id: string;
   token_c_id: string;
   amount: string;
   assets: Assets;
+  isMeme?: boolean;
 }) {
-  const { logicContract, oracleContract } = await getBurrow();
+  const { logicContract, oracleContract, logicMEMEContract } = await getBurrow();
   const { enable_pyth_oracle } = await getConfig();
   const transactions: Transaction[] = [];
   const expanded_supply_amount = expandToken(amount, assets[token_c_id].metadata.decimals, 0);
+  const logicContractId = isMeme ? logicMEMEContract.contractId : logicContract.contractId;
   transactions.push({
     receiverId: token_c_id,
     functionCalls: [
@@ -29,7 +32,7 @@ export async function increaseCollateral({
         methodName: ChangeMethodsToken[ChangeMethodsToken.ft_transfer_call],
         gas: new BN("100000000000000"),
         args: {
-          receiver_id: logicContract.contractId,
+          receiver_id: logicContractId,
           amount: expanded_supply_amount,
           msg: '"DepositToMargin"',
         },
@@ -47,7 +50,7 @@ export async function increaseCollateral({
     ],
   };
   transactions.push({
-    receiverId: enable_pyth_oracle ? logicContract.contractId : oracleContract.contractId,
+    receiverId: enable_pyth_oracle ? logicContractId : oracleContract.contractId,
     functionCalls: [
       {
         methodName: enable_pyth_oracle
@@ -57,7 +60,7 @@ export async function increaseCollateral({
           ...(enable_pyth_oracle
             ? increaseCollateralTemplate
             : {
-                receiver_id: logicContract.contractId,
+                receiver_id: logicContractId,
                 msg: JSON.stringify({
                   MarginExecute: increaseCollateralTemplate,
                 }),

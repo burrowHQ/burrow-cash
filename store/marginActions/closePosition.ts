@@ -13,6 +13,7 @@ export async function closePosition({
   min_token_d_amount,
   swap_indication,
   isLong,
+  isMeme,
 }: {
   pos_id: string;
   token_p_id: string;
@@ -21,8 +22,9 @@ export async function closePosition({
   min_token_d_amount: string;
   swap_indication: any;
   isLong?: boolean;
+  isMeme?: boolean;
 }) {
-  const { logicContract, oracleContract } = await getBurrow();
+  const { logicContract, oracleContract, logicMEMEContract } = await getBurrow();
   const { enable_pyth_oracle } = await getConfig();
   const transactions: Transaction[] = [];
   const closeActionsTemplate = {
@@ -37,8 +39,9 @@ export async function closePosition({
       },
     ],
   };
+  const logicContractId = isMeme ? logicMEMEContract.contractId : logicContract.contractId;
   transactions.push({
-    receiverId: enable_pyth_oracle ? logicContract.contractId : oracleContract.contractId,
+    receiverId: enable_pyth_oracle ? logicContractId : oracleContract.contractId,
     functionCalls: [
       {
         methodName: enable_pyth_oracle
@@ -48,7 +51,7 @@ export async function closePosition({
           ...(enable_pyth_oracle
             ? closeActionsTemplate
             : {
-                receiver_id: logicContract.contractId,
+                receiver_id: logicContractId,
                 msg: JSON.stringify({
                   MarginExecute: closeActionsTemplate,
                 }),
@@ -79,7 +82,7 @@ export async function closePosition({
 
   if (!isLong) {
     transactions.push({
-      receiverId: enable_pyth_oracle ? logicContract.contractId : oracleContract.contractId,
+      receiverId: enable_pyth_oracle ? logicContractId : oracleContract.contractId,
       functionCalls: [
         {
           methodName: enable_pyth_oracle
@@ -89,7 +92,7 @@ export async function closePosition({
             ...(enable_pyth_oracle
               ? cWithDrawActionsTemplate
               : {
-                  receiver_id: logicContract.contractId,
+                  receiver_id: logicContractId,
                   msg: JSON.stringify({
                     MarginExecute: cWithDrawActionsTemplate,
                   }),
@@ -102,7 +105,7 @@ export async function closePosition({
   }
 
   transactions.push({
-    receiverId: enable_pyth_oracle ? logicContract.contractId : oracleContract.contractId,
+    receiverId: enable_pyth_oracle ? logicContractId : oracleContract.contractId,
     functionCalls: [
       {
         methodName: enable_pyth_oracle
@@ -112,7 +115,7 @@ export async function closePosition({
           ...(enable_pyth_oracle
             ? dWithDrawActionsTemplate
             : {
-                receiver_id: logicContract.contractId,
+                receiver_id: logicContractId,
                 msg: JSON.stringify({
                   MarginExecute: dWithDrawActionsTemplate,
                 }),
