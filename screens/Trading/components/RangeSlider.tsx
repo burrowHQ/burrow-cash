@@ -1,8 +1,10 @@
 import React, { useRef, useState, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
+import { useRouter } from "next/router";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
 import { useAppDispatch } from "../../../redux/hooks";
 import { setReduxRangeMount } from "../../../redux/marginTrading";
+import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
 
 interface RangeSliderProps {
   defaultValue: number;
@@ -12,6 +14,11 @@ interface RangeSliderProps {
 
 const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRangeMount }) => {
   const dispatch = useAppDispatch();
+  const { filteredTokenTypeMap } = useRegisterTokenType();
+  const router = useRouter();
+  const { id }: any = router.query;
+  const isMainStream = filteredTokenTypeMap.mainStream.includes(id);
+
   //
   const generateArithmeticSequence = (value: number) => {
     const increment = (value - 1) / 4;
@@ -24,7 +31,8 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRang
     return sequence;
   };
   //
-  const { marginConfigTokens } = useMarginConfigToken();
+  const { marginConfigTokens, marginConfigTokensMEME } = useMarginConfigToken();
+  const marginConfigTokensCombined = isMainStream ? marginConfigTokens : marginConfigTokensMEME;
 
   const [value, setValue] = useState(defaultValue);
   const [splitList, setSplitList] = useState([0]);
@@ -33,9 +41,11 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRang
   const [selectedItem, setSelectedItem] = useState(defaultValue);
 
   useEffect(() => {
-    const newAllowedValues = generateArithmeticSequence(marginConfigTokens["max_leverage_rate"]);
+    const newAllowedValues = generateArithmeticSequence(
+      marginConfigTokensCombined["max_leverage_rate"],
+    );
     setSplitList(newAllowedValues);
-  }, [marginConfigTokens["max_leverage_rate"]]);
+  }, [marginConfigTokensCombined["max_leverage_rate"]]);
 
   useEffect(() => {
     if (valueRef.current && splitList.length > 0) {

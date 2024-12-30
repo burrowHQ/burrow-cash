@@ -54,6 +54,7 @@ export function useMarginConfigToken() {
   return {
     filterMarginConfigList,
     marginConfigTokens,
+    marginConfigTokensMEME,
     categoryAssets1,
     categoryAssets2,
     getPositionType,
