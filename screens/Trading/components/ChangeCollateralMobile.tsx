@@ -1,4 +1,4 @@
-import { useState, createContext, useEffect } from "react";
+import { useState, createContext, useEffect, useMemo } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
 import { useDispatch } from "react-redux";
@@ -21,13 +21,14 @@ import { handleTransactionHash } from "../../../services/transaction";
 import { useRouterQuery } from "../../../utils/txhashContract";
 import { setActiveTab } from "../../../redux/marginTabSlice";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
+import { checkIfMeme } from "../../../utils/margin";
 
 export const ModalContext = createContext(null) as any;
 const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => {
   const { query } = useRouterQuery();
   const dispatch = useDispatch();
   const account = useAppSelector((state) => state.account);
-  const { marginConfigTokens, getPositionType } = useMarginConfigToken();
+  const { marginConfigTokens, marginConfigTokensMEME, getPositionType } = useMarginConfigToken();
   const { parseTokenValue, getAssetDetails, getAssetById, calculateLeverage } = useMarginAccount();
   const theme = useTheme();
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
@@ -194,13 +195,19 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
   }
   const { pos_id } = rowData;
   const token_c_id = rowData.data.token_c_info.token_id;
+  const token_d_id = rowData.data.token_d_info.token_id;
+  const token_p_id = rowData.data.token_p_id;
   const amount = `${inputValue}`;
   const getAssetsdata = useAppSelector(getAssets);
   const assets = getAssetsdata.data;
   const handleAddCollateralClick = async () => {
     try {
       setIsAddCollateralLoading(true);
-      const res = await increaseCollateral({ pos_id, token_c_id, amount, assets });
+      const isMeme = checkIfMeme({
+        debt_id: token_d_id,
+        pos_id: token_p_id,
+      });
+      const res = await increaseCollateral({ pos_id, token_c_id, amount, assets, isMeme });
       const collateralInfo = {
         positionType: positionType.label,
         icon: iconC,
@@ -229,7 +236,11 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
   const handleDeleteCollateralClick = async () => {
     try {
       setIsDeleteCollateralLoading(true);
-      const res = await decreaseCollateral({ pos_id, token_c_id, amount, assets });
+      const isMeme = checkIfMeme({
+        debt_id: token_d_id,
+        pos_id: token_p_id,
+      });
+      const res = await decreaseCollateral({ pos_id, token_c_id, amount, assets, isMeme });
       const collateralInfo = {
         positionType: positionType.label,
         icon: iconC,
