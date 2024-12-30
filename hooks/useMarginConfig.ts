@@ -10,8 +10,6 @@ export function useMarginConfigToken() {
   const marginConfigTokensMEME = useAppSelector(getMarginConfigMEME);
   const combinedAssetsData = { ...assets.data, ...assetsMEME.data };
 
-  // Define a more specific type for category assets if possible
-
   const categoryAssets1: Asset[] = [];
   const categoryAssets2: Asset[] = [];
   const categoryAssets1MEME: Asset[] = [];
