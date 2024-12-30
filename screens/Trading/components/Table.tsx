@@ -1095,8 +1095,13 @@ const PositionRow = ({
         <p className={`text-primary ${pnl < 0 ? "text-red-150" : "text-green-150"}`}>
           {pnl > 0 ? `+` : `-`}${beautifyPrice(Math.abs(pnl))}
           <span className="text-gray-400 text-xs ml-0.5">
-            ({amplitude > 0 ? `+` : `-`}
-            {toInternationalCurrencySystem_number(Math.abs(amplitude))}%)
+            (
+            {amplitude !== null && amplitude !== 0
+              ? `${amplitude > 0 ? `+` : `-`}${toInternationalCurrencySystem_number(
+                  Math.abs(amplitude),
+                )}%`
+              : `-`}
+            )
           </span>
         </p>
       </td>
@@ -1323,8 +1328,13 @@ const PositionMobileRow = ({
           <p className={`text-primary ml-1 ${pnl < 0 ? "text-red-150" : "text-green-150"}`}>
             {pnl > 0 ? `+` : `-`}${beautifyPrice(Math.abs(pnl))}
             <span className="text-gray-400 text-xs ml-0.5">
-              ({amplitude > 0 ? `+` : `-`}
-              {toInternationalCurrencySystem_number(Math.abs(amplitude))}%)
+              (
+              {amplitude !== null && amplitude !== 0
+                ? `${amplitude > 0 ? `+` : `-`}${toInternationalCurrencySystem_number(
+                    Math.abs(amplitude),
+                  )}%`
+                : `-`}
+              )
             </span>
             {/* <span className="text-gray-400 text-xs ml-0.5">(-%)</span> */}
           </p>
