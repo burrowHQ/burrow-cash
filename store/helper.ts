@@ -47,12 +47,17 @@ export const rateToApr = (rate: string): string => {
   return apr.toFixed(2);
 };
 
-export const getPrices = async (): Promise<IPrices | undefined> => {
-  const { view, logicContract } = await getBurrow();
-  const config = (await view(
-    logicContract,
-    ViewMethodsLogic[ViewMethodsLogic.get_config],
-  )) as IConfig;
+export const getPrices = async ({ isMeme }: { isMeme?: boolean }): Promise<IPrices | undefined> => {
+  const { view, logicContract, logicMEMEContract } = await getBurrow();
+  let config;
+  if (isMeme) {
+    config = (await view(
+      logicMEMEContract,
+      ViewMethodsLogic[ViewMethodsLogic.get_config],
+    )) as IConfig;
+  } else {
+    config = (await view(logicContract, ViewMethodsLogic[ViewMethodsLogic.get_config])) as IConfig;
+  }
   const { enable_pyth_oracle } = config;
   if (enable_pyth_oracle) {
     const pythResponse = await getPythPrices();

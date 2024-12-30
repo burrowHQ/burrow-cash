@@ -56,7 +56,7 @@ const getAssets = async () => {
   const tokenIds = Array.from(new Set(token_ids_from_regular.concat(token_ids_from_lp)));
   const metadata = await getAllMetadata(tokenIds);
   const metadataMap = metadata.reduce((acc, cur) => ({ ...acc, [cur.token_id]: cur }), {});
-  const priceResponse = await getPrices();
+  const priceResponse = await getPrices({});
   const priceMap = tokenIds.reduce(
     (acc, cur) => ({ ...acc, [cur]: getPrice(cur, priceResponse, metadataMap[cur]) }),
     {},
