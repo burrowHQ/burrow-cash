@@ -1,6 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
+import { useAppDispatch } from "../../../redux/hooks";
+import { setReduxRangeMount } from "../../../redux/marginTrading";
 
 interface RangeSliderProps {
   defaultValue: number;
@@ -9,6 +11,7 @@ interface RangeSliderProps {
 }
 
 const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRangeMount }) => {
+  const dispatch = useAppDispatch();
   //
   const generateArithmeticSequence = (value: number) => {
     const increment = (value - 1) / 4;
@@ -23,16 +26,20 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRang
   //
   const { marginConfigTokens } = useMarginConfigToken();
 
-  const allowedValues = generateArithmeticSequence(marginConfigTokens["max_leverage_rate"]);
   const [value, setValue] = useState(defaultValue);
-  const [splitList, setSplitList] = useState(allowedValues);
+  const [splitList, setSplitList] = useState([0]);
   const [matchValue, setMatchValue] = useState(value);
   const valueRef = useRef<HTMLInputElement>(null);
   const [selectedItem, setSelectedItem] = useState(defaultValue);
 
   useEffect(() => {
-    if (valueRef.current && allowedValues.length > 0) {
-      const nearestValue = allowedValues.reduce((prev, curr) => {
+    const newAllowedValues = generateArithmeticSequence(marginConfigTokens["max_leverage_rate"]);
+    setSplitList(newAllowedValues);
+  }, [marginConfigTokens["max_leverage_rate"]]);
+
+  useEffect(() => {
+    if (valueRef.current && splitList.length > 0) {
+      const nearestValue = splitList.reduce((prev, curr) => {
         return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
       });
       const percentage =
@@ -40,27 +47,23 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRang
       valueRef.current.style.backgroundSize = `${percentage}% 100%`;
       setMatchValue(nearestValue);
     }
-  }, [value, splitList, allowedValues]);
+  }, [value, JSON.stringify(splitList || [])]);
 
   // add center
-  useEffect(() => {
-    if (defaultValue) {
-      setValue(defaultValue);
-      setRangeMount(defaultValue);
-    } else {
-      setValue(splitList[2]);
-      setRangeMount(splitList[2]);
-    }
-  }, [defaultValue]);
+  // useEffect(() => {
+  //   setValue(splitList[2]);
+  //   setRangeMount(splitList[2]);
+  // }, [JSON.stringify(splitList || [])]);
 
   function changeValue(v: string | number) {
     const numValue = Number(v);
-    const nearestValue = allowedValues.reduce((prev, curr) => {
+    const nearestValue = splitList.reduce((prev, curr) => {
       return Math.abs(curr - numValue) < Math.abs(prev - numValue) ? curr : prev;
     });
     setValue(nearestValue);
     setSelectedItem(nearestValue);
     setRangeMount(nearestValue);
+    dispatch(setReduxRangeMount(nearestValue));
   }
   const actionShowRedColor = action === "Long";
   return (

@@ -63,11 +63,16 @@ const Trading = () => {
 
   useEffect(() => {
     if (id) {
-      setCurrentTokenCate1(combinedAssetsData[id]);
-      dispatch(setCategoryAssets1(combinedAssetsData[id]));
-      dispatch(setCategoryAssets2(currentTokenCate2 || categoryAssets2[0]));
+      setCurrentTokenCate1(assets.data[id]);
+      dispatch(setCategoryAssets1(assets.data[id]));
     }
   }, [id, currentTokenCate1]);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(setCategoryAssets2(currentTokenCate2 || categoryAssets2[0]));
+    }
+  }, [id, categoryAssets2[0]]);
 
   useMemo(() => {
     setLongAndShortPosition([
