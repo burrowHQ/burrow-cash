@@ -406,7 +406,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
   };
 
   function getAssetPrice(categoryId) {
-    return categoryId ? combinedAssetsData[categoryId["token_id"]].price?.usd : 0;
+    return categoryId ? combinedAssetsData[categoryId["token_id"]]?.price?.usd : 0;
   }
 
   function updateOutput(tab: string, inputUsdCharcate: number) {
