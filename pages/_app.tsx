@@ -30,7 +30,7 @@ import { ToastMessage } from "../components/ToastMessage";
 import RpcList from "../components/Rpc";
 import PubTestModal from "../components/PubTestModal";
 import { getAccountId, getAccountPortfolio } from "../redux/accountSelectors";
-import { getAssets } from "../redux/assetsSelectors";
+import { getAssets, getAssetsMEME } from "../redux/assetsSelectors";
 import { getConfig } from "../redux/appSelectors";
 import { fetchAllPools } from "../redux/poolSlice";
 import "./slip.css";
@@ -117,6 +117,7 @@ function Upgrade({ Component, pageProps }) {
   const accountId = useAppSelector(getAccountId);
   const portfolio = useAppSelector(getAccountPortfolio);
   const assets = useAppSelector(getAssets);
+  const assetsMEME = useAppSelector(getAssetsMEME);
   const config = useAppSelector(getConfig);
   const hasValidAccountSupplied =
     accountSupplied.length > 0 &&
@@ -128,6 +129,7 @@ function Upgrade({ Component, pageProps }) {
     if (
       !portfolio.positions ||
       !Object.keys(assets?.data || {}).length ||
+      !Object.keys(assetsMEME?.data || {}).length ||
       !config?.booster_token_id
     ) {
       setUpgrading(true);
@@ -139,6 +141,7 @@ function Upgrade({ Component, pageProps }) {
     accountId,
     portfolio.positions,
     Object.keys(assets?.data || {}).length,
+    Object.keys(assetsMEME?.data || {}).length,
     JSON.stringify(config || {}),
   ]);
   async function fetch() {
