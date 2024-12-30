@@ -1023,8 +1023,13 @@ const PositionRow = ({
   const uahpi_at_open: any = shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
   const holdingFee =
     +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi * 1 - uahpi_at_open * 1);
-  const profitOrLoss = entryPrice !== null ? (indexPrice - entryPrice) * size : 0;
-  const pnl = profitOrLoss - holdingFee;
+  const profitOrLoss =
+    entryPrice !== null && entryPrice !== 0
+      ? positionType.label === "Long"
+        ? (indexPrice - entryPrice) * size
+        : (entryPrice - indexPrice) * size
+      : 0;
+  const pnl = entryPrice !== null && entryPrice !== 0 ? profitOrLoss - holdingFee : 0;
   let amplitude = 0;
   if (entryPrice !== null && entryPrice !== 0) {
     if (positionType.label === "Long") {
@@ -1039,6 +1044,7 @@ const PositionRow = ({
     marginConfigTokens,
     entryPrice,
   };
+  console.log(pnl);
   return (
     <tr className="text-base hover:bg-dark-100 font-normal">
       <td className="py-5 pl-5">
@@ -1092,8 +1098,9 @@ const PositionRow = ({
         ${toInternationalCurrencySystem_number(LiqPrice)}
       </td>
       <td>
-        <p className={`text-primary ${pnl < 0 ? "text-red-150" : "text-green-150"}`}>
-          {pnl > 0 ? `+` : `-`}${beautifyPrice(Math.abs(pnl))}
+        <p className={`${pnl > 0 ? "text-green-150" : pnl < 0 ? "text-red-150" : "text-gray-400"}`}>
+          {pnl === 0 ? "" : `${pnl > 0 ? `+$` : `-$`}`}
+          {beautifyPrice(Math.abs(pnl))}
           <span className="text-gray-400 text-xs ml-0.5">
             (
             {amplitude !== null && amplitude !== 0
@@ -1199,14 +1206,6 @@ const PositionMobileRow = ({
 
   const netValue = parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
   const collateral = parseTokenValue(item.token_c_info.balance, decimalsC);
-  // const entryPrice =
-  //   positionType.label === "Long"
-  //     ? sizeValueLong === 0
-  //       ? 0
-  //       : (leverageD * priceD) / sizeValueLong
-  //     : sizeValueShort === 0
-  //     ? 0
-  //     : netValue / sizeValueShort;
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
   let LiqPrice = 0;
   if (leverage > 1) {
@@ -1232,8 +1231,13 @@ const PositionMobileRow = ({
   const uahpi_at_open: any = shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
   const holdingFee =
     +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi * 1 - uahpi_at_open * 1);
-  const profitOrLoss = entryPrice !== null ? (indexPrice - entryPrice) * size : 0;
-  const pnl = profitOrLoss - holdingFee;
+  const profitOrLoss =
+    entryPrice !== null && entryPrice !== 0
+      ? positionType.label === "Long"
+        ? (indexPrice - entryPrice) * size
+        : (entryPrice - indexPrice) * size
+      : 0;
+  const pnl = entryPrice !== null && entryPrice !== 0 ? profitOrLoss - holdingFee : 0;
   let amplitude = 0;
   if (entryPrice !== null && entryPrice !== 0) {
     if (positionType.label === "Long") {
@@ -1325,8 +1329,13 @@ const PositionMobileRow = ({
         </div>
         <div className="bg-dark-100 rounded-2xl flex items-center justify-center text-xs py-1 text-gray-300 mb-4">
           PNL & ROE{" "}
-          <p className={`text-primary ml-1 ${pnl < 0 ? "text-red-150" : "text-green-150"}`}>
-            {pnl > 0 ? `+` : `-`}${beautifyPrice(Math.abs(pnl))}
+          <p
+            className={`ml-1 ${
+              pnl > 0 ? "text-green-150" : pnl < 0 ? "text-red-150" : "text-gray-400"
+            }`}
+          >
+            {pnl === 0 ? "" : `${pnl > 0 ? `+$` : `-$`}`}
+            {beautifyPrice(Math.abs(pnl))}
             <span className="text-gray-400 text-xs ml-0.5">
               (
               {amplitude !== null && amplitude !== 0
