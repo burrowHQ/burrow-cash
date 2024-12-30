@@ -45,6 +45,10 @@ const Trading = () => {
   const dispatch = useAppDispatch();
   const assets = useAppSelector(getAssetsSelector);
   const assetsMEME = useAppSelector(getAssetsMEME);
+  if (Object.entries(assetsMEME.data).length === 0 && !isMainStream) {
+    router.push("/marginTrading");
+  }
+
   const combinedAssetsData = isMainStream ? assets.data : assetsMEME.data;
   const [showPopupCate1, setShowPopup1] = useState(false);
   const [showPopupCate2, setShowPopup2] = useState(false);
