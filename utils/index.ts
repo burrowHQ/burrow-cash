@@ -159,23 +159,18 @@ export const getBurrow = async ({
     ViewMethodsLogic,
     ChangeMethodsLogic,
   );
-
-  // get oracle address from
-  const config = (await view(
-    logicContract,
-    ViewMethodsLogic[ViewMethodsLogic.get_config],
-  )) as IConfig;
-
-  const configMEME = (await view(
-    logicMEMEContract,
-    ViewMethodsLogic[ViewMethodsLogic.get_config],
-  )) as IConfig;
-
-  const oracle_account_id = getConfig().ORACLE_ACCOUNT_ID;
+  const price_oracle_account_id = getConfig().PRICE_ORACLE_ACCOUNT_ID;
+  const meme_price_oracle_account_id = getConfig().MEME_PRICE_ORACLE_ACCOUNT_ID;
   const ref_exchange_id = getConfig().REF_EXCHANGE_ID;
   const oracleContract: Contract = await getContract(
     account,
-    oracle_account_id,
+    price_oracle_account_id,
+    ViewMethodsOracle,
+    ChangeMethodsOracle,
+  );
+  const memeOracleContract: Contract = await getContract(
+    account,
+    meme_price_oracle_account_id,
     ViewMethodsOracle,
     ChangeMethodsOracle,
   );
@@ -221,10 +216,9 @@ export const getBurrow = async ({
     refv1Contract,
     pythContract,
     dclContract,
+    memeOracleContract,
     view,
     call,
-    config,
-    configMEME,
   } as IBurrow;
 
   return burrow;
