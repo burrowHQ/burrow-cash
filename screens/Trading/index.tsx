@@ -45,6 +45,7 @@ const Trading = () => {
   const dispatch = useAppDispatch();
   const assets = useAppSelector(getAssetsSelector);
   const assetsMEME = useAppSelector(getAssetsMEME);
+  const isLoading = Object.keys(assetsMEME.data).length === 0 && !isMainStream;
 
   const combinedAssetsData = isMainStream ? assets.data : assetsMEME.data;
   const [showPopupCate1, setShowPopup1] = useState(false);
@@ -192,127 +193,57 @@ const Trading = () => {
   //
   return (
     <LayoutBox>
-      {/* back */}
-      <Link href="/marginTrading">
-        <div className="flex items-center text-sm text-gray-300 cursor-pointer lg:mb-8 xsm:m-2 xsm:mb-9">
-          <ComeBackIcon />
-          <p className="ml-3.5"> Margin Trading Markets</p>
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center h-screen">
+          <img src="/loading-brrr.gif" alt="" width="75px" />
+          <span className="flex items-center text-sm text-gray-300 mt-2">Loading Meme data...</span>
         </div>
-      </Link>
-      {/* main */}
-      <div className="lg:grid lg:grid-cols-6 lg:mb-4 xsm:flex xsm:flex-col xsm:w-full xsm:box-border xsm:mb-4">
-        {/* left charts */}
-        <div className="lg:col-span-4 bg-gray-800 border border-dark-50 rounded-md lg:mr-4 xsm:mx-2 xsm:mb-4 xsm:min-h-[488px]">
-          {/* for pc */}
-          <div className="flex justify-between items-center border-b border-dark-50 py-6 lg:px-5 h-[100px] xsm:hidden">
-            {/* cate1 */}
-            <div onMouseLeave={() => handleMouseLeave("1")} className="cursor-pointer relative ">
-              <div onMouseEnter={() => handleMouseEnter("1")} className="flex items-center">
-                {currentTokenCate1?.token_id == nearTokenId ? (
-                  <NearIcon />
-                ) : (
-                  <img
-                    alt=""
-                    src={currentTokenCate1?.metadata?.icon}
-                    style={{ width: "26px", height: "26px" }}
-                  />
-                )}
-                <p className="ml-2 mr-3.5 text-lg">
-                  {getSymbolById(currentTokenCate1?.token_id, currentTokenCate1?.metadata?.symbol)}
-                </p>
-                {/* <TokenArrow /> */}
-              </div>
+      ) : (
+        <>
+          {/* back */}
+          <Link href="/marginTrading">
+            <div className="flex items-center text-sm text-gray-300 cursor-pointer lg:mb-8 xsm:m-2 xsm:mb-9">
+              <ComeBackIcon />
+              <p className="ml-3.5"> Margin Trading Markets</p>
             </div>
-            {/* cate2 */}
-            <div className="text-sm">
-              <div className="flex justify-center items-center">
-                <p className="text-gray-300 mr-1.5">Price</p>
-                {/* drop down */}
+          </Link>
+          {/* main */}
+          <div className="lg:grid lg:grid-cols-6 lg:mb-4 xsm:flex xsm:flex-col xsm:w-full xsm:box-border xsm:mb-4">
+            {/* left charts */}
+            <div className="lg:col-span-4 bg-gray-800 border border-dark-50 rounded-md lg:mr-4 xsm:mx-2 xsm:mb-4 xsm:min-h-[488px]">
+              {/* for pc */}
+              <div className="flex justify-between items-center border-b border-dark-50 py-6 lg:px-5 h-[100px] xsm:hidden">
+                {/* cate1 */}
                 <div
-                  className="relative hover:bg-gray-300 hover:bg-opacity-20 py-1 px-1.5 rounded-sm cursor-pointer min-w-24"
-                  onMouseLeave={() => handleMouseLeave("2")}
+                  onMouseLeave={() => handleMouseLeave("1")}
+                  className="cursor-pointer relative "
                 >
-                  <div
-                    onMouseEnter={() => handleMouseEnter("2")}
-                    onClick={handlePopupToggle}
-                    className="flex justify-center items-center"
-                  >
-                    <p className="mr-1">
-                      {currentTokenCate2?.metadata?.symbol ||
-                        (isMainStream
-                          ? categoryAssets2[0]?.metadata.symbol
-                          : categoryAssets2MEME[0]?.metadata.symbol)}
-                    </p>
-                    <TokenArrow />
-                  </div>
-                  {showPopupCate2 && (
-                    <div
-                      onMouseEnter={() => handleMouseEnter("2")}
-                      onMouseLeave={() => handleMouseLeave("2")}
-                      className="bg-dark-250 border border-dark-500 rounded-sm absolute z-10 top-8 left-0 right-0 pt-0.5 text-gray-300 text-xs pb-1.5"
-                    >
-                      {(isMainStream ? categoryAssets2 : categoryAssets2MEME).map((item, index) => (
-                        <div
-                          key={index}
-                          className="py-1 pl-1.5 hover:bg-gray-950"
-                          onClick={() => handleTokenSelectCate2(item)}
-                        >
-                          {getSymbolById(item.token_id, item.metadata?.symbol)}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-              <span>${combinedAssetsData[id]?.price?.usd || 0}</span>
-            </div>
-            {/* total v */}
-            <div className="text-sm">
-              <p className="text-gray-300  mb-1.5">Total Volume</p>
-              <span>{formatWithCommas_usd(volumeStats.totalVolume)}</span>
-            </div>
-            {/* 24h v */}
-            <div className="text-sm">
-              <p className="text-gray-300 mb-1.5">24H Volume</p>
-              <span>{formatWithCommas_usd(volumeStats.volume24h)}</span>
-            </div>
-            {/* long short */}
-            <div className="text-sm">
-              <p className="text-gray-300 mb-1.5">Long / Short Positions</p>
-              <span>
-                ${longAndShortPosition[0] || "-"} / ${longAndShortPosition[1] || "-"}
-              </span>
-            </div>
-          </div>
-
-          {/* for mobile */}
-          <div className="flex flex-col border-b border-dark-50 p-6 lg:hidden">
-            {/* cate1 */}
-            <div className="cursor-pointer relative mb-[21px]">
-              <div className="flex">
-                <img
-                  alt=""
-                  src={currentTokenCate1?.metadata?.icon}
-                  style={{ width: "24px", height: "24px" }}
-                  className="rounded-full mr-2 mt-0.5"
-                />
-                <div className="flex flex-col">
-                  <p className="text-base text-white">
-                    {getSymbolById(
-                      currentTokenCate1?.token_id,
-                      currentTokenCate1?.metadata?.symbol,
+                  <div onMouseEnter={() => handleMouseEnter("1")} className="flex items-center">
+                    {currentTokenCate1?.token_id == nearTokenId ? (
+                      <NearIcon />
+                    ) : (
+                      <img
+                        alt=""
+                        src={currentTokenCate1?.metadata?.icon}
+                        style={{ width: "26px", height: "26px" }}
+                      />
                     )}
-                  </p>
-                  <p className="text-[#C0C4E9] text-xs">
-                    ${combinedAssetsData[id]?.price?.usd || 0}
-                  </p>
+                    <p className="ml-2 mr-3.5 text-lg">
+                      {getSymbolById(
+                        currentTokenCate1?.token_id,
+                        currentTokenCate1?.metadata?.symbol,
+                      )}
+                    </p>
+                    {/* <TokenArrow /> */}
+                  </div>
                 </div>
-
                 {/* cate2 */}
-                <div className="text-xs">
+                <div className="text-sm">
                   <div className="flex justify-center items-center">
+                    <p className="text-gray-300 mr-1.5">Price</p>
+                    {/* drop down */}
                     <div
-                      className="relative bg-gray-300 bg-opacity-20 py-[1px] rounded-sm cursor-pointer min-w-20 ml-1 mt-0.5"
+                      className="relative hover:bg-gray-300 hover:bg-opacity-20 py-1 px-1.5 rounded-sm cursor-pointer min-w-24"
                       onMouseLeave={() => handleMouseLeave("2")}
                     >
                       <div
@@ -332,7 +263,7 @@ const Trading = () => {
                         <div
                           onMouseEnter={() => handleMouseEnter("2")}
                           onMouseLeave={() => handleMouseLeave("2")}
-                          className="bg-dark-250 border border-dark-500 rounded-sm absolute z-10 top-6 left-0 right-0 pt-0.5 text-gray-300 text-xs pb-1.5"
+                          className="bg-dark-250 border border-dark-500 rounded-sm absolute z-10 top-8 left-0 right-0 pt-0.5 text-gray-300 text-xs pb-1.5"
                         >
                           {(isMainStream ? categoryAssets2 : categoryAssets2MEME).map(
                             (item, index) => (
@@ -349,59 +280,146 @@ const Trading = () => {
                       )}
                     </div>
                   </div>
+                  <span>${combinedAssetsData[id]?.price?.usd || 0}</span>
                 </div>
-                {/* <TokenArrow /> */}
+                {/* total v */}
+                <div className="text-sm">
+                  <p className="text-gray-300  mb-1.5">Total Volume</p>
+                  <span>{formatWithCommas_usd(volumeStats.totalVolume)}</span>
+                </div>
+                {/* 24h v */}
+                <div className="text-sm">
+                  <p className="text-gray-300 mb-1.5">24H Volume</p>
+                  <span>{formatWithCommas_usd(volumeStats.volume24h)}</span>
+                </div>
+                {/* long short */}
+                <div className="text-sm">
+                  <p className="text-gray-300 mb-1.5">Long / Short Positions</p>
+                  <span>
+                    ${longAndShortPosition[0] || "-"} / ${longAndShortPosition[1] || "-"}
+                  </span>
+                </div>
+              </div>
+
+              {/* for mobile */}
+              <div className="flex flex-col border-b border-dark-50 p-6 lg:hidden">
+                {/* cate1 */}
+                <div className="cursor-pointer relative mb-[21px]">
+                  <div className="flex">
+                    <img
+                      alt=""
+                      src={currentTokenCate1?.metadata?.icon}
+                      style={{ width: "24px", height: "24px" }}
+                      className="rounded-full mr-2 mt-0.5"
+                    />
+                    <div className="flex flex-col">
+                      <p className="text-base text-white">
+                        {getSymbolById(
+                          currentTokenCate1?.token_id,
+                          currentTokenCate1?.metadata?.symbol,
+                        )}
+                      </p>
+                      <p className="text-[#C0C4E9] text-xs">
+                        ${combinedAssetsData[id]?.price?.usd || 0}
+                      </p>
+                    </div>
+
+                    {/* cate2 */}
+                    <div className="text-xs">
+                      <div className="flex justify-center items-center">
+                        <div
+                          className="relative bg-gray-300 bg-opacity-20 py-[1px] rounded-sm cursor-pointer min-w-20 ml-1 mt-0.5"
+                          onMouseLeave={() => handleMouseLeave("2")}
+                        >
+                          <div
+                            onMouseEnter={() => handleMouseEnter("2")}
+                            onClick={handlePopupToggle}
+                            className="flex justify-center items-center"
+                          >
+                            <p className="mr-1">
+                              {currentTokenCate2?.metadata?.symbol ||
+                                (isMainStream
+                                  ? categoryAssets2[0]?.metadata.symbol
+                                  : categoryAssets2MEME[0]?.metadata.symbol)}
+                            </p>
+                            <TokenArrow />
+                          </div>
+                          {showPopupCate2 && (
+                            <div
+                              onMouseEnter={() => handleMouseEnter("2")}
+                              onMouseLeave={() => handleMouseLeave("2")}
+                              className="bg-dark-250 border border-dark-500 rounded-sm absolute z-10 top-6 left-0 right-0 pt-0.5 text-gray-300 text-xs pb-1.5"
+                            >
+                              {(isMainStream ? categoryAssets2 : categoryAssets2MEME).map(
+                                (item, index) => (
+                                  <div
+                                    key={index}
+                                    className="py-1 pl-1.5 hover:bg-gray-950"
+                                    onClick={() => handleTokenSelectCate2(item)}
+                                  >
+                                    {getSymbolById(item.token_id, item.metadata?.symbol)}
+                                  </div>
+                                ),
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    {/* <TokenArrow /> */}
+                  </div>
+                </div>
+
+                {/* total v */}
+                <div className="text-sm flex items-center justify-between">
+                  <p className="text-gray-300  mb-1.5">Total Volume</p>
+                  <span>{formatWithCommas_usd(volumeStats.totalVolume)}</span>
+                </div>
+                {/* 24h v */}
+                <div className="text-sm flex items-center justify-between my-[16px]">
+                  <p className="text-gray-300 mb-1.5">24H Volume</p>
+                  <span>{formatWithCommas_usd(volumeStats.volume24h)}</span>
+                </div>
+                {/* long short */}
+                <div className="text-sm flex items-center justify-between">
+                  <p className="text-gray-300 mb-1.5">Long / Short Positions</p>
+                  <span>
+                    ${longAndShortPosition[0] || "-"} / ${longAndShortPosition[1] || "-"}
+                  </span>
+                </div>
+              </div>
+
+              <div style={{ height: isMobile ? "488px" : "calc(100% - 100px)" }}>
+                <TradingViewChart
+                  baseSymbol={standardizeAsset(currentTokenCate1?.metadata)?.symbol}
+                  quoteSymbol={standardizeAsset(currentTokenCate2?.metadata)?.symbol}
+                />
               </div>
             </div>
-
-            {/* total v */}
-            <div className="text-sm flex items-center justify-between">
-              <p className="text-gray-300  mb-1.5">Total Volume</p>
-              <span>{formatWithCommas_usd(volumeStats.totalVolume)}</span>
-            </div>
-            {/* 24h v */}
-            <div className="text-sm flex items-center justify-between my-[16px]">
-              <p className="text-gray-300 mb-1.5">24H Volume</p>
-              <span>{formatWithCommas_usd(volumeStats.volume24h)}</span>
-            </div>
-            {/* long short */}
-            <div className="text-sm flex items-center justify-between">
-              <p className="text-gray-300 mb-1.5">Long / Short Positions</p>
-              <span>
-                ${longAndShortPosition[0] || "-"} / ${longAndShortPosition[1] || "-"}
-              </span>
+            {/* right tradingopts */}
+            <div className="lg:col-span-2 bg-gray-800 border border-dark-50 rounded-md xsm:box-border xsm:mx-2 xsm:hidden">
+              {id && <TradingOperate id={id} />}
             </div>
           </div>
-
-          <div style={{ height: isMobile ? "488px" : "calc(100% - 100px)" }}>
-            <TradingViewChart
-              baseSymbol={standardizeAsset(currentTokenCate1?.metadata)?.symbol}
-              quoteSymbol={standardizeAsset(currentTokenCate2?.metadata)?.symbol}
+          <div className="lg:hidden fixed bottom-0 left-0 right-0 w-full h-[116px] rounded-t-[8px] px-[26px] flex flex-col justify-center items-center bg-[#383A56] z-[12]">
+            <div
+              className="w-full flex items-center justify-center h-[46px] bg-primary rounded-[6px] text-[#14162B] text-base font-bold"
+              onClick={() => {
+                setOpen(true);
+              }}
+            >
+              Long/Short
+            </div>
+          </div>
+          {accountId && (
+            <TradingTable
+              positionsList={isMainStream ? marginAccountList : marginAccountListMEME}
+              filterTitle={filterTitle}
             />
-          </div>
-        </div>
-        {/* right tradingopts */}
-        <div className="lg:col-span-2 bg-gray-800 border border-dark-50 rounded-md xsm:box-border xsm:mx-2 xsm:hidden">
-          {id && <TradingOperate id={id} />}
-        </div>
-      </div>
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 w-full h-[116px] rounded-t-[8px] px-[26px] flex flex-col justify-center items-center bg-[#383A56] z-[12]">
-        <div
-          className="w-full flex items-center justify-center h-[46px] bg-primary rounded-[6px] text-[#14162B] text-base font-bold"
-          onClick={() => {
-            setOpen(true);
-          }}
-        >
-          Long/Short
-        </div>
-      </div>
-      {accountId && (
-        <TradingTable
-          positionsList={isMainStream ? marginAccountList : marginAccountListMEME}
-          filterTitle={filterTitle}
-        />
+          )}
+          {id && <TradingOperateMobile open={open} onClose={() => setOpen(false)} id={id} />}
+        </>
       )}
-      {id && <TradingOperateMobile open={open} onClose={() => setOpen(false)} id={id} />}
     </LayoutBox>
   );
 };
