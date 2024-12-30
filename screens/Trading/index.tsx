@@ -281,7 +281,7 @@ const Trading = () => {
                       )}
                     </div>
                   </div>
-                  <span>${combinedAssetsData[id]?.price?.usd || 0}</span>
+                  <span>${beautifyPrice(combinedAssetsData[id]?.price?.usd || 0)}</span>
                 </div>
                 {/* total v */}
                 <div className="text-sm">
@@ -321,7 +321,7 @@ const Trading = () => {
                         )}
                       </p>
                       <p className="text-[#C0C4E9] text-xs">
-                        ${combinedAssetsData[id]?.price?.usd || 0}
+                        ${beautifyPrice(combinedAssetsData[id]?.price?.usd || 0)}
                       </p>
                     </div>
 
