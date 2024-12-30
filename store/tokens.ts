@@ -163,12 +163,17 @@ export const prepareAndExecuteTokenTransactions = async (
   await prepareAndExecuteTransactions(transactions);
 };
 
-export const prepareAndExecuteTransactions = async (operations: Transaction[] = []) => {
-  const { account, logicContract, view } = await getBurrow();
+export const prepareAndExecuteTransactions = async (
+  operations: Transaction[] = [],
+  isMeme?: boolean,
+) => {
+  const { account, logicContract, view, logicMEMEContract } = await getBurrow();
   const transactions: Transaction[] = [];
 
+  // check if account is registered in burrow cash
+  const burrowContract = isMeme ? logicMEMEContract : logicContract;
   const storageDepositTransaction = (deposit: number) => ({
-    receiverId: logicContract.contractId,
+    receiverId: burrowContract.contractId,
     functionCalls: [
       {
         methodName: ChangeMethodsLogic[ChangeMethodsLogic.storage_deposit],
@@ -176,13 +181,11 @@ export const prepareAndExecuteTransactions = async (operations: Transaction[] = 
       },
     ],
   });
-
-  // check if account is registered in burrow cash
-  if (!(await isRegistered(account.accountId, logicContract))) {
+  if (!(await isRegistered(account.accountId, burrowContract))) {
     transactions.push(storageDepositTransaction(NEAR_STORAGE_DEPOSIT));
   } else {
     const balance = (await view(
-      logicContract,
+      burrowContract,
       ViewMethodsLogic[ViewMethodsLogic.storage_balance_of],
       {
         account_id: account.accountId,

@@ -80,6 +80,7 @@ module.exports = {
     "prefer-template": "off",
     "no-restricted-syntax": "off",
     "prefer-destructuring": "off",
+    "default-param-last": "off",
   },
   settings: {
     react: {
