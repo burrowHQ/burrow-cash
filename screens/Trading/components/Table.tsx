@@ -50,7 +50,6 @@ const TradingTable = ({
   const [positionHistory, setPositionHistory] = useState<any[]>([]);
   const [nextPageToken, setNextPageToken] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [totalPLN, setTotalPLN] = useState(0);
   const accountId = useAccountId();
   const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById, calculateLeverage } =
     useMarginAccount();
@@ -80,6 +79,13 @@ const TradingTable = ({
     setSelectedRowData(rowData);
     setIsChangeCollateralMobileOpen(true);
   };
+
+  useEffect(() => {
+    dispatch(setAccountDetailsOpen(false));
+    return () => {
+      dispatch(setAccountDetailsOpen(false));
+    };
+  }, [dispatch]);
 
   // fix can not change tab after click claim
   useEffect(() => {
@@ -121,7 +127,7 @@ const TradingTable = ({
     if (selectedTab === "history" || isSelectedMobileTab === "history") {
       fetchPositionHistory();
     }
-  }, [selectedTab]);
+  }, [selectedTab, isSelectedMobileTab]);
   const calculateTotalSizeValues = () => {
     let collateralTotal = 0;
     Object.values(marginAccountList).forEach((item) => {
@@ -970,7 +976,7 @@ const PositionRow = ({
       }
     };
     fetchEntryPrice();
-  }, [itemKey]);
+  }, [item]);
   const assetD = getAssetById(item.token_d_info.token_id);
   const assetC = getAssetById(item.token_c_info.token_id);
   const assetP = getAssetById(item.token_p_id);
@@ -1087,9 +1093,11 @@ const PositionRow = ({
       </td>
       <td>
         <p className={`text-primary ${pnl < 0 ? "text-red-150" : "text-green-150"}`}>
-          {pnl > 0 ? `+` : `-`}${beautifyPrice(pnl)}
-          {/* <span className="text-gray-400 text-xs ml-0.5">({beautifyPrice(amplitude)}%)</span> */}
-          <span className="text-gray-400 text-xs ml-0.5">(-%)</span>
+          {pnl > 0 ? `+` : `-`}${beautifyPrice(Math.abs(pnl))}
+          <span className="text-gray-400 text-xs ml-0.5">
+            ({amplitude > 0 ? `+` : `-`}
+            {toInternationalCurrencySystem_number(Math.abs(amplitude))}%)
+          </span>
         </p>
       </td>
       <td>
@@ -1158,7 +1166,7 @@ const PositionMobileRow = ({
       }
     };
     fetchEntryPrice();
-  }, [itemKey]);
+  }, [item]);
   const assetD = getAssetById(item.token_d_info.token_id);
   const assetC = getAssetById(item.token_c_info.token_id);
   const assetP = getAssetById(item.token_p_id);
@@ -1312,10 +1320,13 @@ const PositionMobileRow = ({
         </div>
         <div className="bg-dark-100 rounded-2xl flex items-center justify-center text-xs py-1 text-gray-300 mb-4">
           PNL & ROE{" "}
-          <p className={`text-primary ${pnl < 0 ? "text-red-150" : "text-green-150"}`}>
-            {pnl > 0 ? `+` : `-`}${beautifyPrice(pnl)}
-            {/* <span className="text-gray-400 text-xs ml-0.5">({beautifyPrice(amplitude)}%)</span> */}
-            <span className="text-gray-400 text-xs ml-0.5">(-%)</span>
+          <p className={`text-primary ml-1 ${pnl < 0 ? "text-red-150" : "text-green-150"}`}>
+            {pnl > 0 ? `+` : `-`}${beautifyPrice(Math.abs(pnl))}
+            <span className="text-gray-400 text-xs ml-0.5">
+              ({amplitude > 0 ? `+` : `-`}
+              {toInternationalCurrencySystem_number(Math.abs(amplitude))}%)
+            </span>
+            {/* <span className="text-gray-400 text-xs ml-0.5">(-%)</span> */}
           </p>
         </div>
         <div
