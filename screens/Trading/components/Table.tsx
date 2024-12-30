@@ -400,7 +400,7 @@ const TradingTable = ({
                         assetD.token_id,
                         assetD.metadata?.symbol,
                       )}`;
-                    if (!isFilter) {
+                    if (filterTitle && !isFilter) {
                       return null;
                     }
                     return (
