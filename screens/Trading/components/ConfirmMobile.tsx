@@ -57,6 +57,9 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
   const isMainStream = filteredTokenTypeMap.mainStream.includes(
     confirmInfo.longOutputName?.token_id,
   );
+  const isMemeStream = filteredTokenTypeMap.memeStream.includes(
+    confirmInfo.longOutputName?.token_id,
+  );
   const { marginConfigTokens, marginConfigTokensMEME, filterMarginConfigList } =
     useMarginConfigToken();
   const { max_slippage_rate, min_safety_buffer } = isMainStream
@@ -76,7 +79,6 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
   const decimalsD = +assetD.config.extra_decimals + +assetD.metadata.decimals;
   const decimalsP = +assetP.config.extra_decimals + +assetP.metadata.decimals;
   const decimalsC = action === "Long" ? decimalsD : decimalsP;
-
   const cateSymbol = getSymbolById(
     ReduxcategoryAssets1?.token_id,
     ReduxcategoryAssets1?.metadata?.symbol,
@@ -108,7 +110,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
     ),
     swap_indication: confirmInfo.estimateData.swap_indication,
     assets: confirmInfo.assets.data,
-    isMeme: isMainStream,
+    isMeme: isMemeStream,
   };
 
   const confirmOpenPosition = async () => {

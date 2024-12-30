@@ -63,6 +63,9 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   const isMainStream = filteredTokenTypeMap.mainStream.includes(
     positionType.label === "Long" ? item.token_p_id : item.token_d_info.token_id,
   );
+  const isMemeStream = filteredTokenTypeMap.memeStream.includes(
+    positionType.label === "Long" ? item.token_p_id : item.token_d_info.token_id,
+  );
   const theme = useTheme();
   const intervalRef = useRef<ReturnType<typeof setInterval>>();
   const assets = useAppSelector(isMainStream ? getAssets : getAssetsMEME);
@@ -185,7 +188,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
         token_p_id: item.token_p_id,
         token_d_id: item.token_d_info.token_id,
         token_p_amount: expandToken(tokenInAmount || "0", assetP.config.extra_decimals, 0),
-        isMeme: isMainStream,
+        isMeme: isMemeStream,
       });
 
       onClose();
