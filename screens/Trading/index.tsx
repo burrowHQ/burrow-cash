@@ -67,12 +67,13 @@ const Trading = () => {
   const extra_decimals = config?.extra_decimals || 0;
 
   let timer;
+
   useEffect(() => {
-    if (id) {
+    if (id || !isLoading) {
       setCurrentTokenCate1(combinedAssetsData[id]);
       dispatch(setCategoryAssets1(combinedAssetsData[id]));
     }
-  }, [id, currentTokenCate1]);
+  }, [id, currentTokenCate1, isLoading]);
 
   useEffect(() => {
     if (id) {
