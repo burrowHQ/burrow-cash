@@ -36,10 +36,11 @@ const MyMarginTradingPage = () => {
     const pnlArray: number[] = [];
     await Promise.all(
       Object.entries(totalMarginAccountList).map(async ([itemKey, item]) => {
+        console.log(item, "item");
         const positionType = getPositionType(item.token_d_info.token_id).label;
-        const assetD = getAssetById(item.token_d_info.token_id);
-        const assetC = getAssetById(item.token_c_info.token_id);
-        const assetP = getAssetById(item.token_p_id);
+        const assetD = getAssetById(item.token_d_info.token_id, item);
+        const assetC = getAssetById(item.token_c_info.token_id, item);
+        const assetP = getAssetById(item.token_p_id, item);
         const { price: priceD, symbol: symbolD, decimals: decimalsD } = getAssetDetails(assetD);
         const { price: priceC, symbol: symbolC, decimals: decimalsC } = getAssetDetails(assetC);
         const { price: priceP, symbol: symbolP, decimals: decimalsP } = getAssetDetails(assetP);
@@ -152,7 +153,7 @@ const MyMarginTradingPage = () => {
                       const mergedCollateral = Object.values(
                         totalMarginAccountList,
                       ).reduce<CollateralAccumulator>((acc, item) => {
-                        const assetC = getAssetById(item.token_c_info.token_id);
+                        const assetC = getAssetById(item.token_c_info.token_id, item);
                         const { decimals: decimalsC, price: priceC } = getAssetDetails(assetC);
                         const tokenId = item.token_c_info.token_id;
 
@@ -242,7 +243,7 @@ const MyMarginTradingPage = () => {
                       const mergedCollateral = Object.values(
                         totalMarginAccountList,
                       ).reduce<CollateralAccumulator>((acc, item) => {
-                        const assetC = getAssetById(item.token_c_info.token_id);
+                        const assetC = getAssetById(item.token_c_info.token_id, item);
                         const { decimals: decimalsC, price: priceC } = getAssetDetails(assetC);
                         const tokenId = item.token_c_info.token_id;
 

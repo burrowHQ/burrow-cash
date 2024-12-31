@@ -27,6 +27,7 @@ import { shrinkToken } from "../../../store/helper";
 import { getAssets } from "../../../redux/assetsSelectors";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
+import { checkIfMeme } from "../../../utils/margin";
 
 const TradingTable = ({
   positionsList,
@@ -51,8 +52,14 @@ const TradingTable = ({
   const [nextPageToken, setNextPageToken] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const accountId = useAccountId();
-  const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById, calculateLeverage } =
-    useMarginAccount();
+  const {
+    marginAccountList,
+    parseTokenValue,
+    getAssetDetails,
+    getAssetById,
+    calculateLeverage,
+    getAssetByIdMEME,
+  } = useMarginAccount();
   const { getPositionType, marginConfigTokens } = useMarginConfigToken();
   const accountSupplied = useAppSelector(getMarginAccountSupplied);
   const [isLoadingWithdraw, setIsLoadingWithdraw] = useState(false);
@@ -131,7 +138,7 @@ const TradingTable = ({
   const calculateTotalSizeValues = () => {
     let collateralTotal = 0;
     Object.values(marginAccountList).forEach((item) => {
-      const assetC = getAssetById(item.token_c_info.token_id);
+      const assetC = getAssetById(item.token_c_info.token_id, item);
       const { price: priceC, symbol: symbolC, decimals: decimalsC } = getAssetDetails(assetC);
       const netValue = parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
       collateralTotal += netValue;
@@ -141,10 +148,12 @@ const TradingTable = ({
   useEffect(() => {
     calculateTotalSizeValues();
   }, [marginAccountList]);
+
   const filteredAccountSupplied = accountSupplied.filter((token) => {
     const assetDetails = getAssetById(token.token_id);
     return token.balance.toString().length >= assetDetails.config.extra_decimals;
   });
+
   const handleWithdrawAllClick = async () => {
     setIsLoadingWithdraw(true);
     const accountSuppliedIds = filteredAccountSupplied.map((asset) => asset.token_id);
@@ -183,9 +192,9 @@ const TradingTable = ({
     // if filterTitle
     const filteredArray = filterTitle
       ? positionsArray.filter((item) => {
-          const assetD = getAssetById(item.token_d_info.token_id);
-          const assetC = getAssetById(item.token_c_info.token_id);
-          const assetP = getAssetById(item.token_p_id);
+          const assetD = getAssetById(item.token_d_info.token_id, item);
+          const assetC = getAssetById(item.token_c_info.token_id, item);
+          const assetP = getAssetById(item.token_p_id, item);
           const { symbol: symbolC } = getAssetDetails(assetC);
           const { symbol: symbolP } = getAssetDetails(assetP);
           const { symbol: symbolD } = getAssetDetails(assetD);
@@ -755,8 +764,16 @@ const TradingTable = ({
         <div className={isSelectedMobileTab === "history" ? "" : "hidden"}>
           {positionHistory && positionHistory.length > 0 ? (
             positionHistory.map((record, index) => {
-              const assetD = getAssetById(record.token_d);
-              const assetP = getAssetById(record.token_p);
+              const ifMeme = checkIfMeme({
+                debt_id: record.token_d,
+                pos_id: record.token_p,
+              });
+              const assetD = !ifMeme
+                ? getAssetById(record.token_d)
+                : getAssetByIdMEME(record.token_d);
+              const assetP = !ifMeme
+                ? getAssetById(record.token_p)
+                : getAssetByIdMEME(record.token_p);
               const isFilter = [
                 `${getSymbolById(assetP.token_id, assetP.metadata?.symbol)}/${getSymbolById(
                   assetD.token_id,
@@ -1020,9 +1037,9 @@ const PositionRow = ({
     };
     fetchEntryPrice();
   }, [itemKey, item, index]);
-  const assetD = getAssetById(item.token_d_info.token_id);
-  const assetC = getAssetById(item.token_c_info.token_id);
-  const assetP = getAssetById(item.token_p_id);
+  const assetD = getAssetById(item.token_d_info.token_id, item);
+  const assetC = getAssetById(item.token_c_info.token_id, item);
+  const assetP = getAssetById(item.token_p_id, item);
 
   const { price: priceD, symbol: symbolD, decimals: decimalsD } = getAssetDetails(assetD);
   const { price: priceC, symbol: symbolC, decimals: decimalsC } = getAssetDetails(assetC);
@@ -1219,9 +1236,9 @@ const PositionMobileRow = ({
     };
     fetchEntryPrice();
   }, [itemKey, item, index]);
-  const assetD = getAssetById(item.token_d_info.token_id);
-  const assetC = getAssetById(item.token_c_info.token_id);
-  const assetP = getAssetById(item.token_p_id);
+  const assetD = getAssetById(item.token_d_info.token_id, item);
+  const assetC = getAssetById(item.token_c_info.token_id, item);
+  const assetP = getAssetById(item.token_p_id, item);
 
   const { price: priceD, symbol: symbolD, decimals: decimalsD } = getAssetDetails(assetD);
   const { price: priceC, symbol: symbolC, decimals: decimalsC } = getAssetDetails(assetC);

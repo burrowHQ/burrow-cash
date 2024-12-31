@@ -300,7 +300,9 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
   // update liq price for short
   useEffect(() => {
     if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
-      const assetC = getAssetById(ReduxcategoryAssets2?.token_id);
+      const assetC = isMainStream
+        ? getAssetById(ReduxcategoryAssets2?.token_id)
+        : getAssetByIdMEME(ReduxcategoryAssets2?.token_id);
       let liqPriceX = 0;
       if (rangeMount > 1) {
         const safetyBufferFactor = 1 - marginConfigTokens.min_safety_buffer / 10000;

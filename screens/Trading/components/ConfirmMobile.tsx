@@ -66,14 +66,29 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
     ? marginConfigTokens
     : marginConfigTokensMEME;
 
-  const { getAssetDetails, getAssetById } = useMarginAccount();
-
-  const assetP = getAssetById(
-    action === "Long" ? confirmInfo.longOutputName?.token_id : confirmInfo.longInputName?.token_id,
-  );
-  const assetD = getAssetById(
-    action === "Long" ? confirmInfo.longInputName?.token_id : confirmInfo.longOutputName?.token_id,
-  );
+  const { getAssetDetails, getAssetById, getAssetByIdMEME } = useMarginAccount();
+  const assetP = isMainStream
+    ? getAssetById(
+        action === "Long"
+          ? confirmInfo.longOutputName?.token_id
+          : confirmInfo.longInputName?.token_id,
+      )
+    : getAssetByIdMEME(
+        action === "Long"
+          ? confirmInfo.longOutputName?.token_id
+          : confirmInfo.longInputName?.token_id,
+      );
+  const assetD = isMainStream
+    ? getAssetById(
+        action === "Long"
+          ? confirmInfo.longInputName?.token_id
+          : confirmInfo.longOutputName?.token_id,
+      )
+    : getAssetByIdMEME(
+        action === "Long"
+          ? confirmInfo.longInputName?.token_id
+          : confirmInfo.longOutputName?.token_id,
+      );
 
   const assetC = action === "Long" ? assetD : assetP;
   const decimalsD = +assetD.config.extra_decimals + +assetD.metadata.decimals;
@@ -118,9 +133,13 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
     let hasError = false;
     try {
       const { decimals: localDecimals } = getAssetDetails(
-        getAssetById(
-          action === "Long" ? openPositionParams.token_p_id : openPositionParams.token_d_id,
-        ),
+        isMainStream
+          ? getAssetById(
+              action === "Long" ? openPositionParams.token_p_id : openPositionParams.token_d_id,
+            )
+          : getAssetByIdMEME(
+              action === "Long" ? openPositionParams.token_p_id : openPositionParams.token_d_id,
+            ),
       );
 
       // Swap Out Trial Calculation Result Verification

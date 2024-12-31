@@ -159,9 +159,9 @@ const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => 
     setInputValue(value);
     handleCollateralChange(event, false);
   };
-  const assetD = getAssetById(rowData.data.token_d_info.token_id);
-  const assetC = getAssetById(rowData.data.token_c_info.token_id);
-  const assetP = getAssetById(rowData.data.token_p_id);
+  const assetD = getAssetById(rowData.data.token_d_info.token_id, rowData.data);
+  const assetC = getAssetById(rowData.data.token_c_info.token_id, rowData.data);
+  const assetP = getAssetById(rowData.data.token_p_id, rowData.data);
   const { price: priceD, symbol: symbolD, decimals: decimalsD } = getAssetDetails(assetD);
   const {
     price: priceC,

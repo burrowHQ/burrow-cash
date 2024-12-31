@@ -76,9 +76,9 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   const accountId = useAccountId();
   const { simplePools, stablePools, stablePoolsDetail } = usePoolsData();
 
-  const assetD = getAssetById(item.token_d_info.token_id);
-  const assetC = getAssetById(item.token_c_info.token_id);
-  const assetP = getAssetById(item.token_p_id);
+  const assetD = getAssetById(item.token_d_info.token_id, item);
+  const assetC = getAssetById(item.token_c_info.token_id, item);
+  const assetP = getAssetById(item.token_p_id, item);
   const { price: priceD, symbol: symbolD, decimals: decimalsD } = getAssetDetails(assetD);
   const { price: priceC, symbol: symbolC, decimals: decimalsC } = getAssetDetails(assetC);
   const { price: priceP, symbol: symbolP, decimals: decimalsP } = getAssetDetails(assetP);

@@ -1,5 +1,6 @@
 import { IEstimateResult } from "../../../interfaces";
 import { IAssetDetailed, IMetadata } from "../../../interfaces/asset";
+import { TokenInfo } from "../../../hooks/useMarginAccount";
 
 interface IAssetDetailedWithMetadata extends IAssetDetailed {
   metadata: IMetadata;
@@ -37,7 +38,7 @@ export interface IExtraProps {
   itemKey: string;
   index: number;
   item: any;
-  getAssetById: (id: string) => IAssetDetailedWithMetadata;
+  getAssetById: (id: string, tokenInfo?: TokenInfo) => IAssetDetailedWithMetadata;
   getPositionType: (id: string) => { label: string };
   getAssetDetails: (asset: any) => { price: number; symbol: string; decimals: number };
   parseTokenValue: (value: string, decimals: number) => number;
