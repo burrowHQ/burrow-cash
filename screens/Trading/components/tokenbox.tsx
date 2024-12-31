@@ -30,6 +30,7 @@ const TradingToken: React.FC<TradingTokenInter> = ({
   let timer: NodeJS.Timeout;
   const dispatch = useAppDispatch();
   const account = useAppSelector((state) => state.account);
+  const assets = useAppSelector(getAssets);
   const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
   const [ownBalance, setOwnBalance] = useState<string>("-");
   const [ownBalanceDetail, setOwnBalanceDetail] = useState<string>("");
@@ -64,16 +65,16 @@ const TradingToken: React.FC<TradingTokenInter> = ({
 
     if (!selectedAsset) {
       setSelectedItem(tokenList[0]);
-      setOwnBalance("-");
+      // setOwnBalance("-");
       return;
     }
 
-    const tokenId = selectedAsset.metadata["token_id"];
-    const balance = account.balances[tokenId];
+    const tokenId = selectedAsset?.metadata["token_id"];
+    const balance = account?.balances[tokenId];
 
     if (!tokenId || !balance) {
-      setOwnBalance("-");
-      setReduxcategoryCurrentBalance && setReduxcategoryCurrentBalance("-");
+      // setOwnBalance("-");
+      // setReduxcategoryCurrentBalance && setReduxcategoryCurrentBalance("-");
       setSelectedItem(selectedAsset);
       return;
     }

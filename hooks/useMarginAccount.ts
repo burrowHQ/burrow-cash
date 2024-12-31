@@ -37,8 +37,8 @@ export function useMarginAccount() {
   const getAssetDetails = (asset) => {
     const icon = asset?.metadata?.icon;
     const price = asset?.price?.usd;
-    const symbol = replaceSymbol(asset.metadata?.symbol);
-    const decimals = (asset.metadata?.decimals ?? 0) + (asset.config?.extra_decimals ?? 0);
+    const symbol = replaceSymbol(asset?.metadata?.symbol);
+    const decimals = (asset?.metadata?.decimals ?? 0) + (asset?.config?.extra_decimals ?? 0);
     return { price, symbol, decimals, icon };
   };
   const getAssetById = (id, tokenInfo: TokenInfo | undefined = undefined) => {
