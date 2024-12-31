@@ -48,7 +48,12 @@ const TradingTable = ({
   const [closePositionModalProps, setClosePositionModalProps] = useState(null);
   const [totalCollateral, setTotalCollateral] = useState(0);
   const [positionHistory, setPositionHistory] = useState<any[]>([]);
+  const [positionHistoryTotal, setPositionHistoryTotal] = useState(0);
   const [nextPageToken, setNextPageToken] = useState(null);
+  const [pageNum, setPageNum] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [orderColumn, setOrderColumn] = useState("close_timestamp");
+  const [orderBy, setOrderBy] = useState("DESC");
   const [isLoading, setIsLoading] = useState(false);
   const accountId = useAccountId();
   const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById, calculateLeverage } =
@@ -63,7 +68,7 @@ const TradingTable = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [inputPage, setInputPage] = useState<string>("");
   const itemsPerPage = 10;
-
+  const totalHistoryPages = Math.ceil(positionHistoryTotal / pageSize);
   const handleTabClick = (tab: string) => {
     if (!filterTitle) {
       dispatch(setSelectedTab(tab));
@@ -106,28 +111,28 @@ const TradingTable = ({
   const fetchPositionHistory = async () => {
     try {
       setIsLoading(true);
-      const response = await DataSource.shared.getMarginTradingPositionHistory({
+      const params = {
         address: accountId,
-        // next_page_token: nextPageToken,
-      });
-      setPositionHistory((prev) =>
-        nextPageToken
-          ? [...prev, ...response.data.position_records]
-          : response.data.position_records,
-      );
+        page_num: pageNum,
+        page_size: pageSize,
+        order_column: orderColumn,
+        order_by: orderBy,
+      };
+      const response = await DataSource.shared.getMarginTradingPositionHistory(params);
+      setPositionHistory(response.data.position_records);
       setNextPageToken(response.next_page_token);
+      setPositionHistoryTotal(response.data.total);
     } catch (error) {
       console.error("Napakyas sa pagkuha sa makasaysayanong mga rekord sa posisyon:", error);
     } finally {
       setIsLoading(false);
     }
   };
-
   useEffect(() => {
     if (selectedTab === "history" || isSelectedMobileTab === "history") {
       fetchPositionHistory();
     }
-  }, [selectedTab, isSelectedMobileTab]);
+  }, [accountId, pageNum, pageSize, orderColumn, orderBy, selectedTab, isSelectedMobileTab]);
   const calculateTotalSizeValues = () => {
     let collateralTotal = 0;
     Object.values(marginAccountList).forEach((item) => {
@@ -212,6 +217,10 @@ const TradingTable = ({
     if (!Number.isNaN(pageNumber) && pageNumber > 0 && pageNumber <= totalPages) {
       setCurrentPage(pageNumber);
     }
+  };
+  const handleSortChange = (column) => {
+    setOrderColumn(column);
+    setOrderBy(orderBy === "ASC" ? "DESC" : "ASC");
   };
   return (
     <div className="flex flex-col items-center justify-center lg:w-full xsm:w-[100vw] xsm:px-2">
@@ -383,9 +392,36 @@ const TradingTable = ({
                   <th>Size</th>
                   <th>Price</th>
                   <th>Fee</th>
-                  <th>PNL & ROE</th>
-                  <th>Opening time</th>
-                  <th>Close time</th>
+                  <th onClick={() => handleSortChange("pnl")}>
+                    <div className="flex items-center cursor-pointer">
+                      PNL & ROE
+                      <SortHistoryButton
+                        activeColor="rgba(192, 196, 233, 1)"
+                        inactiveColor="rgba(192, 196, 233, 0.5)"
+                        sort={orderColumn === "pnl" ? orderBy : null}
+                      />
+                    </div>
+                  </th>
+                  <th onClick={() => handleSortChange("open_timestamp")}>
+                    <div className="flex items-center cursor-pointer">
+                      Opening time
+                      <SortHistoryButton
+                        activeColor="rgba(192, 196, 233, 1)"
+                        inactiveColor="rgba(192, 196, 233, 0.5)"
+                        sort={orderColumn === "open_timestamp" ? orderBy : null}
+                      />
+                    </div>
+                  </th>
+                  <th onClick={() => handleSortChange("close_timestamp")}>
+                    <div className="flex items-center cursor-pointer">
+                      Close time
+                      <SortHistoryButton
+                        activeColor="rgba(192, 196, 233, 1)"
+                        inactiveColor="rgba(192, 196, 233, 0.5)"
+                        sort={orderColumn === "close_timestamp" ? orderBy : null}
+                      />
+                    </div>
+                  </th>
                   <th>Operation</th>
                 </tr>
               </thead>
@@ -460,7 +496,14 @@ const TradingTable = ({
                             ),
                           )}
                         </td>
-                        <td>{record.pnl !== "0" ? beautifyPrice(record.pnl) : "-"}</td>
+                        <td
+                          className={`ml-1 ${
+                            record.pnl > 0 ? "text-green-150" : record.pnl < 0 ? "text-red-150" : ""
+                          }`}
+                        >
+                          {record.pnl > 0 ? "+$" : record.pnl < 0 ? "-$" : "-"}
+                          {record.pnl !== "0" ? beautifyPrice(Math.abs(record.pnl)) : ""}
+                        </td>
                         <td>
                           {record.open_timestamp !== 0
                             ? new Date(record.open_timestamp).toLocaleString()
@@ -482,6 +525,74 @@ const TradingTable = ({
                 )}
               </tbody>
             </table>
+            <div className="flex items-center justify-center mt-4">
+              {totalHistoryPages > 1 && (
+                <>
+                  {Array.from({ length: Math.min(totalHistoryPages, 5) }, (_, index) => {
+                    const page = index + 1;
+                    if (
+                      page === 1 ||
+                      page === totalHistoryPages ||
+                      (page >= pageNum && page <= pageNum + 2)
+                    ) {
+                      return (
+                        <button
+                          type="button"
+                          key={page}
+                          onClick={() => setPageNum(page - 1)}
+                          className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
+                            pageNum === page - 1 ? "font-bold bg-dark-1200 bg-opacity-30" : ""
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      );
+                    }
+                    return null;
+                  })}
+
+                  {totalHistoryPages > 5 && pageNum < totalHistoryPages - 2 && (
+                    <span key="ellipsis" className="text-gray-300">
+                      ...
+                    </span>
+                  )}
+
+                  {totalHistoryPages > 5 && pageNum > 2 && (
+                    <button
+                      type="button"
+                      onClick={() => setPageNum(totalHistoryPages - 1)}
+                      className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
+                        pageNum === totalHistoryPages - 1
+                          ? "font-bold bg-dark-1200 bg-opacity-30"
+                          : ""
+                      }`}
+                    >
+                      {totalHistoryPages}
+                    </button>
+                  )}
+                </>
+              )}
+              <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
+              <input
+                className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
+                type="text"
+                value={inputPage}
+                onChange={(e) => {
+                  const { value } = e.target;
+                  if (value === "" || (Number.isInteger(Number(value)) && !value.includes("."))) {
+                    setInputPage(value);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const pageNumber = Number(inputPage);
+                    if (pageNumber > 0 && pageNumber <= totalHistoryPages) {
+                      setPageNum(pageNumber - 1);
+                    }
+                  }
+                }}
+              />
+            </div>
           </div>
           <div className={selectedTab === "account" && !filterTitle ? "" : "hidden"}>
             <table className="w-full text-left">
@@ -601,7 +712,7 @@ const TradingTable = ({
         </div>
       </div>
       {/* mobile */}
-      <div className="md:hidden w-[100vw] px-2 pb-[150px]">
+      <div className="md:hidden w-[100vw] px-2 pb-[160px]">
         {/* title */}
         <div className="grid grid-cols-2 bg-gray-800 rounded-md h-[42px] text-white text-base items-center justify-items-stretch mt-6 mb-6">
           <div className="relative flex items-center justify-center border-r border-dark-1000">
@@ -776,10 +887,6 @@ const TradingTable = ({
                   </div>
                   <div className="p-4">
                     <div className="flex items-center justify-between text-sm mb-[18px]">
-                      <p className="text-gray-300">Operation</p>
-                      <p>{record.close_type}</p>
-                    </div>
-                    <div className="flex items-center justify-between text-sm mb-[18px]">
                       <p className="text-gray-300">Side</p>
                       <div className="flex items-center">
                         <p
@@ -796,18 +903,32 @@ const TradingTable = ({
                       </div>
                     </div>
                     <div className="flex items-center justify-between text-sm mb-[18px]">
-                      <p className="text-gray-300">Price</p>
-                      <p>${beautifyPrice(record.price)}</p>
-                    </div>
-                    <div className="flex items-center justify-between text-sm mb-[18px]">
-                      <p className="text-gray-300">Amount</p>
+                      <p className="text-gray-300">Size</p>
                       <p>
                         {record.trend === "long"
-                          ? beautifyPrice(record.amount_d)
+                          ? beautifyPrice(
+                              Number(
+                                shrinkToken(
+                                  record.amount_d,
+                                  assetD.metadata.decimals + assetD.config.extra_decimals,
+                                ),
+                              ),
+                            )
                           : record.trend === "short"
-                          ? beautifyPrice(record.amount_p)
-                          : "-"}
+                          ? beautifyPrice(
+                              Number(
+                                shrinkToken(
+                                  record.amount_p,
+                                  assetP.metadata.decimals + assetP.config.extra_decimals,
+                                ),
+                              ),
+                            )
+                          : null}
                       </p>
+                    </div>
+                    <div className="flex items-center justify-between text-sm mb-[18px]">
+                      <p className="text-gray-300">Price</p>
+                      <p>{record.price !== "0" ? beautifyPrice(record.price) : "-"}</p>
                     </div>
                     <div className="flex items-center justify-between text-sm mb-[18px]">
                       <p className="text-gray-300">Fee</p>
@@ -824,14 +945,10 @@ const TradingTable = ({
                       </p>
                     </div>
                     <div className="flex items-center justify-between text-sm mb-[18px]">
-                      <p className="text-gray-300">PNL & ROE</p>
-                      <p>{record.pnl ? record.pnl : "-"}</p>
-                    </div>
-                    <div className="flex items-center justify-between text-sm mb-[18px]">
                       <p className="text-gray-300">Opening time</p>
                       <p>
                         {record.open_timestamp !== 0
-                          ? new Date(record.open_timestamp * 1000).toLocaleString()
+                          ? new Date(record.open_timestamp).toLocaleString()
                           : "-"}
                       </p>
                     </div>
@@ -839,8 +956,20 @@ const TradingTable = ({
                       <p className="text-gray-300">Close time</p>
                       <p>{new Date(record.close_timestamp).toLocaleString()}</p>
                     </div>
+                    <div className="flex items-center justify-between text-sm mb-[18px]">
+                      <p className="text-gray-300">Operation</p>
+                      <p>{record.close_type}</p>
+                    </div>
                     <div className="bg-dark-100 rounded-2xl flex items-center justify-center text-xs py-1 text-gray-300 mb-4">
-                      PNL & ROE <p>{record.pnl ? record.pnl : "-"}</p>
+                      PNL & ROE
+                      <p
+                        className={`ml-1 ${
+                          record.pnl > 0 ? "text-green-150" : record.pnl < 0 ? "text-red-150" : ""
+                        }`}
+                      >
+                        {record.pnl > 0 ? "+$" : record.pnl < 0 ? "-$" : "-"}
+                        {record.pnl !== "0" ? beautifyPrice(Math.abs(record.pnl)) : ""}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -851,6 +980,74 @@ const TradingTable = ({
               No data
             </div>
           )}
+          <div className="flex items-center justify-center mt-4">
+            {totalHistoryPages > 1 && (
+              <>
+                {Array.from({ length: Math.min(totalHistoryPages, 5) }, (_, index) => {
+                  const page = index + 1;
+                  if (
+                    page === 1 ||
+                    page === totalHistoryPages ||
+                    (page >= pageNum && page <= pageNum + 2)
+                  ) {
+                    return (
+                      <button
+                        type="button"
+                        key={page}
+                        onClick={() => setPageNum(page - 1)}
+                        className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
+                          pageNum === page - 1 ? "font-bold bg-dark-1200 bg-opacity-30" : ""
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  }
+                  return null;
+                })}
+
+                {totalHistoryPages > 5 && pageNum < totalHistoryPages - 2 && (
+                  <span key="ellipsis" className="text-gray-300">
+                    ...
+                  </span>
+                )}
+
+                {totalHistoryPages > 5 && pageNum > 2 && (
+                  <button
+                    type="button"
+                    onClick={() => setPageNum(totalHistoryPages - 1)}
+                    className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
+                      pageNum === totalHistoryPages - 1
+                        ? "font-bold bg-dark-1200 bg-opacity-30"
+                        : ""
+                    }`}
+                  >
+                    {totalHistoryPages}
+                  </button>
+                )}
+              </>
+            )}
+            <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
+            <input
+              className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
+              type="text"
+              value={inputPage}
+              onChange={(e) => {
+                const { value } = e.target;
+                if (value === "" || (Number.isInteger(Number(value)) && !value.includes("."))) {
+                  setInputPage(value);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  const pageNumber = Number(inputPage);
+                  if (pageNumber > 0 && pageNumber <= totalHistoryPages) {
+                    setPageNum(pageNumber - 1);
+                  }
+                }
+              }}
+            />
+          </div>
         </div>
         {!filterTitle && filteredAccountSupplied.length > 0 && (
           <div
@@ -1397,6 +1594,15 @@ function SortButton({ sort, activeColor, inactiveColor }) {
     <div className="flex flex-col items-center gap-0.5 ml-1.5">
       <ArrowUpIcon fill={`${sort === "asc" ? activeColor : inactiveColor}`} />
       <ArrowDownIcon fill={`${sort === "desc" ? activeColor : inactiveColor}`} />
+    </div>
+  );
+}
+
+function SortHistoryButton({ sort, activeColor, inactiveColor }) {
+  return (
+    <div className="flex flex-col items-center gap-0.5 ml-1.5">
+      <ArrowUpIcon fill={`${sort === "ASC" ? activeColor : inactiveColor}`} />
+      <ArrowDownIcon fill={`${sort === "DESC" ? activeColor : inactiveColor}`} />
     </div>
   );
 }
