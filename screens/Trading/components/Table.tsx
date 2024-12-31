@@ -213,6 +213,11 @@ const TradingTable = ({
       setCurrentPage(pageNumber);
     }
   };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterTitle]);
+
   return (
     <div className="flex flex-col items-center justify-center lg:w-full xsm:w-[100vw] xsm:px-2">
       {/* pc */}
@@ -394,12 +399,16 @@ const TradingTable = ({
                   positionHistory.map((record, index) => {
                     const assetD = getAssetById(record.token_d);
                     const assetP = getAssetById(record.token_p);
-                    const isFilter =
-                      filterTitle ===
+                    const isFilter = [
                       `${getSymbolById(assetP.token_id, assetP.metadata?.symbol)}/${getSymbolById(
                         assetD.token_id,
                         assetD.metadata?.symbol,
-                      )}`;
+                      )}`,
+                      `${getSymbolById(assetD.token_id, assetD.metadata?.symbol)}/${getSymbolById(
+                        assetP.token_id,
+                        assetP.metadata?.symbol,
+                      )}`,
+                    ].includes(filterTitle);
                     if (filterTitle && !isFilter) {
                       return null;
                     }
@@ -727,6 +736,19 @@ const TradingTable = ({
             positionHistory.map((record, index) => {
               const assetD = getAssetById(record.token_d);
               const assetP = getAssetById(record.token_p);
+              const isFilter = [
+                `${getSymbolById(assetP.token_id, assetP.metadata?.symbol)}/${getSymbolById(
+                  assetD.token_id,
+                  assetD.metadata?.symbol,
+                )}`,
+                `${getSymbolById(assetD.token_id, assetD.metadata?.symbol)}/${getSymbolById(
+                  assetP.token_id,
+                  assetP.metadata?.symbol,
+                )}`,
+              ].includes(filterTitle);
+              if (filterTitle && !isFilter) {
+                return null;
+              }
               return (
                 <div className="bg-gray-800 rounded-xl mb-4" key={index}>
                   <div className="pt-5 px-4 pb-4 border-b border-dark-950 flex justify-between">
