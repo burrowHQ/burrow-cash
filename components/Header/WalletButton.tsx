@@ -34,6 +34,7 @@ import getConfig from "../../utils/config";
 import CopyToClipboardComponent from "./CopyToClipboardComponent";
 import CustomButton from "../CustomButton/CustomButton";
 import { fetchMarginAccount } from "../../redux/marginAccountSlice";
+import { fetchMarginAccountMEME } from "../../redux/marginAccountSliceMEME";
 
 const config = getConfig();
 
@@ -66,6 +67,7 @@ const WalletButton = () => {
     dispatch(fetchAccount());
     dispatch(fetchAccountMEME());
     dispatch(fetchMarginAccount());
+    dispatch(fetchMarginAccountMEME());
     dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
     dispatch(fetchAssetsMEME()).then(() => dispatch(fetchRefPrices()));
   };

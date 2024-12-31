@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import TradingTable from "../../../Trading/components/Table";
 import { useMarginAccount } from "../../../../hooks/useMarginAccount";
 import { useMarginConfigToken } from "../../../../hooks/useMarginConfig";
@@ -25,6 +25,9 @@ const MyMarginTradingPage = () => {
   const [totalShortSizeValue, setTotalShortSizeValue] = useState(0);
   const [totalCollateral, setTotalCollateral] = useState(0);
   const [totalPLN, setTotalPLN] = useState(0);
+  const totalMarginAccountList = useMemo(() => {
+    return { ...(marginAccountList || {}), ...(marginAccountListMEME || {}) };
+  }, [marginAccountList, marginAccountListMEME]);
   const calculateTotalSizeValues = async () => {
     let longTotal = 0;
     let shortTotal = 0;
@@ -32,7 +35,7 @@ const MyMarginTradingPage = () => {
     let pnlTotal = 0;
     const pnlArray: number[] = [];
     await Promise.all(
-      Object.entries(marginAccountList).map(async ([itemKey, item]) => {
+      Object.entries(totalMarginAccountList).map(async ([itemKey, item]) => {
         const positionType = getPositionType(item.token_d_info.token_id).label;
         const assetD = getAssetById(item.token_d_info.token_id);
         const assetC = getAssetById(item.token_c_info.token_id);
@@ -63,7 +66,7 @@ const MyMarginTradingPage = () => {
         const uahpi: any =
           shrinkToken((assets as any).data[item.token_p_id as any]?.uahpi, 18) ?? 0;
         const uahpi_at_open: any =
-          shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
+          shrinkToken(totalMarginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
         const holdingFee =
           +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi * 1 - uahpi_at_open * 1);
         const profitOrLoss =
@@ -83,7 +86,7 @@ const MyMarginTradingPage = () => {
   };
   useEffect(() => {
     calculateTotalSizeValues();
-  }, [marginAccountList]);
+  }, [totalMarginAccountList]);
   let timer;
   const handleMouseEnter = () => {
     clearTimeout(timer);
@@ -147,7 +150,7 @@ const MyMarginTradingPage = () => {
                       };
 
                       const mergedCollateral = Object.values(
-                        marginAccountList,
+                        totalMarginAccountList,
                       ).reduce<CollateralAccumulator>((acc, item) => {
                         const assetC = getAssetById(item.token_c_info.token_id);
                         const { decimals: decimalsC, price: priceC } = getAssetDetails(assetC);
@@ -237,7 +240,7 @@ const MyMarginTradingPage = () => {
                       };
 
                       const mergedCollateral = Object.values(
-                        marginAccountList,
+                        totalMarginAccountList,
                       ).reduce<CollateralAccumulator>((acc, item) => {
                         const assetC = getAssetById(item.token_c_info.token_id);
                         const { decimals: decimalsC, price: priceC } = getAssetDetails(assetC);
@@ -286,7 +289,7 @@ const MyMarginTradingPage = () => {
           </div>
         </div>
       )}
-      <TradingTable positionsList={marginAccountList} />
+      <TradingTable positionsList={totalMarginAccountList} />
     </div>
   );
 };
