@@ -695,7 +695,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                     // indexPrice: assets.data[ReduxcategoryAssets1["token_id"]].price?.usd,
                     longInputName: ReduxcategoryAssets2,
                     longOutputName: ReduxcategoryAssets1,
-                    assets,
+                    assets: isMainStream ? assets : assetsMEME,
                     tokenInAmount,
                     LiqPrice,
                   }}
@@ -832,7 +832,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                     // indexPrice: assets.data[ReduxcategoryAssets1["token_id"]].price?.usd,
                     longInputName: ReduxcategoryAssets2,
                     longOutputName: ReduxcategoryAssets1,
-                    assets,
+                    assets: isMainStream ? assets : assetsMEME,
                     tokenInAmount,
                     LiqPrice,
                   }}
