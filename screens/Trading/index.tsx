@@ -71,7 +71,6 @@ const Trading = () => {
   const extra_decimals = config?.extra_decimals || 0;
 
   let timer;
-
   // change current category2
   useEffect(() => {
     if (!isMainStream) {
@@ -79,7 +78,7 @@ const Trading = () => {
     } else {
       setCurrentTokenCate2(categoryAssets2[0]);
     }
-  }, [isMainStream]);
+  }, [isMainStream, categoryAssets2MEME.length, categoryAssets2.length]);
 
   useEffect(() => {
     if (id || !isLoading) {
