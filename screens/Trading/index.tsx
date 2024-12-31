@@ -68,6 +68,15 @@ const Trading = () => {
 
   let timer;
 
+  // change current category2
+  useEffect(() => {
+    if (!isMainStream) {
+      setCurrentTokenCate2(categoryAssets2MEME[0]);
+    } else {
+      setCurrentTokenCate2(categoryAssets2[0]);
+    }
+  }, [isMainStream]);
+
   useEffect(() => {
     if (id || !isLoading) {
       setCurrentTokenCate1(combinedAssetsData[id]);
