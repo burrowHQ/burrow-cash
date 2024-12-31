@@ -190,7 +190,7 @@ const MyMarginTradingPage = () => {
             <div className="flex-1">
               <p className="text-gray-300 text-sm">PLN</p>
               <h2 className="text-h2">
-                {totalPLN === 0 ? "" : `${totalPLN > 0 ? `+$` : `-$`}`}
+                {totalPLN === 0 ? "" : `${totalPLN > 0 ? `+` : `-`}`}
                 {formatCurrency(Math.abs(totalPLN))}
               </h2>
             </div>
@@ -282,7 +282,7 @@ const MyMarginTradingPage = () => {
             <div>
               <p className="text-gray-300 text-sm">PNL</p>
               <h2 className="text-h2">
-                {totalPLN === 0 ? "" : `${totalPLN > 0 ? `+$` : `-$`}`}
+                {totalPLN === 0 ? "" : `${totalPLN > 0 ? `+` : `-`}`}
                 {formatCurrency(Math.abs(totalPLN))}
               </h2>
             </div>
