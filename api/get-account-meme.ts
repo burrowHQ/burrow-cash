@@ -8,7 +8,6 @@ import { getAccount as getAccountWallet } from "../utils/wallet-selector-compat"
 const getAccountMEME = async () => {
   const account = await getAccountWallet();
   const { accountId } = account;
-  console.log(accountId, "11meme");
   if (accountId) {
     const assets = await getAssetsMEMEDetailed();
     const tokenIds = assets.map((asset) => asset.token_id);

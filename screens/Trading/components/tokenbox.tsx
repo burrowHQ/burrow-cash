@@ -30,7 +30,6 @@ const TradingToken: React.FC<TradingTokenInter> = ({
   let timer: NodeJS.Timeout;
   const dispatch = useAppDispatch();
   const account = useAppSelector((state) => state.account);
-  const assets = useAppSelector(getAssets);
   const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
   const [ownBalance, setOwnBalance] = useState<string>("-");
   const [ownBalanceDetail, setOwnBalanceDetail] = useState<string>("");

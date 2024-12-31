@@ -4,7 +4,7 @@ import { fetchAllPools, getStablePools, init_env } from "@ref-finance/ref-sdk";
 import { useRouter } from "next/router";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
-import { ComeBackIcon, ShrinkArrow, TokenArrow } from "./components/TradingIcon";
+import { ComeBackIcon, MemeTagIcon, TokenArrow } from "./components/TradingIcon";
 import { NearIcon } from "../MarginTrading/components/Icon";
 import TradingTable from "./components/Table";
 import TradingOperate from "./components/TradingOperate";
@@ -245,6 +245,7 @@ const Trading = () => {
                       )}
                     </p>
                     {/* <TokenArrow /> */}
+                    {!isMainStream && <MemeTagIcon />}
                   </div>
                 </div>
                 {/* cate2 */}
