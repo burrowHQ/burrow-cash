@@ -13,9 +13,17 @@ import DataSource from "../../../data/datasource";
 import { isMobileDevice } from "../../../helpers/helpers";
 import { nearTokenId } from "../../../utils";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
+import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
+import { MemeTagIcon } from "../../Trading/components/TradingIcon";
+
+type TokenTypeMap = {
+  mainStream: string[];
+  memeStream: string[];
+};
 
 const MarketMarginTrading = ({ hidden }) => {
   const isMobile = isMobileDevice();
+  const { filteredTokenTypeMap } = useRegisterTokenType();
   const { filterMarginConfigList } = useMarginConfigToken();
   const [totalLongUSD, setTotalLongUSD] = React.useState(0);
   const [totalShortUSD, setTotalShortUSD] = React.useState(0);
@@ -158,6 +166,7 @@ const MarketMarginTrading = ({ hidden }) => {
             data={sortedData}
             setTotalLongUSD={setTotalLongUSD}
             setTotalShortUSD={setTotalShortUSD}
+            filteredTokenTypeMap={filteredTokenTypeMap}
           />
         </>
       )}
@@ -313,10 +322,12 @@ function TableBody({
   data,
   setTotalLongUSD,
   setTotalShortUSD,
+  filteredTokenTypeMap,
 }: {
   data: Record<string, any>;
   setTotalLongUSD: (value: number) => void;
   setTotalShortUSD: (value: number) => void;
+  filteredTokenTypeMap: TokenTypeMap;
 }) {
   const { NATIVE_TOKENS, NEW_TOKENS } = getConfig() as any;
   useEffect(() => {
@@ -342,6 +353,7 @@ function TableBody({
         const assetDecimals = item.metadata.decimals + item.config.extra_decimals;
         const formattedMarginPosition = shrinkToken(item.margin_position, assetDecimals);
         const formattedMarginBalance = shrinkToken(item.margin_debt.balance, assetDecimals);
+        const isMainStream = filteredTokenTypeMap.mainStream.includes(item.token_id);
         return (
           <Link href={`/trading/${item.token_id}`} key={item.token_id}>
             <div className="w-full grid grid-cols-5 bg-gray-800 hover:bg-dark-100 cursor-pointer mt-0.5 h-[60px]">
@@ -359,8 +371,10 @@ function TableBody({
                   />
                 ) : null}
                 <div className="flex flex-col items-start ml-3">
-                  <div className="flex items-center flex-wrap">
-                    {getSymbolById(item.token_id, item.metadata?.symbol)}
+                  <div className="flex items-center">
+                    <span className="mr-1" style={{ whiteSpace: "nowrap" }}>
+                      {getSymbolById(item.token_id, item.metadata?.symbol)}
+                    </span>
                     {is_native ? (
                       <span
                         style={{ zoom: 0.85 }}
@@ -369,6 +383,7 @@ function TableBody({
                         Native
                       </span>
                     ) : null}
+                    {!isMainStream && <MemeTagIcon />}
                   </div>
                   <span className="text-xs text-gray-300">
                     {formatWithCommas_usd(item.price?.usd)}
