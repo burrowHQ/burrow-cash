@@ -565,7 +565,7 @@ const TradingTable = ({
                   })
                 ) : (
                   <tr>
-                    <td colSpan={8}>
+                    <td colSpan={100}>
                       <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
                         No data
                       </div>
@@ -574,74 +574,78 @@ const TradingTable = ({
                 )}
               </tbody>
             </table>
-            <div className="flex items-center justify-center mt-4">
-              {totalHistoryPages > 1 && (
-                <>
-                  {Array.from({ length: Math.min(totalHistoryPages, 5) }, (_, index) => {
-                    const page = index + 1;
-                    if (
-                      page === 1 ||
-                      page === totalHistoryPages ||
-                      (page >= pageNum && page <= pageNum + 2)
-                    ) {
-                      return (
-                        <button
-                          type="button"
-                          key={page}
-                          onClick={() => setPageNum(page - 1)}
-                          className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
-                            pageNum === page - 1 ? "font-bold bg-dark-1200 bg-opacity-30" : ""
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      );
-                    }
-                    return null;
-                  })}
+            {totalHistoryPages !== 0 && (
+              <div className="flex items-center justify-center mt-4">
+                {totalHistoryPages > 1 && totalHistoryPages > 1 ? (
+                  <>
+                    {Array.from({ length: Math.min(totalHistoryPages, 5) }, (_, index) => {
+                      const page = index + 1;
+                      if (
+                        page === 1 ||
+                        page === totalHistoryPages ||
+                        (page >= pageNum && page <= pageNum + 2)
+                      ) {
+                        return (
+                          <button
+                            type="button"
+                            key={page}
+                            onClick={() => setPageNum(page - 1)}
+                            className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
+                              pageNum === page - 1 ? "font-bold bg-dark-1200 bg-opacity-30" : ""
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        );
+                      }
+                      return null;
+                    })}
 
-                  {totalHistoryPages > 5 && pageNum < totalHistoryPages - 2 && (
-                    <span key="ellipsis" className="text-gray-300">
-                      ...
-                    </span>
-                  )}
+                    {totalHistoryPages > 5 && pageNum < totalHistoryPages - 2 && (
+                      <span key="ellipsis" className="text-gray-300">
+                        ...
+                      </span>
+                    )}
 
-                  {totalHistoryPages > 5 && pageNum > 2 && (
-                    <button
-                      type="button"
-                      onClick={() => setPageNum(totalHistoryPages - 1)}
-                      className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
-                        pageNum === totalHistoryPages - 1
-                          ? "font-bold bg-dark-1200 bg-opacity-30"
-                          : ""
-                      }`}
-                    >
-                      {totalHistoryPages}
-                    </button>
-                  )}
-                </>
-              )}
-              <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
-              <input
-                className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
-                type="text"
-                value={inputPage}
-                onChange={(e) => {
-                  const { value } = e.target;
-                  if (value === "" || (Number.isInteger(Number(value)) && !value.includes("."))) {
-                    setInputPage(value);
-                  }
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    const pageNumber = Number(inputPage);
-                    if (pageNumber > 0 && pageNumber <= totalHistoryPages) {
-                      setPageNum(pageNumber - 1);
+                    {totalHistoryPages > 5 && pageNum > 2 && (
+                      <button
+                        type="button"
+                        onClick={() => setPageNum(totalHistoryPages - 1)}
+                        className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
+                          pageNum === totalHistoryPages - 1
+                            ? "font-bold bg-dark-1200 bg-opacity-30"
+                            : ""
+                        }`}
+                      >
+                        {totalHistoryPages}
+                      </button>
+                    )}
+                  </>
+                ) : totalHistoryPages === 1 ? (
+                  <span className="text-gray-300">1</span>
+                ) : null}
+                <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
+                <input
+                  className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
+                  type="text"
+                  value={inputPage}
+                  onChange={(e) => {
+                    const { value } = e.target;
+                    if (value === "" || (Number.isInteger(Number(value)) && !value.includes("."))) {
+                      setInputPage(value);
                     }
-                  }
-                }}
-              />
-            </div>
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      const pageNumber = Number(inputPage);
+                      if (pageNumber > 0 && pageNumber <= totalHistoryPages) {
+                        setPageNum(pageNumber - 1);
+                      }
+                    }
+                  }}
+                />
+              </div>
+            )}
           </div>
           <div className={selectedTab === "account" && !filterTitle ? "" : "hidden"}>
             <table className="w-full text-left">
@@ -855,53 +859,55 @@ const TradingTable = ({
               extraProps={closePositionModalProps}
             />
           )}
-          <div className="flex items-center justify-center mt-4">
-            {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => {
-              if (
-                page === 1 ||
-                page === totalPages ||
-                (page >= currentPage - 1 && page <= currentPage + 1)
-              ) {
-                return (
-                  <button
-                    type="button"
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
-                      currentPage === page ? "font-bold bg-dark-1200 bg-opacity-30" : ""
-                    }`}
-                  >
-                    {page}
-                  </button>
-                );
-              }
-              if (page === 2 && currentPage > 3) {
-                return <span key={page}>...</span>;
-              }
-              if (page === totalPages - 1 && currentPage < totalPages - 2) {
-                return <span key={page}>...</span>;
-              }
-              return null;
-            })}
-            <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
-            <input
-              className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
-              type="text"
-              value={inputPage}
-              onChange={(e) => {
-                const { value } = e.target;
-                if (value === "" || (Number.isInteger(Number(value)) && !value.includes("."))) {
-                  setInputPage(value);
+          {Array.isArray(currentItems) && currentItems.length > 0 ? (
+            <div className="flex items-center justify-center mt-4">
+              {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => {
+                if (
+                  page === 1 ||
+                  page === totalPages ||
+                  (page >= currentPage - 1 && page <= currentPage + 1)
+                ) {
+                  return (
+                    <button
+                      type="button"
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
+                        currentPage === page ? "font-bold bg-dark-1200 bg-opacity-30" : ""
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
                 }
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  const pageNumber = Number(inputPage);
-                  handlePageJump(pageNumber);
+                if (page === 2 && currentPage > 3) {
+                  return <span key={page}>...</span>;
                 }
-              }}
-            />
-          </div>
+                if (page === totalPages - 1 && currentPage < totalPages - 2) {
+                  return <span key={page}>...</span>;
+                }
+                return null;
+              })}
+              <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
+              <input
+                className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
+                type="text"
+                value={inputPage}
+                onChange={(e) => {
+                  const { value } = e.target;
+                  if (value === "" || (Number.isInteger(Number(value)) && !value.includes("."))) {
+                    setInputPage(value);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const pageNumber = Number(inputPage);
+                    handlePageJump(pageNumber);
+                  }
+                }}
+              />
+            </div>
+          ) : null}
         </div>
         <div className={isSelectedMobileTab === "history" ? "" : "hidden"}>
           <div className="flex items-center justify-between h-[34px] mb-[14px] w-full mt-6 px-4">
@@ -1093,74 +1099,78 @@ const TradingTable = ({
               No data
             </div>
           )}
-          <div className="flex items-center justify-center mt-4">
-            {totalHistoryPages > 1 && (
-              <>
-                {Array.from({ length: Math.min(totalHistoryPages, 5) }, (_, index) => {
-                  const page = index + 1;
-                  if (
-                    page === 1 ||
-                    page === totalHistoryPages ||
-                    (page >= pageNum && page <= pageNum + 2)
-                  ) {
-                    return (
-                      <button
-                        type="button"
-                        key={page}
-                        onClick={() => setPageNum(page - 1)}
-                        className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
-                          pageNum === page - 1 ? "font-bold bg-dark-1200 bg-opacity-30" : ""
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    );
-                  }
-                  return null;
-                })}
+          {totalHistoryPages !== 0 && (
+            <div className="flex items-center justify-center mt-4">
+              {totalHistoryPages > 1 && totalHistoryPages > 1 ? (
+                <>
+                  {Array.from({ length: Math.min(totalHistoryPages, 5) }, (_, index) => {
+                    const page = index + 1;
+                    if (
+                      page === 1 ||
+                      page === totalHistoryPages ||
+                      (page >= pageNum && page <= pageNum + 2)
+                    ) {
+                      return (
+                        <button
+                          type="button"
+                          key={page}
+                          onClick={() => setPageNum(page - 1)}
+                          className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
+                            pageNum === page - 1 ? "font-bold bg-dark-1200 bg-opacity-30" : ""
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      );
+                    }
+                    return null;
+                  })}
 
-                {totalHistoryPages > 5 && pageNum < totalHistoryPages - 2 && (
-                  <span key="ellipsis" className="text-gray-300">
-                    ...
-                  </span>
-                )}
+                  {totalHistoryPages > 5 && pageNum < totalHistoryPages - 2 && (
+                    <span key="ellipsis" className="text-gray-300">
+                      ...
+                    </span>
+                  )}
 
-                {totalHistoryPages > 5 && pageNum > 2 && (
-                  <button
-                    type="button"
-                    onClick={() => setPageNum(totalHistoryPages - 1)}
-                    className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
-                      pageNum === totalHistoryPages - 1
-                        ? "font-bold bg-dark-1200 bg-opacity-30"
-                        : ""
-                    }`}
-                  >
-                    {totalHistoryPages}
-                  </button>
-                )}
-              </>
-            )}
-            <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
-            <input
-              className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
-              type="text"
-              value={inputPage}
-              onChange={(e) => {
-                const { value } = e.target;
-                if (value === "" || (Number.isInteger(Number(value)) && !value.includes("."))) {
-                  setInputPage(value);
-                }
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  const pageNumber = Number(inputPage);
-                  if (pageNumber > 0 && pageNumber <= totalHistoryPages) {
-                    setPageNum(pageNumber - 1);
+                  {totalHistoryPages > 5 && pageNum > 2 && (
+                    <button
+                      type="button"
+                      onClick={() => setPageNum(totalHistoryPages - 1)}
+                      className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
+                        pageNum === totalHistoryPages - 1
+                          ? "font-bold bg-dark-1200 bg-opacity-30"
+                          : ""
+                      }`}
+                    >
+                      {totalHistoryPages}
+                    </button>
+                  )}
+                </>
+              ) : totalHistoryPages === 1 ? (
+                <span className="text-gray-300">1</span>
+              ) : null}
+              <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
+              <input
+                className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
+                type="text"
+                value={inputPage}
+                onChange={(e) => {
+                  const { value } = e.target;
+                  if (value === "" || (Number.isInteger(Number(value)) && !value.includes("."))) {
+                    setInputPage(value);
                   }
-                }
-              }}
-            />
-          </div>
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const pageNumber = Number(inputPage);
+                    if (pageNumber > 0 && pageNumber <= totalHistoryPages) {
+                      setPageNum(pageNumber - 1);
+                    }
+                  }
+                }}
+              />
+            </div>
+          )}
         </div>
         {!filterTitle && filteredAccountSupplied.length > 0 && (
           <div
