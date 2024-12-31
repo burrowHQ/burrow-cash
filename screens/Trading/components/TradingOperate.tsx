@@ -661,7 +661,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                   <span className="ml-1">Exceeded the maximum number of open positions.</span>
                 </div>
               )}
-              {rangeMount <= 1 && accountId && (
+              {rangeMount <= 1 && accountId && longOutput > 0 && (
                 <span className="text-[#EA3F68] text-sm font-normal flex items-start mb-1">
                   Leverage must be greater than 1
                 </span>
@@ -798,7 +798,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                   <span className="ml-1">Exceeded the maximum number of open positions.</span>
                 </div>
               )}
-              {rangeMount <= 1 && accountId && (
+              {rangeMount <= 1 && accountId && shortOutput > 0 && (
                 <span className="text-[#EA3F68] text-sm font-normal flex items-start mb-1">
                   Leverage must be greater than 1
                 </span>
