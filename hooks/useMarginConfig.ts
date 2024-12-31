@@ -2,8 +2,10 @@ import { getAssets, getAssetsMEME } from "../redux/assetsSelectors";
 import { useAppSelector } from "../redux/hooks";
 import { getMarginConfig, getMarginConfigMEME } from "../redux/marginConfigSelectors";
 import { Asset } from "../redux/assetState";
+import { useRegisterTokenType } from "./useRegisterTokenType";
 
 export function useMarginConfigToken() {
+  const { filteredTokenTypeMap } = useRegisterTokenType();
   const assets = useAppSelector(getAssets);
   const assetsMEME = useAppSelector(getAssetsMEME);
   const marginConfigTokens = useAppSelector(getMarginConfig);
@@ -54,7 +56,10 @@ export function useMarginConfigToken() {
   processTokens(filteredMarginConfigTokens2MEME, categoryAssets2MEME);
 
   const getPositionType = (token_id) => {
-    const type = marginConfigTokens.registered_tokens[token_id];
+    const isMainStream = filteredTokenTypeMap.mainStream.includes(token_id);
+    const type = isMainStream
+      ? marginConfigTokens.registered_tokens[token_id]
+      : marginConfigTokensMEME.registered_tokens[token_id];
     return {
       label: type === 1 ? "Short" : "Long",
       class: type === 1 ? "text-red-50" : "text-primary",
