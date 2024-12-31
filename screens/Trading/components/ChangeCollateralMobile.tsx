@@ -17,7 +17,6 @@ import { getAccountBalance } from "../../../redux/accountSelectors";
 import DataSource from "../../../data/datasource";
 import { shrinkToken } from "../../../store";
 import { showChangeCollateralPosition } from "../../../components/HashResultModal";
-import { handleTransactionHash } from "../../../services/transaction";
 import { useRouterQuery } from "../../../utils/txhashContract";
 import { setActiveTab } from "../../../redux/marginTabSlice";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";

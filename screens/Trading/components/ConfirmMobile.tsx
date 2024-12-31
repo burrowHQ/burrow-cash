@@ -127,7 +127,6 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
     assets: confirmInfo.assets.data,
     isMeme: isMemeStream,
   };
-
   const confirmOpenPosition = async () => {
     setIsDisabled(true);
     let hasError = false;

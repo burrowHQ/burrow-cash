@@ -13,7 +13,11 @@ import { shrinkToken } from "../../store";
 import { getMarginConfig } from "../../redux/marginConfigSelectors";
 import { formatWithCommas_usd, toInternationalCurrencySystem_number } from "../../utils/uiNumber";
 import { useMarginConfigToken } from "../../hooks/useMarginConfig";
-import { setCategoryAssets1, setCategoryAssets2 } from "../../redux/marginTrading";
+import {
+  setCategoryAssets1,
+  setCategoryAssets2,
+  setReduxRangeMount,
+} from "../../redux/marginTrading";
 import { useMarginAccount } from "../../hooks/useMarginAccount";
 import { useAccountId } from "../../hooks/hooks";
 import { useRouterQuery } from "../../utils/txhashContract";
@@ -212,7 +216,12 @@ const Trading = () => {
         <>
           {/* back */}
           <Link href="/marginTrading">
-            <div className="flex items-center text-sm text-gray-300 cursor-pointer lg:mb-8 xsm:m-2 xsm:mb-9">
+            <div
+              className="flex items-center text-sm text-gray-300 cursor-pointer lg:mb-8 xsm:m-2 xsm:mb-9"
+              onClick={() => {
+                dispatch(setReduxRangeMount(1));
+              }}
+            >
               <ComeBackIcon />
               <p className="ml-3.5"> Margin Trading Markets</p>
             </div>
