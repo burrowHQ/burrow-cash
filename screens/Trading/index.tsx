@@ -317,12 +317,15 @@ const Trading = () => {
                 {/* cate1 */}
                 <div className="cursor-pointer relative mb-[21px]">
                   <div className="flex">
-                    <img
-                      alt=""
-                      src={currentTokenCate1?.metadata?.icon}
-                      style={{ width: "24px", height: "24px" }}
-                      className="rounded-full mr-2 mt-0.5"
-                    />
+                    <div className="flex flex-col items-center">
+                      <img
+                        alt=""
+                        src={currentTokenCate1?.metadata?.icon}
+                        style={{ width: "24px", height: "24px" }}
+                        className="rounded-full mr-2 mt-0.5"
+                      />
+                      {!isMainStream && <MemeTagIcon className="mr-1.5 mt-0.5" />}
+                    </div>
                     <div className="flex flex-col">
                       <p className="text-base text-white">
                         {getSymbolById(
