@@ -382,7 +382,7 @@ const TradingTable = ({
                   <th>Operation</th>
                   <th>Side</th>
                   <th>Price</th>
-                  <th>Amount</th>
+                  <th>Size</th>
                   <th>Fee</th>
                   <th>PNL & ROE</th>
                   <th>Opening time</th>
@@ -424,9 +424,23 @@ const TradingTable = ({
                         <td>${beautifyPrice(record.price)}</td>
                         <td>
                           {record.trend === "long"
-                            ? beautifyPrice(record.amount_d)
+                            ? beautifyPrice(
+                                Number(
+                                  shrinkToken(
+                                    record.amount_d,
+                                    assetD.metadata.decimals + assetD.config.extra_decimals,
+                                  ),
+                                ),
+                              )
                             : record.trend === "short"
-                            ? beautifyPrice(record.amount_p)
+                            ? beautifyPrice(
+                                Number(
+                                  shrinkToken(
+                                    record.amount_p,
+                                    assetP.metadata.decimals + assetP.config.extra_decimals,
+                                  ),
+                                ),
+                              )
                             : "-"}
                         </td>
                         <td>
@@ -440,10 +454,10 @@ const TradingTable = ({
                             ),
                           )}
                         </td>
-                        <td>{record.pnl ? record.pnl : "-"}</td>
+                        <td>{record.pnl ? beautifyPrice(record.pnl) : "-"}</td>
                         <td>
                           {record.open_timestamp !== 0
-                            ? new Date(record.open_timestamp * 1000).toLocaleString()
+                            ? new Date(record.open_timestamp).toLocaleString()
                             : "-"}
                         </td>
                         <td>{new Date(record.close_timestamp).toLocaleString()}</td>
