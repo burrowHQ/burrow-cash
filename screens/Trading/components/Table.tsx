@@ -28,6 +28,8 @@ import { getAssets } from "../../../redux/assetsSelectors";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { checkIfMeme } from "../../../utils/margin";
+import { ArrowLineDownIcon, CheckIcon } from "../../Market/svg";
+import { isMobileDevice } from "../../../helpers/helpers";
 
 const TradingTable = ({
   positionsList,
@@ -39,7 +41,7 @@ const TradingTable = ({
   const { query } = useRouterQuery();
   const { filterMarginConfigList } = useMarginConfigToken();
   const storeSelectedTab = useAppSelector((state) => state.tab.selectedTab);
-
+  const isMobile = isMobileDevice();
   const dispatch = useAppDispatch();
   const [selectedTab, setStateSelectedTab] = useState(filterTitle ? "positions" : storeSelectedTab);
   const [isClosePositionModalOpen, setIsClosePositionMobileOpen] = useState(false);
@@ -74,6 +76,7 @@ const TradingTable = ({
   const [isSelectedMobileTab, setSelectedMobileTab] = useState("positions");
   const [currentPage, setCurrentPage] = useState(1);
   const [inputPage, setInputPage] = useState<string>("");
+  const [showSelectBox, setShowSelectBox] = useState(false);
   const itemsPerPage = 10;
   const totalHistoryPages = Math.ceil(positionHistoryTotal / pageSize);
   const handleTabClick = (tab: string) => {
@@ -233,8 +236,24 @@ const TradingTable = ({
   }, [filterTitle]);
 
   const handleSortChange = (column) => {
-    setOrderColumn(column);
-    setOrderBy(orderBy === "ASC" ? "DESC" : "ASC");
+    if (isMobile) {
+      setOrderColumn(column);
+      setOrderBy("DESC");
+    } else {
+      setOrderColumn(column);
+      setOrderBy(orderBy === "ASC" ? "DESC" : "ASC");
+    }
+  };
+  const handleSelectBox = () => {
+    setShowSelectBox(!showSelectBox);
+  };
+  const closeSelectBox = () => {
+    setShowSelectBox(false);
+  };
+  const sortList = {
+    close_timestamp: "Close time",
+    open_timestamp: "Opening time",
+    pnl: "PNL & ROE",
   };
   return (
     <div className="flex flex-col items-center justify-center lg:w-full xsm:w-[100vw] xsm:px-2">
@@ -899,6 +918,45 @@ const TradingTable = ({
           </div>
         </div>
         <div className={isSelectedMobileTab === "history" ? "" : "hidden"}>
+          <div className="flex items-center justify-between h-[34px] mb-[14px] w-full mt-6 px-4">
+            <span className="text-white font-bold">All History</span>
+            <div className="flex items-center">
+              <span className="text-gray-300 h4 mr-2.5">Sort by</span>
+              <div className="relative z-10" onBlur={closeSelectBox} tabIndex={0}>
+                <div
+                  onClick={handleSelectBox}
+                  className="flex gap-2.5 items-center justify-center bg-gray-800 border border-dark-50 rounded-md px-2.5 py-1.5 text-sm text-white"
+                >
+                  {sortList[orderColumn]}
+                  <ArrowLineDownIcon />
+                </div>
+                <div
+                  className={`border border-dark-300 rounded-md px-4 py-1 bg-dark-100 absolute right-0 w-[180px] top-[40px] ${
+                    showSelectBox ? "" : "hidden"
+                  }`}
+                >
+                  {Object.entries(sortList).map(([key, name]) => {
+                    const isSelected = orderColumn === key;
+                    return (
+                      <div
+                        key={key}
+                        className="flex items-center justify-between py-3 cursor-pointer"
+                        onClick={() => {
+                          handleSortChange(key);
+                          closeSelectBox();
+                        }}
+                      >
+                        <span className={`text-sm ${isSelected ? "text-primary" : "text-white"}`}>
+                          {name}
+                        </span>
+                        <CheckIcon className={`${isSelected ? "" : "hidden"}`} />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
           {positionHistory && positionHistory.length > 0 ? (
             positionHistory.map((record, index) => {
               const ifMeme = checkIfMeme({
