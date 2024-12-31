@@ -448,7 +448,7 @@ const TradingTable = ({
                               : ""
                             : null} */}
                         </td>
-                        <td>${beautifyPrice(record.price)}</td>
+                        <td>{record.price !== "0" ? beautifyPrice(record.price) : "-"}</td>
                         <td>
                           $
                           {beautifyPrice(
@@ -460,7 +460,7 @@ const TradingTable = ({
                             ),
                           )}
                         </td>
-                        <td>{record.pnl ? beautifyPrice(record.pnl) : "-"}</td>
+                        <td>{record.pnl !== "0" ? beautifyPrice(record.pnl) : "-"}</td>
                         <td>
                           {record.open_timestamp !== 0
                             ? new Date(record.open_timestamp).toLocaleString()
