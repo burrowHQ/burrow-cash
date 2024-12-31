@@ -390,7 +390,10 @@ const TradingTable = ({
                   <th className="pl-5">Market</th>
                   <th>Side</th>
                   <th>Size</th>
-                  <th>Price</th>
+                  <th>Net value</th>
+                  <th>Collateral</th>
+                  <th>Entry price</th>
+                  <th>Close price</th>
                   <th>Fee</th>
                   <th onClick={() => handleSortChange("pnl")}>
                     <div className="flex items-center cursor-pointer">
@@ -488,6 +491,11 @@ const TradingTable = ({
                               : ""
                             : null} */}
                         </td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>
+                          {record.entry_price !== "0" ? beautifyPrice(record.entry_price) : "-"}
+                        </td>
                         <td>{record.price !== "0" ? beautifyPrice(record.price) : "-"}</td>
                         <td>
                           $
@@ -509,11 +517,29 @@ const TradingTable = ({
                           {record.pnl !== "0" ? beautifyPrice(Math.abs(record.pnl)) : ""}
                         </td>
                         <td>
-                          {record.open_timestamp !== 0
-                            ? new Date(record.open_timestamp).toLocaleString()
-                            : "-"}
+                          <div className="text-sm">
+                            {record.open_timestamp !== 0
+                              ? new Date(record.open_timestamp).toLocaleDateString()
+                              : "-"}
+                          </div>
+                          <div className="text-sm">
+                            {record.open_timestamp !== 0
+                              ? new Date(record.open_timestamp).toLocaleTimeString()
+                              : ""}
+                          </div>
                         </td>
-                        <td>{new Date(record.close_timestamp).toLocaleString()}</td>
+                        <td>
+                          <div className="text-sm">
+                            {record.close_timestamp !== 0
+                              ? new Date(record.close_timestamp).toLocaleDateString()
+                              : "-"}
+                          </div>
+                          <div className="text-sm">
+                            {record.close_timestamp !== 0
+                              ? new Date(record.close_timestamp).toLocaleTimeString()
+                              : ""}
+                          </div>
+                        </td>
                         <td>{record.close_type}</td>
                       </tr>
                     );
@@ -944,7 +970,19 @@ const TradingTable = ({
                       </p>
                     </div>
                     <div className="flex items-center justify-between text-sm mb-[18px]">
-                      <p className="text-gray-300">Price</p>
+                      <p className="text-gray-300">Net Value</p>
+                      <p>-</p>
+                    </div>
+                    <div className="flex items-center justify-between text-sm mb-[18px]">
+                      <p className="text-gray-300">Collateral</p>
+                      <p>-</p>
+                    </div>
+                    <div className="flex items-center justify-between text-sm mb-[18px]">
+                      <p className="text-gray-300">Entry price</p>
+                      <p>{record.entry_price !== "0" ? beautifyPrice(record.entry_price) : "-"}</p>
+                    </div>
+                    <div className="flex items-center justify-between text-sm mb-[18px]">
+                      <p className="text-gray-300">Close price</p>
                       <p>{record.price !== "0" ? beautifyPrice(record.price) : "-"}</p>
                     </div>
                     <div className="flex items-center justify-between text-sm mb-[18px]">
