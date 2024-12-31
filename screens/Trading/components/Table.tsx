@@ -384,14 +384,14 @@ const TradingTable = ({
               <thead>
                 <tr className="text-gray-300 text-sm font-normal">
                   <th className="pl-5">Market</th>
-                  <th>Operation</th>
                   <th>Side</th>
+                  <th>Size</th>
                   <th>Price</th>
-                  <th>Amount</th>
                   <th>Fee</th>
                   <th>PNL & ROE</th>
                   <th>Opening time</th>
                   <th>Close time</th>
+                  <th>Operation</th>
                 </tr>
               </thead>
               <tbody>
@@ -418,7 +418,6 @@ const TradingTable = ({
                           assetP.token_id,
                           assetP.metadata?.symbol,
                         )}/${getSymbolById(assetD.token_id, assetD.metadata?.symbol)}`}</td>
-                        <td>{record.close_type}</td>
                         <td
                           className={
                             record.trend === "long"
@@ -430,14 +429,35 @@ const TradingTable = ({
                         >
                           {record.trend}
                         </td>
-                        <td>${beautifyPrice(record.price)}</td>
                         <td>
                           {record.trend === "long"
-                            ? beautifyPrice(record.amount_d)
+                            ? beautifyPrice(
+                                Number(
+                                  shrinkToken(
+                                    record.amount_d,
+                                    assetD.metadata.decimals + assetD.config.extra_decimals,
+                                  ),
+                                ),
+                              )
                             : record.trend === "short"
-                            ? beautifyPrice(record.amount_p)
-                            : "-"}
+                            ? beautifyPrice(
+                                Number(
+                                  shrinkToken(
+                                    record.amount_p,
+                                    assetP.metadata.decimals + assetP.config.extra_decimals,
+                                  ),
+                                ),
+                              )
+                            : null}
+                          {/* {record.amount_d > 0 && record.amount_p > 0
+                            ? record.trend === "long"
+                              ? getSymbolById(assetD.token_id, assetD.metadata?.symbol)
+                              : record.trend === "short"
+                              ? getSymbolById(assetP.token_id, assetP.metadata?.symbol)
+                              : ""
+                            : null} */}
                         </td>
+                        <td>{record.price !== "0" ? beautifyPrice(record.price) : "-"}</td>
                         <td>
                           $
                           {beautifyPrice(
@@ -449,13 +469,14 @@ const TradingTable = ({
                             ),
                           )}
                         </td>
-                        <td>{record.pnl ? record.pnl : "-"}</td>
+                        <td>{record.pnl !== "0" ? beautifyPrice(record.pnl) : "-"}</td>
                         <td>
                           {record.open_timestamp !== 0
-                            ? new Date(record.open_timestamp * 1000).toLocaleString()
+                            ? new Date(record.open_timestamp).toLocaleString()
                             : "-"}
                         </td>
                         <td>{new Date(record.close_timestamp).toLocaleString()}</td>
+                        <td>{record.close_type}</td>
                       </tr>
                     );
                   })

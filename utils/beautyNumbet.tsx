@@ -3,7 +3,6 @@ import { twMerge } from "tailwind-merge";
 export const beautifyPrice = (num: number, isDollar: boolean = false) => {
   if (!num) return "-";
   if (num == 0) return "0";
-  console.log(num);
   let numStr = num.toString();
   if (numStr.includes("e")) {
     const [base, exp] = numStr.split("e");
