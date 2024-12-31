@@ -442,13 +442,13 @@ const TradingTable = ({
                                 ),
                               )
                             : null}
-                          {record.amount_d > 0 && record.amount_p > 0
+                          {/* {record.amount_d > 0 && record.amount_p > 0
                             ? record.trend === "long"
                               ? getSymbolById(assetD.token_id, assetD.metadata?.symbol)
                               : record.trend === "short"
                               ? getSymbolById(assetP.token_id, assetP.metadata?.symbol)
                               : ""
-                            : null}
+                            : null} */}
                         </td>
                         <td>
                           $
