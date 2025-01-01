@@ -23,7 +23,7 @@ const transformAssetReward = (r, text) => ({
 const sumRewards = (acc, r) => acc + r.dailyAmount * r.price;
 
 export const UserDailyRewards = () => {
-  const { dashBoardActiveTab } = useAppSelector((state) => state.category);
+  const { activeCategory } = useAppSelector((state) => state.category);
   const {
     baseDepositUsdDaily,
     baseBorrowedUsdDaily,
@@ -34,7 +34,7 @@ export const UserDailyRewards = () => {
     farmTotalUsdDaily,
     totalUsdDaily,
     allRewards,
-  } = dashBoardActiveTab == "main" ? useDailyRewards() : useDailyRewardsMEME();
+  } = activeCategory == "main" ? useDailyRewards() : useDailyRewardsMEME();
 
   // useDailyRewards();
   const rewardsLabels = [

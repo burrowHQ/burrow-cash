@@ -7,12 +7,25 @@ import { RootState } from "../store";
 import { hasAssets } from "../utils";
 import { getAdjustedSum } from "./getWithdrawMaxAmount";
 import { DEFAULT_POSITION } from "../../utils/config";
+import { isMemeCategory } from "../../utils";
 
 export const recomputeHealthFactorAdjust = (tokenId: string, amount: number) =>
   createSelector(
     (state: RootState) => state.assets,
+    (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account,
-    (assets, account) => {
+    (state: RootState) => state.accountMEME,
+    (assetsMain, assetsMEME, accountMain, accountMEME) => {
+      const isMeme = isMemeCategory();
+      let assets;
+      let account;
+      if (isMeme) {
+        assets = assetsMEME;
+        account = accountMEME;
+      } else {
+        assets = assetsMain;
+        account = accountMain;
+      }
       if (!hasAssets(assets)) return { healthFactor: 0, maxBorrowValue: 0 };
       if (!account.portfolio || !tokenId) return { healthFactor: 0, maxBorrowValue: 0 };
       const asset = assets.data[tokenId];

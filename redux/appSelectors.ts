@@ -2,6 +2,7 @@ import { createSelector } from "@reduxjs/toolkit";
 
 import type { RootState } from "./store";
 import { transformAsset } from "./utils";
+import { isMemeCategory } from "../utils";
 
 export const getConfig = createSelector(
   (state: RootState) => state.app,
@@ -106,14 +107,30 @@ export const getTheme = createSelector(
 export const getAssetData = createSelector(
   (state: RootState) => state.app,
   (state: RootState) => state.assets.data,
+  (state: RootState) => state.assetsMEME.data,
   (state: RootState) => state.account,
-  (app, assets, account) => {
-    const asset = assets[app.selected?.tokenId];
+  (state: RootState) => state.accountMEME,
+  (app, assetsMain, assetsMEME, accountMain, accountMEME) => {
+    let asset;
+    let portfolio;
+    let account;
+    let assets;
+    if (isMemeCategory()) {
+      asset = assetsMEME[app.selected?.tokenId];
+      portfolio = accountMEME.portfolio;
+      account = accountMEME;
+      assets = assetsMEME;
+    } else {
+      asset = assetsMain[app.selected?.tokenId];
+      portfolio = accountMain.portfolio;
+      account = accountMain;
+      assets = assetsMain;
+    }
     return {
       tokenId: asset?.token_id,
       action: app.selected.action,
       position: app.selected.position,
-      portfolio: account.portfolio,
+      portfolio,
       ...(asset ? transformAsset(asset, account, assets, app) : {}),
     };
   },

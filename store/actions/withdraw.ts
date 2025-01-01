@@ -15,6 +15,7 @@ import { transformAccount } from "../../transformers/account";
 import { computeWithdrawMaxAmount } from "../../redux/selectors/getWithdrawMaxAmount";
 import getConfig from "../../utils/config";
 import { shadow_action_withdraw } from "./shadow";
+import { store } from "../../redux/store";
 
 const { SPECIAL_REGISTRATION_TOKEN_IDS } = getConfig() as any;
 interface Props {
@@ -22,23 +23,36 @@ interface Props {
   extraDecimals: number;
   amount: string;
   isMax: boolean;
-  enable_pyth_oracle: boolean;
+  isMeme: boolean;
 }
 
-export async function withdraw({
-  tokenId,
-  extraDecimals,
-  amount,
-  isMax,
-  enable_pyth_oracle,
-}: Props) {
-  const assets = await getAssets().then(transformAssets);
-  const account = await getAccount().then(transformAccount);
+export async function withdraw({ tokenId, extraDecimals, amount, isMax, isMeme }: Props) {
+  const state = store.getState();
+  const { oracleContract, logicContract, memeOracleContract, logicMEMEContract } =
+    await getBurrow();
+  let assets;
+  let account;
+  let enable_pyth_oracle;
+  let logicContractId;
+  let oracleContractId;
+  if (isMeme) {
+    assets = state.assetsMEME.data;
+    account = state.accountMEME;
+    enable_pyth_oracle = state.appMEME.config.enable_pyth_oracle;
+    logicContractId = logicMEMEContract.contractId;
+    oracleContractId = memeOracleContract.contractId;
+  } else {
+    assets = state.assets.data;
+    account = state.account;
+    enable_pyth_oracle = state.app.config.enable_pyth_oracle;
+    logicContractId = logicContract.contractId;
+    oracleContractId = oracleContract.contractId;
+  }
+  // const assets = await getAssets().then(transformAssets);
+  // const account = await getAccount().then(transformAccount);
   if (!account) return;
-
   const asset = assets[tokenId];
   const { decimals } = asset.metadata;
-  const { logicContract, oracleContract } = await getBurrow();
   const isNEAR = tokenId === nearTokenId;
   const { isLpToken } = asset;
   const suppliedBalance = new Decimal(account.portfolio?.supplied[tokenId]?.balance || 0);
@@ -112,7 +126,7 @@ export async function withdraw({
     };
     if (decreaseCollateralAmount.gt(0)) {
       transactions.push({
-        receiverId: enable_pyth_oracle ? logicContract.contractId : oracleContract.contractId,
+        receiverId: enable_pyth_oracle ? logicContractId : oracleContractId,
         functionCalls: [
           {
             methodName: enable_pyth_oracle
@@ -132,7 +146,7 @@ export async function withdraw({
                   ],
                 }
               : {
-                  receiver_id: logicContract.contractId,
+                  receiver_id: logicContractId,
                   msg: JSON.stringify({
                     Execute: {
                       actions: [
@@ -152,7 +166,7 @@ export async function withdraw({
       });
     } else {
       transactions.push({
-        receiverId: logicContract.contractId,
+        receiverId: logicContractId,
         functionCalls: [
           {
             methodName: ChangeMethodsLogic[ChangeMethodsLogic.execute],

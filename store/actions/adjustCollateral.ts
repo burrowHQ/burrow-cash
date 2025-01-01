@@ -5,31 +5,47 @@ import { decimalMin, getBurrow } from "../../utils";
 import { expandTokenDecimal } from "../helper";
 import { ChangeMethodsLogic, ChangeMethodsOracle } from "../../interfaces";
 import { Transaction } from "../wallet";
-import { getMetadata, prepareAndExecuteTransactions } from "../tokens";
-import { getAccountDetailed } from "../accounts";
-import getAssets from "../../api/get-assets";
-import { transformAssets } from "../../transformers/asstets";
-import getAccount from "../../api/get-account";
-import { transformAccount } from "../../transformers/account";
+import { prepareAndExecuteTransactions } from "../tokens";
+import { store } from "../../redux/store";
 
 export async function adjustCollateral({
   tokenId,
   extraDecimals,
   amount,
   isMax,
-  enable_pyth_oracle,
+  isMeme,
 }: {
   tokenId: string;
   extraDecimals: number;
   amount: string;
   isMax: boolean;
-  enable_pyth_oracle: boolean;
+  isMeme: boolean;
 }) {
-  const { oracleContract, logicContract } = await getBurrow();
-  const assets = await getAssets().then(transformAssets);
+  const state = store.getState();
+  const { oracleContract, logicContract, memeOracleContract, logicMEMEContract } =
+    await getBurrow();
+  let assets;
+  let account;
+  let enable_pyth_oracle;
+  let logicContractId;
+  let oracleContractId;
+  if (isMeme) {
+    assets = state.assetsMEME.data;
+    account = state.accountMEME;
+    enable_pyth_oracle = state.appMEME.config.enable_pyth_oracle;
+    logicContractId = logicMEMEContract.contractId;
+    oracleContractId = memeOracleContract.contractId;
+  } else {
+    assets = state.assets.data;
+    account = state.account;
+    enable_pyth_oracle = state.app.config.enable_pyth_oracle;
+    logicContractId = logicContract.contractId;
+    oracleContractId = oracleContract.contractId;
+  }
+  // const assets = await getAssets().then(transformAssets);
+  // const account = await getAccount().then(transformAccount);
   const asset = assets[tokenId];
   const { decimals } = asset.metadata;
-  const account = await getAccount().then(transformAccount);
   if (!account) return;
   const suppliedBalance = new Decimal(account.portfolio?.supplied[tokenId]?.balance || 0);
   const collateralBalance = new Decimal(
@@ -66,7 +82,7 @@ export async function adjustCollateral({
     }
     await prepareAndExecuteTransactions([
       {
-        receiverId: logicContract.contractId,
+        receiverId: logicContractId,
         functionCalls: [
           {
             methodName: enable_pyth_oracle
@@ -106,7 +122,7 @@ export async function adjustCollateral({
     }
     await prepareAndExecuteTransactions([
       {
-        receiverId: enable_pyth_oracle ? logicContract.contractId : oracleContract.contractId,
+        receiverId: enable_pyth_oracle ? logicContractId : oracleContractId,
         functionCalls: [
           {
             methodName: enable_pyth_oracle
@@ -118,7 +134,7 @@ export async function adjustCollateral({
                   actions: [decreaseCollateralTemplate],
                 }
               : {
-                  receiver_id: logicContract.contractId,
+                  receiver_id: logicContractId,
                   msg: JSON.stringify({
                     Execute: {
                       actions: [decreaseCollateralTemplate],

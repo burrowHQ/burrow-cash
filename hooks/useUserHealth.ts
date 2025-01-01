@@ -23,28 +23,28 @@ import { useFullDigits } from "./useFullDigits";
 
 export function useUserHealth() {
   const dispatch = useAppDispatch();
-  const { dashBoardActiveTab } = useAppSelector((state) => state.category);
+  const { activeCategory } = useAppSelector((state) => state.category);
   const { showDailyReturns } = useAppSelector(
-    dashBoardActiveTab == "main" ? getAppState : getAppStateMEME,
+    activeCategory == "main" ? getAppState : getAppStateMEME,
   );
   const netAPY = useAppSelector(
-    dashBoardActiveTab == "main"
+    activeCategory == "main"
       ? getNetAPY({ isStaking: false })
       : getNetAPYMEME({ isStaking: false }),
   );
   const netLiquidityAPY = useAppSelector(
-    dashBoardActiveTab == "main"
+    activeCategory == "main"
       ? getNetTvlAPY({ isStaking: false })
       : getNetTvlAPYMEME({ isStaking: false }),
   );
   const dailyReturns = useAppSelector(
-    dashBoardActiveTab == "main" ? getDailyReturns : getDailyReturnsMEME,
+    activeCategory == "main" ? getDailyReturns : getDailyReturnsMEME,
   );
   const healthFactor = useAppSelector(
-    dashBoardActiveTab == "main" ? getHealthFactor : getHealthFactorMEME,
+    activeCategory == "main" ? getHealthFactor : getHealthFactorMEME,
   );
   const LPHealthFactor = useAppSelector(
-    dashBoardActiveTab == "main" ? getLPHealthFactor : getLPHealthFactorMEME,
+    activeCategory == "main" ? getLPHealthFactor : getLPHealthFactorMEME,
   );
   const { fullDigits, setDigits } = useFullDigits();
   const slimStats = useSlimStats();

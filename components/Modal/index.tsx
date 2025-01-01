@@ -1,10 +1,12 @@
 import { useEffect, useState, createContext } from "react";
-import { Modal as MUIModal, Typography, Box, Stack, useTheme } from "@mui/material";
+import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 
 import Decimal from "decimal.js";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { hideModal, fetchConfig, updateAmount, updatePosition } from "../../redux/appSlice";
+import { fetchConfig as fetchMemeConfig } from "../../redux/appSliceMEME";
 import { getModalStatus, getAssetData, getSelectedValues } from "../../redux/appSelectors";
+import { getAssets } from "../../redux/selectors/getAssets";
 import { getWithdrawMaxAmount } from "../../redux/selectors/getWithdrawMaxAmount";
 import { getRepayPositions } from "../../redux/selectors/getRepayPositions";
 import { getAccountId } from "../../redux/accountSelectors";
@@ -34,7 +36,8 @@ import Controls from "./Controls";
 import Action from "./Action";
 import { fetchAssets, fetchRefPrices } from "../../redux/assetsSlice";
 import { fetchAssetsMEME } from "../../redux/assetsSliceMEME";
-import { useDegenMode, usePortfolioAssets } from "../../hooks/hooks";
+import { useDegenMode } from "../../hooks/hooks";
+import { isMemeCategory } from "../../utils/index";
 import {
   CollateralTypeSelectorBorrow,
   CollateralTypeSelectorRepay,
@@ -42,18 +45,23 @@ import {
 
 export const ModalContext = createContext(null) as any;
 const Modal = () => {
+  const dispatch = useAppDispatch();
   const isOpen = useAppSelector(getModalStatus);
   const accountId = useAppSelector(getAccountId);
   const asset = useAppSelector(getAssetData);
   const { amount } = useAppSelector(getSelectedValues);
-  const assets = useAppSelector((state) => state.assets?.data || {});
-  const dispatch = useAppDispatch();
+  const { assetsMain, assetsMEME } = useAppSelector(getAssets);
   const { isRepayFromDeposits } = useDegenMode();
   const theme = useTheme();
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
-
   const { action = "Deposit", tokenId, position } = asset;
-
+  const isMeme = isMemeCategory();
+  let assets;
+  if (isMeme) {
+    assets = assetsMEME;
+  } else {
+    assets = assetsMain;
+  }
   const { healthFactor, maxBorrowValue: adjustedMaxBorrowValue } = useAppSelector(
     action === "Withdraw"
       ? recomputeHealthFactorWithdraw(tokenId, +amount)
@@ -82,17 +90,7 @@ const Modal = () => {
   const { maxBorrowAmount = 0, maxBorrowValue = 0 } =
     maxBorrowAmountPositions[activePosition] || {};
   const repayAmount = repayPositions[selectedCollateralType];
-  const {
-    symbol,
-    apy,
-    price,
-    available,
-    available$,
-    totalTitle,
-    rates,
-    alerts,
-    canUseAsCollateral,
-  } = getModalData({
+  const { price, available, available$, rates, alerts, canUseAsCollateral } = getModalData({
     ...asset,
     maxBorrowAmount,
     maxWithdrawAmount,
@@ -102,12 +100,13 @@ const Modal = () => {
     borrowed: repayAmount,
     poolAsset: assets[tokenId],
   });
-  const handleClose = () => dispatch(hideModal());
   useEffect(() => {
     if (isOpen) {
+      // TODO33 still need this???
       dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
       dispatch(fetchAssetsMEME()).then(() => dispatch(fetchRefPrices()));
       dispatch(fetchConfig());
+      dispatch(fetchMemeConfig());
     }
   }, [isOpen]);
   useEffect(() => {
@@ -126,6 +125,7 @@ const Modal = () => {
       value$: new Decimal(price * +amount).toFixed(),
     });
   }
+  const handleClose = () => dispatch(hideModal());
   const repay_to_lp =
     action === "Repay" && isRepayFromDeposits && selectedCollateralType !== DEFAULT_POSITION;
   return (
@@ -185,7 +185,6 @@ const Modal = () => {
                   tokenId={asset.tokenId}
                 />
               )}
-              {/* <BorrowLimit from={maxBorrowValue} to={adjustedMaxBorrowValue} /> */}
             </div>
             <Alerts data={alerts} />
             <Action

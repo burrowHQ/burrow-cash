@@ -14,13 +14,13 @@ import HtmlTooltip from "../../common/html-tooltip";
 import { format_apy } from "../../../utils/uiNumber";
 
 export const APY = () => {
-  const { dashBoardActiveTab } = useAppSelector((state) => state.category);
+  const { activeCategory } = useAppSelector((state) => state.category);
   const { netAPY, netLiquidityAPY } = useUserHealth();
   const totalApy = netAPY + netLiquidityAPY;
   const amount = `${totalApy.toLocaleString(undefined, APY_FORMAT)}%`;
   const showLabels = netAPY !== 0 || netLiquidityAPY !== 0;
   const { averageSupplyApy, averageBorrowedApy } =
-    dashBoardActiveTab == "main" ? useAverageAPY() : useAverageAPYMEME();
+    activeCategory == "main" ? useAverageAPY() : useAverageAPYMEME();
   const apyLabels = [
     [
       {

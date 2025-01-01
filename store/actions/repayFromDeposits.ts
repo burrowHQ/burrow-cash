@@ -9,6 +9,8 @@ import { transformAccount } from "../../transformers/account";
 import getAccount from "../../api/get-account";
 import { DEFAULT_POSITION } from "../../utils/config";
 import getPortfolio from "../../api/get-portfolio";
+import getPortfolioMEME from "../../api/get-portfolio-meme";
+import { store } from "../../redux/store";
 
 export async function repayFromDeposits({
   tokenId,
@@ -16,21 +18,46 @@ export async function repayFromDeposits({
   extraDecimals,
   position,
   isMax,
-  enable_pyth_oracle,
+  isMeme,
 }: {
   tokenId: string;
   amount: string;
   extraDecimals: number;
   position: string;
   isMax: boolean;
-  enable_pyth_oracle: boolean;
+  isMeme: boolean;
 }) {
   // TODO repay from supplied
-  const { logicContract, oracleContract } = await getBurrow();
-  const { decimals } = (await getMetadata(tokenId))!;
-  const account = await getAccount().then(transformAccount);
+  const state = store.getState();
+  const { oracleContract, logicContract, memeOracleContract, logicMEMEContract } =
+    await getBurrow();
+  let assets;
+  let account;
+  let enable_pyth_oracle;
+  let logicContractId;
+  let oracleContractId;
+  if (isMeme) {
+    assets = state.assetsMEME.data;
+    account = state.accountMEME;
+    enable_pyth_oracle = state.appMEME.config.enable_pyth_oracle;
+    logicContractId = logicMEMEContract.contractId;
+    oracleContractId = memeOracleContract.contractId;
+  } else {
+    assets = state.assets.data;
+    account = state.account;
+    enable_pyth_oracle = state.app.config.enable_pyth_oracle;
+    logicContractId = logicContract.contractId;
+    oracleContractId = oracleContract.contractId;
+  }
+  // const account = await getAccount().then(transformAccount);
   if (!account) return;
-  const detailedAccount = (await getPortfolio(account.accountId))!;
+  const { decimals } = (await getMetadata(tokenId))!;
+  let detailedAccount;
+  if (isMeme) {
+    detailedAccount = await getPortfolioMEME(account.accountId);
+  } else {
+    detailedAccount = await getPortfolio(account.accountId);
+  }
   const borrowedBalance = new Decimal(
     detailedAccount.positions[position]?.borrowed?.find((b) => b.token_id === tokenId)?.balance ||
       0,
@@ -75,7 +102,7 @@ export async function repayFromDeposits({
     },
   };
   transactions.push({
-    receiverId: enable_pyth_oracle ? logicContract.contractId : oracleContract.contractId,
+    receiverId: enable_pyth_oracle ? logicContractId : oracleContractId,
     functionCalls: [
       {
         methodName: enable_pyth_oracle
@@ -90,7 +117,7 @@ export async function repayFromDeposits({
               ],
             }
           : {
-              receiver_id: logicContract.contractId,
+              receiver_id: logicContractId,
               msg: JSON.stringify({
                 Execute: {
                   actions: [

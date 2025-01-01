@@ -15,6 +15,7 @@ import { toggleUseAsCollateral } from "../../redux/appSlice";
 import { IToken } from "../../interfaces/asset";
 import { DEFAULT_POSITION } from "../../utils/config";
 import { ModalContext } from "../Modal/index";
+import { isMemeCategory } from "../../utils/index";
 
 export type IAssetType = "borrow" | "supply";
 type IBalance = { supply_balance?: string; borrow_balance?: string };
@@ -31,7 +32,11 @@ export default function SelectToken({
 }) {
   const [updateAsset, setUpdateAsset] = useState<Record<string, IUIAsset>>({});
   const [assetList, setAssetList] = useState<IUIAsset[]>([]);
-  const rows = useAvailableAssets(assetType);
+  const isMeme = isMemeCategory();
+  const rows = useAvailableAssets({
+    source: assetType,
+    isMeme,
+  });
   const selectRef = useRef(null);
   const is_mobile = isMobileDevice();
   if (!rows?.length) return null;

@@ -25,7 +25,7 @@ import { getMarketRewardsData } from "../../redux/selectors/getMarketRewards";
 const ModalStaking = ({ isOpen, onClose }) => {
   const [total, totalUnclaim, totalToken] = useAppSelector(getTotalBRRR);
   const app = useAppSelector((state) =>
-    state.category.dashBoardActiveTab == "main" ? state.app : state.appMEME,
+    state.category.activeCategory == "main" ? state.app : state.appMEME,
   );
   const [monthPercent, setMonthPercent] = useState(0);
   const [loadingStake, setLoadingStake] = useState(false);

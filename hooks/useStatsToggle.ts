@@ -4,9 +4,9 @@ import { setProtocolStats } from "../redux/appSlice";
 
 export function useStatsToggle() {
   const dispatch = useAppDispatch();
-  const { dashBoardActiveTab } = useAppSelector((state) => state.category);
+  const { activeCategory } = useAppSelector((state) => state.category);
   const protocolStats = useAppSelector(
-    dashBoardActiveTab == "main" ? getProtocolStats : getProtocolStatsMEME,
+    activeCategory == "main" ? getProtocolStats : getProtocolStatsMEME,
   );
 
   const setStats = (v: boolean) => dispatch(setProtocolStats(v));

@@ -3,7 +3,7 @@ import { createSelector } from "@reduxjs/toolkit";
 
 import { RootState } from "../store";
 import { shrinkToken, expandTokenDecimal, MAX_RATIO } from "../../store";
-import { decimalMax, decimalMin } from "../../utils";
+import { decimalMax, decimalMin, isMemeCategory } from "../../utils";
 import { Assets } from "../assetState";
 import { Portfolio } from "../accountState";
 import { DEFAULT_POSITION, lpTokenPrefix } from "../../utils/config";
@@ -125,8 +125,20 @@ export const getWithdrawMaxAmount = (tokenId: string) =>
   createSelector(
     (state: RootState) => state.app,
     (state: RootState) => state.assets.data,
+    (state: RootState) => state.assetsMEME.data,
     (state: RootState) => state.account.portfolio,
-    (app, assets, portfolio) => {
+    (state: RootState) => state.accountMEME.portfolio,
+    (app, assetsMain, assetsMEME, portfolioMain, portfolioMEME) => {
+      const isMeme = isMemeCategory();
+      let assets;
+      let portfolio;
+      if (isMeme) {
+        assets = assetsMEME;
+        portfolio = portfolioMEME;
+      } else {
+        assets = assetsMain;
+        portfolio = portfolioMain;
+      }
       const asset = assets[tokenId];
       if (!asset || app.selected.tokenId !== tokenId) return 0;
       if (!["Withdraw", "Adjust", "Repay"].includes(app.selected.action as string)) return 0;

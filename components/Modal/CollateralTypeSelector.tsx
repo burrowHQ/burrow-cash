@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { ArrowDownIcon } from "./svg";
 import { CheckedIcon } from "../SelectToken/svg";
 import { useAvailableAssets } from "../../hooks/hooks";
@@ -6,8 +6,7 @@ import { digitalProcess } from "../../utils/uiNumber";
 import { UIAsset } from "../../interfaces";
 import { DEFAULT_POSITION } from "../../utils/config";
 import CollateralTypeName from "./CollateralTypeName";
-import { shrinkToken } from "../../store";
-import { Asset } from "../../redux/assetState";
+import { isMemeCategory } from "../../utils/index";
 
 export function CollateralTypeSelectorBorrow({
   maxBorrowAmountPositions,
@@ -19,7 +18,8 @@ export function CollateralTypeSelectorBorrow({
   setSelectedCollateralType: any;
 }) {
   const [show, setShow] = useState(false);
-  const assets = useAvailableAssets();
+  const isMeme = isMemeCategory();
+  const assets = useAvailableAssets({ isMeme });
   const LPAssetMap = useMemo(() => {
     return assets
       .filter((asset: UIAsset) => asset.isLpToken)
@@ -106,7 +106,8 @@ export function CollateralTypeSelectorRepay({
   setSelectedCollateralType: any;
 }) {
   const [show, setShow] = useState(false);
-  const assets = useAvailableAssets();
+  const isMeme = isMemeCategory();
+  const assets = useAvailableAssets({ isMeme });
   const LPAssetMap = useMemo(() => {
     return assets
       .filter((asset: UIAsset) => asset.isLpToken)

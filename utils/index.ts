@@ -27,6 +27,7 @@ import { FarmData, Portfolio, Farm } from "../redux/accountState";
 // eslint-disable-next-line import/no-cycle
 import { IPortfolioReward } from "../redux/selectors/getAccountRewards";
 import { IConfig } from "../interfaces";
+import { store } from "../redux/store";
 
 export const getViewAs = () => {
   if (window.location.href.includes("#instant-url")) {
@@ -367,4 +368,14 @@ function filterTypeFarms(typeFarmData): IFarms {
 
 interface IFarms {
   [tokenId: string]: Farm;
+}
+
+export function isMemeCategory() {
+  const state = store.getState();
+  const category = state.category.activeCategory;
+  const url = new URL(window.location.href);
+  const search = new URLSearchParams(url.search);
+  if (search.get("pageType") == "meme") return true;
+  if (category == "meme") return true;
+  return false;
 }

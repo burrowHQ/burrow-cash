@@ -17,9 +17,9 @@ import {
 
 const Records = ({ isShow }) => {
   const accountId = useAccountId();
-  const { dashBoardActiveTab } = useAppSelector((state) => state.category);
+  const { activeCategory } = useAppSelector((state) => state.category);
   const { toastMessage, showToast } = useToastMessage();
-  const assets = useAppSelector(dashBoardActiveTab == "main" ? getAssets : getAssetsMEME);
+  const assets = useAppSelector(activeCategory == "main" ? getAssets : getAssetsMEME);
   const [isLoading, setIsLoading] = useState(false);
   const [docs, setDocs] = useState<any>([]);
   const [pagination, setPagination] = useState<{

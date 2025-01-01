@@ -6,12 +6,7 @@ import { ContentBox } from "../../components/ContentBox/ContentBox";
 import LayoutContainer from "../../components/LayoutContainer/LayoutContainer";
 import SupplyTokenSvg from "../../public/svg/Group 24791.svg";
 import BorrowTokenSvg from "../../public/svg/Group 24677.svg";
-import {
-  useAccountId,
-  useAvailableAssets,
-  usePortfolioAssets,
-  usePortfolioMEMEAssets,
-} from "../../hooks/hooks";
+import { useAccountId, useAvailableAssets, usePortfolioAssets } from "../../hooks/hooks";
 import DashboardReward from "./dashboardReward";
 import CustomTable from "../../components/CustomTable/CustomTable";
 import {
@@ -28,29 +23,21 @@ import SupplyBorrowListMobile from "./supplyBorrowListMobile";
 import { AdjustButton, WithdrawButton, RepayButton, MarketButton } from "./supplyBorrowButtons";
 import { hiddenAssets } from "../../utils/config";
 import { APYCell } from "../Market/APYCell";
-import { setDashBoardActiveTab } from "../../redux/marginTrading";
+import { setActiveCategory } from "../../redux/marginTrading";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 
 const Index = () => {
   const accountId = useAccountId();
   const dispatch = useAppDispatch();
-  const { dashBoardActiveTab: activeTab = "main" } = useAppSelector((state) => state.category);
+  const { activeCategory: activeTab = "main" } = useAppSelector((state) => state.category);
   const [suppliedRows, borrowedRows, totalSuppliedUSD, totalBorrowedUSD, borrowedAll] =
-    activeTab == "main" ? usePortfolioAssets() : usePortfolioMEMEAssets();
+    usePortfolioAssets(activeTab !== "main");
 
   useEffect(() => {
     return () => {
-      dispatch(setDashBoardActiveTab("main"));
+      dispatch(setActiveCategory("main"));
     };
   }, [dispatch]);
-  // const [
-  //   suppliedMEMERows,
-  //   borrowedMEMERows,
-  //   totalMEMESuppliedUSD,
-  //   totalMEMEBorrowedUSD,
-  //   borrowedMEMEAll,
-  // ] = usePortfolioMEMEAssets();
-
   const isMobile = isMobileDevice();
 
   let overviewNode;
@@ -101,7 +88,7 @@ const Index = () => {
             className={`${
               activeTab == "main" ? "bg-primary" : "bg-[#C0C4E94D]"
             } text-center h-12 leading-[48px] text-black rounded-xl`}
-            onClick={() => dispatch(setDashBoardActiveTab("main"))}
+            onClick={() => dispatch(setActiveCategory("main"))}
           >
             Mainstream
           </div>
@@ -109,7 +96,7 @@ const Index = () => {
             className={`${
               activeTab == "meme" ? "bg-primary" : "bg-[#C0C4E94D]"
             } text-center h-12 leading-[48px] text-black rounded-xl`}
-            onClick={() => dispatch(setDashBoardActiveTab("meme"))}
+            onClick={() => dispatch(setActiveCategory("meme"))}
           >
             Meme
           </div>

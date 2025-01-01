@@ -12,18 +12,20 @@ export async function supply({
   useAsCollateral,
   amount,
   isMax,
+  isMeme,
 }: {
   tokenId: string;
   extraDecimals: number;
   useAsCollateral: boolean;
   amount: string;
   isMax: boolean;
+  isMeme: boolean;
 }): Promise<void> {
-  const { account, logicContract } = await getBurrow();
+  const { account, logicContract, logicMEMEContract } = await getBurrow();
   const { decimals } = (await getMetadata(tokenId))!;
   const tokenContract = await getTokenContract(tokenId);
   const tokenBalance = new Decimal(await getBalance(tokenId, account.accountId));
-
+  const burrowContractId = isMeme ? logicMEMEContract.contractId : logicContract.contractId;
   const expandedAmount = isMax
     ? tokenBalance
     : decimalMin(expandTokenDecimal(amount, decimals), tokenBalance);
@@ -44,7 +46,7 @@ export async function supply({
   await prepareAndExecuteTokenTransactions(tokenContract, {
     methodName: ChangeMethodsToken[ChangeMethodsToken.ft_transfer_call],
     args: {
-      receiver_id: logicContract.contractId,
+      receiver_id: burrowContractId,
       amount: expandedAmount.toFixed(0),
       msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
     },

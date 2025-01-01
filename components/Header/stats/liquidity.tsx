@@ -53,13 +53,13 @@ export const ProtocolLiquidity = () => {
 
 export const UserLiquidity = () => {
   const { fullDigits, setDigits } = useFullDigits();
-  const { dashBoardActiveTab } = useAppSelector((state) => state.category);
+  const { activeCategory } = useAppSelector((state) => state.category);
   const userDeposited =
-    dashBoardActiveTab == "main"
+    activeCategory == "main"
       ? useAppSelector(getTotalAccountBalance("supplied"))
       : useAppSelector(getTotalAccountBalanceMEME("borrowed"));
   const userBorrowed =
-    dashBoardActiveTab == "main"
+    activeCategory == "main"
       ? useAppSelector(getTotalAccountBalance("borrowed"))
       : useAppSelector(getTotalAccountBalanceMEME("borrowed"));
   const userNetLiquidity = new Decimal(userDeposited).minus(userBorrowed).toNumber();

@@ -28,15 +28,15 @@ import { standardizeAsset, filterSentOutFarms } from "../utils";
 import { getNetGains } from "../redux/selectors/getAverageNetRewardApy";
 
 export function useRewards() {
-  const { dashBoardActiveTab } = useAppSelector((state) => state.category);
+  const { activeCategory } = useAppSelector((state) => state.category);
   const assetRewards = useAppSelector(
-    dashBoardActiveTab == "main" ? getAccountRewards : getAccountRewardsMEME,
+    activeCategory == "main" ? getAccountRewards : getAccountRewardsMEME,
   );
   const protocol = useAppSelector(
-    dashBoardActiveTab == "main" ? getProtocolRewards : getProtocolRewardsMEME,
+    activeCategory == "main" ? getProtocolRewards : getProtocolRewardsMEME,
   );
   const tokenNetBalanceRewards = useAppSelector(
-    dashBoardActiveTab == "main" ? getTokenNetBalanceRewards : getTokenNetBalanceRewardsMEME,
+    activeCategory == "main" ? getTokenNetBalanceRewards : getTokenNetBalanceRewardsMEME,
   );
   const { brrr, totalUnClaimUSD } = assetRewards || {};
   const extra = Object.entries(assetRewards.extra);
@@ -90,23 +90,23 @@ export function useDailyRewardsMEME() {
 }
 
 export function useNetLiquidityRewards() {
-  const { dashBoardActiveTab } = useAppSelector((state) => state.category);
+  const { activeCategory } = useAppSelector((state) => state.category);
   const rewards = useAppSelector(
-    dashBoardActiveTab == "main" ? getNetLiquidityRewards : getNetLiquidityRewardsMEME,
+    activeCategory == "main" ? getNetLiquidityRewards : getNetLiquidityRewardsMEME,
   );
   return rewards;
 }
 export function useTokenNetLiquidityRewards(tokenId: string) {
-  const { dashBoardActiveTab } = useAppSelector((state) => state.category);
-  const assets = useAppSelector(dashBoardActiveTab == "main" ? getAssets : getAssetsMEME);
+  const { activeCategory } = useAppSelector((state) => state.category);
+  const assets = useAppSelector(activeCategory == "main" ? getAssets : getAssetsMEME);
   const asset = assets.data[tokenId];
   const rewards = getRewards("tokennetbalance", asset, assets.data);
   return rewards;
 }
 
 export function useProRataNetLiquidityReward(tokenId, dailyAmount) {
-  const { dashBoardActiveTab } = useAppSelector((state) => state.category);
-  const assets = useAppSelector(dashBoardActiveTab == "main" ? getAssets : getAssetsMEME);
+  const { activeCategory } = useAppSelector((state) => state.category);
+  const assets = useAppSelector(activeCategory == "main" ? getAssets : getAssetsMEME);
   const net_tvl_multiplier = (assets?.data?.[tokenId].config.net_tvl_multiplier || 0) / 10000;
   const { protocolNetLiquidity } = useProtocolNetLiquidity(true);
   const tokenLiquidity = useAppSelector(getTokenLiquidity(tokenId));
@@ -117,14 +117,14 @@ export function useProRataNetLiquidityReward(tokenId, dailyAmount) {
 }
 
 export function useStakeRewardApy() {
-  const { dashBoardActiveTab } = useAppSelector((state) => state.category);
+  const { activeCategory } = useAppSelector((state) => state.category);
   const assetRewards = useAppSelector(
-    dashBoardActiveTab == "main" ? getAccountRewardsForApy : getAccountRewardsForApyMEME,
+    activeCategory == "main" ? getAccountRewardsForApy : getAccountRewardsForApyMEME,
   );
   const portfolio = useAppSelector(
-    dashBoardActiveTab == "main" ? getAccountPortfolio : getAccountPortfolioMEME,
+    activeCategory == "main" ? getAccountPortfolio : getAccountPortfolioMEME,
   );
-  const assets = useAppSelector(dashBoardActiveTab == "main" ? getAssets : getAssetsMEME);
+  const assets = useAppSelector(activeCategory == "main" ? getAssets : getAssetsMEME);
   if (!assets?.data)
     return {
       avgStakeSupplyAPY: 0,

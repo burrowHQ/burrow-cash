@@ -23,11 +23,11 @@ import {
 import { APYCell } from "./APYCell";
 import getConfig, { incentiveTokens, topTokens } from "../../utils/config";
 
-function MarketsTable({ rows, sorting }: TableProps) {
+function MarketsTable({ rows, sorting, isMeme }: TableProps) {
   return (
     <div className="w-full xsm:p-4">
       <TableHead sorting={sorting} />
-      <TableBody rows={rows} sorting={sorting} />
+      <TableBody rows={rows} sorting={sorting} isMeme={isMeme} />
     </div>
   );
 }
@@ -165,7 +165,7 @@ function HeadMobile({ sorting }) {
     </div>
   );
 }
-function TableBody({ rows, sorting }: TableProps) {
+function TableBody({ rows, sorting, isMeme }: TableProps) {
   const [depositApyMap, setDepositApyMap] = useState<Record<string, number>>({});
   const [borrowApyMap, setBorrowApyMap] = useState<Record<string, number>>({});
   const [sortedRows, setSortedRows] = useState<any>();
@@ -239,6 +239,7 @@ function TableBody({ rows, sorting }: TableProps) {
             setDepositApyMap={setDepositApyMap}
             borrowApyMap={borrowApyMap}
             setBorrowApyMap={setBorrowApyMap}
+            isMeme={isMeme}
           />
         );
       })}
@@ -253,6 +254,7 @@ function TableRow({
   setDepositApyMap,
   borrowApyMap,
   setBorrowApyMap,
+  isMeme,
 }: {
   row: UIAsset;
   lastRow: boolean;
@@ -260,6 +262,7 @@ function TableRow({
   setDepositApyMap: any;
   borrowApyMap: Record<string, number>;
   setBorrowApyMap: any;
+  isMeme: boolean;
 }) {
   const { NATIVE_TOKENS, NEW_TOKENS } = getConfig() as any;
   const isMobile = isMobileDevice();
@@ -357,6 +360,7 @@ function TableRow({
           is_new={is_new}
           getIcons={getIcons}
           getSymbols={getSymbols}
+          isMeme={isMeme}
         />
       ) : (
         <TableRowPc
@@ -367,6 +371,7 @@ function TableRow({
           is_new={is_new}
           getIcons={getIcons}
           getSymbols={getSymbols}
+          isMeme={isMeme}
         />
       )}
     </div>
@@ -380,6 +385,7 @@ function TableRowPc({
   is_new,
   getIcons,
   getSymbols,
+  isMeme,
 }: {
   row: UIAsset;
   lastRow: boolean;
@@ -387,9 +393,13 @@ function TableRowPc({
   is_new: boolean;
   getIcons: () => React.ReactNode;
   getSymbols: () => React.ReactNode;
+  isMeme: boolean;
 }) {
   return (
-    <Link key={row.tokenId} href={`/tokenDetail/${row.tokenId}`}>
+    <Link
+      key={row.tokenId}
+      href={`/tokenDetail/${row.tokenId}?pageType=${isMeme ? "meme" : "main"}`}
+    >
       <div
         className={`grid grid-cols-6 bg-gray-800 hover:bg-dark-100 cursor-pointer mt-0.5 h-[60px] ${
           lastRow ? "rounded-b-md" : ""
@@ -495,6 +505,7 @@ function TableRowMobile({
   is_new,
   getIcons,
   getSymbols,
+  isMeme,
 }: {
   row: UIAsset;
   lastRow: boolean;
@@ -504,9 +515,13 @@ function TableRowMobile({
   is_new: boolean;
   getIcons: () => React.ReactNode;
   getSymbols: () => React.ReactNode;
+  isMeme: boolean;
 }) {
   return (
-    <Link key={row.tokenId} href={`/tokenDetail/${row.tokenId}`}>
+    <Link
+      key={row.tokenId}
+      href={`/tokenDetail/${row.tokenId}?pageType=${isMeme ? "meme" : "main"}`}
+    >
       <div className={`bg-gray-800 rounded-xl p-3.5 ${lastRow ? "" : "mb-4"}`}>
         <div className="flex items-center pb-4 border-b border-dark-950 -ml-1 relative">
           {getIcons()}

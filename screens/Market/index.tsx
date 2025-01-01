@@ -4,21 +4,20 @@ import MarketsTable from "./table";
 import MarketsOverview from "./overview";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { showModal } from "../../redux/appSlice";
-import { useAvailableAssets, useAvailableAssetsMEME } from "../../hooks/hooks";
+import { useAvailableAssets } from "../../hooks/hooks";
 import { useTableSorting } from "../../hooks/useTableSorting";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
-import { setDashBoardActiveTab } from "../../redux/marginTrading";
+import { setActiveCategory } from "../../redux/marginTrading";
 
 const Market = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { dashBoardActiveTab: activeTab = "main" } = useAppSelector((state) => state.category);
-  const { dashBoardActiveTab } = useAppSelector((state) => state.category);
-  const rows = dashBoardActiveTab == "main" ? useAvailableAssets() : useAvailableAssetsMEME();
+  const { activeCategory: activeTab = "main" } = useAppSelector((state) => state.category);
+  const rows = useAvailableAssets({ isMeme: activeTab !== "main" });
   const { sorting, setSorting } = useTableSorting();
   useEffect(() => {
     return () => {
-      dispatch(setDashBoardActiveTab("main"));
+      dispatch(setActiveCategory("main"));
     };
   }, [dispatch]);
   useEffect(() => {
@@ -38,7 +37,7 @@ const Market = () => {
           className={`${
             activeTab == "main" ? "bg-primary" : "bg-[#C0C4E94D]"
           } text-center h-12 leading-[48px] text-black rounded-t-xl xsm:rounded-xl xsm:ml-4`}
-          onClick={() => dispatch(setDashBoardActiveTab("main"))}
+          onClick={() => dispatch(setActiveCategory("main"))}
         >
           Mainstream
         </div>
@@ -46,7 +45,7 @@ const Market = () => {
           className={`${
             activeTab == "meme" ? "bg-primary" : "bg-[#C0C4E94D]"
           } text-center h-12 leading-[48px] text-black rounded-t-xl xsm:rounded-xl xsm:mr-4`}
-          onClick={() => dispatch(setDashBoardActiveTab("meme"))}
+          onClick={() => dispatch(setActiveCategory("meme"))}
         >
           Meme
         </div>
@@ -55,6 +54,7 @@ const Market = () => {
         rows={rows}
         onRowClick={handleOnRowClick}
         sorting={{ name: "market", ...sorting.market, setSorting }}
+        isMeme={activeTab !== "main"}
       />
       {loading ? (
         <div className="flex flex-col items-center mt-24">

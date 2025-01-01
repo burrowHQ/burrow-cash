@@ -1,9 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
-import { Box, Typography, Switch, Tooltip, Alert, useTheme } from "@mui/material";
-import LoadingButton from "@mui/lab/LoadingButton";
 import Decimal from "decimal.js";
-import { FcInfo } from "@react-icons/all-files/fc/FcInfo";
-import { nearTokenId } from "../../utils";
+import { nearTokenId, isMemeCategory } from "../../utils";
 import { toggleUseAsCollateral, hideModal } from "../../redux/appSlice";
 import { getModalData } from "./utils";
 import { repay } from "../../store/actions/repay";
@@ -18,19 +15,19 @@ import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { getSelectedValues, getAssetData, getConfig } from "../../redux/appSelectors";
 import { trackActionButton } from "../../utils/telemetry";
 import { useDegenMode } from "../../hooks/hooks";
-import { SubmitButton, AlertWarning } from "./components";
-import { getAccountPortfolio } from "../../redux/accountSelectors";
+import { SubmitButton } from "./components";
 import getShadowRecords from "../../api/get-shadows";
 import { expandToken, shrinkToken } from "../../store";
 
 export default function Action({ maxBorrowAmount, healthFactor, collateralType, poolAsset }) {
   const [loading, setLoading] = useState(false);
   const { amount, useAsCollateral, isMax } = useAppSelector(getSelectedValues);
-  const { enable_pyth_oracle } = useAppSelector(getConfig);
+  const { enable_pyth_oracle } = useAppSelector(getConfig); // TODO33 need query from api？
   const dispatch = useAppDispatch();
   const asset = useAppSelector(getAssetData);
   const { action = "Deposit", tokenId, borrowApy, price, portfolio, isLpToken, position } = asset;
   const { isRepayFromDeposits } = useDegenMode();
+  const isMeme = isMemeCategory();
   const { available, canUseAsCollateral, extraDecimals, collateral, disabled, decimals } =
     getModalData({
       ...asset,
@@ -64,7 +61,7 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
     switch (action) {
       case "Supply":
         if (tokenId === nearTokenId) {
-          await deposit({ amount, useAsCollateral, isMax });
+          await deposit({ amount, useAsCollateral, isMax, isMeme });
         } else if (isLpToken) {
           const shadowRecords = await getShadowRecords();
           const pool_id = tokenId.split("-")[1];
@@ -83,11 +80,12 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
             useAsCollateral,
             amount,
             isMax,
+            isMeme,
           });
         }
         break;
       case "Borrow": {
-        await borrow({ tokenId, extraDecimals, amount, collateralType, enable_pyth_oracle });
+        await borrow({ tokenId, extraDecimals, amount, collateralType, isMeme });
         break;
       }
       case "Withdraw": {
@@ -96,7 +94,7 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
           extraDecimals,
           amount,
           isMax,
-          enable_pyth_oracle,
+          isMeme,
         });
         break;
       }
@@ -106,7 +104,7 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
           extraDecimals,
           amount,
           isMax,
-          enable_pyth_oracle,
+          isMeme,
         });
         break;
       case "Repay": {
@@ -139,7 +137,7 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
             extraDecimals,
             position: collateralType,
             isMax,
-            enable_pyth_oracle,
+            isMeme,
           });
         } else {
           await repay({
@@ -150,6 +148,7 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
             isMax,
             minRepay,
             interestChargedIn1min,
+            isMeme,
           });
         }
         break;

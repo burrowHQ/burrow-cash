@@ -50,12 +50,7 @@ import { ConnectWalletButton } from "../../components/Header/WalletButton";
 import { OuterLinkConfig } from "./config";
 import { APYCell } from "../Market/APYCell";
 import { RewardsV2 } from "../../components/Rewards";
-import getConfig, {
-  DEFAULT_POSITION,
-  lpTokenPrefix,
-  STABLE_POOL_IDS,
-  incentiveTokens,
-} from "../../utils/config";
+import getConfig, { DEFAULT_POSITION, lpTokenPrefix, STABLE_POOL_IDS } from "../../utils/config";
 import InterestRateChart, { LabelText } from "./interestRateChart";
 import TokenBorrowSuppliesChart from "./tokenBorrowSuppliesChart";
 import { useTokenDetails } from "../../hooks/useTokenDetails";
@@ -63,20 +58,30 @@ import { IToken } from "../../interfaces/asset";
 import LPTokenCell from "./LPTokenCell";
 import AvailableBorrowCell from "./AvailableBorrowCell";
 import { useAppDispatch } from "../../redux/hooks";
+import { isMemeCategory } from "../../utils/index";
 
 const DetailData = createContext(null) as any;
 const TokenDetail = () => {
+  const isMeme = isMemeCategory();
   const router = useRouter();
-  const rows = useAvailableAssets();
+  const rows = useAvailableAssets({ isMeme });
   const { id } = router.query;
   const tokenRow = rows.find((row: UIAsset) => {
     return row.tokenId === id;
   });
   if (!tokenRow) return null;
-  return <TokenDetailView tokenRow={tokenRow} assets={rows} />;
+  return <TokenDetailView tokenRow={tokenRow} assets={rows} isMeme={isMeme} />;
 };
 
-function TokenDetailView({ tokenRow, assets }: { tokenRow: UIAsset; assets: UIAsset[] }) {
+function TokenDetailView({
+  tokenRow,
+  assets,
+  isMeme,
+}: {
+  tokenRow: UIAsset;
+  assets: UIAsset[];
+  isMeme: boolean;
+}) {
   const [suppliers_number, set_suppliers_number] = useState<number>();
   const [borrowers_number, set_borrowers_number] = useState<number>();
   const isMobile = isMobileDevice();
@@ -98,7 +103,7 @@ function TokenDetailView({ tokenRow, assets }: { tokenRow: UIAsset; assets: UIAs
   });
   const tokenDetails = useTokenDetails();
   const { fetchTokenDetails, changePeriodDisplay } = tokenDetails || {};
-  const [suppliedRows, borrowedRows, , , borrowedLPRows] = usePortfolioAssets() as [
+  const [suppliedRows, borrowedRows, , , borrowedLPRows] = usePortfolioAssets(isMeme) as [
     any[],
     any[],
     number,
@@ -235,6 +240,7 @@ function TokenDetailView({ tokenRow, assets }: { tokenRow: UIAsset; assets: UIAs
         assets,
         getIcons,
         getSymbols,
+        isMeme,
       }}
     >
       {isMobile ? (

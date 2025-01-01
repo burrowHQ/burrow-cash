@@ -1,11 +1,7 @@
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import {
-  getAvailableAssets,
-  getAvailableAssetsMEME,
-  isAssetsLoading,
-} from "../redux/assetsSelectors";
+import { getAvailableAssets, isAssetsLoading } from "../redux/assetsSelectors";
 import { getAccountId, getHasNonFarmedAssets, isAccountLoading } from "../redux/accountSelectors";
-import { getPortfolioAssets, getPortfolioMEMEAssets } from "../redux/selectors/getPortfolioAssets";
+import { getPortfolioAssets } from "../redux/selectors/getPortfolioAssets";
 import {
   getConfig,
   getSlimStats,
@@ -63,22 +59,19 @@ export function useNonFarmedAssets() {
   return { hasNonFarmedAssets, weightedNetLiquidity, hasNegativeNetLiquidity, assets };
 }
 
-export function useAvailableAssets(type?: "supply" | "borrow" | "") {
-  const rows = useAppSelector(getAvailableAssets(type));
+export function useAvailableAssets({
+  source,
+  isMeme,
+}: {
+  source?: "supply" | "borrow" | "";
+  isMeme?: boolean;
+}) {
+  const rows = useAppSelector(getAvailableAssets({ source, isMeme }));
   return rows;
 }
 
-export function useAvailableAssetsMEME(type?: "supply" | "borrow" | "") {
-  const rows = useAppSelector(getAvailableAssetsMEME(type));
-  return rows;
-}
-
-export function usePortfolioAssets() {
-  return useAppSelector(getPortfolioAssets);
-}
-
-export function usePortfolioMEMEAssets() {
-  return useAppSelector(getPortfolioMEMEAssets);
+export function usePortfolioAssets(isMeme?: boolean) {
+  return useAppSelector(getPortfolioAssets(isMeme));
 }
 
 export function useDegenMode() {
@@ -110,9 +103,9 @@ export function useDarkMode() {
 }
 
 export function useUnreadLiquidation(liquidationPage = 1) {
-  const { dashBoardActiveTab } = useAppSelector((state) => state.category);
+  const { activeCategory } = useAppSelector((state) => state.category);
   const unreadLiquidation = useAppSelector(
-    dashBoardActiveTab == "main" ? getUnreadLiquidation : getUnreadLiquidationMEME,
+    activeCategory == "main" ? getUnreadLiquidation : getUnreadLiquidationMEME,
   );
   const accountId = useAccountId();
   const dispatch = useAppDispatch();

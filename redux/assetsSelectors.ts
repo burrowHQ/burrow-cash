@@ -5,30 +5,33 @@ import type { RootState } from "./store";
 import { hiddenAssets } from "../utils/config";
 import { toUsd, transformAsset } from "./utils";
 
-export const getAvailableAssets = (source?: "supply" | "borrow" | "") =>
+export const getAvailableAssets = ({
+  source,
+  isMeme,
+}: {
+  source?: "supply" | "borrow" | "";
+  isMeme?: boolean;
+}) =>
   createSelector(
     (state: RootState) => state.assets.data,
-    (state: RootState) => state.account,
-    (state: RootState) => state.app,
-    (assets, account, app) => {
-      const filterKey = source === "supply" ? "can_deposit" : "can_borrow";
-      const assets_filter_by_source = source
-        ? Object.keys(assets).filter((tokenId) => assets[tokenId].config[filterKey])
-        : Object.keys(assets);
-      return assets_filter_by_source
-        .filter((tokenId) => !hiddenAssets.includes(assets[tokenId].token_id))
-        .map((tokenId) => {
-          return transformAsset(assets[tokenId], account, assets, app);
-        });
-    },
-  );
-
-export const getAvailableAssetsMEME = (source?: "supply" | "borrow" | "") =>
-  createSelector(
     (state: RootState) => state.assetsMEME.data,
+    (state: RootState) => state.account,
     (state: RootState) => state.accountMEME,
+    (state: RootState) => state.app,
     (state: RootState) => state.appMEME,
-    (assets, account, app) => {
+    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME) => {
+      let app;
+      let assets;
+      let account;
+      if (isMeme) {
+        app = appMEME;
+        assets = assetsMEME;
+        account = accountMEME;
+      } else {
+        app = appMain;
+        assets = assetsMain;
+        account = accountMain;
+      }
       const filterKey = source === "supply" ? "can_deposit" : "can_borrow";
       const assets_filter_by_source = source
         ? Object.keys(assets).filter((tokenId) => assets[tokenId].config[filterKey])

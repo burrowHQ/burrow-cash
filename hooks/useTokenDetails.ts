@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { DateTime } from "luxon";
 import Decimal from "decimal.js";
 import Datasource from "../data/datasource";

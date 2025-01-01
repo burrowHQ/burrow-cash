@@ -36,6 +36,7 @@ export interface TableProps {
     setSorting: (name: string, property: string, order: IOrder) => void;
   };
   rows: any;
+  isMeme: boolean;
   columns?: any;
   onRowClick?: (rowData: any) => void;
   sx?: any;

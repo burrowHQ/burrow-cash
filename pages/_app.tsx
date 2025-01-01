@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Head from "next/head";
 import { Provider } from "react-redux";
+import Decimal from "decimal.js";
 import type { AppProps } from "next/app";
 import { PersistGate } from "redux-persist/integration/react";
 import { init, ErrorBoundary } from "@sentry/react";
@@ -21,12 +22,12 @@ import { fetchAssetsMEME } from "../redux/assetsSliceMEME";
 import { fetchAccount, logoutAccount } from "../redux/accountSlice";
 import { fetchAccountMEME } from "../redux/accountSliceMEME";
 import { fetchConfig } from "../redux/appSlice";
+import { fetchConfig as fetchMemeConfig } from "../redux/appSliceMEME";
 import { fetchMarginAccount } from "../redux/marginAccountSlice";
 import { fetchMarginAccountMEME } from "../redux/marginAccountSliceMEME";
 import { fetchMarginConfig } from "../redux/marginConfigSlice";
 import { fetchMarginConfigMEME } from "../redux/marginConfigSliceMEME";
 import { ToastMessage } from "../components/ToastMessage";
-// import Popup from "../components/popup";
 import RpcList from "../components/Rpc";
 import PubTestModal from "../components/PubTestModal";
 import { getAccountId, getAccountPortfolio } from "../redux/accountSelectors";
@@ -97,6 +98,7 @@ const Init = () => {
     dispatch(fetchAccount());
     dispatch(fetchAccountMEME());
     dispatch(fetchConfig());
+    dispatch(fetchMemeConfig());
     dispatch(fetchMarginAccount());
     dispatch(fetchMarginAccountMEME());
     dispatch(fetchMarginConfig());
@@ -111,7 +113,6 @@ const Init = () => {
 function Upgrade({ Component, pageProps }) {
   const { getAssetById } = useMarginAccount();
   const [upgrading, setUpgrading] = useState<boolean>(true);
-  const [showTip, setShowTip] = useState<boolean>(true);
   const accountSupplied = useAppSelector(getMarginAccountSupplied);
   const dispatch = useAppDispatch();
   const accountId = useAppSelector(getAccountId);
@@ -119,10 +120,11 @@ function Upgrade({ Component, pageProps }) {
   const assets = useAppSelector(getAssets);
   const config = useAppSelector(getConfig);
   const hasValidAccountSupplied =
-    accountSupplied.length > 0 &&
-    accountSupplied.some((token) => {
-      const assetDetails = getAssetById(token.token_id);
-      return token.balance.toString().length >= assetDetails.config.extra_decimals;
+    accountSupplied?.length > 0 &&
+    accountSupplied?.some((token) => {
+      // const assetDetails = getAssetById(token.token_id);
+      // return token.balance.toString().length >= assetDetails.config.extra_decimals;
+      return new Decimal(token.balance || 0).gt(0);
     });
   useEffect(() => {
     if (
