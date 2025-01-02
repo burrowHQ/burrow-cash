@@ -75,7 +75,7 @@ const MyMarginTradingPage = () => {
               ? (indexPrice - entryPrice) * size
               : (entryPrice - indexPrice) * size
             : 0;
-        const pnl = profitOrLoss - holdingFee;
+        const pnl = entryPrice !== null && entryPrice !== 0 ? profitOrLoss - holdingFee : 0;
         pnlTotal += pnl;
       }),
     );
