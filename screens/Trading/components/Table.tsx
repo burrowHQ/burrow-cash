@@ -1418,7 +1418,7 @@ const PositionRow = ({
       : 0;
   const pnl = entryPrice !== null && entryPrice !== 0 ? profitOrLoss - holdingFee : 0;
   let amplitude = 0;
-  if (entryPrice !== null && entryPrice !== 0) {
+  if (entryPrice !== null && entryPrice !== 0 && pnl !== 0) {
     if (positionType.label === "Long") {
       amplitude = ((indexPrice - entryPrice) / entryPrice) * 100;
     } else if (positionType.label === "Short") {
@@ -1618,7 +1618,7 @@ const PositionMobileRow = ({
       : 0;
   const pnl = entryPrice !== null && entryPrice !== 0 ? profitOrLoss - holdingFee : 0;
   let amplitude = 0;
-  if (entryPrice !== null && entryPrice !== 0) {
+  if (entryPrice !== null && entryPrice !== 0 && pnl !== 0) {
     if (positionType.label === "Long") {
       amplitude = ((indexPrice - entryPrice) / entryPrice) * 100;
     } else if (positionType.label === "Short") {
