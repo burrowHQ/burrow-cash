@@ -9,6 +9,7 @@ interface commonAssets {
   activeCategory: string;
   ReduxTotalPLN: any;
   ReduxRangeMount: any;
+  ReduxActiveTab;
 }
 
 const initialState: commonAssets = {
@@ -20,6 +21,7 @@ const initialState: commonAssets = {
   activeCategory: "main",
   ReduxTotalPLN: 0,
   ReduxRangeMount: 1,
+  ReduxActiveTab: "long",
 };
 
 const marginCategory = createSlice({
@@ -50,6 +52,9 @@ const marginCategory = createSlice({
     setReduxRangeMount(state, action) {
       state.ReduxRangeMount = action.payload;
     },
+    setReduxActiveTab(state, action) {
+      state.ReduxActiveTab = action.payload;
+    },
   },
 });
 
@@ -62,6 +67,7 @@ const {
   setActiveCategory,
   setReduxTotalPLN,
   setReduxRangeMount,
+  setReduxActiveTab,
 } = marginCategory.actions;
 const marginCategoryReducer = marginCategory.reducer;
 export {
@@ -73,5 +79,6 @@ export {
   setActiveCategory,
   setReduxTotalPLN,
   setReduxRangeMount,
+  setReduxActiveTab,
 };
 export default marginCategoryReducer;

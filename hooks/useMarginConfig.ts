@@ -31,7 +31,7 @@ export function useMarginConfigToken() {
     tokens.reduce((item, token) => {
       if (combinedAssetsData[token]) {
         item[token] = combinedAssetsData[token];
-        categoryAssets.push({ ...assets.data[token] });
+        categoryAssets.push({ ...combinedAssetsData[token] });
       }
       return item;
     }, {});
@@ -42,12 +42,12 @@ export function useMarginConfigToken() {
   const filterMarginConfigListMEME =
     Object.entries(assetsMEME.data).length > 0
       ? createFilteredMarginConfigList(filteredMarginConfigTokens1MEME, categoryAssets1MEME)
-      : {};
+      : null;
 
   const processTokens = (tokens, categoryAssets) => {
     tokens.forEach((item: string) => {
       if (combinedAssetsData[item]?.metadata) {
-        categoryAssets.push({ ...assets.data[item] });
+        categoryAssets.push({ ...combinedAssetsData[item] });
       }
     });
   };

@@ -40,8 +40,16 @@ const Trading = () => {
   const { query } = useRouterQuery();
   const accountId = useAccountId();
   const { marginAccountList, marginAccountListMEME } = useMarginAccount();
-  const { categoryAssets2, categoryAssets2MEME, filterMarginConfigList } = useMarginConfigToken();
-  const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
+  const {
+    categoryAssets2,
+    categoryAssets2MEME,
+    filterMarginConfigList,
+    categoryAssets1,
+    categoryAssets1MEME,
+  } = useMarginConfigToken();
+  const { ReduxcategoryAssets1, ReduxcategoryAssets2, ReduxActiveTab } = useAppSelector(
+    (state) => state.category,
+  );
   const router = useRouter();
   const { id }: any = router.query;
   const { filteredTokenTypeMap } = useRegisterTokenType();
@@ -437,6 +445,19 @@ const Trading = () => {
             <TradingTable
               positionsList={isMainStream ? marginAccountList : marginAccountListMEME}
               filterTitle={filterTitle}
+              filterTokenMap={
+                ReduxActiveTab == "long"
+                  ? {
+                      token_c: ReduxcategoryAssets2.token_id,
+                      token_d: ReduxcategoryAssets2.token_id,
+                      token_p: ReduxcategoryAssets1.token_id,
+                    }
+                  : {
+                      token_c: ReduxcategoryAssets2.token_id,
+                      token_d: ReduxcategoryAssets1.token_id,
+                      token_p: ReduxcategoryAssets2.token_id,
+                    }
+              }
             />
           )}
           {id && <TradingOperateMobile open={open} onClose={() => setOpen(false)} id={id} />}
