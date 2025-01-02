@@ -68,7 +68,7 @@ export const transformAsset = (
     .plus(asset.prot_fee)
     .toFixed();
   const totalBorrowedD = new Decimal(asset.borrowed.balance)
-    .plus(new Decimal(asset.margin_debt.balance))
+    .plus(new Decimal(asset?.margin_debt?.balance || 0))
     .toFixed();
   const totalSupply = Number(
     shrinkToken(totalSupplyD, asset.metadata.decimals + asset.config.extra_decimals),
