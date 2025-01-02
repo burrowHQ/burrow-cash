@@ -435,7 +435,7 @@ const TradingTable = ({
               <thead>
                 <tr className="text-gray-300 text-sm font-normal">
                   <th className="pl-5">Market</th>
-                  <th>Side</th>
+                  {/* <th>Side</th> */}
                   <th>Size</th>
                   <th>Net value</th>
                   <th>Collateral</th>
@@ -496,20 +496,22 @@ const TradingTable = ({
                     }
                     return (
                       <tr key={index}>
-                        <td className="py-5 pl-5">{`${getSymbolById(
-                          assetP.token_id,
-                          assetP.metadata?.symbol,
-                        )}/${getSymbolById(assetD.token_id, assetD.metadata?.symbol)}`}</td>
-                        <td
-                          className={
-                            record.trend === "long"
-                              ? "text-primary"
-                              : record.trend === "short"
-                              ? "text-red-50"
-                              : ""
-                          }
-                        >
-                          {record.trend}
+                        <td className="py-5 pl-5">
+                          {`${getSymbolById(
+                            assetP.token_id,
+                            assetP.metadata?.symbol,
+                          )}/${getSymbolById(assetD.token_id, assetD.metadata?.symbol)}`}
+                          <div
+                            className={
+                              record.trend === "long"
+                                ? "text-primary text-xs"
+                                : record.trend === "short"
+                                ? "text-red-50 text-xs"
+                                : ""
+                            }
+                          >
+                            {record.trend}
+                          </div>
                         </td>
                         <td>
                           {record.trend === "long"
@@ -1055,26 +1057,21 @@ const TradingTable = ({
                           assetP.token_id,
                           assetP.metadata?.symbol,
                         )}/${getSymbolById(assetD.token_id, assetD.metadata?.symbol)}`}</p>
+                        <p
+                          className={
+                            record.trend === "long"
+                              ? "text-primary text-xs"
+                              : record.trend === "short"
+                              ? "text-red-50 text-xs"
+                              : ""
+                          }
+                        >
+                          <span>{record.trend}</span>
+                        </p>
                       </div>
                     </div>
                   </div>
                   <div className="p-4">
-                    <div className="flex items-center justify-between text-sm mb-[18px]">
-                      <p className="text-gray-300">Side</p>
-                      <div className="flex items-center">
-                        <p
-                          className={
-                            record.trend === "long"
-                              ? "text-primary"
-                              : record.trend === "short"
-                              ? "text-red-50"
-                              : ""
-                          }
-                        >
-                          <span className="ml-1">{record.trend}</span>
-                        </p>
-                      </div>
-                    </div>
                     <div className="flex items-center justify-between text-sm mb-[18px]">
                       <p className="text-gray-300">Size</p>
                       <p>
