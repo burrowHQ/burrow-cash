@@ -98,7 +98,7 @@ const getConfig = (env: string = defaultNetwork) => {
         PYTH_ORACLE_CONTRACT_ID: "pyth-oracle.near",
         REF_FI_CONTRACT_ID: "v2.ref-finance.near",
         DCL_SWAP_CONTRACT_ID: "dclv2.ref-labs.near",
-        ORACLE_ACCOUNT_ID: "priceoracle.near",
+        ORACLE_ACCOUNT_ID: "meme-priceoracle.ref-labs.near",
         REF_EXCHANGE_ID: "v2.ref-finance.near",
         findPathUrl: "smartrouter.ref.finance",
         indexUrl: "https://api.ref.finance",
