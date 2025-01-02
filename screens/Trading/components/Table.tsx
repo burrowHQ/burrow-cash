@@ -478,9 +478,19 @@ const TradingTable = ({
               <tbody>
                 {positionHistory && positionHistory.length > 0 ? (
                   positionHistory.map((record, index) => {
-                    const assetD = getAssetById(record.token_d);
-                    const assetP = getAssetById(record.token_p);
-                    const assetC = getAssetById(record.token_c);
+                    const ifMeme = checkIfMeme({
+                      debt_id: record.token_d,
+                      pos_id: record.token_p,
+                    });
+                    const assetD = !ifMeme
+                      ? getAssetById(record.token_d)
+                      : getAssetByIdMEME(record.token_d);
+                    const assetP = !ifMeme
+                      ? getAssetById(record.token_p)
+                      : getAssetByIdMEME(record.token_p);
+                    const assetC = !ifMeme
+                      ? getAssetById(record.token_c)
+                      : getAssetByIdMEME(record.token_c);
                     const isFilter = [
                       `${getSymbolById(assetP.token_id, assetP.metadata?.symbol)}/${getSymbolById(
                         assetD.token_id,
@@ -1522,16 +1532,16 @@ const PositionRow = ({
         className="cursor-default"
       >
         {entryPrice !== null && entryPrice !== undefined ? (
-          `$${toInternationalCurrencySystem_number(entryPrice)}`
+          <span>${beautifyPrice(entryPrice)}</span>
         ) : (
           <span className="text-gray-500">-</span>
         )}
       </td>
       <td title={`$${indexPrice?.toString()}`} className="cursor-default">
-        ${toInternationalCurrencySystem_number(indexPrice)}
+        ${beautifyPrice(indexPrice)}
       </td>
       <td title={`$${LiqPrice?.toString()}`} className="cursor-default">
-        ${toInternationalCurrencySystem_number(LiqPrice)}
+        ${beautifyPrice(LiqPrice)}
       </td>
       <td>
         <p className={`${pnl > 0 ? "text-green-150" : pnl < 0 ? "text-red-150" : "text-gray-400"}`}>
@@ -1744,8 +1754,8 @@ const PositionMobileRow = ({
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Entry Price</p>
           <p title={entryPrice !== null && entryPrice !== undefined ? `$${entryPrice}` : ""}>
-            {entryPrice !== null ? (
-              `$${toInternationalCurrencySystem_number(entryPrice)}`
+            {entryPrice !== null && entryPrice !== undefined ? (
+              <span>${beautifyPrice(entryPrice)}</span>
             ) : (
               <span className="text-gray-500">-</span>
             )}
@@ -1753,11 +1763,11 @@ const PositionMobileRow = ({
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Index Price</p>
-          <p title={indexPrice?.toString()}>${toInternationalCurrencySystem_number(indexPrice)}</p>
+          <p title={indexPrice?.toString()}>${beautifyPrice(indexPrice)}</p>
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Liq. Price</p>
-          <p title={LiqPrice?.toString()}>${toInternationalCurrencySystem_number(LiqPrice)}</p>
+          <p title={LiqPrice?.toString()}>${beautifyPrice(LiqPrice)}</p>
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Opening time</p>
