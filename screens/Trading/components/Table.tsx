@@ -1626,7 +1626,8 @@ const PositionMobileRow = ({
   const leverage = calculateLeverage(leverageD, priceD, leverageC, priceC);
 
   const positionType = getPositionType(item.token_d_info.token_id);
-  const marketIcon = positionType.label === "Long" ? assetP.metadata.icon : assetD.metadata.icon;
+  const marketIcon =
+    positionType.label === "Long" ? assetP?.metadata?.icon : assetD?.metadata?.icon;
   const marketTitle =
     positionType.label === "Long" ? `${symbolP}/${symbolC}` : `${symbolD}/${symbolC}`;
   if (filterTitle && marketTitle !== filterTitle) {
@@ -1693,7 +1694,7 @@ const PositionMobileRow = ({
               style={{ width: "26px", height: "26px" }}
             />
             <img
-              src={assetC.metadata.icon}
+              src={assetC?.metadata?.icon}
               alt=""
               className="rounded-2xl border border-gray-800"
               style={{ width: "26px", height: "26px", marginLeft: "-6px" }}
