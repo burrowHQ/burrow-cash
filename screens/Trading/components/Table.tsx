@@ -11,7 +11,7 @@ import ClosePositionMobile from "./ClosePositionMobile";
 import ChangeCollateralMobile from "./ChangeCollateralMobile";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
-import { toInternationalCurrencySystem_number } from "../../../utils/uiNumber";
+import { formatPrice, toInternationalCurrencySystem_number } from "../../../utils/uiNumber";
 import { IAssetEntry } from "../../../interfaces";
 import DataSource from "../../../data/datasource";
 import { useAccountId } from "../../../hooks/hooks";
@@ -521,7 +521,7 @@ const TradingTable = ({
                           {record.trend === "long"
                             ? record.amount_d === "0"
                               ? "-"
-                              : toInternationalCurrencySystem_number(
+                              : beautifyPrice(
                                   Number(
                                     shrinkToken(
                                       record.amount_p,
@@ -532,7 +532,7 @@ const TradingTable = ({
                             : record.trend === "short"
                             ? record.amount_p === "0"
                               ? "-"
-                              : toInternationalCurrencySystem_number(
+                              : beautifyPrice(
                                   Number(
                                     shrinkToken(
                                       record.amount_d,
@@ -574,11 +574,13 @@ const TradingTable = ({
                           </span>
                         </td>
                         <td>
-                          ${record.entry_price !== "0" ? beautifyPrice(record.entry_price) : "-"}
-                        </td>
-                        <td>${record.price !== "0" ? beautifyPrice(record.price) : "-"}</td>
-                        <td>
                           $
+                          {record.entry_price !== "0"
+                            ? formatPrice(Number(record.entry_price))
+                            : "-"}
+                        </td>
+                        <td>${record.price !== "0" ? formatPrice(Number(record.price)) : "-"}</td>
+                        <td>
                           {beautifyPrice(
                             Number(
                               shrinkToken(
@@ -586,6 +588,9 @@ const TradingTable = ({
                                 assetD.metadata.decimals + assetD.config.extra_decimals,
                               ),
                             ),
+                            true,
+                            3,
+                            3,
                           )}
                         </td>
                         <td
@@ -593,8 +598,10 @@ const TradingTable = ({
                             record.pnl > 0 ? "text-green-150" : record.pnl < 0 ? "text-red-150" : ""
                           }`}
                         >
-                          {record.pnl > 0 ? "+$" : record.pnl < 0 ? "-$" : "-"}
-                          {record.pnl !== "0" ? beautifyPrice(Math.abs(record.pnl)) : ""}
+                          {record.pnl > 0 ? "+" : record.pnl < 0 ? "-" : ""}
+                          {record.pnl !== "0"
+                            ? beautifyPrice(Math.abs(record.pnl), true, 3, 3)
+                            : ""}
                         </td>
                         <td>
                           <div className="text-sm">
@@ -736,22 +743,19 @@ const TradingTable = ({
                           </div>
                         </td>
                         <td>
-                          {toInternationalCurrencySystem_number(
-                            parseTokenValue(token.balance, marginAssetDetails.decimals),
-                          )}
+                          {formatPrice(parseTokenValue(token.balance, marginAssetDetails.decimals))}
                         </td>
                         <td>
-                          {marginAssetDetails.price
-                            ? `$${toInternationalCurrencySystem_number(marginAssetDetails.price)}`
-                            : "/"}
+                          {marginAssetDetails.price ? formatPrice(marginAssetDetails.price) : "-"}
                         </td>
                         <td>
+                          $
                           {marginAssetDetails.price
-                            ? `$${toInternationalCurrencySystem_number(
+                            ? formatPrice(
                                 parseTokenValue(token.balance, marginAssetDetails.decimals) *
                                   marginAssetDetails.price,
-                              )}`
-                            : "/"}
+                              )
+                            : "-"}
                         </td>
                       </tr>
                     );
@@ -1076,7 +1080,7 @@ const TradingTable = ({
                         {record.trend === "long"
                           ? record.amount_d === "0"
                             ? "-"
-                            : toInternationalCurrencySystem_number(
+                            : beautifyPrice(
                                 Number(
                                   shrinkToken(
                                     record.amount_p,
@@ -1087,7 +1091,7 @@ const TradingTable = ({
                           : record.trend === "short"
                           ? record.amount_p === "0"
                             ? "-"
-                            : toInternationalCurrencySystem_number(
+                            : beautifyPrice(
                                 Number(
                                   shrinkToken(
                                     record.amount_d,
@@ -1137,16 +1141,18 @@ const TradingTable = ({
                     </div>
                     <div className="flex items-center justify-between text-sm mb-[18px]">
                       <p className="text-gray-300">Entry price</p>
-                      <p>${record.entry_price !== "0" ? beautifyPrice(record.entry_price) : "-"}</p>
+                      <p>
+                        $
+                        {record.entry_price !== "0" ? formatPrice(Number(record.entry_price)) : "-"}
+                      </p>
                     </div>
                     <div className="flex items-center justify-between text-sm mb-[18px]">
                       <p className="text-gray-300">Close price</p>
-                      <p>${record.price !== "0" ? beautifyPrice(record.price) : "-"}</p>
+                      <p>${record.price !== "0" ? formatPrice(Number(record.price)) : "-"}</p>
                     </div>
                     <div className="flex items-center justify-between text-sm mb-[18px]">
                       <p className="text-gray-300">Fee</p>
                       <p>
-                        $
                         {beautifyPrice(
                           Number(
                             shrinkToken(
@@ -1154,6 +1160,9 @@ const TradingTable = ({
                               assetD.metadata.decimals + assetD.config.extra_decimals,
                             ),
                           ),
+                          true,
+                          3,
+                          3,
                         )}
                       </p>
                     </div>
@@ -1180,8 +1189,8 @@ const TradingTable = ({
                           record.pnl > 0 ? "text-green-150" : record.pnl < 0 ? "text-red-150" : ""
                         }`}
                       >
-                        {record.pnl > 0 ? "+$" : record.pnl < 0 ? "-$" : "-"}
-                        {record.pnl !== "0" ? beautifyPrice(Math.abs(record.pnl)) : ""}
+                        {record.pnl > 0 ? "+" : record.pnl < 0 ? "-" : ""}
+                        {record.pnl !== "0" ? beautifyPrice(Math.abs(record.pnl), false, 3, 3) : ""}
                       </p>
                     </div>
                   </div>
@@ -1311,26 +1320,25 @@ const TradingTable = ({
                                   <p className="text-sm"> {assetDetails.metadata.symbol}</p>
                                   <p className="text-xs text-gray-300 -mt-0.5">
                                     {marginAssetDetails.price
-                                      ? `$${toInternationalCurrencySystem_number(
-                                          marginAssetDetails.price,
-                                        )}`
+                                      ? formatPrice(marginAssetDetails.price)
                                       : "/"}
                                   </p>
                                 </div>
                               </div>
                             </td>
                             <td>
-                              {toInternationalCurrencySystem_number(
+                              {formatPrice(
                                 parseTokenValue(token.balance, marginAssetDetails.decimals),
                               )}
                             </td>
                             <td className="text-right pr-[32px]">
+                              $
                               {marginAssetDetails.price
-                                ? `$${toInternationalCurrencySystem_number(
+                                ? formatPrice(
                                     parseTokenValue(token.balance, marginAssetDetails.decimals) *
                                       marginAssetDetails.price,
-                                  )}`
-                                : "/"}
+                                  )
+                                : "-"}
                             </td>
                           </tr>
                         );
@@ -1490,10 +1498,8 @@ const PositionRow = ({
       </td>
       <td>
         <div className="flex mr-4 items-center">
-          <p className="mr-2"> {toInternationalCurrencySystem_number(size)}</p>
-          <span className="text-gray-300 text-sm">
-            (${toInternationalCurrencySystem_number(sizeValue)})
-          </span>
+          <p className="mr-2"> {beautifyPrice(size)}</p>
+          <span className="text-gray-300 text-sm">({beautifyPrice(sizeValue, true, 3, 3)})</span>
         </div>
       </td>
       <td>${toInternationalCurrencySystem_number(netValue)}</td>
@@ -1520,21 +1526,21 @@ const PositionRow = ({
         className="cursor-default"
       >
         {entryPrice !== null && entryPrice !== undefined ? (
-          <span>${beautifyPrice(entryPrice)}</span>
+          <span>${formatPrice(entryPrice)}</span>
         ) : (
           <span className="text-gray-500">-</span>
         )}
       </td>
       <td title={`$${indexPrice?.toString()}`} className="cursor-default">
-        ${beautifyPrice(indexPrice)}
+        ${formatPrice(indexPrice)}
       </td>
       <td title={`$${LiqPrice?.toString()}`} className="cursor-default">
-        ${beautifyPrice(LiqPrice)}
+        ${formatPrice(LiqPrice)}
       </td>
       <td>
         <p className={`${pnl > 0 ? "text-green-150" : pnl < 0 ? "text-red-150" : "text-gray-400"}`}>
           {pnl === 0 ? "" : `${pnl > 0 ? `+$` : `-$`}`}
-          {beautifyPrice(Math.abs(pnl))}
+          {beautifyPrice(Math.abs(pnl), false, 3, 3)}
           <span className="text-gray-400 text-xs ml-0.5">
             {amplitude !== null && amplitude !== 0
               ? `(${amplitude > 0 ? `+` : `-`}${toInternationalCurrencySystem_number(
@@ -1640,6 +1646,18 @@ const PositionMobileRow = ({
   const netValue = parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
   const collateral = parseTokenValue(item.token_c_info.balance, decimalsC);
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
+  const openTime = new Date(Number(item.open_ts) / 1e6);
+  const uahpi: any = shrinkToken((assets as any).data[item.token_p_id]?.uahpi, 18) ?? 0;
+  const uahpi_at_open: any = shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
+  const holdingFee =
+    +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi * 1 - uahpi_at_open * 1);
+  const profitOrLoss =
+    entryPrice !== null && entryPrice !== 0
+      ? positionType.label === "Long"
+        ? (indexPrice - entryPrice) * size
+        : (entryPrice - indexPrice) * size
+      : 0;
+  const pnl = entryPrice !== null && entryPrice !== 0 ? profitOrLoss - holdingFee : 0;
   let LiqPrice = 0;
   if (leverage > 1) {
     if (positionType.label === "Long") {
@@ -1654,18 +1672,6 @@ const PositionMobileRow = ({
       if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
     }
   }
-  const openTime = new Date(Number(item.open_ts) / 1e6);
-  const uahpi: any = shrinkToken((assets as any).data[item.token_p_id]?.uahpi, 18) ?? 0;
-  const uahpi_at_open: any = shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
-  const holdingFee =
-    +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi * 1 - uahpi_at_open * 1);
-  const profitOrLoss =
-    entryPrice !== null && entryPrice !== 0
-      ? positionType.label === "Long"
-        ? (indexPrice - entryPrice) * size
-        : (entryPrice - indexPrice) * size
-      : 0;
-  const pnl = entryPrice !== null && entryPrice !== 0 ? profitOrLoss - holdingFee : 0;
   let amplitude = 0;
   if (entryPrice !== null && entryPrice !== 0 && pnl !== 0) {
     if (positionType.label === "Long") {
@@ -1708,10 +1714,8 @@ const PositionMobileRow = ({
         </div>
         <div className="text-right">
           <div className="flex items-center">
-            <p className="mr-2"> {toInternationalCurrencySystem_number(size)}</p>
-            <span className="text-gray-300 text-sm">
-              (${toInternationalCurrencySystem_number(sizeValue)})
-            </span>
+            <p className="mr-2"> {beautifyPrice(size)}</p>
+            <span className="text-gray-300 text-sm">({beautifyPrice(sizeValue, true, 3, 3)})</span>
           </div>
           <p className="text-xs text-gray-300">Size</p>
         </div>
@@ -1742,8 +1746,8 @@ const PositionMobileRow = ({
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Entry Price</p>
           <p title={entryPrice !== null && entryPrice !== undefined ? `$${entryPrice}` : ""}>
-            {entryPrice !== null && entryPrice !== undefined ? (
-              <span>${beautifyPrice(entryPrice)}</span>
+            {entryPrice !== null ? (
+              <span>${formatPrice(entryPrice)}</span>
             ) : (
               <span className="text-gray-500">-</span>
             )}
@@ -1751,11 +1755,11 @@ const PositionMobileRow = ({
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Index Price</p>
-          <p title={indexPrice?.toString()}>${beautifyPrice(indexPrice)}</p>
+          <p title={indexPrice?.toString()}>${formatPrice(indexPrice)}</p>
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Liq. Price</p>
-          <p title={LiqPrice?.toString()}>${beautifyPrice(LiqPrice)}</p>
+          <p title={LiqPrice?.toString()}>${formatPrice(LiqPrice)}</p>
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Opening time</p>
@@ -1769,7 +1773,7 @@ const PositionMobileRow = ({
             }`}
           >
             {pnl === 0 ? "" : `${pnl > 0 ? `+$` : `-$`}`}
-            {beautifyPrice(Math.abs(pnl))}
+            {beautifyPrice(Math.abs(pnl), false, 3, 3)}
             <span className="text-gray-400 text-xs ml-0.5">
               {amplitude !== null && amplitude !== 0
                 ? `(${amplitude > 0 ? `+` : `-`}${toInternationalCurrencySystem_number(
