@@ -383,7 +383,8 @@ const Trading = () => {
           positionsList={marginAccountList}
           filterTitle={filterTitle}
           filterTokenMap={{
-            token_c: ReduxcategoryAssets2?.token_id,
+            token_2: ReduxcategoryAssets2?.token_id,
+            token_1: ReduxcategoryAssets1?.token_id,
           }}
         />
       )}

@@ -321,10 +321,12 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
       if (rangeMount > 1) {
         const safetyBufferFactor = 1 - marginConfigTokens.min_safety_buffer / 10000;
         const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
+        const assetPriceP = getAssetPrice(ReduxcategoryAssets1) as any;
 
         if (activeTab === "long" && longInput) {
-          const k1 = Number(longInput) * rangeMount * assetPrice;
-          liqPriceX = (k1 / safetyBufferFactor - Number(longInput) * assetPrice) / longOutput;
+          const k1 = Number(longInput) * rangeMount * assetPrice; // debt cap
+          liqPriceX =
+            ((Number(longInput) * assetPrice + longOutput * assetPriceP) * safetyBufferFactor) / k1;
         }
       }
       if (activeTab === "long") {

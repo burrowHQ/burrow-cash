@@ -124,7 +124,7 @@ const TradingTable = ({
         page_size: pageSize,
         order_column: orderColumn,
         order_by: orderBy,
-        ...filterTokenMap,
+        tokens: Object.values(filterTokenMap).join("|"),
       };
       const response = await DataSource.shared.getMarginTradingPositionHistory(params);
       setPositionHistory(response.data.position_records);
