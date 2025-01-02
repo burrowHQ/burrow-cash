@@ -480,6 +480,7 @@ const TradingTable = ({
                   positionHistory.map((record, index) => {
                     const assetD = getAssetById(record.token_d);
                     const assetP = getAssetById(record.token_p);
+                    const assetC = getAssetById(record.token_c);
                     const isFilter = [
                       `${getSymbolById(assetP.token_id, assetP.metadata?.symbol)}/${getSymbolById(
                         assetD.token_id,
@@ -512,38 +513,64 @@ const TradingTable = ({
                         </td>
                         <td>
                           {record.trend === "long"
-                            ? beautifyPrice(
-                                Number(
-                                  shrinkToken(
-                                    record.amount_d,
-                                    assetD.metadata.decimals + assetD.config.extra_decimals,
+                            ? record.amount_d === "0"
+                              ? "-"
+                              : toInternationalCurrencySystem_number(
+                                  Number(
+                                    shrinkToken(
+                                      record.amount_p,
+                                      assetP.metadata.decimals + assetP.config.extra_decimals,
+                                    ),
                                   ),
-                                ),
-                              )
+                                )
                             : record.trend === "short"
-                            ? beautifyPrice(
+                            ? record.amount_p === "0"
+                              ? "-"
+                              : toInternationalCurrencySystem_number(
+                                  Number(
+                                    shrinkToken(
+                                      record.amount_d,
+                                      assetD.metadata.decimals + assetD.config.extra_decimals,
+                                    ),
+                                  ),
+                                )
+                            : null}
+                        </td>
+                        <td>
+                          {record.net_value === "0"
+                            ? "-"
+                            : `$${toInternationalCurrencySystem_number(
                                 Number(
                                   shrinkToken(
-                                    record.amount_p,
-                                    assetP.metadata.decimals + assetP.config.extra_decimals,
+                                    record.net_value,
+                                    assetC.metadata.decimals + assetC.config.extra_decimals,
                                   ),
-                                ),
-                              )
-                            : null}
-                          {/* {record.amount_d > 0 && record.amount_p > 0
-                            ? record.trend === "long"
-                              ? getSymbolById(assetD.token_id, assetD.metadata?.symbol)
-                              : record.trend === "short"
-                              ? getSymbolById(assetP.token_id, assetP.metadata?.symbol)
-                              : ""
-                            : null} */}
+                                ) -
+                                  Number(
+                                    shrinkToken(
+                                      record.open_fee,
+                                      assetC.metadata.decimals + assetC.config.extra_decimals,
+                                    ),
+                                  ),
+                              )}`}
                         </td>
-                        <td>-</td>
-                        <td>-</td>
                         <td>
-                          {record.entry_price !== "0" ? beautifyPrice(record.entry_price) : "-"}
+                          {toInternationalCurrencySystem_number(
+                            Number(
+                              shrinkToken(
+                                record.amount_c,
+                                assetC.metadata.decimals + assetC.config.extra_decimals,
+                              ),
+                            ),
+                          )}
+                          <span className="ml-1">
+                            {getSymbolById(assetC.token_id, assetC.metadata?.symbol)}
+                          </span>
                         </td>
-                        <td>{record.price !== "0" ? beautifyPrice(record.price) : "-"}</td>
+                        <td>
+                          ${record.entry_price !== "0" ? beautifyPrice(record.entry_price) : "-"}
+                        </td>
+                        <td>${record.price !== "0" ? beautifyPrice(record.price) : "-"}</td>
                         <td>
                           $
                           {beautifyPrice(
@@ -989,6 +1016,9 @@ const TradingTable = ({
               const assetP = !ifMeme
                 ? getAssetById(record.token_p)
                 : getAssetByIdMEME(record.token_p);
+              const assetC = !ifMeme
+                ? getAssetById(record.token_c)
+                : getAssetByIdMEME(record.token_c);
               const isFilter = [
                 `${getSymbolById(assetP.token_id, assetP.metadata?.symbol)}/${getSymbolById(
                   assetD.token_id,
@@ -1049,41 +1079,74 @@ const TradingTable = ({
                       <p className="text-gray-300">Size</p>
                       <p>
                         {record.trend === "long"
-                          ? beautifyPrice(
-                              Number(
-                                shrinkToken(
-                                  record.amount_d,
-                                  assetD.metadata.decimals + assetD.config.extra_decimals,
+                          ? record.amount_d === "0"
+                            ? "-"
+                            : toInternationalCurrencySystem_number(
+                                Number(
+                                  shrinkToken(
+                                    record.amount_p,
+                                    assetP.metadata.decimals + assetP.config.extra_decimals,
+                                  ),
                                 ),
-                              ),
-                            )
+                              )
                           : record.trend === "short"
-                          ? beautifyPrice(
-                              Number(
-                                shrinkToken(
-                                  record.amount_p,
-                                  assetP.metadata.decimals + assetP.config.extra_decimals,
+                          ? record.amount_p === "0"
+                            ? "-"
+                            : toInternationalCurrencySystem_number(
+                                Number(
+                                  shrinkToken(
+                                    record.amount_d,
+                                    assetD.metadata.decimals + assetD.config.extra_decimals,
+                                  ),
                                 ),
-                              ),
-                            )
+                              )
                           : null}
                       </p>
                     </div>
                     <div className="flex items-center justify-between text-sm mb-[18px]">
                       <p className="text-gray-300">Net Value</p>
-                      <p>-</p>
+                      <p>
+                        {record.net_value === "0"
+                          ? "-"
+                          : `$${toInternationalCurrencySystem_number(
+                              Number(
+                                shrinkToken(
+                                  record.net_value,
+                                  assetC.metadata.decimals + assetC.config.extra_decimals,
+                                ),
+                              ) -
+                                Number(
+                                  shrinkToken(
+                                    record.open_fee,
+                                    assetC.metadata.decimals + assetC.config.extra_decimals,
+                                  ),
+                                ),
+                            )}`}
+                      </p>
                     </div>
                     <div className="flex items-center justify-between text-sm mb-[18px]">
                       <p className="text-gray-300">Collateral</p>
-                      <p>-</p>
+                      <p>
+                        {toInternationalCurrencySystem_number(
+                          Number(
+                            shrinkToken(
+                              record.amount_c,
+                              assetC.metadata.decimals + assetC.config.extra_decimals,
+                            ),
+                          ),
+                        )}
+                        <span className="ml-1">
+                          {getSymbolById(assetC.token_id, assetC.metadata?.symbol)}
+                        </span>
+                      </p>
                     </div>
                     <div className="flex items-center justify-between text-sm mb-[18px]">
                       <p className="text-gray-300">Entry price</p>
-                      <p>{record.entry_price !== "0" ? beautifyPrice(record.entry_price) : "-"}</p>
+                      <p>${record.entry_price !== "0" ? beautifyPrice(record.entry_price) : "-"}</p>
                     </div>
                     <div className="flex items-center justify-between text-sm mb-[18px]">
                       <p className="text-gray-300">Close price</p>
-                      <p>{record.price !== "0" ? beautifyPrice(record.price) : "-"}</p>
+                      <p>${record.price !== "0" ? beautifyPrice(record.price) : "-"}</p>
                     </div>
                     <div className="flex items-center justify-between text-sm mb-[18px]">
                       <p className="text-gray-300">Fee</p>
