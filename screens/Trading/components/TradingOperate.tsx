@@ -385,10 +385,11 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       return () => clearTimeout(timer); // Cleanup the timer on component unmount or when estimateLoading changes
     }
   }, [estimateLoading]);
-
   const Fee = useMemo(() => {
     return {
-      openPFee: ((Number(longInput || shortInput) * config.open_position_fee_rate) / 10000) * 1,
+      openPFee:
+        ((Number(longInput || shortInput) * config.open_position_fee_rate) / 10000) *
+        (ReduxcategoryAssets2?.price?.usd || 1),
       swapFee:
         ((estimateData?.fee ?? 0) / 10000) *
         Number(tokenInAmount) *
@@ -700,6 +701,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                     assets: isMainStream ? assets : assetsMEME,
                     tokenInAmount,
                     LiqPrice,
+                    Fee,
                   }}
                 />
               )}
@@ -837,6 +839,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                     assets: isMainStream ? assets : assetsMEME,
                     tokenInAmount,
                     LiqPrice,
+                    Fee,
                   }}
                 />
               )}

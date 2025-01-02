@@ -145,7 +145,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
       : shrinkToken(marginAccountListMEME[itemKey]?.uahpi_at_open ?? 0, 18);
     const { debt_cap } = item;
     return {
-      HPFee: +shrinkToken(debt_cap, decimalsD) * priceD * (uahpi * 1 - uahpi_at_open * 1),
+      HPFee: +shrinkToken(debt_cap, decimalsD) * priceD * (uahpi * priceD - uahpi_at_open * priceD),
       swapFee:
         ((estimateData?.fee ?? 0) / 10000) *
         +shrinkToken(tokenInAmount || "0", assetP.metadata.decimals) *
