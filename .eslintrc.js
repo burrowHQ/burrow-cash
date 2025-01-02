@@ -81,6 +81,7 @@ module.exports = {
     "no-restricted-syntax": "off",
     "prefer-destructuring": "off",
     "default-param-last": "off",
+    "no-await-in-loop": "off",
   },
   settings: {
     react: {

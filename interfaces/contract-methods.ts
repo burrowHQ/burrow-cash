@@ -16,7 +16,6 @@ export enum ViewMethodsLogic {
   get_asset_farms,
   get_asset_farms_paged,
   storage_balance_of,
-  check_registration,
   get_all_token_pyth_infos,
 }
 
@@ -64,10 +63,10 @@ export enum ViewMethodsToken {
   ft_metadata,
   ft_balance_of,
   storage_balance_of,
-  check_registration,
   get_st_near_price,
   get_nearx_price,
   ft_price,
+  storage_balance_bounds,
 }
 
 export enum ChangeMethodsToken {

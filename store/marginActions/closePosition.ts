@@ -1,10 +1,13 @@
 import BN from "bn.js";
+import { Contract } from "near-api-js";
 import { getBurrow } from "../../utils";
 import { ChangeMethodsLogic, ChangeMethodsOracle } from "../../interfaces";
-import { Transaction } from "../wallet";
-import { prepareAndExecuteTransactions } from "../tokens";
+import { Transaction, isRegistered } from "../wallet";
+import { prepareAndExecuteTransactions, getTokenContract } from "../tokens";
 import getConfig from "../../api/get-config";
 import getMemeConfig from "../../api/get-config-meme";
+import { store } from "../../redux/store";
+import { registerAccountOnToken } from "../helper";
 
 export async function closePosition({
   pos_id,
@@ -89,8 +92,13 @@ export async function closePosition({
       },
     ],
   };
-
+  const accountId = store.getState().account.accountId;
   if (!isLong) {
+    const registered_p = await isRegistered(accountId, token_p_id);
+    if (registered_p == null) {
+      const storageDeposit = await registerAccountOnToken(accountId, token_p_id);
+      transactions.unshift(storageDeposit);
+    }
     transactions.push({
       receiverId: enable_pyth_oracle ? logicContractId : priceOracleContract,
       functionCalls: [
@@ -112,6 +120,11 @@ export async function closePosition({
         },
       ],
     });
+  }
+  const registered_d = await isRegistered(accountId, token_d_id);
+  if (registered_d == null) {
+    const storageDeposit = await registerAccountOnToken(accountId, token_d_id);
+    transactions.push(storageDeposit);
   }
 
   transactions.push({

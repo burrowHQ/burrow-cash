@@ -1,7 +1,8 @@
 import { Contract } from "near-api-js";
 import Decimal from "decimal.js";
 import BN from "bn.js";
-
+// eslint-disable-next-line import/no-cycle
+import { expandToken, expandTokenDecimal, getContract, shrinkToken } from "./helper";
 import { getBurrow } from "../utils";
 import {
   DEFAULT_PRECISION,
@@ -11,7 +12,6 @@ import {
   NEAR_STORAGE_DEPOSIT_MIN,
   NEAR_STORAGE_EXTRA_DEPOSIT,
 } from "./constants";
-import { expandToken, expandTokenDecimal, getContract, shrinkToken } from "./helper";
 import {
   ViewMethodsLogic,
   ChangeMethodsLogic,
@@ -25,7 +25,6 @@ import {
   executeMultipleTransactions,
   FunctionCallOptions,
   isRegistered,
-  isRegisteredNew,
   Transaction,
 } from "./wallet";
 
@@ -110,42 +109,13 @@ export const prepareAndExecuteTokenTransactions = async (
 
   // check if account is registered in the token contract
   if (
-    !(await isRegistered(account.accountId, tokenContract)) &&
+    !(await isRegistered(account.accountId, tokenContract.contractId)) &&
     !NO_STORAGE_DEPOSIT_CONTRACTS.includes(tokenContract.contractId)
   ) {
-    if (SPECIAL_REGISTRATION_TOKEN_IDS.includes(tokenContract.contractId)) {
-      const r = await isRegisteredNew(account.accountId, tokenContract);
-      if (r) {
-        transactions.push({
-          receiverId: tokenContract.contractId,
-          functionCalls: [
-            {
-              methodName: ChangeMethodsToken[ChangeMethodsToken.storage_deposit],
-              attachedDeposit: new BN(expandToken(NEAR_STORAGE_DEPOSIT, NEAR_DECIMALS)),
-            },
-          ],
-        });
-      } else {
-        transactions.push({
-          receiverId: tokenContract.contractId,
-          functionCalls: [
-            {
-              methodName: ChangeMethodsToken[ChangeMethodsToken.register_account],
-              gas: new BN("10000000000000"),
-              args: {
-                account_id: account.accountId,
-              },
-              attachedDeposit: new BN(0),
-            },
-          ],
-        });
-      }
-    } else {
-      functionCalls.push({
-        methodName: ChangeMethodsToken[ChangeMethodsToken.storage_deposit],
-        attachedDeposit: new BN(expandToken(NEAR_STORAGE_DEPOSIT, NEAR_DECIMALS)),
-      });
-    }
+    functionCalls.push({
+      methodName: ChangeMethodsToken[ChangeMethodsToken.storage_deposit],
+      attachedDeposit: new BN(expandToken(NEAR_STORAGE_DEPOSIT, NEAR_DECIMALS)),
+    });
   }
 
   if (functionCall) {
@@ -177,11 +147,15 @@ export const prepareAndExecuteTransactions = async (
     functionCalls: [
       {
         methodName: ChangeMethodsLogic[ChangeMethodsLogic.storage_deposit],
+        args: {
+          registration_only: true,
+          account_id: account.accountId,
+        },
         attachedDeposit: new BN(expandToken(deposit, NEAR_DECIMALS)),
       },
     ],
   });
-  if (!(await isRegistered(account.accountId, burrowContract))) {
+  if (!(await isRegistered(account.accountId, burrowContract.contractId))) {
     transactions.push(storageDepositTransaction(NEAR_STORAGE_DEPOSIT));
   } else {
     const balance = (await view(

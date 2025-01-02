@@ -4,7 +4,7 @@ import { Transaction as SelectorTransaction } from "@near-wallet-selector/core";
 
 import { getBurrow } from "../utils";
 import { ViewMethodsLogic } from "../interfaces/contract-methods";
-import { Balance } from "../interfaces";
+import { getTokenContract } from "../api/get-balance";
 import getConfig from "../utils/config";
 
 const { SPECIAL_REGISTRATION_TOKEN_IDS } = getConfig() as any;
@@ -67,39 +67,24 @@ export const executeMultipleTransactions = async (transactions) => {
   if (hideModal) hideModal();
 };
 
-export const isRegistered = async (account_id: string, contract: Contract): Promise<boolean> => {
-  const { view } = await getBurrow();
-  if (SPECIAL_REGISTRATION_TOKEN_IDS.includes(contract.contractId)) {
-    try {
-      const balance = (await view(contract, ViewMethodsLogic[ViewMethodsLogic.storage_balance_of], {
-        account_id,
-      })) as Balance;
-      return balance && balance?.total !== "0";
-    } catch (error) {
-      const registration = (await view(
-        contract,
-        ViewMethodsLogic[ViewMethodsLogic.check_registration],
-        {
-          account_id,
-        },
-      )) as boolean;
-      return registration;
-    }
-  } else {
-    const balance = (await view(contract, ViewMethodsLogic[ViewMethodsLogic.storage_balance_of], {
+export const isRegistered = async (account_id: string, contractId: string): Promise<any> => {
+  try {
+    const contract: Contract = await getTokenContract(contractId);
+    const { view } = await getBurrow();
+    return await view(contract, ViewMethodsLogic[ViewMethodsLogic.storage_balance_of], {
       account_id,
-    })) as Balance;
-    return balance && balance?.total !== "0";
+    });
+  } catch (error) {
+    return null;
   }
 };
-export const isRegisteredNew = async (account_id: string, contract: Contract): Promise<boolean> => {
-  const { view } = await getBurrow();
+export const isRegistered2 = async (account_id: string, contract: Contract): Promise<any> => {
   try {
-    (await view(contract, ViewMethodsLogic[ViewMethodsLogic.storage_balance_of], {
+    const { view } = await getBurrow();
+    return await view(contract, ViewMethodsLogic[ViewMethodsLogic.storage_balance_of], {
       account_id,
-    })) as Balance;
-    return true;
+    });
   } catch (error) {
-    return false;
+    return null;
   }
 };

@@ -1,7 +1,7 @@
 import Decimal from "decimal.js";
 import BN from "bn.js";
 import { decimalMax, decimalMin, getBurrow, nearTokenId } from "../../utils";
-import { expandTokenDecimal, registerNearFnCall, expandToken } from "../helper";
+import { expandTokenDecimal, registerNearFnCall } from "../helper";
 import { ChangeMethodsNearToken, ChangeMethodsToken } from "../../interfaces";
 import { getTokenContract, getMetadata, prepareAndExecuteTransactions } from "../tokens";
 import getBalance from "../../api/get-balance";

@@ -16,7 +16,7 @@ import {
   IConfig,
   IPrice,
 } from "../interfaces";
-import { isRegistered } from "./wallet";
+import { isRegistered, Transaction } from "./wallet";
 import {
   NEARX_TOKEN,
   LINEAR_TOKEN,
@@ -267,12 +267,11 @@ export const getContract = async (
       .filter((m) => typeof m === "string")
       .map((m) => m as string),
   });
-
   return contract;
 };
 
 export const registerNearFnCall = async (accountId: string, contract: Contract) =>
-  !(await isRegistered(accountId, contract))
+  !(await isRegistered(accountId, contract.contractId))
     ? [
         {
           methodName: ChangeMethodsLogic[ChangeMethodsLogic.storage_deposit],
@@ -281,3 +280,31 @@ export const registerNearFnCall = async (accountId: string, contract: Contract) 
         },
       ]
     : [];
+export const registerAccountOnToken = async (accountId: string, tokenId: string) => {
+  const storage = await getStorageBalanceBounds(tokenId);
+  return {
+    receiverId: tokenId,
+    functionCalls: [
+      {
+        methodName: ChangeMethodsLogic[ChangeMethodsLogic.storage_deposit],
+        args: {
+          registration_only: true,
+          account_id: accountId,
+        },
+        attachedDeposit: new BN(storage),
+      },
+    ],
+  } as Transaction;
+};
+export const getStorageBalanceBounds = async (tokenId: string) => {
+  const { view } = await getBurrow();
+  const tokenContract: Contract = await getTokenContract(tokenId);
+  const storage: any = await view(
+    tokenContract,
+    ViewMethodsToken[ViewMethodsToken.storage_balance_bounds],
+  );
+  if (storage) {
+    return storage.max || storage.min;
+  }
+  return 250000000000000000000000;
+};
