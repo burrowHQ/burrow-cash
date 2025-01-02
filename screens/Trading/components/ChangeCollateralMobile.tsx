@@ -6,7 +6,7 @@ import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
 import { CloseIcon } from "../../../components/Modal/svg";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";
-import { toInternationalCurrencySystem_number } from "../../../utils/uiNumber";
+import { formatPrice, toInternationalCurrencySystem_number } from "../../../utils/uiNumber";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
 import { RightArrow } from "./TradingIcon";
 import { increaseCollateral } from "../../../store/marginActions/increaseCollateral";
@@ -22,14 +22,16 @@ import { setActiveTab } from "../../../redux/marginTabSlice";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { checkIfMeme } from "../../../utils/margin";
 import { ChangeCollateralMobileProps } from "../comInterface";
+import { beautifyPrice } from "../../../utils/beautyNumbet";
 
 export const ModalContext = createContext(null) as any;
 const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose, rowData }) => {
   const { query } = useRouterQuery();
   const dispatch = useDispatch();
   const account = useAppSelector((state) => state.account);
-  const { marginConfigTokens, marginConfigTokensMEME, getPositionType } = useMarginConfigToken();
-  const { parseTokenValue, getAssetDetails, getAssetById, calculateLeverage } = useMarginAccount();
+  const { marginConfigTokens, getPositionType } = useMarginConfigToken();
+  const { parseTokenValue, getAssetDetails, getAssetById, calculateLeverage, marginAccountList } =
+    useMarginAccount();
   const theme = useTheme();
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
   const [ChangeCollateralTab, setChangeCollateralTab] = useState("Add");
@@ -70,14 +72,15 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
     if (positionType.label === "Long") {
       const k1 = Number(newNetValue) * newLeverage * priceC;
       const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
-      newLiqPrice = (k1 / k2 - Number(newNetValue)) / sizeValueLong;
+      newLiqPrice = ((Number(newNetValue) * priceC + size * priceP) * k2) / k1 + holdingFee;
       if (Number.isNaN(newLiqPrice) || !Number.isFinite(newLiqPrice)) newLiqPrice = 0;
     } else {
       newLiqPrice =
         ((newNetValue + sizeValueLong) *
           priceC *
           (1 - marginConfigTokens.min_safety_buffer / 10000)) /
-        sizeValueShort;
+          sizeValueShort +
+        holdingFee;
       if (Number.isNaN(newLiqPrice) || !Number.isFinite(newLiqPrice)) newLiqPrice = 0;
     }
     return { newNetValue, newLeverage, newLiqPrice };
@@ -169,6 +172,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
     icon: iconC,
     decimals: decimalsC,
   } = getAssetDetails(assetC);
+  const holdingAssets = useAppSelector(getAssets);
   const { price: priceP, symbol: symbolP, decimals: decimalsP } = getAssetDetails(assetP);
   const leverageD = parseTokenValue(rowData.data.token_d_info.balance, decimalsD);
   const leverageC = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
@@ -176,20 +180,28 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
   const positionType = getPositionType(rowData.data.token_d_info.token_id);
   const sizeValueLong = parseTokenValue(rowData.data.token_p_amount, decimalsP);
   const sizeValueShort = parseTokenValue(rowData.data.token_d_info.balance, decimalsD);
+  const size = positionType.label === "Long" ? sizeValueLong : sizeValueShort;
   const sizeValue =
     positionType.label === "Long" ? sizeValueLong * (priceP || 0) : sizeValueShort * (priceD || 0);
   const netValue = parseTokenValue(rowData.data.token_c_info.balance, decimalsC) * (priceC || 0);
+  const uahpi: any =
+    shrinkToken((holdingAssets as any).data[rowData.data.token_p_id]?.uahpi, 18) ?? 0;
+  const uahpi_at_open: any =
+    shrinkToken(marginAccountList[rowData.data.itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
+  const holdingFee =
+    +shrinkToken(rowData.data.debt_cap, decimalsD) * priceD * (uahpi * 1 - uahpi_at_open * 1);
   let LiqPrice = 0;
   if (leverage > 1) {
     if (positionType.label === "Long") {
       const k1 = Number(netValue) * leverage * priceC;
       const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
-      LiqPrice = (k1 / k2 - Number(netValue) * priceC) / sizeValueLong;
+      LiqPrice = ((Number(netValue) * priceC + size * priceP) * k2) / k1 + holdingFee;
       if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
     } else {
       LiqPrice =
         ((netValue + sizeValueLong) * priceC * (1 - marginConfigTokens.min_safety_buffer / 10000)) /
-        sizeValueShort;
+          sizeValueShort +
+        holdingFee;
       if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
     }
   }
@@ -464,15 +476,15 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                     <div className="text-gray-300">Position Size</div>
                     <div>
                       {positionType.label === "Long"
-                        ? toInternationalCurrencySystem_number(sizeValueLong)
-                        : toInternationalCurrencySystem_number(leverageD)}
+                        ? beautifyPrice(sizeValueLong)
+                        : beautifyPrice(leverageD)}
                       <span className="ml-1.5">
                         {positionType.label === "Long"
                           ? getSymbolById(assetP.token_id, assetP.metadata?.symbol)
                           : getSymbolById(assetD.token_id, assetD.metadata?.symbol)}
                       </span>
                       <span className="text-xs text-gray-300 ml-1.5">
-                        (${toInternationalCurrencySystem_number(sizeValue)})
+                        ({beautifyPrice(sizeValue, true, 3, 3)})
                       </span>
                     </div>
                   </div>
@@ -515,7 +527,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                   </div>
                   <div className="flex items-center justify-between text-sm mb-4">
                     <div className="text-gray-300">Entry Price</div>
-                    <div>${toInternationalCurrencySystem_number(rowData.entryPrice)}</div>
+                    <div>${formatPrice(rowData.entryPrice ?? 0)}</div>
                   </div>
                   <div className="flex items-center justify-between text-sm mb-4">
                     <div className="text-gray-300">Liq. Price</div>
@@ -523,13 +535,13 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                       {addPnl ? (
                         <>
                           <span className="text-gray-300 mr-2 line-through">
-                            ${toInternationalCurrencySystem_number(LiqPrice)}
+                            ${formatPrice(LiqPrice)}
                           </span>
                           <RightArrow />
-                          <p className="ml-2">${toInternationalCurrencySystem_number(addPnl)}</p>
+                          <p className="ml-2">${formatPrice(addPnl)}</p>
                         </>
                       ) : (
-                        <p>${toInternationalCurrencySystem_number(LiqPrice)}</p>
+                        <p>${formatPrice(LiqPrice)}</p>
                       )}
                     </div>
                   </div>
@@ -603,15 +615,15 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                     <div className="text-gray-300">Position Size</div>
                     <div>
                       {positionType.label === "Long"
-                        ? toInternationalCurrencySystem_number(sizeValueLong)
-                        : toInternationalCurrencySystem_number(leverageD)}
+                        ? beautifyPrice(sizeValueLong)
+                        : beautifyPrice(leverageD)}
                       <span className="ml-1.5">
                         {positionType.label === "Long"
                           ? getSymbolById(assetP.token_id, assetP.metadata?.symbol)
                           : getSymbolById(assetD.token_id, assetD.metadata?.symbol)}
                       </span>
                       <span className="text-xs text-gray-300 ml-1.5">
-                        (${toInternationalCurrencySystem_number(sizeValue)})
+                        ({beautifyPrice(sizeValue, true, 3, 3)})
                       </span>
                     </div>
                   </div>
@@ -654,7 +666,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                   </div>
                   <div className="flex items-center justify-between text-sm mb-4">
                     <div className="text-gray-300">Entry Price</div>
-                    <div>${toInternationalCurrencySystem_number(rowData.entryPrice)}</div>
+                    <div>${formatPrice(rowData.entryPrice ?? 0)}</div>
                   </div>
                   <div className="flex items-center justify-between text-sm mb-4">
                     <div className="text-gray-300">Liq. Price</div>
@@ -662,13 +674,13 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                       {addPnl ? (
                         <>
                           <span className="text-gray-300 mr-2 line-through">
-                            ${toInternationalCurrencySystem_number(LiqPrice)}
+                            ${formatPrice(LiqPrice)}
                           </span>
                           <RightArrow />
-                          <p className="ml-2">${toInternationalCurrencySystem_number(addPnl)}</p>
+                          <p className="ml-2">${formatPrice(addPnl)}</p>
                         </>
                       ) : (
-                        <p>${toInternationalCurrencySystem_number(LiqPrice)}</p>
+                        <p>${formatPrice(LiqPrice)}</p>
                       )}
                     </div>
                   </div>
