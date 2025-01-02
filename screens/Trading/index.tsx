@@ -446,7 +446,7 @@ const Trading = () => {
               positionsList={isMainStream ? marginAccountList : marginAccountListMEME}
               filterTitle={filterTitle}
               filterTokenMap={{
-                token_c: ReduxcategoryAssets2.token_id,
+                token_c: ReduxcategoryAssets2?.token_id,
               }}
             />
           )}
