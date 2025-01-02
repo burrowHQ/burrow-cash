@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
+import { useDebounce } from "react-use";
 import { NearIcon } from "../../MarginTrading/components/Icon";
 import { TokenThinArrow, TokenSelected } from "./TradingIcon";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
@@ -36,58 +37,64 @@ const TradingToken: React.FC<TradingTokenInter> = ({
   const [ownBalanceDetail, setOwnBalanceDetail] = useState<string>("");
   const [showModal, setShowModal] = useState<boolean>(false);
   const accountId = useAppSelector(getAccountId);
-  const [selectedItem, setSelectedItem] = useState<any>(tokenList[0]);
+  const [selectedItem, setSelectedItem] = useState<any>(
+    type === "cate1" ? ReduxcategoryAssets1 : ReduxcategoryAssets2,
+  );
   const sendBalance = () => {
     if (setOwnBanlance) {
       setOwnBanlance(ownBalanceDetail);
     }
   };
   //
-  useEffect(() => {
-    const getSelectedAssetAndBalanceSetter = () => {
-      if (type === "cate1" && ReduxcategoryAssets1) {
-        return {
-          selectedAsset: ReduxcategoryAssets1,
-          setReduxcategoryCurrentBalance: (value: any) =>
-            dispatch(setReduxcategoryCurrentBalance1(value)),
-        };
-      } else if (type === "cate2" && ReduxcategoryAssets2) {
-        return {
-          selectedAsset: ReduxcategoryAssets2,
-          setReduxcategoryCurrentBalance: (value: any) =>
-            dispatch(setReduxcategoryCurrentBalance2(value)),
-        };
+  useDebounce(
+    () => {
+      const getSelectedAssetAndBalanceSetter = () => {
+        if (type === "cate1" && ReduxcategoryAssets1) {
+          return {
+            selectedAsset: ReduxcategoryAssets1,
+            setReduxcategoryCurrentBalance: (value: any) =>
+              dispatch(setReduxcategoryCurrentBalance1(value)),
+          };
+        } else if (type === "cate2" && ReduxcategoryAssets2) {
+          return {
+            selectedAsset: ReduxcategoryAssets2,
+            setReduxcategoryCurrentBalance: (value: any) =>
+              dispatch(setReduxcategoryCurrentBalance2(value)),
+          };
+        }
+        return { selectedAsset: null, setReduxcategoryCurrentBalance: null };
+      };
+
+      const { selectedAsset, setReduxcategoryCurrentBalance } = getSelectedAssetAndBalanceSetter();
+
+      if (!selectedAsset) {
+        setSelectedItem(type === "cate1" ? ReduxcategoryAssets1 : ReduxcategoryAssets2);
+        // setOwnBalance("-");
+        return;
       }
-      return { selectedAsset: null, setReduxcategoryCurrentBalance: null };
-    };
 
-    const { selectedAsset, setReduxcategoryCurrentBalance } = getSelectedAssetAndBalanceSetter();
+      const tokenId = selectedAsset.metadata["token_id"];
+      const balance = account.balances[tokenId];
 
-    if (!selectedAsset) {
-      setSelectedItem(tokenList[0]);
-      setOwnBalance("-");
-      return;
-    }
+      if (!tokenId || !balance) {
+        // setOwnBalance("-");
+        // setReduxcategoryCurrentBalance && setReduxcategoryCurrentBalance("-");
+        setSelectedItem(type === "cate1" ? ReduxcategoryAssets1 : ReduxcategoryAssets2);
+        return;
+      }
 
-    const tokenId = selectedAsset.metadata["token_id"];
-    const balance = account.balances[tokenId];
+      const { decimals } = selectedAsset.metadata;
+      const waitUseKey = shrinkToken(balance, decimals);
+      const formattedBalance = toInternationalCurrencySystem_number(waitUseKey);
 
-    if (!tokenId || !balance) {
-      setOwnBalance("-");
-      setReduxcategoryCurrentBalance && setReduxcategoryCurrentBalance("-");
+      setOwnBalance(formattedBalance);
+      setOwnBalanceDetail(waitUseKey);
+      setReduxcategoryCurrentBalance && setReduxcategoryCurrentBalance(waitUseKey);
       setSelectedItem(selectedAsset);
-      return;
-    }
-
-    const { decimals } = selectedAsset.metadata;
-    const waitUseKey = shrinkToken(balance, decimals);
-    const formattedBalance = toInternationalCurrencySystem_number(waitUseKey);
-
-    setOwnBalance(formattedBalance);
-    setOwnBalanceDetail(waitUseKey);
-    setReduxcategoryCurrentBalance && setReduxcategoryCurrentBalance(waitUseKey);
-    setSelectedItem(selectedAsset);
-  }, [type, accountId, account.balances, ReduxcategoryAssets1, ReduxcategoryAssets2]);
+    },
+    300,
+    [type, accountId, account.balances, ReduxcategoryAssets1, ReduxcategoryAssets2],
+  );
 
   //
   const handleTokenClick = (item: any) => {

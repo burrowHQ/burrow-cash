@@ -33,9 +33,13 @@ import { isMobileDevice } from "../../../helpers/helpers";
 const TradingTable = ({
   positionsList,
   filterTitle = "",
+  filterTokenMap = {},
 }: {
   positionsList: any;
   filterTitle?: string;
+  filterTokenMap?: {
+    [key: string]: string;
+  };
 }) => {
   const { query } = useRouterQuery();
   const { filterMarginConfigList } = useMarginConfigToken();
@@ -120,6 +124,7 @@ const TradingTable = ({
         page_size: pageSize,
         order_column: orderColumn,
         order_by: orderBy,
+        ...filterTokenMap,
       };
       const response = await DataSource.shared.getMarginTradingPositionHistory(params);
       setPositionHistory(response.data.position_records);
@@ -135,7 +140,16 @@ const TradingTable = ({
     if (selectedTab === "history" || isSelectedMobileTab === "history") {
       fetchPositionHistory();
     }
-  }, [accountId, pageNum, pageSize, orderColumn, orderBy, selectedTab, isSelectedMobileTab]);
+  }, [
+    accountId,
+    pageNum,
+    pageSize,
+    orderColumn,
+    orderBy,
+    selectedTab,
+    isSelectedMobileTab,
+    JSON.stringify(filterTokenMap || {}),
+  ]);
   const calculateTotalSizeValues = () => {
     let collateralTotal = 0;
     Object.values(marginAccountList).forEach((item) => {

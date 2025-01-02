@@ -8,6 +8,7 @@ interface commonAssets {
   ReduxSlippageTolerance: any;
   ReduxTotalPLN: any;
   ReduxRangeMount: any;
+  ReduxActiveTab: string;
 }
 
 const initialState: commonAssets = {
@@ -18,6 +19,7 @@ const initialState: commonAssets = {
   ReduxSlippageTolerance: 0.5,
   ReduxTotalPLN: 0,
   ReduxRangeMount: 1,
+  ReduxActiveTab: "long",
 };
 
 const marginCategory = createSlice({
@@ -45,6 +47,9 @@ const marginCategory = createSlice({
     setReduxRangeMount(state, action) {
       state.ReduxRangeMount = action.payload;
     },
+    setReduxActiveTab(state, action) {
+      state.ReduxActiveTab = action.payload;
+    },
   },
 });
 
@@ -56,6 +61,7 @@ const {
   setSlippageToleranceFromRedux,
   setReduxTotalPLN,
   setReduxRangeMount,
+  setReduxActiveTab,
 } = marginCategory.actions;
 const marginCategoryReducer = marginCategory.reducer;
 export {
@@ -66,5 +72,6 @@ export {
   setSlippageToleranceFromRedux,
   setReduxTotalPLN,
   setReduxRangeMount,
+  setReduxActiveTab,
 };
 export default marginCategoryReducer;

@@ -13,7 +13,7 @@ import { usePoolsData } from "../../../hooks/useGetPoolsData";
 import { getMarginConfig } from "../../../redux/marginConfigSelectors";
 import { toInternationalCurrencySystem_number, toDecimal } from "../../../utils/uiNumber";
 import { useEstimateSwap } from "../../../hooks/useEstimateSwap";
-import { setSlippageToleranceFromRedux } from "../../../redux/marginTrading";
+import { setSlippageToleranceFromRedux, setReduxActiveTab } from "../../../redux/marginTrading";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";
 import { shrinkToken } from "../../../store/helper";
 import {
@@ -44,6 +44,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
     ReduxcategoryCurrentBalance2,
     ReduxSlippageTolerance,
     ReduxRangeMount,
+    ReduxActiveTab,
   } = useAppSelector((state) => state.category);
 
   //
@@ -51,7 +52,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
   const [showFeeModal, setShowFeeModal] = useState<boolean>(false);
   const [forceUpdateLoading, setForceUpdateLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
-  const [activeTab, setActiveTab] = useState<string>("long");
+  const [activeTab, setActiveTab] = useState<string>(ReduxActiveTab || "long");
   const [estimateLoading, setEstimateLoading] = useState<boolean>(false);
 
   //
@@ -105,6 +106,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
   };
   // tab click event
   const handleTabClick = (tabString: string) => {
+    dispatch(setReduxActiveTab(tabString));
     setActiveTab(tabString);
     initCateState(tabString);
     setForceUpdate((prev) => prev + 1);

@@ -36,7 +36,9 @@ const Trading = () => {
   const accountId = useAccountId();
   const { marginAccountList, parseTokenValue, getAssetDetails, getAssetById } = useMarginAccount();
   const { categoryAssets1, categoryAssets2, filterMarginConfigList } = useMarginConfigToken();
-  const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
+  const { ReduxcategoryAssets1, ReduxcategoryAssets2, ReduxActiveTab } = useAppSelector(
+    (state) => state.category,
+  );
   const router = useRouter();
   const { id }: any = router.query;
   const dispatch = useAppDispatch();
@@ -376,7 +378,25 @@ const Trading = () => {
           Long/Short
         </div>
       </div>
-      {accountId && <TradingTable positionsList={marginAccountList} filterTitle={filterTitle} />}
+      {accountId && (
+        <TradingTable
+          positionsList={marginAccountList}
+          filterTitle={filterTitle}
+          filterTokenMap={
+            ReduxActiveTab == "long"
+              ? {
+                  token_c: ReduxcategoryAssets2.token_id,
+                  token_d: ReduxcategoryAssets2.token_id,
+                  token_p: ReduxcategoryAssets1.token_id,
+                }
+              : {
+                  token_c: ReduxcategoryAssets2.token_id,
+                  token_d: ReduxcategoryAssets1.token_id,
+                  token_p: ReduxcategoryAssets2.token_id,
+                }
+          }
+        />
+      )}
       <TradingOperateMobile open={open} onClose={() => setOpen(false)} />
     </LayoutBox>
   );
