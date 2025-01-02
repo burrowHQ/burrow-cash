@@ -209,6 +209,13 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
       }
     }
   };
+
+  // calculate collateral value
+  const collateralValue = new Decimal(confirmInfo.longInput)
+    .mul(new Decimal(assetC.price?.usd || 1))
+    .minus(new Decimal(confirmInfo.Fee.openPFee))
+    .div(new Decimal(assetC?.price?.usd || 1));
+
   return (
     <MUIModal open={open} onClose={onClose}>
       <Wrapper
@@ -292,9 +299,16 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Collateral</div>
               <div className="text-right flex">
-                {beautifyPrice(confirmInfo.longInput)} {confirmInfo.longInputName?.metadata.symbol}
+                {beautifyPrice(collateralValue.toNumber())}
+                {confirmInfo.longInputName?.metadata.symbol}
                 <span className="text-xs text-gray-300 ml-1.5">
-                  (${beautifyPrice(confirmInfo.longInputUsd)})
+                  ($
+                  {beautifyPrice(
+                    new Decimal(confirmInfo.longInputUsd)
+                      .minus(confirmInfo.Fee.openPFee)
+                      .toNumber(),
+                  )}
+                  )
                 </span>
               </div>
             </div>
