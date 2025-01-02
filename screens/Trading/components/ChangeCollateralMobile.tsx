@@ -1,4 +1,4 @@
-import { useState, createContext, useEffect, useMemo } from "react";
+import { useState, createContext, useEffect, FC } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
 import { useDispatch } from "react-redux";
@@ -21,9 +21,10 @@ import { useRouterQuery } from "../../../utils/txhashContract";
 import { setActiveTab } from "../../../redux/marginTabSlice";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { checkIfMeme } from "../../../utils/margin";
+import { ChangeCollateralMobileProps } from "../comInterface";
 
 export const ModalContext = createContext(null) as any;
-const ChangeCollateralMobile = ({ open, onClose, rowData, collateralTotal }) => {
+const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose, rowData }) => {
   const { query } = useRouterQuery();
   const dispatch = useDispatch();
   const account = useAppSelector((state) => state.account);

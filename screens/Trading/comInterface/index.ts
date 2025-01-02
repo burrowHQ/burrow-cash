@@ -58,3 +58,14 @@ export interface IClosePositionMobileProps {
   onClose: (e?: any) => void;
   extraProps: IExtraProps;
 }
+
+export interface ChangeCollateralMobileProps {
+  open: boolean;
+  onClose: (e?: any) => void;
+  rowData: {
+    pos_id: string;
+    data: any;
+    marginConfigTokens: any;
+    entryPrice: number | null;
+  };
+}

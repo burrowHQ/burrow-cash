@@ -367,8 +367,15 @@ const TradingTable = ({
                   <ChangeCollateralMobile
                     open={isChangeCollateralMobileOpen}
                     onClose={() => setIsChangeCollateralMobileOpen(false)}
-                    rowData={selectedRowData}
-                    collateralTotal={totalCollateral}
+                    rowData={
+                      selectedRowData || {
+                        pos_id: "",
+                        data: {},
+                        marginConfigTokens: {},
+                        entryPrice: null,
+                      }
+                    }
+                    // collateralTotal={totalCollateral}
                   />
                 )}
                 {isClosePositionModalOpen && closePositionModalProps && (
@@ -898,8 +905,15 @@ const TradingTable = ({
                 // e.stopPropagation();
                 setIsChangeCollateralMobileOpen(false);
               }}
-              rowData={selectedRowData}
-              collateralTotal={totalCollateral}
+              rowData={
+                selectedRowData || {
+                  pos_id: "",
+                  data: {},
+                  marginConfigTokens: {},
+                  entryPrice: null,
+                }
+              }
+              // collateralTotal={totalCollateral}
             />
           )}
           {isClosePositionModalOpen && closePositionModalProps && (

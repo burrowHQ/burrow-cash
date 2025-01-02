@@ -21,7 +21,7 @@ type TokenTypeMap = {
   memeStream: string[];
 };
 
-const MarketMarginTrading = ({ hidden }) => {
+const MarketMarginTrading = ({ hidden }: { hidden: boolean }) => {
   const isMobile = isMobileDevice();
   const { filteredTokenTypeMap } = useRegisterTokenType();
   const { filterMarginConfigList } = useMarginConfigToken();
@@ -30,7 +30,10 @@ const MarketMarginTrading = ({ hidden }) => {
   const [sortDirection, setSortDirection] = React.useState<"asc" | "desc" | null>(null);
   const [sortBy, setSortBy] = React.useState<string | null>(null);
   const [mergedData, setMergedData] = useState<any[]>([]);
-  const [volumeStats, setVolumeStats] = React.useState({
+  const [volumeStats, setVolumeStats] = React.useState<{
+    totalVolume: number;
+    volume24h: number;
+  }>({
     totalVolume: 0,
     volume24h: 0,
   });
@@ -174,7 +177,7 @@ const MarketMarginTrading = ({ hidden }) => {
   );
 };
 
-const DataItem = ({ title, value }) => (
+const DataItem = ({ title, value }: { title: string; value: string }) => (
   <div className="flex flex-1 justify-center xsm:justify-start xsm:mb-[30px]">
     <div>
       <p className="text-gray-300 text-sm">{title}</p>
@@ -183,7 +186,15 @@ const DataItem = ({ title, value }) => (
   </div>
 );
 
-function SortButton({ sort, activeColor, inactiveColor }) {
+function SortButton({
+  sort,
+  activeColor,
+  inactiveColor,
+}: {
+  sort: "asc" | "desc" | null;
+  activeColor: string;
+  inactiveColor: string;
+}) {
   return (
     <div className="flex flex-col items-center gap-0.5 ml-1.5">
       <ArrowUpIcon fill={`${sort === "asc" ? activeColor : inactiveColor}`} />
@@ -192,7 +203,15 @@ function SortButton({ sort, activeColor, inactiveColor }) {
   );
 }
 
-function TableHead({ onSort, sortDirection, sortBy }) {
+function TableHead({
+  onSort,
+  sortDirection,
+  sortBy,
+}: {
+  onSort: (field: string) => void;
+  sortDirection: "asc" | "desc" | null;
+  sortBy: string | null;
+}) {
   return (
     <div className="w-full grid grid-cols-5 h-12">
       <div className="grid grid-cols-3 col-span-3 border border-dark-50 bg-gray-800 rounded-t-2xl items-center text-sm text-gray-300">
