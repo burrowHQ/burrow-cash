@@ -491,19 +491,6 @@ const TradingTable = ({
                     const assetC = !ifMeme
                       ? getAssetById(record.token_c)
                       : getAssetByIdMEME(record.token_c);
-                    const isFilter = [
-                      `${getSymbolById(assetP.token_id, assetP.metadata?.symbol)}/${getSymbolById(
-                        assetD.token_id,
-                        assetD.metadata?.symbol,
-                      )}`,
-                      `${getSymbolById(assetD.token_id, assetD.metadata?.symbol)}/${getSymbolById(
-                        assetP.token_id,
-                        assetP.metadata?.symbol,
-                      )}`,
-                    ].includes(filterTitle);
-                    if (filterTitle && !isFilter) {
-                      return null;
-                    }
                     return (
                       <tr key={index}>
                         <td className="py-5 pl-5">
