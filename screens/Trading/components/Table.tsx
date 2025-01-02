@@ -490,8 +490,8 @@ const TradingTable = ({
                               : toInternationalCurrencySystem_number(
                                   Number(
                                     shrinkToken(
-                                      record.amount_d,
-                                      assetD.metadata.decimals + assetD.config.extra_decimals,
+                                      record.amount_p,
+                                      assetP.metadata.decimals + assetP.config.extra_decimals,
                                     ),
                                   ),
                                 )
@@ -501,8 +501,8 @@ const TradingTable = ({
                               : toInternationalCurrencySystem_number(
                                   Number(
                                     shrinkToken(
-                                      record.amount_p,
-                                      assetP.metadata.decimals + assetP.config.extra_decimals,
+                                      record.amount_d,
+                                      assetD.metadata.decimals + assetD.config.extra_decimals,
                                     ),
                                   ),
                                 )
@@ -517,7 +517,13 @@ const TradingTable = ({
                                     record.net_value,
                                     assetC.metadata.decimals + assetC.config.extra_decimals,
                                   ),
-                                ),
+                                ) -
+                                  Number(
+                                    shrinkToken(
+                                      record.open_fee,
+                                      assetC.metadata.decimals + assetC.config.extra_decimals,
+                                    ),
+                                  ),
                               )}`}
                         </td>
                         <td>
@@ -1040,8 +1046,8 @@ const TradingTable = ({
                             : toInternationalCurrencySystem_number(
                                 Number(
                                   shrinkToken(
-                                    record.amount_d,
-                                    assetD.metadata.decimals + assetD.config.extra_decimals,
+                                    record.amount_p,
+                                    assetP.metadata.decimals + assetP.config.extra_decimals,
                                   ),
                                 ),
                               )
@@ -1051,8 +1057,8 @@ const TradingTable = ({
                             : toInternationalCurrencySystem_number(
                                 Number(
                                   shrinkToken(
-                                    record.amount_p,
-                                    assetP.metadata.decimals + assetP.config.extra_decimals,
+                                    record.amount_d,
+                                    assetD.metadata.decimals + assetD.config.extra_decimals,
                                   ),
                                 ),
                               )
@@ -1070,7 +1076,13 @@ const TradingTable = ({
                                   record.net_value,
                                   assetC.metadata.decimals + assetC.config.extra_decimals,
                                 ),
-                              ),
+                              ) -
+                                Number(
+                                  shrinkToken(
+                                    record.open_fee,
+                                    assetC.metadata.decimals + assetC.config.extra_decimals,
+                                  ),
+                                ),
                             )}`}
                       </p>
                     </div>
