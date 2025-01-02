@@ -382,19 +382,20 @@ const Trading = () => {
         <TradingTable
           positionsList={marginAccountList}
           filterTitle={filterTitle}
-          filterTokenMap={
-            ReduxActiveTab == "long"
-              ? {
-                  token_c: ReduxcategoryAssets2.token_id,
-                  token_d: ReduxcategoryAssets2.token_id,
-                  token_p: ReduxcategoryAssets1.token_id,
-                }
-              : {
-                  token_c: ReduxcategoryAssets2.token_id,
-                  token_d: ReduxcategoryAssets1.token_id,
-                  token_p: ReduxcategoryAssets2.token_id,
-                }
-          }
+          filterTokenMap={{
+            token_c: ReduxcategoryAssets2.token_id,
+            // ReduxActiveTab == "long"
+            //   ? {
+            //       token_c: ReduxcategoryAssets2.token_id,
+            //       token_d: ReduxcategoryAssets2.token_id,
+            //       token_p: ReduxcategoryAssets1.token_id,
+            //     }
+            //   : {
+            //       token_c: ReduxcategoryAssets2.token_id,
+            //       token_d: ReduxcategoryAssets1.token_id,
+            //       token_p: ReduxcategoryAssets2.token_id,
+            //     }
+          }}
         />
       )}
       <TradingOperateMobile open={open} onClose={() => setOpen(false)} />
