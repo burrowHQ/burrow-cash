@@ -448,14 +448,14 @@ const Trading = () => {
               filterTokenMap={
                 ReduxActiveTab == "long"
                   ? {
-                      token_c: ReduxcategoryAssets2.token_id,
-                      token_d: ReduxcategoryAssets2.token_id,
-                      token_p: ReduxcategoryAssets1.token_id,
+                      token_c: ReduxcategoryAssets2?.token_id,
+                      token_d: ReduxcategoryAssets2?.token_id,
+                      token_p: ReduxcategoryAssets1?.token_id,
                     }
                   : {
-                      token_c: ReduxcategoryAssets2.token_id,
-                      token_d: ReduxcategoryAssets1.token_id,
-                      token_p: ReduxcategoryAssets2.token_id,
+                      token_c: ReduxcategoryAssets2?.token_id,
+                      token_d: ReduxcategoryAssets1?.token_id,
+                      token_p: ReduxcategoryAssets2?.token_id,
                     }
               }
             />
