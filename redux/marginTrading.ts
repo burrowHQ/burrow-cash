@@ -9,7 +9,7 @@ interface commonAssets {
   activeCategory: string;
   ReduxTotalPLN: any;
   ReduxRangeMount: any;
-  ReduxActiveTab;
+  ReduxActiveTab: string;
 }
 
 const initialState: commonAssets = {
