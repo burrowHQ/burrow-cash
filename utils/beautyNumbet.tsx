@@ -1,6 +1,11 @@
 import { twMerge } from "tailwind-merge";
 
-export const beautifyPrice = (num: number, isDollar: boolean = false) => {
+export const beautifyPrice = (
+  num: number,
+  isDollar: boolean = false,
+  decimalPlaces: number = 5,
+  digitsPlaces: number = 4,
+) => {
   if (!num) return "-";
   if (num == 0) return "0";
   let numStr = num.toString();
@@ -19,7 +24,7 @@ export const beautifyPrice = (num: number, isDollar: boolean = false) => {
   if (isPositive) {
     const nonZeroIndex = decimalPart.split("").findIndex((n) => +n !== 0);
     if (nonZeroIndex <= 1) {
-      let significantDigits = decimalPart.replace(/0+$/, "").slice(0, 5);
+      let significantDigits = decimalPart.replace(/0+$/, "").slice(0, decimalPlaces);
       if (significantDigits.endsWith("0")) {
         significantDigits = significantDigits.slice(0, 4);
       }
@@ -31,7 +36,7 @@ export const beautifyPrice = (num: number, isDollar: boolean = false) => {
       );
     }
     const nonZeroPart = decimalPart.substring(nonZeroIndex);
-    let digits = nonZeroPart.slice(0, 4);
+    let digits = nonZeroPart.slice(0, digitsPlaces);
     if (digits.endsWith("0")) {
       digits = digits.slice(0, 3);
     }

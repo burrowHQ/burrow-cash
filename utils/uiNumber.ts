@@ -1,5 +1,6 @@
 import Decimal from "decimal.js";
 import { formatWithCommas, toInternationalCurrencySystem } from "./number";
+import { beautifyPrice } from "./beautyNumbet";
 
 export const formatWithCommas_usd = (v) => {
   if (isInvalid(v)) return "$-";
@@ -88,4 +89,12 @@ export const isInvalid = (v) => {
 
 export const toDecimal = (v) => {
   return new Decimal(v).toFixed();
+};
+
+export const formatPrice = (price: number, isDollar: boolean = false) => {
+  if (price >= 100) {
+    return `${toInternationalCurrencySystem_number(price)}`;
+  } else {
+    return beautifyPrice(price);
+  }
 };
