@@ -72,15 +72,14 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
     if (positionType.label === "Long") {
       const k1 = Number(newNetValue) * newLeverage * priceC;
       const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
-      newLiqPrice = ((Number(newNetValue) * priceC + size * priceP) * k2) / k1 + holdingFee;
+      newLiqPrice = ((Number(newNetValue) * priceC + size * priceP) * k2) / (k1 + holdingFee);
       if (Number.isNaN(newLiqPrice) || !Number.isFinite(newLiqPrice)) newLiqPrice = 0;
     } else {
       newLiqPrice =
         ((newNetValue + sizeValueLong) *
           priceC *
           (1 - marginConfigTokens.min_safety_buffer / 10000)) /
-          sizeValueShort +
-        holdingFee;
+        (sizeValueShort + holdingFee);
       if (Number.isNaN(newLiqPrice) || !Number.isFinite(newLiqPrice)) newLiqPrice = 0;
     }
     return { newNetValue, newLeverage, newLiqPrice };
@@ -189,19 +188,20 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
   const uahpi_at_open: any =
     shrinkToken(marginAccountList[rowData.data.itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
   const holdingFee =
-    +shrinkToken(rowData.data.debt_cap, decimalsD) * priceD * (uahpi * 1 - uahpi_at_open * 1);
+    +shrinkToken(rowData.data.debt_cap, decimalsD) *
+    priceD *
+    (uahpi * priceD - uahpi_at_open * priceD);
   let LiqPrice = 0;
   if (leverage > 1) {
     if (positionType.label === "Long") {
       const k1 = Number(netValue) * leverage * priceC;
       const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
-      LiqPrice = ((Number(netValue) * priceC + size * priceP) * k2) / k1 + holdingFee;
+      LiqPrice = ((Number(netValue) * priceC + size * priceP) * k2) / (k1 + holdingFee);
       if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
     } else {
       LiqPrice =
         ((netValue + sizeValueLong) * priceC * (1 - marginConfigTokens.min_safety_buffer / 10000)) /
-          sizeValueShort +
-        holdingFee;
+        (sizeValueShort + holdingFee);
       if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
     }
   }
