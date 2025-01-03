@@ -28,6 +28,7 @@ export const beautifyPrice = (
       if (significantDigits.endsWith("0")) {
         significantDigits = significantDigits.slice(0, 4);
       }
+      significantDigits = significantDigits.replace(/0+$/, "");
       return (
         <span key={num} className="animate-flipIn">
           {isDollar ? "$" : ""}
