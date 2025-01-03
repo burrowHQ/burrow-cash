@@ -192,8 +192,22 @@ const TradingTable = ({
   const handleWithdrawAllClick = async () => {
     setIsLoadingWithdraw(true);
     const accountSuppliedIds = filteredAccountSupplied.map((asset) => asset.token_id);
+    const [memeAccountSuppliedIds, mainAccountSuppliedIds] = filteredAccountSupplied.reduce(
+      (acc, cur) => {
+        if (cur.type == "meme") {
+          acc[0].push(cur.token_id);
+        } else {
+          acc[1].push(cur.token_id);
+        }
+        return acc;
+      },
+      [[], []] as string[][],
+    );
     try {
-      const result = await withdrawActionsAll(accountSuppliedIds);
+      const result = await withdrawActionsAll({
+        meme_token_ids: memeAccountSuppliedIds,
+        main_token_ids: mainAccountSuppliedIds,
+      });
       if (result !== undefined && result !== null) {
         showCheckTxBeforeShowToast({ txHash: result[0].transaction.hash });
       }
