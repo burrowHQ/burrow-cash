@@ -7,7 +7,6 @@ export const beautifyPrice = (
   digitsPlaces: number = 4,
 ) => {
   if (!num) return "-";
-  if (num == 0) return "0";
   let numStr = num.toString();
   if (numStr.includes("e")) {
     const [base, exp] = numStr.split("e");
@@ -22,11 +21,30 @@ export const beautifyPrice = (
   const isPositive = +integerPart >= 0;
 
   if (isPositive) {
+    if (+integerPart >= 100) {
+      const significantDigits = decimalPart.slice(0, 2).replace(/0+$/, "");
+      return (
+        <span key={num} className="animate-flipIn">
+          {isDollar ? "$" : ""}
+          {`${integerPart}${significantDigits ? `.${significantDigits}` : ""}`}
+        </span>
+      );
+    } else if (+integerPart > 0 && +integerPart < 100) {
+      let totalDigits = `${integerPart}${decimalPart ? `.${decimalPart}` : ""}`.slice(0, 6);
+      totalDigits = totalDigits.replace(/0+$/, "");
+      return (
+        <span key={num} className="animate-flipIn">
+          {isDollar ? "$" : ""}
+          {totalDigits}
+        </span>
+      );
+    }
+
     const nonZeroIndex = decimalPart.split("").findIndex((n) => +n !== 0);
     if (nonZeroIndex <= 1) {
       let significantDigits = decimalPart.replace(/0+$/, "").slice(0, decimalPlaces);
-      if (significantDigits.endsWith("0")) {
-        significantDigits = significantDigits.slice(0, 4);
+      while (significantDigits.endsWith("0")) {
+        significantDigits = significantDigits.slice(0, -1);
       }
       return (
         <span key={num} className="animate-flipIn">
@@ -37,8 +55,8 @@ export const beautifyPrice = (
     }
     const nonZeroPart = decimalPart.substring(nonZeroIndex);
     let digits = nonZeroPart.slice(0, digitsPlaces);
-    if (digits.endsWith("0")) {
-      digits = digits.slice(0, 3);
+    while (digits.endsWith("0")) {
+      digits = digits.slice(0, -1);
     }
     return (
       <span key={num} className="animate-flipIn">
