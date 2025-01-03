@@ -1402,7 +1402,7 @@ const PositionRow = ({
     };
     const timeoutId = setTimeout(() => {
       fetchEntryPrice();
-    }, 5000);
+    }, 3000);
     return () => clearTimeout(timeoutId);
   }, [itemKey, item, index]);
   const assetD = getAssetById(item.token_d_info.token_id);
@@ -1602,7 +1602,7 @@ const PositionMobileRow = ({
     };
     const timeoutId = setTimeout(() => {
       fetchEntryPrice();
-    }, 5000);
+    }, 3000);
     return () => clearTimeout(timeoutId);
   }, [itemKey, item, index]);
   const assetD = getAssetById(item.token_d_info.token_id);
