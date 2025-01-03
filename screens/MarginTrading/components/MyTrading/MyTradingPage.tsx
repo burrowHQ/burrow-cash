@@ -59,7 +59,9 @@ const MyMarginTradingPage = () => {
         const uahpi_at_open: any =
           shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
         const holdingFee =
-          +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi * 1 - uahpi_at_open * 1);
+          +shrinkToken(item.debt_cap, decimalsD) *
+          priceD *
+          (uahpi * priceD - uahpi_at_open * priceD);
         const profitOrLoss =
           entryPrice !== null && entryPrice !== 0
             ? positionType === "Long"
