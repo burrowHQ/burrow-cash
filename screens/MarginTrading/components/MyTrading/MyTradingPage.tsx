@@ -7,7 +7,7 @@ import { isMobileDevice } from "../../../../helpers/helpers";
 import DataSource from "../../../../data/datasource";
 import { shrinkToken } from "../../../../store/helper";
 import { useAppSelector } from "../../../../redux/hooks";
-import { getAssets } from "../../../../redux/assetsSelectors";
+import { getAssets, getAssetsMEME } from "../../../../redux/assetsSelectors";
 import { useRegisterTokenType } from "../../../../hooks/useRegisterTokenType";
 
 const MyMarginTradingPage = () => {
@@ -22,6 +22,7 @@ const MyMarginTradingPage = () => {
   } = useMarginAccount();
   const { filteredTokenTypeMap } = useRegisterTokenType();
   const assets = useAppSelector(getAssets);
+  const assetsMEME = useAppSelector(getAssetsMEME);
   const { getPositionType } = useMarginConfigToken();
   const [totalLongSizeValue, setTotalLongSizeValue] = useState(0);
   const [totalShortSizeValue, setTotalShortSizeValue] = useState(0);
@@ -70,8 +71,9 @@ const MyMarginTradingPage = () => {
             ? entryPriceResponse.data[0].entry_price
             : null;
         const indexPrice = positionType === "Long" ? priceP : priceD;
-        const uahpi: any =
-          shrinkToken((assets as any).data[item.token_d_info.token_id]?.uahpi, 18) ?? 0;
+        const uahpi: any = isMainStream
+          ? shrinkToken((assets as any).data[item.token_d_info.token_id]?.uahpi, 18)
+          : shrinkToken((assetsMEME as any).data[item.token_d_info.token_id]?.uahpi, 18);
         const uahpi_at_open: any = isMainStream
           ? shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18)
           : shrinkToken(marginAccountListMEME[itemKey]?.uahpi_at_open ?? 0, 18);

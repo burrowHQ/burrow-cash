@@ -11,7 +11,7 @@ import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
 import { RightArrow } from "./TradingIcon";
 import { increaseCollateral } from "../../../store/marginActions/increaseCollateral";
 import { useAppSelector } from "../../../redux/hooks";
-import { getAssets } from "../../../redux/assetsSelectors";
+import { getAssets, getAssetsMEME } from "../../../redux/assetsSelectors";
 import { decreaseCollateral } from "../../../store/marginActions/decreaseCollateral";
 import { getAccountBalance } from "../../../redux/accountSelectors";
 import DataSource from "../../../data/datasource";
@@ -179,7 +179,6 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
     icon: iconC,
     decimals: decimalsC,
   } = getAssetDetails(assetC);
-  const holdingAssets = useAppSelector(getAssets);
   const { price: priceP, symbol: symbolP, decimals: decimalsP } = getAssetDetails(assetP);
   const leverageD = parseTokenValue(rowData.data.token_d_info.balance, decimalsD);
   const leverageC = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
@@ -195,6 +194,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
       ? rowData.data.token_p_id.toString()
       : rowData.data.token_d_info.token_id.toString(),
   );
+  const holdingAssets = useAppSelector(isMainStream ? getAssets : getAssetsMEME);
   const netValue = parseTokenValue(rowData.data.token_c_info.balance, decimalsC) * (priceC || 0);
   const uahpi: any =
     shrinkToken((holdingAssets as any).data[rowData.data.token_d_info.token_id]?.uahpi, 18) ?? 0;

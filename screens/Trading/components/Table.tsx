@@ -24,7 +24,7 @@ import { handleTransactionHash, handleTransactionResults } from "../../../servic
 import { setAccountDetailsOpen, setSelectedTab } from "../../../redux/marginTabSlice";
 import { showCheckTxBeforeShowToast } from "../../../components/HashResultModal";
 import { shrinkToken } from "../../../store/helper";
-import { getAssets } from "../../../redux/assetsSelectors";
+import { getAssets, getAssetsMEME } from "../../../redux/assetsSelectors";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { checkIfMeme } from "../../../utils/margin";
@@ -53,6 +53,7 @@ const TradingTable = ({
   const [isChangeCollateralMobileOpen, setIsChangeCollateralMobileOpen] = useState(false);
   const [selectedRowData, setSelectedRowData] = useState(null);
   const assets = useAppSelector(getAssets);
+  const assetsMEME = useAppSelector(getAssetsMEME);
   const [closePositionModalProps, setClosePositionModalProps] = useState(null);
   const [totalCollateral, setTotalCollateral] = useState(0);
   const [positionHistory, setPositionHistory] = useState<any[]>([]);
@@ -353,6 +354,7 @@ const TradingTable = ({
                       calculateLeverage={calculateLeverage}
                       marginConfigTokens={marginConfigTokens}
                       assets={assets}
+                      assetsMEME={assetsMEME}
                       filterTitle={filterTitle}
                       marginAccountList={marginAccountList}
                       marginAccountListMEME={marginAccountListMEME}
@@ -904,6 +906,7 @@ const TradingTable = ({
                 calculateLeverage={calculateLeverage}
                 marginConfigTokens={marginConfigTokens}
                 assets={assets}
+                assetsMEME={assetsMEME}
                 filterTitle={filterTitle}
                 marginAccountList={marginAccountList}
                 marginAccountListMEME={marginAccountListMEME}
@@ -1420,6 +1423,7 @@ const PositionRow = ({
   parseTokenValue,
   calculateLeverage,
   assets,
+  assetsMEME,
   marginConfigTokens,
   filterTitle,
   marginAccountList,
@@ -1479,7 +1483,9 @@ const PositionRow = ({
   const collateral = parseTokenValue(item.token_c_info.balance, decimalsC);
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
   const openTime = new Date(Number(item.open_ts) / 1e6);
-  const uahpi: any = shrinkToken((assets as any).data[item.token_d_info.token_id]?.uahpi, 18) ?? 0;
+  const uahpi: any = isMainStream
+    ? shrinkToken((assets as any).data[item.token_d_info.token_id]?.uahpi, 18)
+    : shrinkToken((assetsMEME as any).data[item.token_d_info.token_id]?.uahpi, 18);
   const uahpi_at_open: any = isMainStream
     ? shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18)
     : shrinkToken(marginAccountListMEME[itemKey]?.uahpi_at_open ?? 0, 18);
@@ -1627,6 +1633,7 @@ const PositionMobileRow = ({
   parseTokenValue,
   calculateLeverage,
   assets,
+  assetsMEME,
   marginConfigTokens,
   filterTitle,
   marginAccountList,
@@ -1688,7 +1695,9 @@ const PositionMobileRow = ({
   const collateral = parseTokenValue(item.token_c_info.balance, decimalsC);
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
   const openTime = new Date(Number(item.open_ts) / 1e6);
-  const uahpi: any = shrinkToken((assets as any).data[item.token_d_info.token_id]?.uahpi, 18) ?? 0;
+  const uahpi: any = isMainStream
+    ? shrinkToken((assets as any).data[item.token_d_info.token_id]?.uahpi, 18)
+    : shrinkToken((assetsMEME as any).data[item.token_d_info.token_id]?.uahpi, 18);
   const uahpi_at_open: any = isMainStream
     ? shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18)
     : shrinkToken(marginAccountListMEME[itemKey]?.uahpi_at_open ?? 0, 18);
