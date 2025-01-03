@@ -16,7 +16,10 @@ import { IAssetEntry } from "../../../interfaces";
 import DataSource from "../../../data/datasource";
 import { useAccountId } from "../../../hooks/hooks";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { getMarginAccountSupplied } from "../../../redux/marginAccountSelectors";
+import {
+  getMarginAccountSupplied,
+  getMarginAccountSuppliedMEME,
+} from "../../../redux/marginAccountSelectors";
 import { withdrawActionsAll } from "../../../store/marginActions/withdrawAll";
 import { MarginAccountDetailIcon, YellowBallIcon } from "../../TokenDetail/svg";
 import { useRouterQuery } from "../../../utils/txhashContract";
@@ -77,6 +80,8 @@ const TradingTable = ({
   const { filteredTokenTypeMap } = useRegisterTokenType();
   const { getPositionType, marginConfigTokens } = useMarginConfigToken();
   const accountSupplied = useAppSelector(getMarginAccountSupplied);
+  const accountSuppliedMEME = useAppSelector(getMarginAccountSuppliedMEME);
+  const combinedAccountSupplied = [...accountSupplied, ...accountSuppliedMEME];
   const [isLoadingWithdraw, setIsLoadingWithdraw] = useState(false);
   const isAccountDetailsOpen = useAppSelector((state) => state.tab.isAccountDetailsOpen);
   const [sortBy, setSortBy] = useState<string | null>("open_ts");
@@ -175,8 +180,11 @@ const TradingTable = ({
     calculateTotalSizeValues();
   }, [marginAccountList]);
 
-  const filteredAccountSupplied = accountSupplied.filter((token) => {
-    const assetDetails = getAssetById(token.token_id);
+  const filteredAccountSupplied = combinedAccountSupplied.filter((token) => {
+    const isMainStream = filteredTokenTypeMap.mainStream.includes(token.token_id);
+    const assetDetails = isMainStream
+      ? getAssetById(token.token_id)
+      : getAssetByIdMEME(token.token_id);
     return token.balance.toString().length >= assetDetails.config.extra_decimals;
   });
 
@@ -742,7 +750,10 @@ const TradingTable = ({
               <tbody>
                 {filteredAccountSupplied.length > 0 ? (
                   filteredAccountSupplied.map((token, index) => {
-                    const assetDetails = getAssetById(token.token_id);
+                    const isMainStream = filteredTokenTypeMap.mainStream.includes(token.token_id);
+                    const assetDetails = isMainStream
+                      ? getAssetById(token.token_id)
+                      : getAssetByIdMEME(token.token_id);
                     const marginAssetDetails = getAssetDetails(assetDetails);
                     return (
                       <tr key={index} className="text-base hover:bg-dark-100 font-normal">
@@ -1331,7 +1342,12 @@ const TradingTable = ({
                   <tbody>
                     {filteredAccountSupplied.length > 0 ? (
                       filteredAccountSupplied.map((token, index) => {
-                        const assetDetails = getAssetById(token.token_id);
+                        const isMainStream = filteredTokenTypeMap.mainStream.includes(
+                          token.token_id,
+                        );
+                        const assetDetails = isMainStream
+                          ? getAssetById(token.token_id)
+                          : getAssetByIdMEME(token.token_id);
                         const marginAssetDetails = getAssetDetails(assetDetails);
                         return (
                           <tr key={index} className="text-sm hover:bg-dark-100 font-normal ">

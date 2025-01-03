@@ -32,6 +32,9 @@ export const beautifyPrice = (
     } else if (+integerPart > 0 && +integerPart < 100) {
       let totalDigits = `${integerPart}${decimalPart ? `.${decimalPart}` : ""}`.slice(0, 6);
       totalDigits = totalDigits.replace(/0+$/, "");
+      if (totalDigits.endsWith(".")) {
+        totalDigits = totalDigits.slice(0, -1);
+      }
       return (
         <span key={num} className="animate-flipIn">
           {isDollar ? "$" : ""}
