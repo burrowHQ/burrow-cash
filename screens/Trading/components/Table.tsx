@@ -1400,7 +1400,10 @@ const PositionRow = ({
         setEntryPrice(null);
       }
     };
-    fetchEntryPrice();
+    const timeoutId = setTimeout(() => {
+      fetchEntryPrice();
+    }, 5000);
+    return () => clearTimeout(timeoutId);
   }, [itemKey, item, index]);
   const assetD = getAssetById(item.token_d_info.token_id);
   const assetC = getAssetById(item.token_c_info.token_id);
@@ -1598,7 +1601,10 @@ const PositionMobileRow = ({
         setEntryPrice(null);
       }
     };
-    fetchEntryPrice();
+    const timeoutId = setTimeout(() => {
+      fetchEntryPrice();
+    }, 5000);
+    return () => clearTimeout(timeoutId);
   }, [itemKey, item, index]);
   const assetD = getAssetById(item.token_d_info.token_id);
   const assetC = getAssetById(item.token_c_info.token_id);
