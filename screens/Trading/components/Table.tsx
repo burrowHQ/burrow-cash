@@ -30,6 +30,7 @@ import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { checkIfMeme } from "../../../utils/margin";
 import { ArrowLineDownIcon, CheckIcon } from "../../Market/svg";
 import { isMobileDevice } from "../../../helpers/helpers";
+import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
 
 const TradingTable = ({
   positionsList,
@@ -65,12 +66,14 @@ const TradingTable = ({
   const accountId = useAccountId();
   const {
     marginAccountList,
+    marginAccountListMEME,
     parseTokenValue,
     getAssetDetails,
     getAssetById,
     calculateLeverage,
     getAssetByIdMEME,
   } = useMarginAccount();
+  const { filteredTokenTypeMap } = useRegisterTokenType();
   const { getPositionType, marginConfigTokens } = useMarginConfigToken();
   const accountSupplied = useAppSelector(getMarginAccountSupplied);
   const [isLoadingWithdraw, setIsLoadingWithdraw] = useState(false);
@@ -352,6 +355,8 @@ const TradingTable = ({
                       assets={assets}
                       filterTitle={filterTitle}
                       marginAccountList={marginAccountList}
+                      marginAccountListMEME={marginAccountListMEME}
+                      filteredTokenTypeMap={filteredTokenTypeMap}
                     />
                   ))
                 ) : (
@@ -901,6 +906,8 @@ const TradingTable = ({
                 assets={assets}
                 filterTitle={filterTitle}
                 marginAccountList={marginAccountList}
+                marginAccountListMEME={marginAccountListMEME}
+                filteredTokenTypeMap={filteredTokenTypeMap}
               />
             ))
           ) : (
@@ -1416,6 +1423,8 @@ const PositionRow = ({
   marginConfigTokens,
   filterTitle,
   marginAccountList,
+  marginAccountListMEME,
+  filteredTokenTypeMap,
 }) => {
   // console.log(itemKey, item, index);
   const [entryPrice, setEntryPrice] = useState<number | null>(null);
@@ -1457,6 +1466,9 @@ const PositionRow = ({
   if (filterTitle && marketTitle !== filterTitle) {
     return null;
   }
+  const isMainStream = filteredTokenTypeMap.mainStream.includes(
+    positionType.label === "Long" ? item.token_p_id : item.token_d_info.token_id,
+  );
   const sizeValueLong = parseTokenValue(item.token_p_amount, decimalsP);
   const sizeValueShort = parseTokenValue(item.token_d_info.balance, decimalsD);
   const size = positionType.label === "Long" ? sizeValueLong : sizeValueShort;
@@ -1468,7 +1480,9 @@ const PositionRow = ({
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
   const openTime = new Date(Number(item.open_ts) / 1e6);
   const uahpi: any = shrinkToken((assets as any).data[item.token_d_info.token_id]?.uahpi, 18) ?? 0;
-  const uahpi_at_open: any = shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
+  const uahpi_at_open: any = isMainStream
+    ? shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18)
+    : shrinkToken(marginAccountListMEME[itemKey]?.uahpi_at_open ?? 0, 18);
   const holdingFee = +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi - uahpi_at_open);
   const holding = +shrinkToken(item.debt_cap, decimalsD) * (uahpi - uahpi_at_open);
   const profitOrLoss =
@@ -1616,6 +1630,8 @@ const PositionMobileRow = ({
   marginConfigTokens,
   filterTitle,
   marginAccountList,
+  marginAccountListMEME,
+  filteredTokenTypeMap,
 }) => {
   // console.log(itemKey, item, index);
   const [entryPrice, setEntryPrice] = useState<number | null>(null);
@@ -1659,6 +1675,9 @@ const PositionMobileRow = ({
   if (filterTitle && marketTitle !== filterTitle) {
     return null;
   }
+  const isMainStream = filteredTokenTypeMap.mainStream.includes(
+    positionType.label === "Long" ? item.token_p_id : item.token_d_info.token_id,
+  );
   const sizeValueLong = parseTokenValue(item.token_p_amount, decimalsP);
   const sizeValueShort = parseTokenValue(item.token_d_info.balance, decimalsD);
   const size = positionType.label === "Long" ? sizeValueLong : sizeValueShort;
@@ -1670,7 +1689,9 @@ const PositionMobileRow = ({
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
   const openTime = new Date(Number(item.open_ts) / 1e6);
   const uahpi: any = shrinkToken((assets as any).data[item.token_d_info.token_id]?.uahpi, 18) ?? 0;
-  const uahpi_at_open: any = shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
+  const uahpi_at_open: any = isMainStream
+    ? shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18)
+    : shrinkToken(marginAccountListMEME[itemKey]?.uahpi_at_open ?? 0, 18);
   const holdingFee = +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi - uahpi_at_open);
   const holding = +shrinkToken(item.debt_cap, decimalsD) * (uahpi - uahpi_at_open);
   const profitOrLoss =

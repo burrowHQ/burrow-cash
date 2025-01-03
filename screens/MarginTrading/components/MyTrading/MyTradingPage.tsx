@@ -8,6 +8,7 @@ import DataSource from "../../../../data/datasource";
 import { shrinkToken } from "../../../../store/helper";
 import { useAppSelector } from "../../../../redux/hooks";
 import { getAssets } from "../../../../redux/assetsSelectors";
+import { useRegisterTokenType } from "../../../../hooks/useRegisterTokenType";
 
 const MyMarginTradingPage = () => {
   const isMobile = isMobileDevice();
@@ -19,6 +20,7 @@ const MyMarginTradingPage = () => {
     getAssetDetails,
     getAssetById,
   } = useMarginAccount();
+  const { filteredTokenTypeMap } = useRegisterTokenType();
   const assets = useAppSelector(getAssets);
   const { getPositionType } = useMarginConfigToken();
   const [totalLongSizeValue, setTotalLongSizeValue] = useState(0);
@@ -58,6 +60,11 @@ const MyMarginTradingPage = () => {
         const entryPriceResponse = await DataSource.shared.getMarginTradingRecordEntryPrice(
           itemKey,
         );
+        const isMainStream = filteredTokenTypeMap.mainStream.includes(
+          positionType === "Long"
+            ? item.token_p_id.toString()
+            : item.token_d_info.token_id.toString(),
+        );
         const entryPrice =
           entryPriceResponse && entryPriceResponse.data && entryPriceResponse.data.length > 0
             ? entryPriceResponse.data[0].entry_price
@@ -65,8 +72,9 @@ const MyMarginTradingPage = () => {
         const indexPrice = positionType === "Long" ? priceP : priceD;
         const uahpi: any =
           shrinkToken((assets as any).data[item.token_d_info.token_id]?.uahpi, 18) ?? 0;
-        const uahpi_at_open: any =
-          shrinkToken(totalMarginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
+        const uahpi_at_open: any = isMainStream
+          ? shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18)
+          : shrinkToken(marginAccountListMEME[itemKey]?.uahpi_at_open ?? 0, 18);
         const holdingFee =
           +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi - uahpi_at_open);
         const holding = +shrinkToken(item.debt_cap, decimalsD) * (uahpi - uahpi_at_open);

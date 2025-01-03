@@ -23,6 +23,7 @@ import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { checkIfMeme } from "../../../utils/margin";
 import { ChangeCollateralMobileProps } from "../comInterface";
 import { beautifyPrice } from "../../../utils/beautyNumbet";
+import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
 
 export const ModalContext = createContext(null) as any;
 const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose, rowData }) => {
@@ -30,8 +31,15 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
   const dispatch = useDispatch();
   const account = useAppSelector((state) => state.account);
   const { marginConfigTokens, getPositionType } = useMarginConfigToken();
-  const { parseTokenValue, getAssetDetails, getAssetById, calculateLeverage, marginAccountList } =
-    useMarginAccount();
+  const {
+    parseTokenValue,
+    getAssetDetails,
+    getAssetById,
+    calculateLeverage,
+    marginAccountList,
+    marginAccountListMEME,
+  } = useMarginAccount();
+  const { filteredTokenTypeMap } = useRegisterTokenType();
   const theme = useTheme();
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
   const [ChangeCollateralTab, setChangeCollateralTab] = useState("Add");
@@ -182,11 +190,17 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
   const size = positionType.label === "Long" ? sizeValueLong : sizeValueShort;
   const sizeValue =
     positionType.label === "Long" ? sizeValueLong * (priceP || 0) : sizeValueShort * (priceD || 0);
+  const isMainStream = filteredTokenTypeMap.mainStream.includes(
+    positionType.label === "Long"
+      ? rowData.data.token_p_id.toString()
+      : rowData.data.token_d_info.token_id.toString(),
+  );
   const netValue = parseTokenValue(rowData.data.token_c_info.balance, decimalsC) * (priceC || 0);
   const uahpi: any =
     shrinkToken((holdingAssets as any).data[rowData.data.token_d_info.token_id]?.uahpi, 18) ?? 0;
-  const uahpi_at_open: any =
-    shrinkToken(marginAccountList[rowData.data.itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
+  const uahpi_at_open: any = isMainStream
+    ? shrinkToken(marginAccountList[rowData.data.itemKey]?.uahpi_at_open ?? 0, 18)
+    : shrinkToken(marginAccountListMEME[rowData.data.itemKey]?.uahpi_at_open ?? 0, 18);
   const holdingFee =
     +shrinkToken(rowData.data.debt_cap, decimalsD) * priceD * (uahpi - uahpi_at_open);
   const holding = +shrinkToken(rowData.data.debt_cap, decimalsD) * (uahpi - uahpi_at_open);
