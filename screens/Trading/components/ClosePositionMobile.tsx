@@ -141,7 +141,9 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   const Fee = useMemo(() => {
     const uahpi: any =
       shrinkToken((assets as any).data[item.token_d_info.token_id]?.uahpi, 18) ?? 0;
-    const uahpi_at_open: any = shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
+    const uahpi_at_open: any = isMainStream
+      ? shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18)
+      : shrinkToken(marginAccountListMEME[itemKey]?.uahpi_at_open ?? 0, 18);
     const { debt_cap } = item;
     return {
       HPFee: +shrinkToken(debt_cap, decimalsD) * priceD * (uahpi - uahpi_at_open),
