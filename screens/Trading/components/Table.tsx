@@ -574,12 +574,19 @@ const TradingTable = ({
                           </span>
                         </td>
                         <td>
-                          $
-                          {record.entry_price !== "0"
-                            ? formatPrice(Number(record.entry_price))
-                            : "-"}
+                          {record.entry_price !== "0" ? (
+                            <span>${formatPrice(Number(record.entry_price))}</span>
+                          ) : (
+                            "-"
+                          )}
                         </td>
-                        <td>${record.price !== "0" ? formatPrice(Number(record.price)) : "-"}</td>
+                        <td>
+                          {record.price !== "0" ? (
+                            <span>${formatPrice(Number(record.price))}</span>
+                          ) : (
+                            "-"
+                          )}
+                        </td>
                         <td>
                           {beautifyPrice(
                             Number(
@@ -1142,13 +1149,22 @@ const TradingTable = ({
                     <div className="flex items-center justify-between text-sm mb-[18px]">
                       <p className="text-gray-300">Entry price</p>
                       <p>
-                        $
-                        {record.entry_price !== "0" ? formatPrice(Number(record.entry_price)) : "-"}
+                        {record.entry_price !== "0" ? (
+                          <span>${formatPrice(Number(record.entry_price))}</span>
+                        ) : (
+                          "-"
+                        )}
                       </p>
                     </div>
                     <div className="flex items-center justify-between text-sm mb-[18px]">
                       <p className="text-gray-300">Close price</p>
-                      <p>${record.price !== "0" ? formatPrice(Number(record.price)) : "-"}</p>
+                      <p>
+                        {record.price !== "0" ? (
+                          <span>${formatPrice(Number(record.price))}</span>
+                        ) : (
+                          "-"
+                        )}
+                      </p>
                     </div>
                     <div className="flex items-center justify-between text-sm mb-[18px]">
                       <p className="text-gray-300">Fee</p>
