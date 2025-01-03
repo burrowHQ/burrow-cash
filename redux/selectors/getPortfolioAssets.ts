@@ -7,7 +7,7 @@ import { emptySuppliedAsset, emptyBorrowedAsset, hasAssets, getRewards, toUsd } 
 import { shrinkToken, expandToken } from "../../store";
 import { Asset, Assets } from "../assetState";
 import { Farm } from "../accountState";
-import { standardizeAsset } from "../../utils";
+import { isMemeCategory, standardizeAsset } from "../../utils";
 import { DEFAULT_POSITION } from "../../utils/config";
 import { CONST_COLLATERAL_TYPE } from "../../const/constCommon";
 
@@ -45,7 +45,7 @@ export const getPortfolioRewards = (
   });
 };
 
-export const getPortfolioAssets = (isMeme?: boolean) => {
+export const getPortfolioAssets = (memeCategory?: boolean) => {
   return createSelector(
     (state: RootState) => state.app,
     (state: RootState) => state.appMEME,
@@ -54,9 +54,15 @@ export const getPortfolioAssets = (isMeme?: boolean) => {
     (state: RootState) => state.account,
     (state: RootState) => state.accountMEME,
     (appMain, appMEME, assetsMain, assetsMEME, accountMain, accountMEME) => {
-      let app;
-      let assets;
-      let account;
+      let isMeme: boolean;
+      if (memeCategory == undefined) {
+        isMeme = isMemeCategory();
+      } else {
+        isMeme = memeCategory;
+      }
+      let app: typeof appMain;
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
       if (isMeme) {
         app = appMEME;
         assets = assetsMEME;

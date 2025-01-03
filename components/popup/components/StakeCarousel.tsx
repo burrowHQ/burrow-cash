@@ -11,7 +11,7 @@ const StakeCarousel = () => {
   const [tokenRowTwo, setTokenRowTwo] = useState<any>();
   const [tokenRowThree, setTokenRowThree] = useState<any>();
   // const [tokenRowFour, setTokenRowFour] = useState<any>();
-  const assets = useAvailableAssets({});
+  const assets = useAvailableAssets();
   const router = useRouter();
   useEffect(() => {
     if (assets?.length) {

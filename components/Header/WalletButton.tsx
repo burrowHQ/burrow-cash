@@ -1,13 +1,5 @@
 import { useState, useEffect, useRef, createContext, useContext } from "react";
-import {
-  Button,
-  Box,
-  IconButton,
-  useTheme,
-  useMediaQuery,
-  Typography,
-  Modal as MUIModal,
-} from "@mui/material";
+import { Button, Box, useTheme, Modal as MUIModal } from "@mui/material";
 import type { WalletSelector } from "@near-wallet-selector/core";
 import { BeatLoader } from "react-spinners";
 import { fetchAssets, fetchRefPrices } from "../../redux/assetsSlice";
@@ -16,38 +8,29 @@ import { logoutAccount, fetchAccount, setAccountId } from "../../redux/accountSl
 import { fetchAccountMEME } from "../../redux/accountSliceMEME";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { getBurrow, accountTrim } from "../../utils";
-
 import { hideModal as _hideModal } from "../../redux/appSlice";
-
+import { hideModal as _hideModalMEME } from "../../redux/appSliceMEME";
 import { getAccountBalance, getAccountId } from "../../redux/accountSelectors";
-import { getAccountRewards, IAccountRewards } from "../../redux/selectors/getAccountRewards";
+import { getAccountRewards } from "../../redux/selectors/getAccountRewards";
 import { trackConnectWallet, trackLogout } from "../../utils/telemetry";
-import { useDegenMode } from "../../hooks/hooks";
-import { HamburgerMenu } from "./Menu";
 import Disclaimer from "../Disclaimer";
 import { useDisclaimer } from "../../hooks/useDisclaimer";
 import { NearSolidIcon, ArrowDownIcon, CloseIcon, ArrowRightTopIcon } from "./svg";
 import ClaimAllRewards from "../ClaimAllRewards";
 import { formatWithCommas_usd } from "../../utils/uiNumber";
 import { isMobileDevice } from "../../helpers/helpers";
-import getConfig from "../../utils/config";
 import CopyToClipboardComponent from "./CopyToClipboardComponent";
 import CustomButton from "../CustomButton/CustomButton";
 import { fetchMarginAccount } from "../../redux/marginAccountSlice";
 import { fetchMarginAccountMEME } from "../../redux/marginAccountSliceMEME";
 
-const config = getConfig();
-
 const WalletContext = createContext(null) as any;
 const WalletButton = () => {
   const theme = useTheme();
   const dispatch = useAppDispatch();
-  // const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isMobile = isMobileDevice();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const balance = useAppSelector(getAccountBalance);
   const accountId = useAppSelector(getAccountId);
-  const { degenMode } = useDegenMode();
   const [isDisclaimerOpen, setDisclaimer] = useState(false);
   const { getDisclaimer: hasAgreedDisclaimer } = useDisclaimer();
   const [show_account_detail, set_show_account_detail] = useState(false);
@@ -55,15 +38,14 @@ const WalletButton = () => {
   const selectorRef = useRef<WalletSelector>();
   const [selector, setSelector] = useState<WalletSelector | null>(null);
   const [currentWallet, setCurrentWallet] = useState<any>(null);
-  const rewards = useAppSelector(getAccountRewards);
-  const isSignedIn = selector?.isSignedIn();
+  const rewards = useAppSelector(getAccountRewards());
   const hideModal = () => {
     dispatch(_hideModal());
+    dispatch(_hideModalMEME());
   };
 
   const fetchData = (id?: string) => {
     dispatch(setAccountId(id));
-    // dispatch(setAccountIdMEME(id));
     dispatch(fetchAccount());
     dispatch(fetchAccountMEME());
     dispatch(fetchMarginAccount());
@@ -74,7 +56,6 @@ const WalletButton = () => {
 
   const signOut = () => {
     dispatch(logoutAccount());
-    // dispatch(logoutAccountMEME());
   };
 
   const onMount = async () => {
@@ -115,7 +96,6 @@ const WalletButton = () => {
       signOutBurrow();
     }
     trackLogout();
-    setAnchorEl(null);
     setDisclaimer(false);
   };
   const handleSwitchWallet = async () => {

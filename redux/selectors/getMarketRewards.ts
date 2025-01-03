@@ -3,10 +3,19 @@ import { isEmpty } from "lodash";
 import { RootState } from "../store";
 import { getTokennetMarketAPY } from "../../hooks/useRewards";
 import { AssetsState } from "../assetState";
+import { isMemeCategory } from "../../utils";
 
 export const getMarketRewardsData = createSelector(
   (state: RootState) => state.assets,
-  (assets) => {
+  (state: RootState) => state.assetsMEME,
+  (assetsMain, assetsMEME) => {
+    const isMeme = isMemeCategory();
+    let assets: typeof assetsMain;
+    if (isMeme) {
+      assets = assetsMEME;
+    } else {
+      assets = assetsMain;
+    }
     const result = getMarketRewardsDataUtil(assets);
     return result;
   },

@@ -6,7 +6,7 @@ import HtmlTooltip from "../../components/common/html-tooltip";
 import { toPrecision } from "../../utils/number";
 
 const Booster = () => {
-  const [BRRR, amount, multiplier] = useAppSelector(getAccountBoostRatioData);
+  const [BRRR, amount, multiplier] = useAppSelector(getAccountBoostRatioData(false));
   const displayBRRR = toPrecision(new Decimal(BRRR || 0).toFixed(), 4, false, false);
   const displayAmount = toPrecision(new Decimal(amount || 0).toFixed(), 4, false, false);
   const displayMultiplier = toPrecision(new Decimal(multiplier || 0).toFixed(), 4, false, false);

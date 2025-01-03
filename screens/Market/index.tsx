@@ -13,7 +13,7 @@ const Market = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { activeCategory: activeTab = "main" } = useAppSelector((state) => state.category);
-  const rows = useAvailableAssets({ isMeme: activeTab !== "main" });
+  const rows = useAvailableAssets();
   const { sorting, setSorting } = useTableSorting();
   useEffect(() => {
     return () => {

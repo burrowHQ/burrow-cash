@@ -1,7 +1,7 @@
 import BN from "bn.js";
 
 import { getBurrow, nearTokenId } from "../../utils";
-import { expandToken, expandTokenDecimal } from "../helper";
+import { expandToken, expandTokenDecimal, registerAccountOnTokenWithQuery } from "../helper";
 import {
   ChangeMethodsNearToken,
   ChangeMethodsOracle,
@@ -11,10 +11,9 @@ import {
 import { Transaction, isRegistered } from "../wallet";
 import { prepareAndExecuteTransactions, getMetadata, getTokenContract } from "../tokens";
 import { NEAR_DECIMALS, NO_STORAGE_DEPOSIT_CONTRACTS, NEAR_STORAGE_DEPOSIT } from "../constants";
-import getConfig, { DEFAULT_POSITION } from "../../utils/config";
+import { DEFAULT_POSITION } from "../../utils/config";
 import { store } from "../../redux/store";
 
-const { SPECIAL_REGISTRATION_TOKEN_IDS } = getConfig() as any;
 export async function borrow({
   tokenId,
   extraDecimals,
@@ -49,19 +48,12 @@ export async function borrow({
   const transactions: Transaction[] = [];
 
   const expandedAmount = expandTokenDecimal(amount, decimals + extraDecimals);
-  if (
-    !(await isRegistered(account.accountId, tokenContract.contractId)) &&
-    !NO_STORAGE_DEPOSIT_CONTRACTS.includes(tokenContract.contractId)
-  ) {
-    transactions.push({
-      receiverId: tokenContract.contractId,
-      functionCalls: [
-        {
-          methodName: ChangeMethodsToken[ChangeMethodsToken.storage_deposit],
-          attachedDeposit: new BN(expandToken(NEAR_STORAGE_DEPOSIT, NEAR_DECIMALS)),
-        },
-      ],
-    });
+  const registerToken = await registerAccountOnTokenWithQuery(
+    account.accountId,
+    tokenContract.contractId,
+  );
+  if (registerToken) {
+    transactions.push(registerToken);
   }
   let borrowTemplate;
   if (!collateralType || collateralType === DEFAULT_POSITION) {

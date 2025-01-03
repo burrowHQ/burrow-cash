@@ -3,13 +3,25 @@ import { RootState } from "../store";
 import { shrinkToken } from "../../store";
 import { toUsd } from "../utils";
 import { AssetsState } from "../assetState";
-import { filterAccountSentOutFarms } from "../../utils/index";
+import { filterAccountSentOutFarms, isMemeCategory } from "../../utils/index";
 
 export const getAverageNetRewardApy = () =>
   createSelector(
     (state: RootState) => state.assets,
+    (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account,
-    (assets, account) => {
+    (state: RootState) => state.accountMEME,
+    (assetsMain, assetsMEME, accountMain, accountMEME) => {
+      const isMeme = isMemeCategory();
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
+      if (isMeme) {
+        assets = assetsMEME;
+        account = accountMEME;
+      } else {
+        assets = assetsMain;
+        account = accountMain;
+      }
       const [, totalCollateral] = getNetGains(account.portfolio.collaterals, assets);
       const [, totalSupplied] = getNetGains(account.portfolio.supplies, assets);
       const [, totalBorrowed] = getNetGains(account.portfolio.borrows, assets);

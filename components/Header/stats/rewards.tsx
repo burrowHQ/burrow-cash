@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useState } from "react";
-import { useRewards, useDailyRewards, useDailyRewardsMEME } from "../../../hooks/useRewards";
+import { useRewards, useDailyRewards } from "../../../hooks/useRewards";
 import { TOKEN_FORMAT, USD_FORMAT, NUMBER_FORMAT } from "../../../store";
 import CustomTooltips from "../../CustomTooltips/CustomTooltips";
 import TokenIcon from "../../TokenIcon";
@@ -22,8 +22,7 @@ const transformAssetReward = (r, text) => ({
 
 const sumRewards = (acc, r) => acc + r.dailyAmount * r.price;
 
-export const UserDailyRewards = () => {
-  const { activeCategory } = useAppSelector((state) => state.category);
+export const UserDailyRewards = ({ memeCategory }: { memeCategory?: boolean }) => {
   const {
     baseDepositUsdDaily,
     baseBorrowedUsdDaily,
@@ -34,9 +33,8 @@ export const UserDailyRewards = () => {
     farmTotalUsdDaily,
     totalUsdDaily,
     allRewards,
-  } = activeCategory == "main" ? useDailyRewards() : useDailyRewardsMEME();
+  } = useDailyRewards(memeCategory);
 
-  // useDailyRewards();
   const rewardsLabels = [
     [
       {

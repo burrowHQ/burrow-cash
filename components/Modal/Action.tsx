@@ -2,6 +2,10 @@ import { useState, useMemo, useEffect } from "react";
 import Decimal from "decimal.js";
 import { nearTokenId, isMemeCategory } from "../../utils";
 import { toggleUseAsCollateral, hideModal } from "../../redux/appSlice";
+import {
+  toggleUseAsCollateral as toggleUseAsCollateralMEME,
+  hideModal as hideModalMEME,
+} from "../../redux/appSliceMEME";
 import { getModalData } from "./utils";
 import { repay } from "../../store/actions/repay";
 import { repayFromDeposits } from "../../store/actions/repayFromDeposits";
@@ -42,7 +46,12 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
   );
   useEffect(() => {
     if (!canUseAsCollateral) {
-      dispatch(toggleUseAsCollateral({ useAsCollateral: false }));
+      const isMeme = isMemeCategory();
+      if (isMeme) {
+        dispatch(toggleUseAsCollateralMEME({ useAsCollateral: false }));
+      } else {
+        dispatch(toggleUseAsCollateral({ useAsCollateral: false }));
+      }
     }
   }, [useAsCollateral]);
 
@@ -157,6 +166,7 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
         break;
     }
     dispatch(hideModal());
+    dispatch(hideModalMEME());
   };
   const actionDisabled = useMemo(() => {
     if (action === "Supply" && +amount > 0) return false;

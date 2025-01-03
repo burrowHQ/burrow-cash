@@ -1,12 +1,11 @@
 import styled from "styled-components";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
 import BookTokenSvg from "../../public/svg/Group 74.svg";
 import { ContentBox } from "../../components/ContentBox/ContentBox";
 import LayoutContainer from "../../components/LayoutContainer/LayoutContainer";
 import SupplyTokenSvg from "../../public/svg/Group 24791.svg";
 import BorrowTokenSvg from "../../public/svg/Group 24677.svg";
-import { useAccountId, useAvailableAssets, usePortfolioAssets } from "../../hooks/hooks";
+import { useAccountId, usePortfolioAssets } from "../../hooks/hooks";
 import DashboardReward from "./dashboardReward";
 import CustomTable from "../../components/CustomTable/CustomTable";
 import {
@@ -30,19 +29,40 @@ const Index = () => {
   const accountId = useAccountId();
   const dispatch = useAppDispatch();
   const { activeCategory: activeTab = "main" } = useAppSelector((state) => state.category);
-  const [suppliedRows, borrowedRows, totalSuppliedUSD, totalBorrowedUSD, borrowedAll] =
-    usePortfolioAssets(activeTab !== "main");
-
+  const [
+    suppliedRowsMEME,
+    borrowedRowsMEME,
+    totalSuppliedUSDMEME,
+    totalBorrowedUSDMEME,
+    ,
+    borrowedAllMEME,
+  ] = usePortfolioAssets(true);
+  const [suppliedRows, borrowedRows, totalSuppliedUSD, totalBorrowedUSD, , borrowedAll] =
+    usePortfolioAssets(false);
   useEffect(() => {
     return () => {
       dispatch(setActiveCategory("main"));
     };
   }, [dispatch]);
   const isMobile = isMobileDevice();
-
+  const isMemeTab = activeTab !== "main";
+  let overviewNodeMEME;
   let overviewNode;
   if (accountId) {
-    overviewNode = <DashboardOverview suppliedRows={suppliedRows} borrowedRows={borrowedRows} />;
+    overviewNode = (
+      <DashboardOverview
+        suppliedRows={suppliedRows}
+        borrowedRows={borrowedRows}
+        memeCategory={false}
+      />
+    );
+    overviewNodeMEME = (
+      <DashboardOverview
+        suppliedRows={suppliedRowsMEME}
+        borrowedRows={borrowedRowsMEME}
+        memeCategory={true}
+      />
+    );
   } else {
     overviewNode = (
       <div className="bg-gray-800 p-4 mb-4 rounded md:bg-transparent md:p-0 md:mb-0 md:flex justify-between items-center">
@@ -61,21 +81,38 @@ const Index = () => {
       </div>
     );
   }
-
   let supplyBorrowNode;
+  let supplyBorrowNodeMEME;
   if (isMobile) {
     supplyBorrowNode = (
+      <SupplyBorrowListMobile suppliedRows={suppliedRows} borrowedRows={borrowedAll} />
+    );
+    supplyBorrowNodeMEME = (
       <SupplyBorrowListMobile
-        suppliedRows={suppliedRows}
-        borrowedRows={borrowedRows}
-        accountId={accountId}
+        suppliedRows={suppliedRowsMEME}
+        borrowedRows={borrowedAllMEME}
+        memeCategory={true}
       />
     );
   } else {
     supplyBorrowNode = (
       <StyledSupplyBorrow className="gap-6 lg:flex mb-10">
-        <YourSupplied suppliedRows={suppliedRows} accountId={accountId} total={totalSuppliedUSD} />
-        <YourBorrowed borrowedRows={borrowedRows} accountId={accountId} total={totalBorrowedUSD} />
+        <YourSupplied suppliedRows={suppliedRows} total={totalSuppliedUSD as number} />
+        <YourBorrowed borrowedRows={borrowedAll} accountId={accountId} total={totalBorrowedUSD} />
+      </StyledSupplyBorrow>
+    );
+    supplyBorrowNodeMEME = (
+      <StyledSupplyBorrow className="gap-6 lg:flex mb-10">
+        <YourSupplied
+          suppliedRows={suppliedRowsMEME}
+          total={totalSuppliedUSDMEME as number}
+          memeCategory={true}
+        />
+        <YourBorrowed
+          borrowedRows={borrowedAllMEME}
+          accountId={accountId}
+          total={totalBorrowedUSDMEME}
+        />
       </StyledSupplyBorrow>
     );
   }
@@ -101,18 +138,14 @@ const Index = () => {
             Meme
           </div>
         </div>
-        {activeTab === "main" && (
-          <div>
-            {overviewNode}
-            <div style={{ minHeight: isMobile ? 300 : 600 }}>{supplyBorrowNode}</div>
-          </div>
-        )}
-        {activeTab === "meme" && (
-          <div>
-            {overviewNode}
-            <div style={{ minHeight: isMobile ? 300 : 600 }}>{supplyBorrowNode}</div>
-          </div>
-        )}
+        <div className={`${isMemeTab ? "hidden" : ""}`}>
+          {overviewNode}
+          <div style={{ minHeight: isMobile ? 300 : 600 }}>{supplyBorrowNode}</div>
+        </div>
+        <div className={`${isMemeTab ? "" : "hidden"}`}>
+          {overviewNodeMEME}
+          <div style={{ minHeight: isMobile ? 300 : 600 }}>{supplyBorrowNodeMEME}</div>
+        </div>
       </LayoutContainer>
     </div>
   );
@@ -252,7 +285,15 @@ type TableRowSelect = {
   index: number | null | undefined;
 };
 
-const YourSupplied = ({ suppliedRows, accountId, total }) => {
+const YourSupplied = ({
+  suppliedRows,
+  memeCategory,
+  total,
+}: {
+  suppliedRows: any;
+  memeCategory?: boolean;
+  total: number;
+}) => {
   const [selected, setSelected] = useState<TableRowSelect>({ data: null, index: null });
   const { canUseAsCollateral, tokenId } = selected?.data || {};
 
@@ -284,7 +325,9 @@ const YourSupplied = ({ suppliedRows, accountId, total }) => {
               <MarketButton tokenId={selected?.data?.tokenId} />
             )}
             <WithdrawButton tokenId={selected?.data?.tokenId} />
-            {canUseAsCollateral && <AdjustButton tokenId={selected?.data?.tokenId} />}
+            {canUseAsCollateral && (
+              <AdjustButton tokenId={selected?.data?.tokenId || ""} memeCategory={memeCategory} />
+            )}
           </div>
         }
       />

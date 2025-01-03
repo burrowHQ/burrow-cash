@@ -49,16 +49,20 @@ export const getBorrowMaxAmount = (tokenId: string) =>
     (state: RootState) => state.account,
     (state: RootState) => state.accountMEME,
     (state: RootState) => state.app,
-    (assetsMain, assetsMEME, accountMain, accountMEME, app) => {
+    (state: RootState) => state.appMEME,
+    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME) => {
       const isMeme = isMemeCategory();
-      let assets;
-      let account;
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
+      let app: typeof appMain;
       if (isMeme) {
         assets = assetsMEME;
         account = accountMEME;
+        app = appMEME;
       } else {
         assets = assetsMain;
         account = accountMain;
+        app = appMain;
       }
       if (!account.accountId || !tokenId)
         return { [DEFAULT_POSITION]: { maxBorrowAmount: 0, maxBorrowValue: 0 } };

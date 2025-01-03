@@ -4,7 +4,6 @@ import { UIAsset } from "../../interfaces";
 import { DEFAULT_POSITION } from "../../utils/config";
 import { digitalProcess } from "../../utils/uiNumber";
 import { useAvailableAssets } from "../../hooks/hooks";
-import { isMemeCategory } from "../../utils";
 
 const AvailableBorrowCell = ({
   asset,
@@ -14,8 +13,7 @@ const AvailableBorrowCell = ({
   borrowData: [string, number];
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
-  const isMeme = isMemeCategory();
-  const assets = useAvailableAssets({ isMeme });
+  const assets = useAvailableAssets();
   function getName(position) {
     if (position === DEFAULT_POSITION) return "Standard Token";
     const t = assets.find((a: UIAsset) => a.tokenId === position);

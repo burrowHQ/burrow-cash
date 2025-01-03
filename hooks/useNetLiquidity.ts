@@ -1,18 +1,20 @@
 import { useAppSelector } from "../redux/hooks";
+import { getTotalBalance } from "../redux/selectors/getTotalBalance";
 
-import { getTotalBalance, getTotalBalanceMEME } from "../redux/selectors/getTotalBalance";
-
-export function useProtocolNetLiquidity(withNetTvlMultiplier?: boolean) {
-  const { activeCategory } = useAppSelector((state) => state.category);
+export function useProtocolNetLiquidity(withNetTvlMultiplier?: boolean, memeCategory?: boolean) {
   const protocolDeposited = useAppSelector(
-    activeCategory == "main"
-      ? getTotalBalance("supplied", withNetTvlMultiplier)
-      : getTotalBalanceMEME("supplied", withNetTvlMultiplier),
+    getTotalBalance({
+      source: "supplied",
+      withNetTvlMultiplier,
+      memeCategory,
+    }),
   );
   const protocolBorrowed = useAppSelector(
-    activeCategory == "main"
-      ? getTotalBalance("borrowed", withNetTvlMultiplier)
-      : getTotalBalanceMEME("borrowed", withNetTvlMultiplier),
+    getTotalBalance({
+      source: "borrowed",
+      withNetTvlMultiplier,
+      memeCategory,
+    }),
   );
   const protocolNetLiquidity = protocolDeposited - protocolBorrowed;
   return { protocolDeposited, protocolBorrowed, protocolNetLiquidity };

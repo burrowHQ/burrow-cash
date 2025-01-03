@@ -40,8 +40,14 @@ export const WithdrawButton = ({ tokenId }) => {
   );
 };
 
-export const AdjustButton = ({ tokenId }) => {
-  const handleAdjustClick = useAdjustTrigger(tokenId);
+export const AdjustButton = ({
+  tokenId,
+  memeCategory,
+}: {
+  tokenId: string;
+  memeCategory?: boolean;
+}) => {
+  const handleAdjustClick = useAdjustTrigger(tokenId, memeCategory);
   return (
     <CustomButton className="flex-1 text-base md:text-sm" onClick={handleAdjustClick}>
       Adjust

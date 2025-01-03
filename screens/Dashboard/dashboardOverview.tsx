@@ -22,18 +22,20 @@ import { TagToolTip } from "../../components/ToolTip";
 import { Wrapper } from "../../components/Modal/style";
 import { CloseIcon } from "../../components/Modal/svg";
 
-const DashboardOverview = ({ suppliedRows, borrowedRows }) => {
+const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
   const [modal, setModal] = useState<modalProps>({
     name: "",
     data: null,
   });
-  const userHealth = useUserHealth();
   const [userHealthCur, setUserHealthCur] = useState<any>();
-  const rewardsObj = useRewards();
-  const { unreadLiquidation, fetchUnreadLiquidation } = useUnreadLiquidation();
-  const isMobile = isMobileDevice();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const isMobile = isMobileDevice();
   const theme = useTheme();
+  const userHealth = useUserHealth(memeCategory);
+  const rewardsObj = useRewards(memeCategory);
+  const { unreadLiquidation, fetchUnreadLiquidation } = useUnreadLiquidation({
+    memeCategory,
+  });
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -141,12 +143,12 @@ const DashboardOverview = ({ suppliedRows, borrowedRows }) => {
           <div className="mb-4 lg3:max-w-[640px] lg3:mb-0">
             <div className="flex gap-2 justify-between lg3:gap-6">
               <div className="gap-6 flex flex-col flex-2">
-                <UserLiquidity />
-                <UserDailyRewards />
+                <UserLiquidity memeCategory={memeCategory} />
+                <UserDailyRewards memeCategory={memeCategory} />
               </div>
 
               <div className="gap-6 flex flex-col">
-                <APY />
+                <APY memeCategory={memeCategory} />
                 <div className="flex flex-col">
                   <div className="h6 text-gray-300 flex items-center gap-1">
                     Unclaimed Rewards
@@ -205,39 +207,6 @@ const DashboardOverview = ({ suppliedRows, borrowedRows }) => {
                       </div>
                     )}
                   </div>
-
-                  {/* <div
-                    className="flex flex-wrap mt-3 lg3:mt-1"
-                    style={{ minWidth: rewardsObj?.extra?.length > 1 ? 45 : 20 }}
-                  >
-                    {rewardsObj?.brrr?.icon ? (
-                      <img
-                        src={rewardsObj?.brrr?.icon}
-                        width={26}
-                        height={26}
-                        alt="token"
-                        className="rounded-full"
-                        style={{ margin: -3 }}
-                      />
-                    ) : null}
-
-                    {rewardsObj?.extra?.length
-                      ? rewardsObj.extra.map((d, i) => {
-                          const extraData = d?.[1];
-                          return (
-                            <img
-                              src={extraData?.icon}
-                              width={26}
-                              key={(extraData?.tokenId || "0") + i}
-                              height={26}
-                              alt="token"
-                              className="rounded-full"
-                              style={{ margin: -3, maxWidth: "none" }}
-                            />
-                          );
-                        })
-                      : null}
-                  </div> */}
                 </div>
               </div>
             </div>

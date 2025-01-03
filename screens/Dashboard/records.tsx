@@ -5,7 +5,7 @@ import Datasource from "../../data/datasource";
 import { useAccountId, useToastMessage } from "../../hooks/hooks";
 import { shrinkToken, TOKEN_FORMAT } from "../../store";
 import { useAppSelector } from "../../redux/hooks";
-import { getAssets, getAssetsMEME } from "../../redux/assetsSelectors";
+import { getAssetsCategory } from "../../redux/assetsSelectors";
 import { getDateString } from "../../helpers/helpers";
 import { nearNativeTokens, nearTokenId, standardizeAsset } from "../../utils";
 import {
@@ -19,7 +19,7 @@ const Records = ({ isShow }) => {
   const accountId = useAccountId();
   const { activeCategory } = useAppSelector((state) => state.category);
   const { toastMessage, showToast } = useToastMessage();
-  const assets = useAppSelector(activeCategory == "main" ? getAssets : getAssetsMEME);
+  const assets = useAppSelector(getAssetsCategory(false));
   const [isLoading, setIsLoading] = useState(false);
   const [docs, setDocs] = useState<any>([]);
   const [pagination, setPagination] = useState<{

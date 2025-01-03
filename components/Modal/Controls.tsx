@@ -1,40 +1,49 @@
 import Decimal from "decimal.js";
 import { updateAmount } from "../../redux/appSlice";
+import { updateAmount as updateAmountMEME } from "../../redux/appSliceMEME";
 import { useAppDispatch } from "../../redux/hooks";
 import { formatWithCommas_number } from "../../utils/uiNumber";
 import RangeSlider from "./RangeSlider";
 import TokenBox from "./TokenBox";
+import { isMemeCategory } from "../../utils";
 
-export default function Controls({
-  amount,
-  available,
-  action,
-  tokenId,
-  asset,
-  totalAvailable,
-  available$,
-}) {
+export default function Controls({ amount, available, action, asset, totalAvailable, available$ }) {
   const dispatch = useAppDispatch();
 
   const handleInputChange = (e) => {
+    const isMeme = isMemeCategory();
     const { value } = e.target;
     const numRegex = /^([0-9]*\.?[0-9]*$)/;
     if (!numRegex.test(value) || Number(value) > Number(available)) {
       e.preventDefault();
       return;
     }
-    dispatch(updateAmount({ isMax: false, amount: value }));
+    if (isMeme) {
+      dispatch(updateAmountMEME({ isMax: false, amount: value }));
+    } else {
+      dispatch(updateAmount({ isMax: false, amount: value }));
+    }
   };
 
   const handleSliderChange = (percent) => {
+    const isMeme = isMemeCategory();
     const p = percent < 1 ? 0 : percent > 99 ? 100 : percent;
     const value = new Decimal(available).mul(p).div(100).toFixed();
-    dispatch(
-      updateAmount({
-        isMax: p === 100,
-        amount: new Decimal(value || 0).toFixed(),
-      }),
-    );
+    if (isMeme) {
+      dispatch(
+        updateAmountMEME({
+          isMax: p === 100,
+          amount: new Decimal(value || 0).toFixed(),
+        }),
+      );
+    } else {
+      dispatch(
+        updateAmount({
+          isMax: p === 100,
+          amount: new Decimal(value || 0).toFixed(),
+        }),
+      );
+    }
   };
 
   const sliderValue = Math.round((amount * 100) / available) || 0;

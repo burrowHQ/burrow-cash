@@ -1,7 +1,7 @@
 import Decimal from "decimal.js";
 
 import { getAccountPortfolio } from "../redux/accountSelectors";
-import { getAssets, getTotalSupplyAndBorrowUSD } from "../redux/assetsSelectors";
+import { getAssets } from "../redux/assetsSelectors";
 import { computePoolsDailyAmount } from "../redux/selectors/getAccountRewards";
 import { getStaking } from "../redux/selectors/getStaking";
 import { getConfig } from "../redux/appSelectors";
@@ -21,9 +21,8 @@ export function useExtraAPY({
   isBorrow: boolean | undefined;
   onlyMarket?: boolean;
 }) {
-  const [totalSupplyUSD, totalBorrowUSD] = useAppSelector(getTotalSupplyAndBorrowUSD(assetId));
   const { xBRRR, extraXBRRRAmount } = useAppSelector(getStaking);
-  const portfolio = useAppSelector(getAccountPortfolio);
+  const portfolio = useAppSelector(getAccountPortfolio());
   const appConfig = useAppSelector(getConfig);
   const assets = useAppSelector(getAssets);
   const userNetTvlAPY = useAppSelector(getNetTvlAPY({ isStaking: false }));

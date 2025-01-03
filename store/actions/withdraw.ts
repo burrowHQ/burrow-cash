@@ -2,7 +2,7 @@ import BN from "bn.js";
 import Decimal from "decimal.js";
 
 import { decimalMax, decimalMin, getBurrow, nearTokenId } from "../../utils";
-import { expandToken, expandTokenDecimal } from "../helper";
+import { expandToken, expandTokenDecimal, registerAccountOnTokenWithQuery } from "../helper";
 import { ChangeMethodsLogic, ChangeMethodsOracle, ChangeMethodsToken } from "../../interfaces";
 import { getTokenContract, prepareAndExecuteTransactions } from "../tokens";
 import { ChangeMethodsNearToken } from "../../interfaces/contract-methods";
@@ -30,11 +30,11 @@ export async function withdraw({ tokenId, extraDecimals, amount, isMax, isMeme }
   const state = store.getState();
   const { oracleContract, logicContract, memeOracleContract, logicMEMEContract } =
     await getBurrow();
-  let assets;
-  let account;
-  let enable_pyth_oracle;
-  let logicContractId;
-  let oracleContractId;
+  let assets: typeof state.assets.data;
+  let account: typeof state.account;
+  let enable_pyth_oracle: boolean;
+  let logicContractId: string;
+  let oracleContractId: string;
   if (isMeme) {
     assets = state.assetsMEME.data;
     account = state.accountMEME;
@@ -73,20 +73,9 @@ export async function withdraw({ tokenId, extraDecimals, amount, isMax, isMeme }
       enable_pyth_oracle,
     });
   } else {
-    const tokenContract = await getTokenContract(tokenId);
-    if (
-      !(await isRegistered(account.accountId, tokenContract.contractId)) &&
-      !NO_STORAGE_DEPOSIT_CONTRACTS.includes(tokenContract.contractId)
-    ) {
-      transactions.push({
-        receiverId: tokenContract.contractId,
-        functionCalls: [
-          {
-            methodName: ChangeMethodsToken[ChangeMethodsToken.storage_deposit],
-            attachedDeposit: new BN(expandToken(NEAR_STORAGE_DEPOSIT, NEAR_DECIMALS)),
-          },
-        ],
-      });
+    const registerToken = await registerAccountOnTokenWithQuery(account.accountId, tokenId);
+    if (registerToken) {
+      transactions.push(registerToken);
     }
 
     const withdrawAction = {
@@ -149,6 +138,7 @@ export async function withdraw({ tokenId, extraDecimals, amount, isMax, isMeme }
       });
     }
     // 10 yocto is for rounding errors.
+    const tokenContract = await getTokenContract(tokenId);
     if (isNEAR && expandedAmount.gt(10)) {
       transactions.push({
         receiverId: tokenContract.contractId,

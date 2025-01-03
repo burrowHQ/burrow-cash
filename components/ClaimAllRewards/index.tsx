@@ -11,8 +11,8 @@ interface Props {
   disabled?: boolean;
 }
 
-function ClaimAllRewards({ Button, location, onDone, disabled = false }: Props) {
-  const { handleClaimAll, isLoading } = useClaimAllRewards(location);
+function ClaimAllRewards({ Button, onDone, disabled = false }: Props) {
+  const { handleClaimAll, isLoading } = useClaimAllRewards();
   const [hasClicked, setHasClicked] = useState(false);
 
   const loading = Button.name === "ClaimMenuItem" ? undefined : isLoading;

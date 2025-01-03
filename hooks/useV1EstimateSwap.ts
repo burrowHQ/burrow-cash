@@ -10,7 +10,7 @@ import {
 import { isEmpty } from "lodash";
 import Decimal from "decimal.js";
 import { useAppSelector } from "../redux/hooks";
-import { getAssets, getAssetsMEME } from "../redux/assetsSelectors";
+import { getAllAssetsData } from "../redux/assetsSelectors";
 import { getMarginConfig } from "../redux/marginConfigSelectors";
 import { getAllPools } from "../redux/poolSelectors";
 import { expandTokenDecimal } from "../store";
@@ -47,9 +47,7 @@ export const useV1EstimateSwap = ({
   stablePoolsDetail: any[];
   forceUpdate?: number;
 }) => {
-  const assets = useAppSelector(getAssets);
-  const assetsMEME = useAppSelector(getAssetsMEME);
-  const combinedAssetsData = { ...assets.data, ...assetsMEME.data };
+  const combinedAssetsData = useAppSelector(getAllAssetsData);
   const marginConfig = useAppSelector(getMarginConfig);
   const allPools = useAppSelector(getAllPools);
   const [estimateData, setEstimateData] = useState<IEstimateResult>();
@@ -65,7 +63,7 @@ export const useV1EstimateSwap = ({
   }, [tokenIn_id, tokenOut_id]);
   useEffect(() => {
     if (
-      !isEmpty(assets) &&
+      !isEmpty(combinedAssetsData) &&
       !isEmpty(simplePools) &&
       !isEmpty(stablePools) &&
       !isEmpty(stablePoolsDetail) &&
@@ -74,7 +72,7 @@ export const useV1EstimateSwap = ({
       getEstimateSwapData();
     }
   }, [
-    assets,
+    combinedAssetsData,
     tokenIn_id,
     tokenOut_id,
     tokenIn_amount,
@@ -142,8 +140,8 @@ export const useV1EstimateSwap = ({
   }
   async function getEstimateSwapFromScript() {
     const [tokenIn_metadata, tokenOut_metadata] = getMetadatas([
-      assets.data[tokenIn_id],
-      assets.data[tokenOut_id],
+      combinedAssetsData[tokenIn_id],
+      combinedAssetsData[tokenOut_id],
     ]);
     const swapTodos = await estimateSwap({
       tokenIn: tokenIn_metadata,

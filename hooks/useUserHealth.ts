@@ -1,51 +1,27 @@
 import { useAppSelector, useAppDispatch } from "../redux/hooks";
-import { getDailyReturns, getDailyReturnsMEME } from "../redux/selectors/getDailyReturns";
-import {
-  getNetAPY,
-  getNetTvlAPY,
-  getNetAPYMEME,
-  getNetTvlAPYMEME,
-} from "../redux/selectors/getNetAPY";
+import { getDailyReturns } from "../redux/selectors/getDailyReturns";
+import { getNetAPY, getNetTvlAPY } from "../redux/selectors/getNetAPY";
 import {
   DANGER_HEALTH_FACTOR,
   LOW_HEALTH_FACTOR,
   getHealthFactor,
   getLPHealthFactor,
   getHealthStatus,
-  getHealthFactorMEME,
-  getLPHealthFactorMEME,
 } from "../redux/selectors/getHealthFactor";
-import { getAppState, getAppStateMEME } from "../redux/appSelectors";
+import { getAppState } from "../redux/appSelectors";
 import { toggleShowDailyReturns } from "../redux/appSlice";
 import { trackShowDailyReturns } from "../utils/telemetry";
 import { useSlimStats } from "./hooks";
 import { useFullDigits } from "./useFullDigits";
 
-export function useUserHealth() {
+export function useUserHealth(memeCategory?) {
   const dispatch = useAppDispatch();
-  const { activeCategory } = useAppSelector((state) => state.category);
-  const { showDailyReturns } = useAppSelector(
-    activeCategory == "main" ? getAppState : getAppStateMEME,
-  );
-  const netAPY = useAppSelector(
-    activeCategory == "main"
-      ? getNetAPY({ isStaking: false })
-      : getNetAPYMEME({ isStaking: false }),
-  );
-  const netLiquidityAPY = useAppSelector(
-    activeCategory == "main"
-      ? getNetTvlAPY({ isStaking: false })
-      : getNetTvlAPYMEME({ isStaking: false }),
-  );
-  const dailyReturns = useAppSelector(
-    activeCategory == "main" ? getDailyReturns : getDailyReturnsMEME,
-  );
-  const healthFactor = useAppSelector(
-    activeCategory == "main" ? getHealthFactor : getHealthFactorMEME,
-  );
-  const LPHealthFactor = useAppSelector(
-    activeCategory == "main" ? getLPHealthFactor : getLPHealthFactorMEME,
-  );
+  const { showDailyReturns } = useAppSelector(getAppState(memeCategory));
+  const netAPY = useAppSelector(getNetAPY({ isStaking: false, memeCategory }));
+  const netLiquidityAPY = useAppSelector(getNetTvlAPY({ isStaking: false, memeCategory }));
+  const dailyReturns = useAppSelector(getDailyReturns(memeCategory));
+  const healthFactor = useAppSelector(getHealthFactor(memeCategory));
+  const LPHealthFactor = useAppSelector(getLPHealthFactor(memeCategory));
   const { fullDigits, setDigits } = useFullDigits();
   const slimStats = useSlimStats();
 

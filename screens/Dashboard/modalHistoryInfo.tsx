@@ -10,7 +10,7 @@ import Datasource from "../../data/datasource";
 const ModalHistoryInfo = ({ isOpen, onClose, tab }) => {
   const [tabIndex, setTabIndex] = useState(tab);
   const [liquidationPage, setLiquidationPage] = useState(1);
-  const { unreadLiquidation, fetchUnreadLiquidation } = useUnreadLiquidation(liquidationPage);
+  const { unreadLiquidation, fetchUnreadLiquidation } = useUnreadLiquidation({ liquidationPage });
 
   useEffect(() => {
     if (tab !== undefined) {

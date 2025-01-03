@@ -10,7 +10,15 @@ import { hiddenAssets } from "../../utils/config";
 import CustomTooltips from "../../components/CustomTooltips/CustomTooltips";
 import { APYCell } from "../Market/APYCell";
 
-const SupplyBorrowListMobile = ({ suppliedRows, borrowedRows, accountId }) => {
+const SupplyBorrowListMobile = ({
+  suppliedRows,
+  borrowedRows,
+  memeCategory,
+}: {
+  suppliedRows: any;
+  borrowedRows: any;
+  memeCategory?: boolean;
+}) => {
   const [tabIndex, setTabIndex] = useState(0);
 
   const handleTabChange = (i) => {
@@ -23,7 +31,7 @@ const SupplyBorrowListMobile = ({ suppliedRows, borrowedRows, accountId }) => {
   if (suppliedRows?.length) {
     supplyNode = suppliedRows?.map((d) => (
       <ContentBox style={{ padding: 0, marginBottom: 15 }} key={d.tokenId}>
-        <SupplyItem data={d} key={d.tokenId} />
+        <SupplyItem data={d} key={d.tokenId} memeCategory={memeCategory} />
       </ContentBox>
     ));
   } else {
@@ -125,7 +133,7 @@ const StyledTabActiveBall = styled.div`
   }
 `;
 
-const SupplyItem = ({ data }) => {
+const SupplyItem = ({ data, memeCategory }: { data: any; memeCategory?: boolean }) => {
   const { canUseAsCollateral, metadata, symbol, icon } = data || {};
   const { tokens } = metadata || {};
   let iconImg;
@@ -223,7 +231,9 @@ const SupplyItem = ({ data }) => {
 
         <div className="flex gap-2">
           <WithdrawButton tokenId={data?.tokenId} />
-          {canUseAsCollateral && <AdjustButton tokenId={data?.tokenId} />}
+          {canUseAsCollateral && (
+            <AdjustButton tokenId={data?.tokenId} memeCategory={memeCategory} />
+          )}
         </div>
       </div>
     </div>

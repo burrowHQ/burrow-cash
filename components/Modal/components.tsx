@@ -8,12 +8,18 @@ import { TOKEN_FORMAT, USD_FORMAT } from "../../store";
 import { useDegenMode } from "../../hooks/hooks";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { toggleUseAsCollateral, hideModal, showModal } from "../../redux/appSlice";
+import {
+  toggleUseAsCollateral as toggleUseAsCollateralMEME,
+  hideModal as hideModalMEME,
+  showModal as showModalMEME,
+} from "../../redux/appSliceMEME";
 import { isInvalid, formatWithCommas_usd } from "../../utils/uiNumber";
 import { YellowSolidSubmitButton, RedSolidSubmitButton } from "./button";
 import { getCollateralAmount } from "../../redux/selectors/getCollateralAmount";
 import { TipIcon, CloseIcon, WarnIcon, JumpTipIcon, ArrowRight } from "./svg";
 import ReactToolTip from "../ToolTip";
 import { IToken } from "../../interfaces/asset";
+import { isMemeCategory } from "../../utils";
 
 export const USNInfo = () => (
   <Box mt="1rem">
@@ -178,23 +184,40 @@ export const CollateralSwitch = ({ action, canUseAsCollateral, tokenId }) => {
   const [collateralStatus, setCollateralStatus] = useState<boolean>(true);
   const dispatch = useAppDispatch();
   const showToggle = action === "Supply";
+  const isMeme = isMemeCategory();
   useEffect(() => {
     if (!canUseAsCollateral) {
-      dispatch(toggleUseAsCollateral({ useAsCollateral: false }));
+      if (isMeme) {
+        dispatch(toggleUseAsCollateralMEME({ useAsCollateral: false }));
+      } else {
+        dispatch(toggleUseAsCollateral({ useAsCollateral: false }));
+      }
       setCollateralStatus(false);
     } else {
-      dispatch(toggleUseAsCollateral({ useAsCollateral: true }));
+      if (isMeme) {
+        dispatch(toggleUseAsCollateralMEME({ useAsCollateral: true }));
+      } else {
+        dispatch(toggleUseAsCollateral({ useAsCollateral: true }));
+      }
       setCollateralStatus(true);
     }
-  }, [tokenId]);
+  }, [tokenId, isMeme]);
   useEffect(() => {
     if (!canUseAsCollateral) {
-      dispatch(toggleUseAsCollateral({ useAsCollateral: false }));
+      if (isMeme) {
+        dispatch(toggleUseAsCollateralMEME({ useAsCollateral: false }));
+      } else {
+        dispatch(toggleUseAsCollateral({ useAsCollateral: false }));
+      }
       setCollateralStatus(false);
     } else {
-      dispatch(toggleUseAsCollateral({ useAsCollateral: collateralStatus }));
+      if (isMeme) {
+        dispatch(toggleUseAsCollateralMEME({ useAsCollateral: collateralStatus }));
+      } else {
+        dispatch(toggleUseAsCollateral({ useAsCollateral: collateralStatus }));
+      }
     }
-  }, [collateralStatus]);
+  }, [collateralStatus, isMeme]);
   const handleSwitchToggle = (checked: boolean) => {
     setCollateralStatus(checked);
   };
@@ -330,36 +353,66 @@ export const AlertError = ({ title, className }: { title: string; className?: st
 
 export function useWithdrawTrigger(tokenId: string) {
   const dispatch = useAppDispatch();
+  const isMeme = isMemeCategory();
   return () => {
-    dispatch(showModal({ action: "Withdraw", tokenId, amount: "0" }));
+    if (isMeme) {
+      dispatch(showModalMEME({ action: "Withdraw", tokenId, amount: "0" }));
+    } else {
+      dispatch(showModal({ action: "Withdraw", tokenId, amount: "0" }));
+    }
   };
 }
 
-export function useAdjustTrigger(tokenId: string) {
+export function useAdjustTrigger(tokenId: string, memeCategory?: boolean) {
   const dispatch = useAppDispatch();
-  const amount = useAppSelector(getCollateralAmount(tokenId));
+  let isMeme: boolean;
+  if (memeCategory == undefined) {
+    isMeme = isMemeCategory();
+  } else {
+    isMeme = memeCategory;
+  }
+  const amount = useAppSelector(getCollateralAmount(tokenId, isMeme));
   return () => {
-    dispatch(showModal({ action: "Adjust", tokenId, amount }));
+    if (isMeme) {
+      dispatch(showModalMEME({ action: "Adjust", tokenId, amount }));
+    } else {
+      dispatch(showModal({ action: "Adjust", tokenId, amount }));
+    }
   };
 }
 
 export function useSupplyTrigger(tokenId: string) {
   const dispatch = useAppDispatch();
+  const isMeme = isMemeCategory();
   return () => {
-    dispatch(showModal({ action: "Supply", tokenId, amount: "0" }));
+    if (isMeme) {
+      dispatch(showModalMEME({ action: "Supply", tokenId, amount: "0" }));
+    } else {
+      dispatch(showModal({ action: "Supply", tokenId, amount: "0" }));
+    }
   };
 }
 
 export function useBorrowTrigger(tokenId: string) {
   const dispatch = useAppDispatch();
+  const isMeme = isMemeCategory();
   return () => {
-    dispatch(showModal({ action: "Borrow", tokenId, amount: "0" }));
+    if (isMeme) {
+      dispatch(showModalMEME({ action: "Borrow", tokenId, amount: "0" }));
+    } else {
+      dispatch(showModal({ action: "Borrow", tokenId, amount: "0" }));
+    }
   };
 }
 
 export function useRepayTrigger(tokenId: string, position?: string) {
   const dispatch = useAppDispatch();
+  const isMeme = isMemeCategory();
   return () => {
-    dispatch(showModal({ action: "Repay", tokenId, amount: "0", position }));
+    if (isMeme) {
+      dispatch(showModalMEME({ action: "Repay", tokenId, amount: "0", position }));
+    } else {
+      dispatch(showModal({ action: "Repay", tokenId, amount: "0", position }));
+    }
   };
 }

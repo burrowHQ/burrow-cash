@@ -5,6 +5,7 @@ import { Modal as MUIModal } from "@mui/material";
 import { twMerge } from "tailwind-merge";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 import { updatePosition } from "../../redux/appSlice";
+import { updatePosition as updatePositionMEME } from "../../redux/appSliceMEME";
 import {
   ArrowLeft,
   SuppliedEmptyIcon,
@@ -64,7 +65,7 @@ const DetailData = createContext(null) as any;
 const TokenDetail = () => {
   const isMeme = isMemeCategory();
   const router = useRouter();
-  const rows = useAvailableAssets({ isMeme });
+  const rows = useAvailableAssets();
   const { id } = router.query;
   const tokenRow = rows.find((row: UIAsset) => {
     return row.tokenId === id;
@@ -103,7 +104,7 @@ function TokenDetailView({
   });
   const tokenDetails = useTokenDetails();
   const { fetchTokenDetails, changePeriodDisplay } = tokenDetails || {};
-  const [suppliedRows, borrowedRows, , , borrowedLPRows] = usePortfolioAssets(isMeme) as [
+  const [suppliedRows, borrowedRows, , , borrowedLPRows] = usePortfolioAssets() as [
     any[],
     any[],
     number,
@@ -892,6 +893,7 @@ function TokenUserInfo() {
   const { tokenRow } = useContext(DetailData) as any;
   const { tokenId, tokens, isLpToken, price } = tokenRow;
   const accountId = useAccountId();
+  const isMeme = isMemeCategory();
   const isWrappedNear = tokenRow.symbol === "NEAR";
   const { supplyBalance, maxBorrowAmountPositions } = useUserBalance(tokenId, isWrappedNear);
   const handleSupplyClick = useSupplyTrigger(tokenId);
@@ -992,7 +994,11 @@ function TokenUserInfo() {
                 className="w-1 flex-grow"
                 onClick={() => {
                   handleBorrowClick();
-                  dispatch(updatePosition({ position: DEFAULT_POSITION }));
+                  if (isMeme) {
+                    dispatch(updatePositionMEME({ position: DEFAULT_POSITION }));
+                  } else {
+                    dispatch(updatePosition({ position: DEFAULT_POSITION }));
+                  }
                 }}
               >
                 Borrow
@@ -1023,16 +1029,6 @@ function YouSupplied() {
     },
     [[], 0],
   ) || [[], 0];
-  const RewardsReactNode = supplied?.rewards?.length ? (
-    <div className="flex items-center">
-      {icons.map((icon, index) => {
-        return <img key={index} src={icon} className="w-4 h-4 rounded-full -ml-0.5" alt="" />;
-      })}
-      <span className="ml-2">{formatWithCommas_usd(totalDailyRewardsMoney)}</span>
-    </div>
-  ) : (
-    "-"
-  );
   const handleWithdrawClick = useWithdrawTrigger(tokenId);
   const handleAdjustClick = useAdjustTrigger(tokenId);
   const withdraw_disabled = !supplied || !supplied?.canWithdraw;
@@ -1111,6 +1107,7 @@ function YouSupplied() {
 function YouBorrowed() {
   const { tokenRow, borrowed, borrowedLp, assets } = useContext(DetailData) as any;
   const { tokenId } = tokenRow;
+  const isMeme = isMemeCategory();
   const [icons, totalDailyRewardsMoney] = borrowed?.rewards?.reduce(
     (acc, cur) => {
       const { rewards, metadata, config, price } = cur;
@@ -1233,7 +1230,11 @@ function YouBorrowed() {
                   className="w-1 flex-grow"
                   onClick={() => {
                     handleRepayClick();
-                    dispatch(updatePosition({ position }));
+                    if (isMeme) {
+                      dispatch(updatePositionMEME({ position }));
+                    } else {
+                      dispatch(updatePosition({ position }));
+                    }
                   }}
                 >
                   Repay

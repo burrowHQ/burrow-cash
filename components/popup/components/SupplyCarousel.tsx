@@ -2,12 +2,7 @@ import React, { useEffect, useMemo, useState, memo } from "react";
 import { BeatLoader } from "react-spinners";
 import { twMerge } from "tailwind-merge";
 import { useRouter } from "next/router";
-import {
-  useNonFarmedAssets,
-  useAccountId,
-  usePortfolioAssets,
-  useAvailableAssets,
-} from "../../../hooks/hooks";
+import { useNonFarmedAssets, useAccountId, usePortfolioAssets } from "../../../hooks/hooks";
 import { IPortfolioAsset } from "../../../interfaces";
 import { incentiveTokens } from "../../../utils/config";
 import ClaimAllRewards from "../../ClaimAllRewards";

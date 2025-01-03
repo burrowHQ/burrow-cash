@@ -4,14 +4,9 @@ import { createSelector } from "@reduxjs/toolkit";
 import type { RootState } from "./store";
 import { hiddenAssets } from "../utils/config";
 import { toUsd, transformAsset } from "./utils";
+import { isMemeCategory } from "../utils";
 
-export const getAvailableAssets = ({
-  source,
-  isMeme,
-}: {
-  source?: "supply" | "borrow" | "";
-  isMeme?: boolean;
-}) =>
+export const getAvailableAssets = ({ source }: { source?: "supply" | "borrow" | "" }) =>
   createSelector(
     (state: RootState) => state.assets.data,
     (state: RootState) => state.assetsMEME.data,
@@ -20,9 +15,10 @@ export const getAvailableAssets = ({
     (state: RootState) => state.app,
     (state: RootState) => state.appMEME,
     (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME) => {
-      let app;
-      let assets;
-      let account;
+      const isMeme = isMemeCategory();
+      let app: typeof appMain;
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
       if (isMeme) {
         app = appMEME;
         assets = assetsMEME;
@@ -63,11 +59,49 @@ export const getAssetsMEME = createSelector(
   (state: RootState) => state.assetsMEME,
   (assets) => assets,
 );
+export const getAssetsCategory = (memeCategory?: boolean) => {
+  return createSelector(
+    (state: RootState) => state.assets,
+    (state: RootState) => state.assetsMEME,
+    (assetsMain, assetsMEME) => {
+      let isMeme: boolean;
+      if (memeCategory == undefined) {
+        isMeme = isMemeCategory();
+      } else {
+        isMeme = memeCategory;
+      }
+      let assets: typeof assetsMain;
+      if (isMeme) {
+        assets = assetsMEME;
+      } else {
+        assets = assetsMain;
+      }
+      return assets;
+    },
+  );
+};
+export const getAllAssetsData = createSelector(
+  (state: RootState) => state.assets,
+  (state: RootState) => state.assetsMEME,
+  (assetsMain, assetsMEME) => {
+    const combinedAssetsData = { ...assetsMain.data, ...assetsMEME.data };
+    return combinedAssetsData;
+  },
+);
 
 export const getTotalSupplyAndBorrowUSD = (tokenId: string) =>
   createSelector(
     (state: RootState) => state.assets,
-    (assets) => {
+    (state: RootState) => state.assetsMEME,
+    (assetsMain, assetsMEME) => {
+      const isMeme = isMemeCategory();
+      let assets: typeof assetsMain;
+      if (isMeme) {
+        assets = assetsMEME;
+      } else {
+        assets = assetsMain;
+      }
+
       const asset = assets.data[tokenId];
       if (!asset) return [0, 0];
 

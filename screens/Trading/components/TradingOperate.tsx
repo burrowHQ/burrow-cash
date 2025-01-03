@@ -6,7 +6,7 @@ import { SetUp, ShrinkArrow, MaxPositionIcon, RefreshIcon } from "./TradingIcon"
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import RangeSlider from "./RangeSlider";
 import ConfirmMobile from "./ConfirmMobile";
-import { getAccountBalance, getAccountId } from "../../../redux/accountSelectors";
+import { getAccountId } from "../../../redux/accountSelectors";
 import { getAssets, getAssetsMEME } from "../../../redux/assetsSelectors";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
 import { usePoolsData } from "../../../hooks/useGetPoolsData";

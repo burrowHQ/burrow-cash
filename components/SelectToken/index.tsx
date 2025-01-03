@@ -12,6 +12,7 @@ import { getModalData } from "../../redux/appSelectors";
 import { isMobileDevice } from "../../helpers/helpers";
 import { CloseIcon } from "../Modal/svg";
 import { toggleUseAsCollateral } from "../../redux/appSlice";
+import { toggleUseAsCollateral as toggleUseAsCollateralMEME } from "../../redux/appSliceMEME";
 import { IToken } from "../../interfaces/asset";
 import { DEFAULT_POSITION } from "../../utils/config";
 import { ModalContext } from "../Modal/index";
@@ -32,10 +33,8 @@ export default function SelectToken({
 }) {
   const [updateAsset, setUpdateAsset] = useState<Record<string, IUIAsset>>({});
   const [assetList, setAssetList] = useState<IUIAsset[]>([]);
-  const isMeme = isMemeCategory();
   const rows = useAvailableAssets({
     source: assetType,
-    isMeme,
   });
   const selectRef = useRef(null);
   const is_mobile = isMobileDevice();
@@ -126,6 +125,7 @@ function TokenRow({
     isLpToken,
     tokens,
   } = asset;
+  const isMeme = isMemeCategory();
   const handleSupplyClick = useSupplyTrigger(tokenId);
   const handleBorrowClick = useBorrowTrigger(tokenId);
   const selected = useAppSelector(getModalData);
@@ -138,7 +138,11 @@ function TokenRow({
       handleBorrowClick();
       selectRef.current.scrollTop = 0;
     }
-    dispatch(toggleUseAsCollateral({ useAsCollateral: canUseAsCollateral }));
+    if (isMeme) {
+      dispatch(toggleUseAsCollateralMEME({ useAsCollateral: canUseAsCollateral }));
+    } else {
+      dispatch(toggleUseAsCollateral({ useAsCollateral: canUseAsCollateral }));
+    }
     onClose();
   }
   const is_checked = selected?.tokenId === asset.tokenId;

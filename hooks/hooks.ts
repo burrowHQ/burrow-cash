@@ -9,7 +9,6 @@ import {
   getTheme,
   getUnreadLiquidation,
   getToastMessage,
-  getUnreadLiquidationMEME,
 } from "../redux/appSelectors";
 import {
   setRepayFrom,
@@ -18,7 +17,11 @@ import {
   setUnreadLiquidation,
   setToastMessage,
 } from "../redux/appSlice";
-import { getViewAs } from "../utils";
+import {
+  setRepayFrom as setRepayFromMEME,
+  setUnreadLiquidation as setUnreadLiquidationMEME,
+} from "../redux/appSliceMEME";
+import { getViewAs, isMemeCategory } from "../utils";
 import { getWeightedAssets, getWeightedNetLiquidity } from "../redux/selectors/getAccountRewards";
 import { getLiquidations } from "../api/get-liquidations";
 
@@ -59,19 +62,14 @@ export function useNonFarmedAssets() {
   return { hasNonFarmedAssets, weightedNetLiquidity, hasNegativeNetLiquidity, assets };
 }
 
-export function useAvailableAssets({
-  source,
-  isMeme,
-}: {
-  source?: "supply" | "borrow" | "";
-  isMeme?: boolean;
-}) {
-  const rows = useAppSelector(getAvailableAssets({ source, isMeme }));
+export function useAvailableAssets(params?: { source?: "supply" | "borrow" | "" }) {
+  const { source } = params || {};
+  const rows = useAppSelector(getAvailableAssets({ source }));
   return rows;
 }
 
-export function usePortfolioAssets(isMeme?: boolean) {
-  return useAppSelector(getPortfolioAssets(isMeme));
+export function usePortfolioAssets(memeCategory?: boolean) {
+  return useAppSelector(getPortfolioAssets(memeCategory));
 }
 
 export function useDegenMode() {
@@ -83,7 +81,12 @@ export function useDegenMode() {
   };
 
   const setRepayFromDeposits = (repayFromDeposits: boolean) => {
-    dispatch(setRepayFrom({ repayFromDeposits }));
+    const isMeme = isMemeCategory();
+    if (isMeme) {
+      dispatch(setRepayFromMEME({ repayFromDeposits }));
+    } else {
+      dispatch(setRepayFrom({ repayFromDeposits }));
+    }
   };
 
   const isRepayFromDeposits = degenMode.enabled && degenMode.repayFromDeposits;
@@ -102,11 +105,20 @@ export function useDarkMode() {
   return { toggle, theme, isDark: theme === "dark" };
 }
 
-export function useUnreadLiquidation(liquidationPage = 1) {
-  const { activeCategory } = useAppSelector((state) => state.category);
-  const unreadLiquidation = useAppSelector(
-    activeCategory == "main" ? getUnreadLiquidation : getUnreadLiquidationMEME,
-  );
+export function useUnreadLiquidation({
+  liquidationPage = 1,
+  memeCategory,
+}: {
+  liquidationPage?: number;
+  memeCategory?: boolean;
+}) {
+  let isMeme: boolean;
+  if (memeCategory == undefined) {
+    isMeme = isMemeCategory();
+  } else {
+    isMeme = memeCategory;
+  }
+  const unreadLiquidation = useAppSelector(getUnreadLiquidation);
   const accountId = useAccountId();
   const dispatch = useAppDispatch();
 
@@ -114,12 +126,21 @@ export function useUnreadLiquidation(liquidationPage = 1) {
     try {
       const { liquidationData } = await getLiquidations(accountId, liquidationPage || 1, 10);
       if (liquidationData?.unread !== undefined) {
-        dispatch(
-          setUnreadLiquidation({
-            count: liquidationData.unread,
-            unreadIds: unreadLiquidation?.unreadIds || [],
-          }),
-        );
+        if (isMeme) {
+          dispatch(
+            setUnreadLiquidationMEME({
+              count: liquidationData.unread,
+              unreadIds: unreadLiquidation?.unreadIds || [],
+            }),
+          );
+        } else {
+          dispatch(
+            setUnreadLiquidation({
+              count: liquidationData.unread,
+              unreadIds: unreadLiquidation?.unreadIds || [],
+            }),
+          );
+        }
       }
     } catch (e) {
       console.error(e);

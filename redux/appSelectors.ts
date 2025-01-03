@@ -3,6 +3,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import type { RootState } from "./store";
 import { transformAsset } from "./utils";
 import { isMemeCategory } from "../utils";
+import { Asset } from "./assetState";
 
 export const getConfig = createSelector(
   (state: RootState) => state.app,
@@ -16,7 +17,17 @@ export const getConfigMEME = createSelector(
 
 export const getModalStatus = createSelector(
   (state: RootState) => state.app,
-  (app) => app.showModal,
+  (state: RootState) => state.appMEME,
+  (appMain, appMEME) => {
+    const isMeme = isMemeCategory();
+    let app: typeof appMain;
+    if (isMeme) {
+      app = appMEME;
+    } else {
+      app = appMain;
+    }
+    return app.showModal;
+  },
 );
 export const getModalData = createSelector(
   (state: RootState) => state.app,
@@ -40,12 +51,17 @@ export const getFullDigits = createSelector(
 
 export const getProtocolStats = createSelector(
   (state: RootState) => state.app,
-  (app) => app.protocolStats,
-);
-
-export const getProtocolStatsMEME = createSelector(
   (state: RootState) => state.appMEME,
-  (app) => app.protocolStats,
+  (appMain, appMEME) => {
+    const isMeme = isMemeCategory();
+    let app: typeof appMain;
+    if (isMeme) {
+      app = appMEME;
+    } else {
+      app = appMain;
+    }
+    return app.protocolStats;
+  },
 );
 
 export const getShowInfo = createSelector(
@@ -53,15 +69,27 @@ export const getShowInfo = createSelector(
   (app) => app.showInfo,
 );
 
-export const getAppState = createSelector(
-  (state: RootState) => state.app,
-  (app) => app,
-);
-
-export const getAppStateMEME = createSelector(
-  (state: RootState) => state.appMEME,
-  (app) => app,
-);
+export const getAppState = (memeCategory?) => {
+  return createSelector(
+    (state: RootState) => state.app,
+    (state: RootState) => state.appMEME,
+    (appMain, appMEME) => {
+      let isMeme: boolean;
+      if (memeCategory == undefined) {
+        isMeme = isMemeCategory();
+      } else {
+        isMeme = memeCategory;
+      }
+      let app: typeof appMain;
+      if (isMeme) {
+        app = appMEME;
+      } else {
+        app = appMain;
+      }
+      return app;
+    },
+  );
+};
 
 export const getShowDust = createSelector(
   (state: RootState) => state.app,
@@ -75,7 +103,17 @@ export const getShowTicker = createSelector(
 
 export const getSelectedValues = createSelector(
   (state: RootState) => state.app,
-  (app) => app.selected,
+  (state: RootState) => state.appMEME,
+  (appMain, appMEME) => {
+    const isMeme = isMemeCategory();
+    let app: typeof appMain;
+    if (isMeme) {
+      app = appMEME;
+    } else {
+      app = appMain;
+    }
+    return app.selected;
+  },
 );
 
 export const getTableSorting = createSelector(
@@ -85,7 +123,17 @@ export const getTableSorting = createSelector(
 
 export const getDegenMode = createSelector(
   (state: RootState) => state.app,
-  (app) => app.degenMode,
+  (state: RootState) => state.appMEME,
+  (appMain, appMEME) => {
+    let app: typeof appMain;
+    const isMeme = isMemeCategory();
+    if (isMeme) {
+      app = appMEME;
+    } else {
+      app = appMain;
+    }
+    return app.degenMode;
+  },
 );
 
 export const getDisclaimerAgreed = createSelector(
@@ -106,21 +154,26 @@ export const getTheme = createSelector(
 
 export const getAssetData = createSelector(
   (state: RootState) => state.app,
+  (state: RootState) => state.appMEME,
   (state: RootState) => state.assets.data,
   (state: RootState) => state.assetsMEME.data,
   (state: RootState) => state.account,
   (state: RootState) => state.accountMEME,
-  (app, assetsMain, assetsMEME, accountMain, accountMEME) => {
-    let asset;
-    let portfolio;
-    let account;
-    let assets;
-    if (isMemeCategory()) {
+  (appMain, appMEME, assetsMain, assetsMEME, accountMain, accountMEME) => {
+    let asset: Asset;
+    let app: typeof appMain;
+    let portfolio: typeof accountMain.portfolio;
+    let account: typeof accountMain;
+    let assets: typeof assetsMain;
+    const isMeme = isMemeCategory();
+    if (isMeme) {
+      app = appMEME;
       asset = assetsMEME[app.selected?.tokenId];
       portfolio = accountMEME.portfolio;
       account = accountMEME;
       assets = assetsMEME;
     } else {
+      app = appMain;
       asset = assetsMain[app.selected?.tokenId];
       portfolio = accountMain.portfolio;
       account = accountMain;
@@ -139,9 +192,25 @@ export const getAssetData = createSelector(
 export const getAssetDataByTokenId = (tokenId: string) =>
   createSelector(
     (state: RootState) => state.app,
+    (state: RootState) => state.appMEME,
     (state: RootState) => state.assets.data,
+    (state: RootState) => state.assetsMEME.data,
     (state: RootState) => state.account,
-    (app, assets, account) => {
+    (state: RootState) => state.accountMEME,
+    (appMain, appMEME, assetsMain, assetsMEME, accountMain, accountMEME) => {
+      const isMeme = isMemeCategory();
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
+      let app: typeof appMain;
+      if (isMeme) {
+        assets = assetsMEME;
+        account = accountMEME;
+        app = appMEME;
+      } else {
+        assets = assetsMain;
+        account = accountMain;
+        app = appMain;
+      }
       const asset = assets[tokenId];
       return {
         tokenId: asset?.token_id,
@@ -152,12 +221,17 @@ export const getAssetDataByTokenId = (tokenId: string) =>
 
 export const getUnreadLiquidation = createSelector(
   (state: RootState) => state.app,
-  (app) => app.unreadLiquidation,
-);
-
-export const getUnreadLiquidationMEME = createSelector(
   (state: RootState) => state.appMEME,
-  (app) => app.unreadLiquidation,
+  (appMain, appMEME) => {
+    const isMeme = isMemeCategory();
+    let app: typeof appMain;
+    if (isMeme) {
+      app = appMEME;
+    } else {
+      app = appMain;
+    }
+    return app.unreadLiquidation;
+  },
 );
 
 export const getToastMessage = createSelector(

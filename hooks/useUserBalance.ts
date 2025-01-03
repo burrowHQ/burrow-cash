@@ -1,9 +1,8 @@
 import Decimal from "decimal.js";
-import { useAppSelector, useAppDispatch } from "../redux/hooks";
+import { useAppSelector } from "../redux/hooks";
 import { getAssetDataByTokenId } from "../redux/appSelectors";
 import { getBorrowMaxAmount } from "../redux/selectors/getBorrowMaxAmount";
 import { NEAR_STORAGE_DEPOSIT } from "../store";
-import { DEFAULT_POSITION } from "../utils/config";
 
 export function useUserBalance(tokenId: string, isWrappedNear: boolean) {
   const asset = useAppSelector(getAssetDataByTokenId(tokenId));

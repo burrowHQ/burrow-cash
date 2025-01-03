@@ -46,11 +46,13 @@ export const executeMultipleTransactions = async (transactions) => {
       transactions: selectorTransactions,
     });
     if (fetchData) fetchData(account.accountId);
+    if (hideModal) hideModal();
     return result;
   } catch (e: any) {
+    if (hideModal) hideModal();
     if (/reject/.test(e)) {
+      // eslint-disable-next-line no-alert
       alert("Transaction was rejected in wallet. Please try again!");
-      hideModal();
       return;
     }
     if (!/No accounts available/.test(e)) {
@@ -58,28 +60,17 @@ export const executeMultipleTransactions = async (transactions) => {
     }
     console.warn(e);
     signOut();
+    // eslint-disable-next-line no-alert
     alert(
       "No accounts available. Your wallet may be locked. You have been signed out. Please sign in again!",
     );
     return;
   }
-
-  if (hideModal) hideModal();
 };
 
 export const isRegistered = async (account_id: string, contractId: string): Promise<any> => {
   try {
     const contract: Contract = await getTokenContract(contractId);
-    const { view } = await getBurrow();
-    return await view(contract, ViewMethodsLogic[ViewMethodsLogic.storage_balance_of], {
-      account_id,
-    });
-  } catch (error) {
-    return null;
-  }
-};
-export const isRegistered2 = async (account_id: string, contract: Contract): Promise<any> => {
-  try {
     const { view } = await getBurrow();
     return await view(contract, ViewMethodsLogic[ViewMethodsLogic.storage_balance_of], {
       account_id,

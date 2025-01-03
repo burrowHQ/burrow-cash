@@ -11,6 +11,7 @@ import {
   NEAR_STORAGE_DEPOSIT,
   NEAR_STORAGE_DEPOSIT_MIN,
   NEAR_STORAGE_EXTRA_DEPOSIT,
+  NEAR_STORAGE_TOKEN,
 } from "./constants";
 import {
   ViewMethodsLogic,
@@ -114,7 +115,7 @@ export const prepareAndExecuteTokenTransactions = async (
   ) {
     functionCalls.push({
       methodName: ChangeMethodsToken[ChangeMethodsToken.storage_deposit],
-      attachedDeposit: new BN(expandToken(NEAR_STORAGE_DEPOSIT, NEAR_DECIMALS)),
+      attachedDeposit: new BN(expandToken(NEAR_STORAGE_TOKEN, NEAR_DECIMALS)),
     });
   }
 

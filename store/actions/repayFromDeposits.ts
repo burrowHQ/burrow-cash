@@ -5,8 +5,6 @@ import { expandTokenDecimal } from "../helper";
 import { ChangeMethodsOracle, ChangeMethodsLogic } from "../../interfaces";
 import { getMetadata, prepareAndExecuteTransactions } from "../tokens";
 import { Transaction } from "../wallet";
-import { transformAccount } from "../../transformers/account";
-import getAccount from "../../api/get-account";
 import { DEFAULT_POSITION } from "../../utils/config";
 import getPortfolio from "../../api/get-portfolio";
 import getPortfolioMEME from "../../api/get-portfolio-meme";
@@ -31,11 +29,11 @@ export async function repayFromDeposits({
   const state = store.getState();
   const { oracleContract, logicContract, memeOracleContract, logicMEMEContract } =
     await getBurrow();
-  let assets;
-  let account;
-  let enable_pyth_oracle;
-  let logicContractId;
-  let oracleContractId;
+  let assets: typeof state.assets.data;
+  let account: typeof state.account;
+  let enable_pyth_oracle: boolean;
+  let logicContractId: string;
+  let oracleContractId: string;
   if (isMeme) {
     assets = state.assetsMEME.data;
     account = state.accountMEME;

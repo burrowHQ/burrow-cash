@@ -6,7 +6,7 @@ import { getNetAPY, getNetTvlAPY } from "../redux/selectors/getNetAPY";
 export function useStaking() {
   const staking = useAppSelector(getStaking);
   const dispatch = useAppDispatch();
-  const stakingNetAPY = useAppSelector(getNetAPY({ isStaking: true }));
+  const stakingNetAPY = useAppSelector(getNetAPY({ isStaking: true, memeCategory: false }));
   const stakingNetTvlAPY = useAppSelector(getNetTvlAPY({ isStaking: true }));
 
   const setAmount = (amount) => {

@@ -26,7 +26,6 @@ import { IAssetFarmReward } from "../interfaces/asset";
 import { FarmData, Portfolio, Farm } from "../redux/accountState";
 // eslint-disable-next-line import/no-cycle
 import { IPortfolioReward } from "../redux/selectors/getAccountRewards";
-import { IConfig } from "../interfaces";
 import { store } from "../redux/store";
 
 export const getViewAs = () => {

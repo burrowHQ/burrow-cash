@@ -15,16 +15,20 @@ export const recomputeHealthFactorSupply = (tokenId: string, amount: number) =>
     (state: RootState) => state.account,
     (state: RootState) => state.accountMEME,
     (state: RootState) => state.app,
-    (assetsMain, assetsMEME, accountMain, accountMEME, app) => {
+    (state: RootState) => state.appMEME,
+    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME) => {
       const isMeme = isMemeCategory();
-      let assets;
-      let account;
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
+      let app: typeof appMain;
       if (isMeme) {
         assets = assetsMEME;
         account = accountMEME;
+        app = appMEME;
       } else {
         assets = assetsMain;
         account = accountMain;
+        app = appMain;
       }
       if (!hasAssets(assets)) return { healthFactor: 0, maxBorrowValue: 0 };
       if (!account.portfolio || !tokenId) return { healthFactor: 0, maxBorrowValue: 0 };

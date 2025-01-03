@@ -270,16 +270,26 @@ export const getContract = async (
   return contract;
 };
 
-export const registerNearFnCall = async (accountId: string, contract: Contract) =>
-  !(await isRegistered(accountId, contract.contractId))
-    ? [
-        {
-          methodName: ChangeMethodsLogic[ChangeMethodsLogic.storage_deposit],
-          attachedDeposit: new BN(expandToken(0.00125, NEAR_DECIMALS)),
-          gas: new BN("5000000000000"),
-        },
-      ]
-    : [];
+/**
+ * @param accountId;
+ * @param contract;
+ * @returns;
+ */
+export const registerNearFnCall = async (accountId: string, contract: Contract) => {
+  const registered = await isRegistered(accountId, contract.contractId);
+  if (!registered) {
+    const storage = await getStorageBalanceBounds(contract.contractId);
+    return [
+      {
+        methodName: ChangeMethodsLogic[ChangeMethodsLogic.storage_deposit],
+        attachedDeposit: new BN(storage),
+        gas: new BN("5000000000000"),
+      },
+    ];
+  }
+  return [];
+};
+
 export const registerAccountOnToken = async (accountId: string, tokenId: string) => {
   const storage = await getStorageBalanceBounds(tokenId);
   return {
@@ -296,6 +306,14 @@ export const registerAccountOnToken = async (accountId: string, tokenId: string)
     ],
   } as Transaction;
 };
+export const registerAccountOnTokenWithQuery = async (accountId: string, tokenId: string) => {
+  const registered = await isRegistered(accountId, tokenId);
+  if (!registered) {
+    const registerTranstion = registerAccountOnToken(accountId, tokenId);
+    return registerTranstion as unknown as Transaction;
+  }
+};
+
 export const getStorageBalanceBounds = async (tokenId: string) => {
   const { view } = await getBurrow();
   const tokenContract: Contract = await getTokenContract(tokenId);
@@ -306,5 +324,5 @@ export const getStorageBalanceBounds = async (tokenId: string) => {
   if (storage) {
     return storage.max || storage.min;
   }
-  return 250000000000000000000000;
+  return 100000000000000000000000;
 };

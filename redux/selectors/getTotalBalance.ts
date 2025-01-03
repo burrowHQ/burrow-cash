@@ -2,35 +2,33 @@ import { createSelector } from "@reduxjs/toolkit";
 
 import { RootState } from "../store";
 import { toUsd, sumReducer, hasAssets } from "../utils";
+import { isMemeCategory } from "../../utils";
 
-export const getTotalBalance = (source: "borrowed" | "supplied", withNetTvlMultiplier = false) =>
+export const getTotalBalance = ({
+  source,
+  withNetTvlMultiplier = false,
+  memeCategory,
+}: {
+  source: "borrowed" | "supplied";
+  withNetTvlMultiplier?: boolean;
+  memeCategory?: boolean;
+}) =>
   createSelector(
     (state: RootState) => state.assets,
-    (assets) => {
-      if (!hasAssets(assets)) return 0;
-      return Object.keys(assets.data)
-        .map((tokenId) => {
-          const asset = assets.data[tokenId];
-          const netTvlMultiplier = withNetTvlMultiplier
-            ? asset.config.net_tvl_multiplier / 10000
-            : 1;
-
-          return (
-            toUsd(asset[source].balance, asset) * netTvlMultiplier +
-            (source === "supplied" ? toUsd(asset.reserved, asset) * netTvlMultiplier : 0)
-          );
-        })
-        .reduce(sumReducer, 0);
-    },
-  );
-
-export const getTotalBalanceMEME = (
-  source: "borrowed" | "supplied",
-  withNetTvlMultiplier = false,
-) =>
-  createSelector(
     (state: RootState) => state.assetsMEME,
-    (assets) => {
+    (assetsMain, assetsMEME) => {
+      let isMeme: boolean;
+      if (memeCategory == undefined) {
+        isMeme = isMemeCategory();
+      } else {
+        isMeme = memeCategory;
+      }
+      let assets: typeof assetsMain;
+      if (isMeme) {
+        assets = assetsMEME;
+      } else {
+        assets = assetsMain;
+      }
       if (!hasAssets(assets)) return 0;
       return Object.keys(assets.data)
         .map((tokenId) => {

@@ -4,6 +4,7 @@ import { shrinkToken } from "../../store";
 import { RootState } from "../store";
 
 export const getStaking = createSelector(
+  // only main
   (state: RootState) => state.account,
   (state: RootState) => state.app,
   (account, app) => {

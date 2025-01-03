@@ -18,8 +18,7 @@ export function CollateralTypeSelectorBorrow({
   setSelectedCollateralType: any;
 }) {
   const [show, setShow] = useState(false);
-  const isMeme = isMemeCategory();
-  const assets = useAvailableAssets({ isMeme });
+  const assets = useAvailableAssets();
   const LPAssetMap = useMemo(() => {
     return assets
       .filter((asset: UIAsset) => asset.isLpToken)
@@ -106,8 +105,7 @@ export function CollateralTypeSelectorRepay({
   setSelectedCollateralType: any;
 }) {
   const [show, setShow] = useState(false);
-  const isMeme = isMemeCategory();
-  const assets = useAvailableAssets({ isMeme });
+  const assets = useAvailableAssets();
   const LPAssetMap = useMemo(() => {
     return assets
       .filter((asset: UIAsset) => asset.isLpToken)

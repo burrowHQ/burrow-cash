@@ -82,6 +82,8 @@ module.exports = {
     "prefer-destructuring": "off",
     "default-param-last": "off",
     "no-await-in-loop": "off",
+    "no-lonely-if": "off",
+    "react/jsx-boolean-value": "off",
   },
   settings: {
     react: {

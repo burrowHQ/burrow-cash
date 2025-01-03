@@ -85,7 +85,7 @@ export const StakingCard = ({
 };
 
 export const LiveUnclaimedAmount = ({ addAmount = 0 }) => {
-  const rewards = useAppSelector(getAccountRewards);
+  const rewards = useAppSelector(getAccountRewards());
   const { unclaimedAmount = 0, dailyAmount = 0 } = rewards.brrr;
   const [unclaimed, setUnclaimed] = useState<number>(unclaimedAmount);
 

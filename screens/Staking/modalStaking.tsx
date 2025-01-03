@@ -21,12 +21,11 @@ import Booster from "./booster";
 import { format_apy } from "../../utils/uiNumber";
 import { getAccountBoostRatioData } from "../../redux/selectors/getAccountRewards";
 import { getMarketRewardsData } from "../../redux/selectors/getMarketRewards";
+import { getAppState } from "../../redux/appSelectors";
 
 const ModalStaking = ({ isOpen, onClose }) => {
-  const [total, totalUnclaim, totalToken] = useAppSelector(getTotalBRRR);
-  const app = useAppSelector((state) =>
-    state.category.activeCategory == "main" ? state.app : state.appMEME,
-  );
+  const [total, totalUnclaim, totalToken] = useAppSelector(getTotalBRRR(false));
+  const app = useAppSelector(getAppState(false));
   const [monthPercent, setMonthPercent] = useState(0);
   const [loadingStake, setLoadingStake] = useState(false);
   const { stakingTimestamp, amount, months, setAmount, setMonths } = useStaking();
@@ -50,7 +49,7 @@ const ModalStaking = ({ isOpen, onClose }) => {
   const disabledStake = !amount || invalidAmount || invalidMonths || Number(amount) === 0;
   const { avgStakeSupplyAPY, avgStakeBorrowAPY, avgStakeNetAPY, totalTokenNetMap } =
     useStakeRewardApy();
-  const [, , multiplier] = useAppSelector(getAccountBoostRatioData);
+  const [, , multiplier] = useAppSelector(getAccountBoostRatioData(false));
   const { tokenNetBalance } = useAppSelector(getMarketRewardsData);
 
   const inputAmount = `${amount}`

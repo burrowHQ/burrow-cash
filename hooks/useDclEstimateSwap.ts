@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import _ from "lodash";
 import Decimal from "decimal.js";
 import { useAppSelector } from "../redux/hooks";
-import { getAssets, getAssetsMEME } from "../redux/assetsSelectors";
+import { getAllAssetsData } from "../redux/assetsSelectors";
 import { expandTokenDecimal, shrinkToken } from "../store";
 import { getDclPools } from "../redux/poolSelectors";
 import { DCL_POOL_FEE_LIST } from "../utils/constant";
@@ -25,9 +25,7 @@ export const useDclEstimateSwap = ({
   forceUpdate?: number;
 }) => {
   const [estimateData, setEstimateData] = useState<IEstimateResult>();
-  const assets = useAppSelector(getAssets);
-  const assetsMEME = useAppSelector(getAssetsMEME);
-  const combinedAssetsData = { ...assets.data, ...assetsMEME.data };
+  const combinedAssetsData = useAppSelector(getAllAssetsData);
   const allDclPools = useAppSelector(getDclPools);
   useEffect(() => {
     if (tokenIn_id && tokenOut_id && new Decimal(tokenIn_amount || 0).gt(0)) {

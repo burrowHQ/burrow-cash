@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { SetIcon } from "./svg";
 import { toggleShowDust } from "../../redux/appSlice";

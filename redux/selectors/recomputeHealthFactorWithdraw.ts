@@ -17,8 +17,8 @@ export const recomputeHealthFactorWithdraw = (tokenId: string, amount: number) =
     (state: RootState) => state.accountMEME,
     (assetsMain, assetsMEME, accountMain, accountMEME) => {
       const isMeme = isMemeCategory();
-      let assets;
-      let account;
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
       if (isMeme) {
         assets = assetsMEME;
         account = accountMEME;

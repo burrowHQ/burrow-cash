@@ -24,11 +24,11 @@ export async function adjustCollateral({
   const state = store.getState();
   const { oracleContract, logicContract, memeOracleContract, logicMEMEContract } =
     await getBurrow();
-  let assets;
-  let account;
-  let enable_pyth_oracle;
-  let logicContractId;
-  let oracleContractId;
+  let assets: typeof state.assetsMEME.data;
+  let account: typeof state.accountMEME;
+  let enable_pyth_oracle: boolean;
+  let logicContractId: string;
+  let oracleContractId: string;
   if (isMeme) {
     assets = state.assetsMEME.data;
     account = state.accountMEME;

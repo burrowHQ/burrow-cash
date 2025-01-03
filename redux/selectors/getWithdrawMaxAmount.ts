@@ -124,20 +124,24 @@ export const computeWithdrawMaxAmount = (tokenId: string, assets: Assets, portfo
 export const getWithdrawMaxAmount = (tokenId: string) =>
   createSelector(
     (state: RootState) => state.app,
+    (state: RootState) => state.appMEME,
     (state: RootState) => state.assets.data,
     (state: RootState) => state.assetsMEME.data,
     (state: RootState) => state.account.portfolio,
     (state: RootState) => state.accountMEME.portfolio,
-    (app, assetsMain, assetsMEME, portfolioMain, portfolioMEME) => {
+    (appMain, appMEME, assetsMain, assetsMEME, portfolioMain, portfolioMEME) => {
       const isMeme = isMemeCategory();
-      let assets;
-      let portfolio;
+      let assets: typeof assetsMain;
+      let portfolio: typeof portfolioMain;
+      let app: typeof appMain;
       if (isMeme) {
         assets = assetsMEME;
         portfolio = portfolioMEME;
+        app = appMEME;
       } else {
         assets = assetsMain;
         portfolio = portfolioMain;
+        app = appMain;
       }
       const asset = assets[tokenId];
       if (!asset || app.selected.tokenId !== tokenId) return 0;

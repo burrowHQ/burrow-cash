@@ -80,7 +80,7 @@ const ToolTip = ({
     isBorrow,
     onlyMarket,
   });
-  const netTvlRewards = useAppSelector(getProtocolRewards);
+  const netTvlRewards = useAppSelector(getProtocolRewards());
   function getNetTvlFarmRewardIcon() {
     const asset = assets.data[netTvlFarmTokenId];
     const icon = asset?.metadata?.icon;

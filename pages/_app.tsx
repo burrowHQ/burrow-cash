@@ -124,7 +124,7 @@ function Upgrade({ Component, pageProps }) {
   ];
   const dispatch = useAppDispatch();
   const accountId = useAppSelector(getAccountId);
-  const portfolio = useAppSelector(getAccountPortfolio);
+  const portfolio = useAppSelector(getAccountPortfolio());
   const assets = useAppSelector(getAssets);
   const config = useAppSelector(getConfig);
   const hasValidAccountSupplied =

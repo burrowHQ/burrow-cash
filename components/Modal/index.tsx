@@ -4,9 +4,13 @@ import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import Decimal from "decimal.js";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { hideModal, fetchConfig, updateAmount, updatePosition } from "../../redux/appSlice";
-import { fetchConfig as fetchMemeConfig } from "../../redux/appSliceMEME";
+import {
+  hideModal as hideModalMEME,
+  fetchConfig as fetchConfigMEME,
+  updateAmount as updateAmountMEME,
+  updatePosition as updatePositionMEME,
+} from "../../redux/appSliceMEME";
 import { getModalStatus, getAssetData, getSelectedValues } from "../../redux/appSelectors";
-import { getAssets } from "../../redux/selectors/getAssets";
 import { getWithdrawMaxAmount } from "../../redux/selectors/getWithdrawMaxAmount";
 import { getRepayPositions } from "../../redux/selectors/getRepayPositions";
 import { getAccountId } from "../../redux/accountSelectors";
@@ -16,6 +20,7 @@ import { recomputeHealthFactorAdjust } from "../../redux/selectors/recomputeHeal
 import { recomputeHealthFactorWithdraw } from "../../redux/selectors/recomputeHealthFactorWithdraw";
 import { recomputeHealthFactorSupply } from "../../redux/selectors/recomputeHealthFactorSupply";
 import { recomputeHealthFactorRepay } from "../../redux/selectors/recomputeHealthFactorRepay";
+import { getAssetsCategory } from "../../redux/assetsSelectors";
 import { recomputeHealthFactorRepayFromDeposits } from "../../redux/selectors/recomputeHealthFactorRepayFromDeposits";
 import { formatWithCommas_number } from "../../utils/uiNumber";
 import { DEFAULT_POSITION, lpTokenPrefix } from "../../utils/config";
@@ -49,19 +54,12 @@ const Modal = () => {
   const isOpen = useAppSelector(getModalStatus);
   const accountId = useAppSelector(getAccountId);
   const asset = useAppSelector(getAssetData);
+  const assets = useAppSelector(getAssetsCategory());
   const { amount } = useAppSelector(getSelectedValues);
-  const { assetsMain, assetsMEME } = useAppSelector(getAssets);
   const { isRepayFromDeposits } = useDegenMode();
   const theme = useTheme();
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
   const { action = "Deposit", tokenId, position } = asset;
-  const isMeme = isMemeCategory();
-  let assets;
-  if (isMeme) {
-    assets = assetsMEME;
-  } else {
-    assets = assetsMain;
-  }
   const { healthFactor, maxBorrowValue: adjustedMaxBorrowValue } = useAppSelector(
     action === "Withdraw"
       ? recomputeHealthFactorWithdraw(tokenId, +amount)
@@ -106,7 +104,7 @@ const Modal = () => {
       dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
       dispatch(fetchAssetsMEME()).then(() => dispatch(fetchRefPrices()));
       dispatch(fetchConfig());
-      dispatch(fetchMemeConfig());
+      dispatch(fetchConfigMEME());
     }
   }, [isOpen]);
   useEffect(() => {
@@ -115,8 +113,14 @@ const Modal = () => {
     }
   }, [position]);
   useEffect(() => {
-    dispatch(updateAmount({ isMax: false, amount: "0" }));
-    dispatch(updatePosition({ position: selectedCollateralType }));
+    const isMeme = isMemeCategory();
+    if (isMeme) {
+      dispatch(updateAmountMEME({ isMax: false, amount: "0" }));
+      dispatch(updatePositionMEME({ position: selectedCollateralType }));
+    } else {
+      dispatch(updateAmount({ isMax: false, amount: "0" }));
+      dispatch(updatePosition({ position: selectedCollateralType }));
+    }
   }, [selectedCollateralType]);
   if (action === "Adjust") {
     rates.push({
@@ -125,7 +129,14 @@ const Modal = () => {
       value$: new Decimal(price * +amount).toFixed(),
     });
   }
-  const handleClose = () => dispatch(hideModal());
+  const handleClose = () => {
+    const isMeme = isMemeCategory();
+    if (isMeme) {
+      dispatch(hideModalMEME());
+    } else {
+      dispatch(hideModal());
+    }
+  };
   const repay_to_lp =
     action === "Repay" && isRepayFromDeposits && selectedCollateralType !== DEFAULT_POSITION;
   return (
@@ -164,7 +175,6 @@ const Modal = () => {
               amount={amount}
               available={available}
               action={action}
-              tokenId={tokenId}
               asset={asset}
               totalAvailable={available}
               available$={available$}

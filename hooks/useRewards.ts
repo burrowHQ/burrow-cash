@@ -5,39 +5,25 @@ import {
   getAccountRewards,
   getAccountDailyRewards,
   getAccountRewardsForApy,
-  getAccountDailyRewardsMEME,
-  getAccountRewardsMEME,
-  getAccountRewardsForApyMEME,
 } from "../redux/selectors/getAccountRewards";
 import {
   getNetLiquidityRewards,
   getProtocolRewards,
   getTokenNetBalanceRewards,
-  getNetLiquidityRewardsMEME,
-  getProtocolRewardsMEME,
-  getTokenNetBalanceRewardsMEME,
 } from "../redux/selectors/getProtocolRewards";
 import { getTokenLiquidity } from "../redux/selectors/getTokenLiquidity";
 import { useProtocolNetLiquidity } from "./useNetLiquidity";
 import { shrinkToken, USD_FORMAT } from "../store";
-import { useAvailableAssets } from "./hooks";
-import { getAccountPortfolio, getAccountPortfolioMEME } from "../redux/accountSelectors";
+import { getAccountPortfolio } from "../redux/accountSelectors";
 import { getRewards } from "../redux/utils";
-import { getAssets, getAssetsMEME } from "../redux/assetsSelectors";
+import { getAssetsCategory } from "../redux/assetsSelectors";
 import { standardizeAsset, filterSentOutFarms } from "../utils";
 import { getNetGains } from "../redux/selectors/getAverageNetRewardApy";
 
-export function useRewards() {
-  const { activeCategory } = useAppSelector((state) => state.category);
-  const assetRewards = useAppSelector(
-    activeCategory == "main" ? getAccountRewards : getAccountRewardsMEME,
-  );
-  const protocol = useAppSelector(
-    activeCategory == "main" ? getProtocolRewards : getProtocolRewardsMEME,
-  );
-  const tokenNetBalanceRewards = useAppSelector(
-    activeCategory == "main" ? getTokenNetBalanceRewards : getTokenNetBalanceRewardsMEME,
-  );
+export function useRewards(memeCategory?: boolean) {
+  const assetRewards = useAppSelector(getAccountRewards(memeCategory));
+  const protocol = useAppSelector(getProtocolRewards(memeCategory));
+  const tokenNetBalanceRewards = useAppSelector(getTokenNetBalanceRewards(memeCategory));
   const { brrr, totalUnClaimUSD } = assetRewards || {};
   const extra = Object.entries(assetRewards.extra);
   const net = Object.entries(assetRewards.net);
@@ -79,26 +65,19 @@ export function useRewards() {
     },
   };
 }
-export function useDailyRewards() {
-  const assetRewards = useAppSelector(getAccountDailyRewards);
-  return assetRewards;
-}
-
-export function useDailyRewardsMEME() {
-  const assetRewards = useAppSelector(getAccountDailyRewardsMEME);
+export function useDailyRewards(memeCategory) {
+  const assetRewards = useAppSelector(getAccountDailyRewards(memeCategory));
   return assetRewards;
 }
 
 export function useNetLiquidityRewards() {
   const { activeCategory } = useAppSelector((state) => state.category);
-  const rewards = useAppSelector(
-    activeCategory == "main" ? getNetLiquidityRewards : getNetLiquidityRewardsMEME,
-  );
+  const rewards = useAppSelector(getNetLiquidityRewards);
   return rewards;
 }
 export function useTokenNetLiquidityRewards(tokenId: string) {
   const { activeCategory } = useAppSelector((state) => state.category);
-  const assets = useAppSelector(activeCategory == "main" ? getAssets : getAssetsMEME);
+  const assets = useAppSelector(getAssetsCategory());
   const asset = assets.data[tokenId];
   const rewards = getRewards("tokennetbalance", asset, assets.data);
   return rewards;
@@ -106,7 +85,7 @@ export function useTokenNetLiquidityRewards(tokenId: string) {
 
 export function useProRataNetLiquidityReward(tokenId, dailyAmount) {
   const { activeCategory } = useAppSelector((state) => state.category);
-  const assets = useAppSelector(activeCategory == "main" ? getAssets : getAssetsMEME);
+  const assets = useAppSelector(getAssetsCategory());
   const net_tvl_multiplier = (assets?.data?.[tokenId].config.net_tvl_multiplier || 0) / 10000;
   const { protocolNetLiquidity } = useProtocolNetLiquidity(true);
   const tokenLiquidity = useAppSelector(getTokenLiquidity(tokenId));
@@ -117,14 +96,9 @@ export function useProRataNetLiquidityReward(tokenId, dailyAmount) {
 }
 
 export function useStakeRewardApy() {
-  const { activeCategory } = useAppSelector((state) => state.category);
-  const assetRewards = useAppSelector(
-    activeCategory == "main" ? getAccountRewardsForApy : getAccountRewardsForApyMEME,
-  );
-  const portfolio = useAppSelector(
-    activeCategory == "main" ? getAccountPortfolio : getAccountPortfolioMEME,
-  );
-  const assets = useAppSelector(activeCategory == "main" ? getAssets : getAssetsMEME);
+  const assetRewards = useAppSelector(getAccountRewardsForApy(false));
+  const portfolio = useAppSelector(getAccountPortfolio(false));
+  const assets = useAppSelector(getAssetsCategory(false));
   if (!assets?.data)
     return {
       avgStakeSupplyAPY: 0,

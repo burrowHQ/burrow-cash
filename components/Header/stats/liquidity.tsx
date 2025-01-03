@@ -3,10 +3,7 @@ import { Typography } from "@mui/material";
 import Decimal from "decimal.js";
 import { useFullDigits } from "../../../hooks/useFullDigits";
 import { useAppSelector } from "../../../redux/hooks";
-import {
-  getTotalAccountBalance,
-  getTotalAccountBalanceMEME,
-} from "../../../redux/selectors/getTotalAccountBalance";
+import { getTotalAccountBalance } from "../../../redux/selectors/getTotalAccountBalance";
 import { m, COMPACT_USD_FORMAT } from "../../../store";
 import { trackFullDigits } from "../../../utils/telemetry";
 import { Stat } from "./components";
@@ -51,17 +48,10 @@ export const ProtocolLiquidity = () => {
   );
 };
 
-export const UserLiquidity = () => {
+export const UserLiquidity = ({ memeCategory }: { memeCategory?: boolean }) => {
   const { fullDigits, setDigits } = useFullDigits();
-  const { activeCategory } = useAppSelector((state) => state.category);
-  const userDeposited =
-    activeCategory == "main"
-      ? useAppSelector(getTotalAccountBalance("supplied"))
-      : useAppSelector(getTotalAccountBalanceMEME("borrowed"));
-  const userBorrowed =
-    activeCategory == "main"
-      ? useAppSelector(getTotalAccountBalance("borrowed"))
-      : useAppSelector(getTotalAccountBalanceMEME("borrowed"));
+  const userDeposited = useAppSelector(getTotalAccountBalance("supplied", memeCategory));
+  const userBorrowed = useAppSelector(getTotalAccountBalance("borrowed", memeCategory));
   const userNetLiquidity = new Decimal(userDeposited).minus(userBorrowed).toNumber();
   const userNetLiquidityValue = userNetLiquidity > 0 ? `$${m(userNetLiquidity)}` : `$0`;
   const userDepositedValue = userDeposited > 0 ? `$${m(userDeposited)}` : `$0`;
