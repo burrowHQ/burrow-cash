@@ -1433,10 +1433,10 @@ const PositionRow = ({
   const collateral = parseTokenValue(item.token_c_info.balance, decimalsC);
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
   const openTime = new Date(Number(item.open_ts) / 1e6);
-  const uahpi: any = shrinkToken((assets as any).data[item.token_p_id]?.uahpi, 18) ?? 0;
+  const uahpi: any = shrinkToken((assets as any).data[item.token_d_info.token_id]?.uahpi, 18) ?? 0;
   const uahpi_at_open: any = shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
-  const holdingFee =
-    +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi * priceD - uahpi_at_open * priceD);
+  const holdingFee = +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi - uahpi_at_open);
+  const holding = +shrinkToken(item.debt_cap, decimalsD) * (uahpi - uahpi_at_open);
   const profitOrLoss =
     entryPrice !== null && entryPrice !== 0
       ? positionType.label === "Long"
@@ -1457,12 +1457,12 @@ const PositionRow = ({
     if (positionType.label === "Long") {
       const k1 = Number(netValue) * leverage * priceC;
       const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
-      LiqPrice = ((Number(netValue) * priceC + size * priceP) * k2) / (k1 + holdingFee);
+      LiqPrice = ((Number(netValue) * priceC + size * priceP) * k2) / (k1 + holding);
       if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
     } else {
       LiqPrice =
         ((netValue + sizeValueLong) * priceC * (1 - marginConfigTokens.min_safety_buffer / 10000)) /
-        (sizeValueShort + holdingFee);
+        (sizeValueShort + holding);
       if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
     }
   }
@@ -1634,10 +1634,10 @@ const PositionMobileRow = ({
   const collateral = parseTokenValue(item.token_c_info.balance, decimalsC);
   const indexPrice = positionType.label === "Long" ? priceP : priceD;
   const openTime = new Date(Number(item.open_ts) / 1e6);
-  const uahpi: any = shrinkToken((assets as any).data[item.token_p_id]?.uahpi, 18) ?? 0;
+  const uahpi: any = shrinkToken((assets as any).data[item.token_d_info.token_id]?.uahpi, 18) ?? 0;
   const uahpi_at_open: any = shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
-  const holdingFee =
-    +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi * priceD - uahpi_at_open * priceD);
+  const holdingFee = +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi - uahpi_at_open);
+  const holding = +shrinkToken(item.debt_cap, decimalsD) * (uahpi - uahpi_at_open);
   const profitOrLoss =
     entryPrice !== null && entryPrice !== 0
       ? positionType.label === "Long"
@@ -1658,12 +1658,12 @@ const PositionMobileRow = ({
     if (positionType.label === "Long") {
       const k1 = Number(netValue) * leverage * priceC;
       const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
-      LiqPrice = ((Number(netValue) * priceC + size * priceP) * k2) / (k1 + holdingFee);
+      LiqPrice = ((Number(netValue) * priceC + size * priceP) * k2) / (k1 + holding);
       if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
     } else {
       LiqPrice =
         ((netValue + sizeValueLong) * priceC * (1 - marginConfigTokens.min_safety_buffer / 10000)) /
-        (sizeValueShort + holdingFee);
+        (sizeValueShort + holding);
       if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
     }
   }
