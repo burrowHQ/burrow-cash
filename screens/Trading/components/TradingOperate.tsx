@@ -630,7 +630,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                   {estimateLoading ? (
                     <BeatLoader size={5} color="white" />
                   ) : (
-                    `$${toInternationalCurrencySystem_number(LiqPrice)}`
+                    <span>${beautifyPrice(LiqPrice)}</span>
                   )}
                 </div>
               </div>
