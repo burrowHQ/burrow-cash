@@ -1343,12 +1343,10 @@ const TradingTable = ({
                   <tbody>
                     {filteredAccountSupplied.length > 0 ? (
                       filteredAccountSupplied.map((token, index) => {
-                        const isMainStream = filteredTokenTypeMap.mainStream.includes(
-                          token.token_id,
-                        );
-                        const assetDetails = isMainStream
-                          ? getAssetById(token.token_id)
-                          : getAssetByIdMEME(token.token_id);
+                        const assetDetails =
+                          token.type === "main"
+                            ? getAssetById(token.token_id)
+                            : getAssetByIdMEME(token.token_id);
                         const marginAssetDetails = getAssetDetails(assetDetails);
                         return (
                           <tr key={index} className="text-sm hover:bg-dark-100 font-normal ">
