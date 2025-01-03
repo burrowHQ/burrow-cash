@@ -72,14 +72,14 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
     if (positionType.label === "Long") {
       const k1 = Number(newNetValue) * newLeverage * priceC;
       const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
-      newLiqPrice = ((Number(newNetValue) * priceC + size * priceP) * k2) / (k1 + holdingFee);
+      newLiqPrice = ((Number(newNetValue) * priceC + size * priceP) * k2) / (k1 + holding);
       if (Number.isNaN(newLiqPrice) || !Number.isFinite(newLiqPrice)) newLiqPrice = 0;
     } else {
       newLiqPrice =
         ((newNetValue + sizeValueLong) *
           priceC *
           (1 - marginConfigTokens.min_safety_buffer / 10000)) /
-        (sizeValueShort + holdingFee);
+        (sizeValueShort + holding);
       if (Number.isNaN(newLiqPrice) || !Number.isFinite(newLiqPrice)) newLiqPrice = 0;
     }
     return { newNetValue, newLeverage, newLiqPrice };
@@ -184,24 +184,23 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
     positionType.label === "Long" ? sizeValueLong * (priceP || 0) : sizeValueShort * (priceD || 0);
   const netValue = parseTokenValue(rowData.data.token_c_info.balance, decimalsC) * (priceC || 0);
   const uahpi: any =
-    shrinkToken((holdingAssets as any).data[rowData.data.token_p_id]?.uahpi, 18) ?? 0;
+    shrinkToken((holdingAssets as any).data[rowData.data.token_d_info.token_id]?.uahpi, 18) ?? 0;
   const uahpi_at_open: any =
     shrinkToken(marginAccountList[rowData.data.itemKey]?.uahpi_at_open ?? 0, 18) ?? 0;
   const holdingFee =
-    +shrinkToken(rowData.data.debt_cap, decimalsD) *
-    priceD *
-    (uahpi * priceD - uahpi_at_open * priceD);
+    +shrinkToken(rowData.data.debt_cap, decimalsD) * priceD * (uahpi - uahpi_at_open);
+  const holding = +shrinkToken(rowData.data.debt_cap, decimalsD) * (uahpi - uahpi_at_open);
   let LiqPrice = 0;
   if (leverage > 1) {
     if (positionType.label === "Long") {
       const k1 = Number(netValue) * leverage * priceC;
       const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
-      LiqPrice = ((Number(netValue) * priceC + size * priceP) * k2) / (k1 + holdingFee);
+      LiqPrice = ((Number(netValue) * priceC + size * priceP) * k2) / (k1 + holding);
       if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
     } else {
       LiqPrice =
         ((netValue + sizeValueLong) * priceC * (1 - marginConfigTokens.min_safety_buffer / 10000)) /
-        (sizeValueShort + holdingFee);
+        (sizeValueShort + holding);
       if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
     }
   }
