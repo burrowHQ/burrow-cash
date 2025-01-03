@@ -30,7 +30,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
   const { query } = useRouterQuery();
   const dispatch = useDispatch();
   const account = useAppSelector((state) => state.account);
-  const { marginConfigTokens, getPositionType } = useMarginConfigToken();
+  const { marginConfigTokens, marginConfigTokensMEME, getPositionType } = useMarginConfigToken();
   const {
     parseTokenValue,
     getAssetDetails,
@@ -79,14 +79,23 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
     let newLiqPrice = 0;
     if (positionType.label === "Long") {
       const k1 = Number(newNetValue) * newLeverage * priceC;
-      const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
+      const k2 =
+        1 -
+        (isMainStream
+          ? marginConfigTokens.min_safety_buffer
+          : marginConfigTokensMEME.min_safety_buffer) /
+          10000;
       newLiqPrice = ((Number(newNetValue) * priceC + size * priceP) * k2) / (k1 + holding);
       if (Number.isNaN(newLiqPrice) || !Number.isFinite(newLiqPrice)) newLiqPrice = 0;
     } else {
       newLiqPrice =
         ((newNetValue + sizeValueLong) *
           priceC *
-          (1 - marginConfigTokens.min_safety_buffer / 10000)) /
+          (1 -
+            (isMainStream
+              ? marginConfigTokens.min_safety_buffer
+              : marginConfigTokensMEME.min_safety_buffer) /
+              10000)) /
         (sizeValueShort + holding);
       if (Number.isNaN(newLiqPrice) || !Number.isFinite(newLiqPrice)) newLiqPrice = 0;
     }
@@ -208,12 +217,23 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
   if (leverage > 1) {
     if (positionType.label === "Long") {
       const k1 = Number(netValue) * leverage * priceC;
-      const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
+      const k2 =
+        1 -
+        (isMainStream
+          ? marginConfigTokens.min_safety_buffer
+          : marginConfigTokensMEME.min_safety_buffer) /
+          10000;
       LiqPrice = ((Number(netValue) * priceC + size * priceP) * k2) / (k1 + holding);
       if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
     } else {
       LiqPrice =
-        ((netValue + sizeValueLong) * priceC * (1 - marginConfigTokens.min_safety_buffer / 10000)) /
+        ((netValue + sizeValueLong) *
+          priceC *
+          (1 -
+            (isMainStream
+              ? marginConfigTokens.min_safety_buffer
+              : marginConfigTokensMEME.min_safety_buffer) /
+              10000)) /
         (sizeValueShort + holding);
       if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
     }
@@ -324,7 +344,9 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
   const calculateMaxRemovable = () => {
     const tokenCInfoBalance = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
     const tokenDInfoBalance = parseTokenValue(rowData.data.token_d_info.balance, decimalsD);
-    const maxLeverage = marginConfigTokens["max_leverage_rate"];
+    const maxLeverage = isMainStream
+      ? marginConfigTokens["max_leverage_rate"]
+      : marginConfigTokensMEME["max_leverage_rate"];
     let left = 0;
     let right = tokenCInfoBalance;
     let result = 0;

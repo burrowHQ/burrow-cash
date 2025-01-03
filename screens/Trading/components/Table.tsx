@@ -81,7 +81,10 @@ const TradingTable = ({
   const { getPositionType, marginConfigTokens } = useMarginConfigToken();
   const accountSupplied = useAppSelector(getMarginAccountSupplied);
   const accountSuppliedMEME = useAppSelector(getMarginAccountSuppliedMEME);
-  const combinedAccountSupplied = [...accountSupplied, ...accountSuppliedMEME];
+  const combinedAccountSupplied = [
+    ...accountSupplied.map((token) => ({ ...token, type: "main" })),
+    ...accountSuppliedMEME.map((token) => ({ ...token, type: "meme" })),
+  ];
   const [isLoadingWithdraw, setIsLoadingWithdraw] = useState(false);
   const isAccountDetailsOpen = useAppSelector((state) => state.tab.isAccountDetailsOpen);
   const [sortBy, setSortBy] = useState<string | null>("open_ts");
@@ -181,10 +184,8 @@ const TradingTable = ({
   }, [marginAccountList]);
 
   const filteredAccountSupplied = combinedAccountSupplied.filter((token) => {
-    const isMainStream = filteredTokenTypeMap.mainStream.includes(token.token_id);
-    const assetDetails = isMainStream
-      ? getAssetById(token.token_id)
-      : getAssetByIdMEME(token.token_id);
+    const assetDetails =
+      token.type === "main" ? getAssetById(token.token_id) : getAssetByIdMEME(token.token_id);
     return token.balance.toString().length >= assetDetails.config.extra_decimals;
   });
 
@@ -750,10 +751,10 @@ const TradingTable = ({
               <tbody>
                 {filteredAccountSupplied.length > 0 ? (
                   filteredAccountSupplied.map((token, index) => {
-                    const isMainStream = filteredTokenTypeMap.mainStream.includes(token.token_id);
-                    const assetDetails = isMainStream
-                      ? getAssetById(token.token_id)
-                      : getAssetByIdMEME(token.token_id);
+                    const assetDetails =
+                      token.type === "main"
+                        ? getAssetById(token.token_id)
+                        : getAssetByIdMEME(token.token_id);
                     const marginAssetDetails = getAssetDetails(assetDetails);
                     return (
                       <tr key={index} className="text-base hover:bg-dark-100 font-normal">
