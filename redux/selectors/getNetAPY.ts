@@ -55,7 +55,7 @@ export const getNetAPY = ({
         totalCollateral +
         totalSupplied -
         totalBorrowed -
-        (isStaking ? Number(amount || 0) * (booster_token_asset.price?.usd || 0) : 0);
+        (isStaking ? Number(amount || 0) * (booster_token_asset?.price?.usd || 0) : 0);
       const netAPY = (netGains / netTotals) * 100;
       return netAPY || 0;
     },
@@ -157,7 +157,7 @@ export const getNetTvlAPY = ({
         totalCollateral +
         totalSupplied -
         totalBorrowed -
-        (isStaking ? Number(amount || 0) * (booster_token_asset.price?.usd || 0) : 0);
+        (isStaking ? Number(amount || 0) * (booster_token_asset?.price?.usd || 0) : 0);
       let apy;
       if (new Decimal(netLiquidity).gt(0)) {
         apy = ((netTvlRewards * 365) / netLiquidity) * 100;
