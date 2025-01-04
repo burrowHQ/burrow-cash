@@ -197,8 +197,8 @@ const Trading = () => {
       try {
         const response = await DataSource.shared.getMarginTradingTokenVolumeStatistics(id);
         setVolumeStats({
-          totalVolume: response.data.totalVolume || 0,
-          volume24h: response.data.volume24h || 0,
+          totalVolume: response.data.total_volume || 0,
+          volume24h: response.data["24h_volume"] || 0,
           long: response.data.long_open_volume || 0,
           short: response.data.short_open_volume || 0,
         });
