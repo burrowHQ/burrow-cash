@@ -64,7 +64,7 @@ const Index = () => {
       />
     );
   } else {
-    overviewNode = (
+    const unLoginUi = (
       <div className="bg-gray-800 p-4 mb-4 rounded md:bg-transparent md:p-0 md:mb-0 md:flex justify-between items-center">
         <div>
           <div className="h3 mb-2">Connect your wallet</div>
@@ -80,6 +80,8 @@ const Index = () => {
         </div>
       </div>
     );
+    overviewNode = unLoginUi;
+    overviewNodeMEME = unLoginUi;
   }
   let supplyBorrowNode;
   let supplyBorrowNodeMEME;

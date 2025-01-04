@@ -5,7 +5,7 @@ import { BeatLoader } from "react-spinners";
 import { fetchAssets, fetchRefPrices } from "../../redux/assetsSlice";
 import { fetchAssetsMEME } from "../../redux/assetsSliceMEME";
 import { logoutAccount, fetchAccount, setAccountId } from "../../redux/accountSlice";
-import { fetchAccountMEME } from "../../redux/accountSliceMEME";
+import { logoutAccount as logoutAccountMEME, fetchAccountMEME } from "../../redux/accountSliceMEME";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { getBurrow, accountTrim } from "../../utils";
 import { hideModal as _hideModal } from "../../redux/appSlice";
@@ -56,6 +56,7 @@ const WalletButton = () => {
 
   const signOut = () => {
     dispatch(logoutAccount());
+    dispatch(logoutAccountMEME());
   };
 
   const onMount = async () => {
@@ -100,7 +101,7 @@ const WalletButton = () => {
   };
   const handleSwitchWallet = async () => {
     await handleSignOut();
-    window.modal.show();
+    // window.modal.show();
   };
 
   const getUnClaimRewards = () => formatWithCommas_usd(rewards.totalUnClaimUSD);

@@ -20,7 +20,7 @@ import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { fetchAssets, fetchRefPrices } from "../redux/assetsSlice";
 import { fetchAssetsMEME } from "../redux/assetsSliceMEME";
 import { fetchAccount, logoutAccount } from "../redux/accountSlice";
-import { fetchAccountMEME } from "../redux/accountSliceMEME";
+import { fetchAccountMEME, logoutAccount as logoutAccountMEME } from "../redux/accountSliceMEME";
 import { fetchConfig } from "../redux/appSlice";
 import { fetchConfig as fetchMemeConfig } from "../redux/appSliceMEME";
 import { fetchMarginAccount } from "../redux/marginAccountSlice";
@@ -160,7 +160,7 @@ function Upgrade({ Component, pageProps }) {
       await dispatch(fetchAccountMEME());
     } else {
       await dispatch(logoutAccount());
-      // await dispatch(logoutAccountMEME());
+      await dispatch(logoutAccountMEME());
     }
   }
   return (
