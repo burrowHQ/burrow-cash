@@ -3,7 +3,6 @@ import { createSelector } from "@reduxjs/toolkit";
 import { shrinkToken, PERCENT_DIGITS } from "../../store";
 import { RootState } from "../store";
 import { hasAssets } from "../utils";
-import { isMemeCategory } from "../../utils";
 import { toDecimal } from "../../utils/uiNumber";
 import { lpTokenPrefix, DEFAULT_POSITION } from "../../utils/config";
 
@@ -13,10 +12,11 @@ export const getCollateralAmount = (tokenId: string, memeCategory?: boolean) =>
     (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account,
     (state: RootState) => state.accountMEME,
-    (assetsMain, assetsMEME, accountMain, accountMEME) => {
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, category) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {
-        isMeme = isMemeCategory();
+        isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
       }

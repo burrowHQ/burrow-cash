@@ -2,12 +2,12 @@ import { useAppSelector, useAppDispatch } from "../redux/hooks";
 import { isClaiming } from "../redux/accountSelectors";
 import { farmClaimAll, fetchAccount } from "../redux/accountSlice";
 import { farmClaimAllMEME, fetchAccountMEME } from "../redux/accountSliceMEME";
-import { isMemeCategory } from "../utils";
+import { isMemeCategory } from "../redux/categorySelectors";
 
 export function useClaimAllRewards() {
   const isLoading = useAppSelector(isClaiming);
   const dispatch = useAppDispatch();
-  const isMeme = isMemeCategory();
+  const isMeme = useAppSelector(isMemeCategory);
 
   const handleClaimAll = () => {
     if (isMeme) {

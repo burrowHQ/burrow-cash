@@ -58,12 +58,12 @@ import { useTokenDetails } from "../../hooks/useTokenDetails";
 import { IToken } from "../../interfaces/asset";
 import LPTokenCell from "./LPTokenCell";
 import AvailableBorrowCell from "./AvailableBorrowCell";
-import { useAppDispatch } from "../../redux/hooks";
-import { isMemeCategory } from "../../utils/index";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { isMemeCategory } from "../../redux/categorySelectors";
 
 const DetailData = createContext(null) as any;
 const TokenDetail = () => {
-  const isMeme = isMemeCategory();
+  const isMeme = useAppSelector(isMemeCategory);
   const router = useRouter();
   const rows = useAvailableAssets();
   const { id } = router.query;
@@ -893,7 +893,7 @@ function TokenUserInfo() {
   const { tokenRow } = useContext(DetailData) as any;
   const { tokenId, tokens, isLpToken, price } = tokenRow;
   const accountId = useAccountId();
-  const isMeme = isMemeCategory();
+  const isMeme = useAppSelector(isMemeCategory);
   const isWrappedNear = tokenRow.symbol === "NEAR";
   const { supplyBalance, maxBorrowAmountPositions } = useUserBalance(tokenId, isWrappedNear);
   const handleSupplyClick = useSupplyTrigger(tokenId);
@@ -1107,7 +1107,7 @@ function YouSupplied() {
 function YouBorrowed() {
   const { tokenRow, borrowed, borrowedLp, assets } = useContext(DetailData) as any;
   const { tokenId } = tokenRow;
-  const isMeme = isMemeCategory();
+  const isMeme = useAppSelector(isMemeCategory);
   const [icons, totalDailyRewardsMoney] = borrowed?.rewards?.reduce(
     (acc, cur) => {
       const { rewards, metadata, config, price } = cur;

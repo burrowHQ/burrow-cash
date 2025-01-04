@@ -39,11 +39,11 @@ const Index = () => {
   ] = usePortfolioAssets(true);
   const [suppliedRows, borrowedRows, totalSuppliedUSD, totalBorrowedUSD, , borrowedAll] =
     usePortfolioAssets(false);
-  useEffect(() => {
-    return () => {
-      dispatch(setActiveCategory("main"));
-    };
-  }, [dispatch]);
+  // useEffect(() => {
+  //   return () => {
+  //     dispatch(setActiveCategory("main"));
+  //   };
+  // }, [dispatch]);
   const isMobile = isMobileDevice();
   const isMemeTab = activeTab !== "main";
   let overviewNodeMEME;

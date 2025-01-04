@@ -19,7 +19,7 @@ import { getCollateralAmount } from "../../redux/selectors/getCollateralAmount";
 import { TipIcon, CloseIcon, WarnIcon, JumpTipIcon, ArrowRight } from "./svg";
 import ReactToolTip from "../ToolTip";
 import { IToken } from "../../interfaces/asset";
-import { isMemeCategory } from "../../utils";
+import { isMemeCategory } from "../../redux/categorySelectors";
 
 export const USNInfo = () => (
   <Box mt="1rem">
@@ -183,8 +183,8 @@ export const BorrowLimit = ({ from, to }: { from: string | number; to: string | 
 export const CollateralSwitch = ({ action, canUseAsCollateral, tokenId }) => {
   const [collateralStatus, setCollateralStatus] = useState<boolean>(true);
   const dispatch = useAppDispatch();
+  const isMeme = useAppSelector(isMemeCategory);
   const showToggle = action === "Supply";
-  const isMeme = isMemeCategory();
   useEffect(() => {
     if (!canUseAsCollateral) {
       if (isMeme) {
@@ -353,7 +353,7 @@ export const AlertError = ({ title, className }: { title: string; className?: st
 
 export function useWithdrawTrigger(tokenId: string) {
   const dispatch = useAppDispatch();
-  const isMeme = isMemeCategory();
+  const isMeme = useAppSelector(isMemeCategory);
   return () => {
     if (isMeme) {
       dispatch(showModalMEME({ action: "Withdraw", tokenId, amount: "0" }));
@@ -365,9 +365,10 @@ export function useWithdrawTrigger(tokenId: string) {
 
 export function useAdjustTrigger(tokenId: string, memeCategory?: boolean) {
   const dispatch = useAppDispatch();
+  const isMemeCur = useAppSelector(isMemeCategory);
   let isMeme: boolean;
   if (memeCategory == undefined) {
-    isMeme = isMemeCategory();
+    isMeme = isMemeCur;
   } else {
     isMeme = memeCategory;
   }
@@ -383,7 +384,7 @@ export function useAdjustTrigger(tokenId: string, memeCategory?: boolean) {
 
 export function useSupplyTrigger(tokenId: string) {
   const dispatch = useAppDispatch();
-  const isMeme = isMemeCategory();
+  const isMeme = useAppSelector(isMemeCategory);
   return () => {
     if (isMeme) {
       dispatch(showModalMEME({ action: "Supply", tokenId, amount: "0" }));
@@ -395,7 +396,7 @@ export function useSupplyTrigger(tokenId: string) {
 
 export function useBorrowTrigger(tokenId: string) {
   const dispatch = useAppDispatch();
-  const isMeme = isMemeCategory();
+  const isMeme = useAppSelector(isMemeCategory);
   return () => {
     if (isMeme) {
       dispatch(showModalMEME({ action: "Borrow", tokenId, amount: "0" }));
@@ -407,7 +408,7 @@ export function useBorrowTrigger(tokenId: string) {
 
 export function useRepayTrigger(tokenId: string, position?: string) {
   const dispatch = useAppDispatch();
-  const isMeme = isMemeCategory();
+  const isMeme = useAppSelector(isMemeCategory);
   return () => {
     if (isMeme) {
       dispatch(showModalMEME({ action: "Repay", tokenId, amount: "0", position }));

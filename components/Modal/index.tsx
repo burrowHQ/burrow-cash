@@ -42,7 +42,7 @@ import Action from "./Action";
 import { fetchAssets, fetchRefPrices } from "../../redux/assetsSlice";
 import { fetchAssetsMEME } from "../../redux/assetsSliceMEME";
 import { useDegenMode } from "../../hooks/hooks";
-import { isMemeCategory } from "../../utils/index";
+import { isMemeCategory } from "../../redux/categorySelectors";
 import {
   CollateralTypeSelectorBorrow,
   CollateralTypeSelectorRepay,
@@ -51,6 +51,7 @@ import {
 export const ModalContext = createContext(null) as any;
 const Modal = () => {
   const dispatch = useAppDispatch();
+  const isMeme = useAppSelector(isMemeCategory);
   const isOpen = useAppSelector(getModalStatus);
   const accountId = useAppSelector(getAccountId);
   const asset = useAppSelector(getAssetData);
@@ -113,7 +114,6 @@ const Modal = () => {
     }
   }, [position]);
   useEffect(() => {
-    const isMeme = isMemeCategory();
     if (isMeme) {
       dispatch(updateAmountMEME({ isMax: false, amount: "0" }));
       dispatch(updatePositionMEME({ position: selectedCollateralType }));
@@ -121,7 +121,7 @@ const Modal = () => {
       dispatch(updateAmount({ isMax: false, amount: "0" }));
       dispatch(updatePosition({ position: selectedCollateralType }));
     }
-  }, [selectedCollateralType]);
+  }, [selectedCollateralType, isMeme]);
   if (action === "Adjust") {
     rates.push({
       label: "Use as Collateral",
@@ -130,7 +130,6 @@ const Modal = () => {
     });
   }
   const handleClose = () => {
-    const isMeme = isMemeCategory();
     if (isMeme) {
       dispatch(hideModalMEME());
     } else {

@@ -6,7 +6,6 @@ import { digitalProcess } from "../../utils/uiNumber";
 import { UIAsset } from "../../interfaces";
 import { DEFAULT_POSITION } from "../../utils/config";
 import CollateralTypeName from "./CollateralTypeName";
-import { isMemeCategory } from "../../utils/index";
 
 export function CollateralTypeSelectorBorrow({
   maxBorrowAmountPositions,

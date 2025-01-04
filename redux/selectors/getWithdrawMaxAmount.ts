@@ -3,7 +3,7 @@ import { createSelector } from "@reduxjs/toolkit";
 
 import { RootState } from "../store";
 import { shrinkToken, expandTokenDecimal, MAX_RATIO } from "../../store";
-import { decimalMax, decimalMin, isMemeCategory } from "../../utils";
+import { decimalMax, decimalMin } from "../../utils";
 import { Assets } from "../assetState";
 import { Portfolio } from "../accountState";
 import { DEFAULT_POSITION, lpTokenPrefix } from "../../utils/config";
@@ -129,8 +129,9 @@ export const getWithdrawMaxAmount = (tokenId: string) =>
     (state: RootState) => state.assetsMEME.data,
     (state: RootState) => state.account.portfolio,
     (state: RootState) => state.accountMEME.portfolio,
-    (appMain, appMEME, assetsMain, assetsMEME, portfolioMain, portfolioMEME) => {
-      const isMeme = isMemeCategory();
+    (state: RootState) => state.category,
+    (appMain, appMEME, assetsMain, assetsMEME, portfolioMain, portfolioMEME, category) => {
+      const isMeme = category.activeCategory == "meme";
       let assets: typeof assetsMain;
       let portfolio: typeof portfolioMain;
       let app: typeof appMain;

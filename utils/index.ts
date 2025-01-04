@@ -372,9 +372,9 @@ interface IFarms {
 export function isMemeCategory() {
   const state = store.getState();
   const category = state.category.activeCategory;
-  const url = new URL(window.location.href);
-  const search = new URLSearchParams(url.search);
-  if (search.get("pageType") == "meme") return true;
+  // const url = new URL(window.location.href);
+  // const search = new URLSearchParams(url.search);
+  // if (search.get("pageType") == "meme") return true;
   if (category == "meme") return true;
   return false;
 }

@@ -3,7 +3,7 @@ import Decimal from "decimal.js";
 import { RootState } from "../store";
 import { shrinkToken } from "../../store";
 import { Farm } from "../accountState";
-import { filterAccountSentOutFarms, standardizeAsset, isMemeCategory } from "../../utils/index";
+import { filterAccountSentOutFarms, standardizeAsset } from "../../utils/index";
 
 export const getListTokenNetRewardApy = () =>
   createSelector(
@@ -11,8 +11,9 @@ export const getListTokenNetRewardApy = () =>
     (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account,
     (state: RootState) => state.accountMEME,
-    (assetsMain, assetsMEME, accountMain, accountMEME) => {
-      const isMeme = isMemeCategory();
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, category) => {
+      const isMeme = category.activeCategory == "meme";
       let assets: typeof assetsMain;
       let account: typeof accountMain;
       if (isMeme) {

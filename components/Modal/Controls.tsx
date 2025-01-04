@@ -1,17 +1,16 @@
 import Decimal from "decimal.js";
 import { updateAmount } from "../../redux/appSlice";
 import { updateAmount as updateAmountMEME } from "../../redux/appSliceMEME";
-import { useAppDispatch } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { formatWithCommas_number } from "../../utils/uiNumber";
 import RangeSlider from "./RangeSlider";
 import TokenBox from "./TokenBox";
-import { isMemeCategory } from "../../utils";
+import { isMemeCategory } from "../../redux/categorySelectors";
 
 export default function Controls({ amount, available, action, asset, totalAvailable, available$ }) {
   const dispatch = useAppDispatch();
-
+  const isMeme = useAppSelector(isMemeCategory);
   const handleInputChange = (e) => {
-    const isMeme = isMemeCategory();
     const { value } = e.target;
     const numRegex = /^([0-9]*\.?[0-9]*$)/;
     if (!numRegex.test(value) || Number(value) > Number(available)) {
@@ -26,7 +25,6 @@ export default function Controls({ amount, available, action, asset, totalAvaila
   };
 
   const handleSliderChange = (percent) => {
-    const isMeme = isMemeCategory();
     const p = percent < 1 ? 0 : percent > 99 ? 100 : percent;
     const value = new Decimal(available).mul(p).div(100).toFixed();
     if (isMeme) {

@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import Decimal from "decimal.js";
-import { nearTokenId, isMemeCategory } from "../../utils";
+import { nearTokenId } from "../../utils";
 import { toggleUseAsCollateral, hideModal } from "../../redux/appSlice";
 import {
   toggleUseAsCollateral as toggleUseAsCollateralMEME,
@@ -17,6 +17,7 @@ import { shadow_action_supply } from "../../store/actions/shadow";
 import { adjustCollateral } from "../../store/actions/adjustCollateral";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { getSelectedValues, getAssetData, getConfig } from "../../redux/appSelectors";
+import { isMemeCategory } from "../../redux/categorySelectors";
 import { trackActionButton } from "../../utils/telemetry";
 import { useDegenMode } from "../../hooks/hooks";
 import { SubmitButton } from "./components";
@@ -31,7 +32,7 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
   const asset = useAppSelector(getAssetData);
   const { action = "Deposit", tokenId, borrowApy, price, portfolio, isLpToken, position } = asset;
   const { isRepayFromDeposits } = useDegenMode();
-  const isMeme = isMemeCategory();
+  const isMeme = useAppSelector(isMemeCategory);
   const { available, canUseAsCollateral, extraDecimals, collateral, disabled, decimals } =
     getModalData({
       ...asset,
@@ -46,7 +47,6 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
   );
   useEffect(() => {
     if (!canUseAsCollateral) {
-      const isMeme = isMemeCategory();
       if (isMeme) {
         dispatch(toggleUseAsCollateralMEME({ useAsCollateral: false }));
       } else {

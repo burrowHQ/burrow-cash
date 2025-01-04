@@ -2,7 +2,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import Decimal from "decimal.js";
 import { RootState } from "../store";
 import { shrinkToken } from "../../store";
-import { isMemeCategory, filterAccountSentOutFarms } from "../../utils";
+import { filterAccountSentOutFarms } from "../../utils";
 import { Farm } from "../accountState";
 
 export const getAverageBorrowedRewardApy = () =>
@@ -11,8 +11,9 @@ export const getAverageBorrowedRewardApy = () =>
     (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account,
     (state: RootState) => state.accountMEME,
-    (assetsMain, assetsMEME, accountMain, accountMEME) => {
-      const isMeme = isMemeCategory();
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, category) => {
+      const isMeme = category.activeCategory == "meme";
       let assets: typeof assetsMain;
       let account: typeof accountMain;
       if (isMeme) {

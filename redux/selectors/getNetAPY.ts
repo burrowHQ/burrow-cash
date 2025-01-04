@@ -6,7 +6,6 @@ import { hasAssets } from "../utils";
 import { getExtraDailyTotals } from "./getExtraDailyTotals";
 import { getAccountRewards, getGains, getGainsArr } from "./getAccountRewards";
 import { getProtocolRewards } from "./getProtocolRewards";
-import { isMemeCategory } from "../../utils";
 
 export const getNetAPY = ({
   isStaking = false,
@@ -22,11 +21,12 @@ export const getNetAPY = ({
     (state: RootState) => state.accountMEME,
     (state: RootState) => state.app,
     (state: RootState) => state.appMEME,
+    (state: RootState) => state.category,
     getExtraDailyTotals({ isStaking }),
-    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, extraDaily) => {
+    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category, extraDaily) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {
-        isMeme = isMemeCategory();
+        isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
       }
@@ -67,11 +67,12 @@ export const getYourNetAPY = (memeCategory?: boolean) =>
     (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account,
     (state: RootState) => state.accountMEME,
+    (state: RootState) => state.category,
     getExtraDailyTotals({ isStaking: false }),
-    (assetsMain, assetsMEME, accountMain, accountMEME, extraDaily) => {
+    (assetsMain, assetsMEME, accountMain, accountMEME, category, extraDaily) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {
-        isMeme = isMemeCategory();
+        isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
       }
@@ -120,11 +121,12 @@ export const getNetTvlAPY = ({
     (state: RootState) => state.accountMEME,
     (state: RootState) => state.app,
     (state: RootState) => state.appMEME,
+    (state: RootState) => state.category,
     getAccountRewards(),
-    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, rewards) => {
+    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category, rewards) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {
-        isMeme = isMemeCategory();
+        isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
       }

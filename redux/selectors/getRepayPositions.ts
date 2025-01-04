@@ -2,7 +2,6 @@ import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { hasAssets } from "../utils";
 import { shrinkToken } from "../../store";
-import { isMemeCategory } from "../../utils";
 
 export const getRepayPositions = (tokenId: string) =>
   createSelector(
@@ -10,8 +9,9 @@ export const getRepayPositions = (tokenId: string) =>
     (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account,
     (state: RootState) => state.accountMEME,
-    (assetsMain, assetsMEME, accountMain, accountMEME) => {
-      const isMeme = isMemeCategory();
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, category) => {
+      const isMeme = category.activeCategory == "meme";
       let assets: typeof assetsMain;
       let account: typeof accountMain;
       if (isMeme) {

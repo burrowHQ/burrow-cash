@@ -4,7 +4,6 @@ import { createSelector } from "@reduxjs/toolkit";
 import type { RootState } from "./store";
 import { hiddenAssets } from "../utils/config";
 import { toUsd, transformAsset } from "./utils";
-import { isMemeCategory } from "../utils";
 
 export const getAvailableAssets = ({ source }: { source?: "supply" | "borrow" | "" }) =>
   createSelector(
@@ -14,8 +13,9 @@ export const getAvailableAssets = ({ source }: { source?: "supply" | "borrow" | 
     (state: RootState) => state.accountMEME,
     (state: RootState) => state.app,
     (state: RootState) => state.appMEME,
-    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME) => {
-      const isMeme = isMemeCategory();
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category) => {
+      const isMeme = category.activeCategory == "meme";
       let app: typeof appMain;
       let assets: typeof assetsMain;
       let account: typeof accountMain;
@@ -63,10 +63,11 @@ export const getAssetsCategory = (memeCategory?: boolean) => {
   return createSelector(
     (state: RootState) => state.assets,
     (state: RootState) => state.assetsMEME,
-    (assetsMain, assetsMEME) => {
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, category) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {
-        isMeme = isMemeCategory();
+        isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
       }
@@ -93,8 +94,9 @@ export const getTotalSupplyAndBorrowUSD = (tokenId: string) =>
   createSelector(
     (state: RootState) => state.assets,
     (state: RootState) => state.assetsMEME,
-    (assetsMain, assetsMEME) => {
-      const isMeme = isMemeCategory();
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, category) => {
+      const isMeme = category.activeCategory == "meme";
       let assets: typeof assetsMain;
       if (isMeme) {
         assets = assetsMEME;

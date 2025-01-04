@@ -2,7 +2,6 @@ import { createSelector } from "@reduxjs/toolkit";
 
 import { shrinkToken, PERCENT_DIGITS, NEAR_DECIMALS } from "../store";
 import type { RootState } from "./store";
-import { isMemeCategory } from "../utils";
 
 export const getAccountId = createSelector(
   (state: RootState) => state.account,
@@ -13,10 +12,11 @@ export const getAccountPortfolio = (memeCategory?: boolean) => {
   return createSelector(
     (state: RootState) => state.account,
     (state: RootState) => state.accountMEME,
-    (accountMain, accountMEME) => {
+    (state: RootState) => state.category,
+    (accountMain, accountMEME, category) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {
-        isMeme = isMemeCategory();
+        isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
       }

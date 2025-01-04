@@ -5,7 +5,6 @@ import { RootState } from "../store";
 import { hasAssets } from "../utils";
 import { getAdjustedSum } from "./getWithdrawMaxAmount";
 import { DEFAULT_POSITION } from "../../utils/config";
-import { isMemeCategory } from "../../utils";
 
 export const LOW_HEALTH_FACTOR = 180;
 export const DANGER_HEALTH_FACTOR = 100;
@@ -16,10 +15,11 @@ export const getHealthFactor = (memeCategory?: boolean) => {
     (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account.portfolio,
     (state: RootState) => state.accountMEME.portfolio,
-    (assetsMain, assetsMEME, portfolioMain, portfolioMEME) => {
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, portfolioMain, portfolioMEME, category) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {
-        isMeme = isMemeCategory();
+        isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
       }
@@ -46,10 +46,11 @@ export const getLPHealthFactor = (memeCategory?: boolean) => {
     (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account.portfolio,
     (state: RootState) => state.accountMEME.portfolio,
-    (assetsMain, assetsMEME, portfolioMain, portfolioMEME) => {
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, portfolioMain, portfolioMEME, category) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {
-        isMeme = isMemeCategory();
+        isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
       }

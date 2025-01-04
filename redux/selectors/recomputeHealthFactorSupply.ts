@@ -6,7 +6,6 @@ import { RootState } from "../store";
 import { hasAssets } from "../utils";
 import { getAdjustedSum } from "./getWithdrawMaxAmount";
 import { DEFAULT_POSITION } from "../../utils/config";
-import { isMemeCategory } from "../../utils";
 
 export const recomputeHealthFactorSupply = (tokenId: string, amount: number) =>
   createSelector(
@@ -16,8 +15,9 @@ export const recomputeHealthFactorSupply = (tokenId: string, amount: number) =>
     (state: RootState) => state.accountMEME,
     (state: RootState) => state.app,
     (state: RootState) => state.appMEME,
-    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME) => {
-      const isMeme = isMemeCategory();
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category) => {
+      const isMeme = category.activeCategory == "meme";
       let assets: typeof assetsMain;
       let account: typeof accountMain;
       let app: typeof appMain;

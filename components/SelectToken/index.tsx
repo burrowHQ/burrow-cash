@@ -16,7 +16,7 @@ import { toggleUseAsCollateral as toggleUseAsCollateralMEME } from "../../redux/
 import { IToken } from "../../interfaces/asset";
 import { DEFAULT_POSITION } from "../../utils/config";
 import { ModalContext } from "../Modal/index";
-import { isMemeCategory } from "../../utils/index";
+import { isMemeCategory } from "../../redux/categorySelectors";
 
 export type IAssetType = "borrow" | "supply";
 type IBalance = { supply_balance?: string; borrow_balance?: string };
@@ -125,7 +125,7 @@ function TokenRow({
     isLpToken,
     tokens,
   } = asset;
-  const isMeme = isMemeCategory();
+  const isMeme = useAppSelector(isMemeCategory);
   const handleSupplyClick = useSupplyTrigger(tokenId);
   const handleBorrowClick = useBorrowTrigger(tokenId);
   const selected = useAppSelector(getModalData);

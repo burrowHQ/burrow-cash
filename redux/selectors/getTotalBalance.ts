@@ -2,7 +2,6 @@ import { createSelector } from "@reduxjs/toolkit";
 
 import { RootState } from "../store";
 import { toUsd, sumReducer, hasAssets } from "../utils";
-import { isMemeCategory } from "../../utils";
 
 export const getTotalBalance = ({
   source,
@@ -16,10 +15,11 @@ export const getTotalBalance = ({
   createSelector(
     (state: RootState) => state.assets,
     (state: RootState) => state.assetsMEME,
-    (assetsMain, assetsMEME) => {
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, category) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {
-        isMeme = isMemeCategory();
+        isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
       }

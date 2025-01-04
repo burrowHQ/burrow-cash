@@ -5,7 +5,6 @@ import { MAX_RATIO } from "../../store";
 import { RootState } from "../store";
 import { hasAssets, transformAsset } from "../utils";
 import { Assets } from "../assetState";
-import { isMemeCategory } from "../../utils";
 import { getAdjustedSum } from "./getWithdrawMaxAmount";
 import { DEFAULT_POSITION } from "../../utils/config";
 import { UIAsset } from "../../interfaces";
@@ -50,8 +49,9 @@ export const getBorrowMaxAmount = (tokenId: string) =>
     (state: RootState) => state.accountMEME,
     (state: RootState) => state.app,
     (state: RootState) => state.appMEME,
-    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME) => {
-      const isMeme = isMemeCategory();
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category) => {
+      const isMeme = category.activeCategory == "meme";
       let assets: typeof assetsMain;
       let account: typeof accountMain;
       let app: typeof appMain;

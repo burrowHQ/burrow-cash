@@ -18,9 +18,7 @@ import {
   standardizeAsset,
   filterAccountSentOutFarms,
   filterAccountAllSentOutFarms,
-  isMemeCategory,
 } from "../../utils/index";
-import { lpTokenPrefix, DEFAULT_POSITION } from "../../utils/config";
 
 export interface IPortfolioReward {
   icon: string;
@@ -350,11 +348,12 @@ export const getAccountRewards = (memeCategory?: boolean) => {
     (state: RootState) => state.accountMEME,
     (state: RootState) => state.app,
     (state: RootState) => state.appMEME,
+    (state: RootState) => state.category,
     getStaking,
-    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, stakingMain) => {
+    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category, stakingMain) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {
-        isMeme = isMemeCategory();
+        isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
       }
@@ -511,11 +510,12 @@ export const getAccountRewardsForApy = (memeCategory?: boolean) => {
     (state: RootState) => state.accountMEME,
     (state: RootState) => state.app,
     (state: RootState) => state.appMEME,
+    (state: RootState) => state.category,
     getStaking,
-    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, stakingMain) => {
+    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category, stakingMain) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {
-        isMeme = isMemeCategory();
+        isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
       }
@@ -651,11 +651,12 @@ export const getAccountBoostRatioData = (memeCategory?: boolean) => {
     (state: RootState) => state.accountMEME,
     (state: RootState) => state.app,
     (state: RootState) => state.appMEME,
+    (state: RootState) => state.category,
     getStaking,
-    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, staking) => {
+    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category, staking) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {
-        isMeme = isMemeCategory();
+        isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
       }
@@ -718,8 +719,9 @@ export const getWeightedNetLiquidity = createSelector(
   (state: RootState) => state.assetsMEME,
   (state: RootState) => state.account,
   (state: RootState) => state.accountMEME,
-  (assetsMain, assetsMEME, accountMain, accountMEME) => {
-    const isMeme = isMemeCategory();
+  (state: RootState) => state.category,
+  (assetsMain, assetsMEME, accountMain, accountMEME, category) => {
+    const isMeme = category.activeCategory == "meme";
     let assets: typeof assetsMain;
     let account: typeof accountMain;
     if (isMeme) {
@@ -750,8 +752,9 @@ export const getWeightedNetLiquidity = createSelector(
 export const getWeightedAssets = createSelector(
   (state: RootState) => state.assets,
   (state: RootState) => state.assetsMEME,
-  (assetsMain, assetsMEME) => {
-    const isMeme = isMemeCategory();
+  (state: RootState) => state.category,
+  (assetsMain, assetsMEME, category) => {
+    const isMeme = category.activeCategory == "meme";
     let assets: typeof assetsMain;
     if (isMeme) {
       assets = assetsMEME;
@@ -772,10 +775,11 @@ export const getAccountDailyRewards = (memeCategory?: boolean) => {
     (state: RootState) => state.accountMEME,
     (state: RootState) => state.app,
     (state: RootState) => state.appMEME,
-    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME) => {
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {
-        isMeme = isMemeCategory();
+        isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
       }

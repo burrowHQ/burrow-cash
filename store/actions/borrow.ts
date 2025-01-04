@@ -1,16 +1,10 @@
 import BN from "bn.js";
 
 import { getBurrow, nearTokenId } from "../../utils";
-import { expandToken, expandTokenDecimal, registerAccountOnTokenWithQuery } from "../helper";
-import {
-  ChangeMethodsNearToken,
-  ChangeMethodsOracle,
-  ChangeMethodsToken,
-  ChangeMethodsLogic,
-} from "../../interfaces";
-import { Transaction, isRegistered } from "../wallet";
+import { expandTokenDecimal, registerAccountOnTokenWithQuery } from "../helper";
+import { ChangeMethodsNearToken, ChangeMethodsOracle, ChangeMethodsLogic } from "../../interfaces";
+import { Transaction } from "../wallet";
 import { prepareAndExecuteTransactions, getMetadata, getTokenContract } from "../tokens";
-import { NEAR_DECIMALS, NO_STORAGE_DEPOSIT_CONTRACTS, NEAR_STORAGE_DEPOSIT } from "../constants";
 import { DEFAULT_POSITION } from "../../utils/config";
 import { store } from "../../redux/store";
 

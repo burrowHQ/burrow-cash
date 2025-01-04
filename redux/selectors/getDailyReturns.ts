@@ -2,7 +2,6 @@ import { createSelector } from "@reduxjs/toolkit";
 
 import { RootState } from "../store";
 import { hasAssets } from "../utils";
-import { isMemeCategory } from "../../utils";
 import { getExtraDailyTotals } from "./getExtraDailyTotals";
 import { getAccountRewards, getGains } from "./getAccountRewards";
 
@@ -12,12 +11,13 @@ export const getDailyReturns = (memeCategory) => {
     (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account,
     (state: RootState) => state.accountMEME,
+    (state: RootState) => state.category,
     getExtraDailyTotals({ isStaking: false, memeCategory }),
     getAccountRewards(memeCategory),
-    (assetsMain, assetsMEME, accountMain, accountMEME, extraDaily, rewards) => {
+    (assetsMain, assetsMEME, accountMain, accountMEME, category, extraDaily, rewards) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {
-        isMeme = isMemeCategory();
+        isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
       }

@@ -3,7 +3,6 @@ import { createSelector } from "@reduxjs/toolkit";
 import { shrinkToken } from "../../store";
 import { RootState } from "../store";
 import { sumReducer, hasAssets } from "../utils";
-import { isMemeCategory } from "../../utils";
 
 export const getTotalAccountBalance = (source: "borrowed" | "supplied", memeCategory?: boolean) =>
   createSelector(
@@ -11,10 +10,11 @@ export const getTotalAccountBalance = (source: "borrowed" | "supplied", memeCate
     (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account,
     (state: RootState) => state.accountMEME,
-    (assetsMain, assetsMEME, accountMain, accountMEME) => {
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, category) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {
-        isMeme = isMemeCategory();
+        isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
       }

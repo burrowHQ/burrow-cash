@@ -21,7 +21,8 @@ import {
   setRepayFrom as setRepayFromMEME,
   setUnreadLiquidation as setUnreadLiquidationMEME,
 } from "../redux/appSliceMEME";
-import { getViewAs, isMemeCategory } from "../utils";
+import { getViewAs } from "../utils";
+import { isMemeCategory } from "../redux/categorySelectors";
 import { getWeightedAssets, getWeightedNetLiquidity } from "../redux/selectors/getAccountRewards";
 import { getLiquidations } from "../api/get-liquidations";
 
@@ -81,7 +82,7 @@ export function useDegenMode() {
   };
 
   const setRepayFromDeposits = (repayFromDeposits: boolean) => {
-    const isMeme = isMemeCategory();
+    const isMeme = useAppSelector(isMemeCategory);
     if (isMeme) {
       dispatch(setRepayFromMEME({ repayFromDeposits }));
     } else {
@@ -112,9 +113,10 @@ export function useUnreadLiquidation({
   liquidationPage?: number;
   memeCategory?: boolean;
 }) {
+  const isMemeCur = useAppSelector(isMemeCategory);
   let isMeme: boolean;
   if (memeCategory == undefined) {
-    isMeme = isMemeCategory();
+    isMeme = isMemeCur;
   } else {
     isMeme = memeCategory;
   }

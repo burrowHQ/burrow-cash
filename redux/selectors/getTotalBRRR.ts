@@ -3,7 +3,6 @@ import { createSelector } from "@reduxjs/toolkit";
 import { shrinkToken } from "../../store";
 import { RootState } from "../store";
 import { sumReducer } from "../utils";
-import { isMemeCategory } from "../../utils";
 
 export const getTotalBRRR = (memeCategory?: boolean) => {
   return createSelector(
@@ -13,10 +12,11 @@ export const getTotalBRRR = (memeCategory?: boolean) => {
     (state: RootState) => state.accountMEME,
     (state: RootState) => state.app,
     (state: RootState) => state.appMEME,
-    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME) => {
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {
-        isMeme = isMemeCategory();
+        isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
       }

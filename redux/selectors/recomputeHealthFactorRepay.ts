@@ -6,7 +6,6 @@ import { expandTokenDecimal, MAX_RATIO } from "../../store";
 import { RootState } from "../store";
 import { hasAssets } from "../utils";
 import { getAdjustedSum } from "./getWithdrawMaxAmount";
-import { isMemeCategory } from "../../utils";
 
 export const recomputeHealthFactorRepay = (tokenId: string, amount: number, position: string) =>
   createSelector(
@@ -14,8 +13,9 @@ export const recomputeHealthFactorRepay = (tokenId: string, amount: number, posi
     (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account,
     (state: RootState) => state.accountMEME,
-    (assetsMain, assetsMEME, accountMain, accountMEME) => {
-      const isMeme = isMemeCategory();
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, category) => {
+      const isMeme = category.activeCategory == "meme";
       let assets: typeof assetsMain;
       let account: typeof accountMain;
       if (isMeme) {

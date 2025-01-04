@@ -3,7 +3,7 @@ import { RootState } from "../store";
 import { shrinkToken } from "../../store";
 import { toUsd } from "../utils";
 import { AssetsState } from "../assetState";
-import { filterAccountSentOutFarms, isMemeCategory } from "../../utils/index";
+import { filterAccountSentOutFarms } from "../../utils/index";
 
 export const getAverageNetRewardApy = () =>
   createSelector(
@@ -11,8 +11,9 @@ export const getAverageNetRewardApy = () =>
     (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account,
     (state: RootState) => state.accountMEME,
-    (assetsMain, assetsMEME, accountMain, accountMEME) => {
-      const isMeme = isMemeCategory();
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, category) => {
+      const isMeme = category.activeCategory == "meme";
       let assets: typeof assetsMain;
       let account: typeof accountMain;
       if (isMeme) {

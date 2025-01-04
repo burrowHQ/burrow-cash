@@ -3,7 +3,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { shrinkToken } from "../../store";
 import { RootState } from "../store";
 import { INetTvlFarmReward } from "../../interfaces/asset";
-import { filterSentOutFarms, isMemeCategory } from "../../utils/index";
+import { filterSentOutFarms } from "../../utils/index";
 
 interface IProtocolReward {
   icon: string;
@@ -20,10 +20,11 @@ export const getProtocolRewards = (memeCategory?: boolean) => {
   return createSelector(
     (state: RootState) => state.assets,
     (state: RootState) => state.assetsMEME,
-    (assetsMain, assetsMEME) => {
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, category) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {
-        isMeme = isMemeCategory();
+        isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
       }
@@ -63,11 +64,12 @@ export const getTokenNetBalanceRewards = (memeCategory) => {
   return createSelector(
     (state: RootState) => state.assets,
     (state: RootState) => state.assetsMEME,
-    (assetsMain, assetsMEME) => {
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, category) => {
       let assets: typeof assetsMain;
       let isMeme: boolean;
       if (memeCategory == undefined) {
-        isMeme = isMemeCategory();
+        isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
       }
@@ -116,8 +118,9 @@ export const getTokenNetBalanceRewards = (memeCategory) => {
 export const getNetLiquidityRewards = createSelector(
   (state: RootState) => state.assets,
   (state: RootState) => state.assetsMEME,
-  (assetsMain, assetsMEME) => {
-    const isMeme = isMemeCategory();
+  (state: RootState) => state.category,
+  (assetsMain, assetsMEME, category) => {
+    const isMeme = category.activeCategory == "meme";
     let assets: typeof assetsMain;
     if (isMeme) {
       assets = assetsMEME;
