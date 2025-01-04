@@ -109,10 +109,10 @@ const MarketMarginTrading = ({ hidden }: { hidden: boolean }) => {
         );
       } else if (sortBy === "shortPosition") {
         valueA = parseFloat(
-          shrinkToken(b.margin_debt.balance, b.metadata.decimals + a.config.extra_decimals) || "0",
+          shrinkToken(a.margin_debt.balance, a.metadata.decimals + a.config.extra_decimals) || "0",
         );
         valueB = parseFloat(
-          shrinkToken(a.margin_debt.balance, a.metadata.decimals + a.config.extra_decimals) || "0",
+          shrinkToken(b.margin_debt.balance, b.metadata.decimals + b.config.extra_decimals) || "0",
         );
       } else if (sortBy === "totalVolume") {
         valueA = a.totalVolume;
