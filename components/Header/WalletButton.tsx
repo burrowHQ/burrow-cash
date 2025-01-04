@@ -412,7 +412,7 @@ export const ConnectWalletButton = ({
           height: className?.includes("h-") ? undefined : "42px",
           borderRadius: "6px",
           ":hover": {
-            backgroundColor: "#D2FF3A",
+            backgroundColor: isShort ? "#FF6BA9" : "#D2FF3A",
             opacity: "0.8",
           },
           backgroundColor: isShort ? "#FF6BA9" : "#D2FF3A",

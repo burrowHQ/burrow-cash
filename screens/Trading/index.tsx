@@ -193,10 +193,12 @@ const Trading = () => {
   useEffect(() => {
     const fetchVolumeStats = async () => {
       try {
-        const response = await DataSource.shared.getMarginTradingVolumeStatistics();
+        const response = await DataSource.shared.getMarginTradingTokenVolumeStatistics(id);
         setVolumeStats({
           totalVolume: response.totalVolume || 0,
           volume24h: response.volume24h || 0,
+          long: response.long_open_volume || 0,
+          short: response.short_open_volume || 0,
         });
       } catch (error) {
         console.error("Failed to fetch volume statistics:", error);
@@ -208,7 +210,7 @@ const Trading = () => {
     const intervalId = setInterval(fetchVolumeStats, 10000); // Fetch every 10 seconds
 
     return () => clearInterval(intervalId); // Cleanup on unmount
-  }, []);
+  }, [id]);
 
   const [open, setOpen] = useState(false);
   //
@@ -222,7 +224,7 @@ const Trading = () => {
       ) : (
         <>
           {/* back */}
-          <Link href="/marginTrading">
+          <div onClick={() => router.push("/marginTrading")}>
             <div
               className="flex items-center text-sm text-gray-300 cursor-pointer lg:mb-8 xsm:m-2 xsm:mb-9"
               onClick={() => {
@@ -232,7 +234,7 @@ const Trading = () => {
               <ComeBackIcon />
               <p className="ml-3.5"> Margin Trading Markets</p>
             </div>
-          </Link>
+          </div>
           {/* main */}
           <div className="lg:grid lg:grid-cols-6 lg:mb-4 xsm:flex xsm:flex-col xsm:w-full xsm:box-border xsm:mb-4">
             {/* left charts */}
@@ -312,12 +314,12 @@ const Trading = () => {
                 {/* total v */}
                 <div className="text-sm">
                   <p className="text-gray-300  mb-1.5">Total Volume</p>
-                  <span>{formatWithCommas_usd(volumeStats.totalVolume)}</span>
+                  <span>{beautifyPrice(+volumeStats.totalVolume)}</span>
                 </div>
                 {/* 24h v */}
                 <div className="text-sm">
                   <p className="text-gray-300 mb-1.5">24H Volume</p>
-                  <span>{formatWithCommas_usd(volumeStats.volume24h)}</span>
+                  <span>{beautifyPrice(+volumeStats.volume24h)}</span>
                 </div>
                 {/* long short */}
                 <div className="text-sm">
@@ -403,12 +405,12 @@ const Trading = () => {
                 {/* total v */}
                 <div className="text-sm flex items-center justify-between">
                   <p className="text-gray-300  mb-1.5">Total Volume</p>
-                  <span>{formatWithCommas_usd(volumeStats.totalVolume)}</span>
+                  <span>{beautifyPrice(+volumeStats.totalVolume)}</span>
                 </div>
                 {/* 24h v */}
                 <div className="text-sm flex items-center justify-between my-[16px]">
                   <p className="text-gray-300 mb-1.5">24H Volume</p>
-                  <span>{formatWithCommas_usd(volumeStats.volume24h)}</span>
+                  <span>{beautifyPrice(+volumeStats.volume24h)}</span>
                 </div>
                 {/* long short */}
                 <div className="text-sm flex items-center justify-between">
