@@ -573,21 +573,20 @@ const TradingTable = ({
                             : null}
                         </td>
                         <td>
-                          {record.net_value === "0"
+                          {Number(
+                            shrinkToken(
+                              record.amount_c,
+                              assetC.metadata.decimals + assetC.config.extra_decimals,
+                            ),
+                          ) === 0
                             ? "-"
                             : `$${toInternationalCurrencySystem_number(
                                 Number(
                                   shrinkToken(
-                                    record.net_value,
+                                    record.amount_c,
                                     assetC.metadata.decimals + assetC.config.extra_decimals,
                                   ),
-                                ) -
-                                  Number(
-                                    shrinkToken(
-                                      record.open_fee,
-                                      assetC.metadata.decimals + assetC.config.extra_decimals,
-                                    ),
-                                  ),
+                                ) * Number(record.c_token_price),
                               )}`}
                         </td>
                         <td>
@@ -1148,21 +1147,20 @@ const TradingTable = ({
                     <div className="flex items-center justify-between text-sm mb-[18px]">
                       <p className="text-gray-300">Net Value</p>
                       <p>
-                        {record.net_value === "0"
+                        {Number(
+                          shrinkToken(
+                            record.amount_c,
+                            assetC.metadata.decimals + assetC.config.extra_decimals,
+                          ),
+                        ) === 0
                           ? "-"
                           : `$${toInternationalCurrencySystem_number(
                               Number(
                                 shrinkToken(
-                                  record.net_value,
+                                  record.amount_c,
                                   assetC.metadata.decimals + assetC.config.extra_decimals,
                                 ),
-                              ) -
-                                Number(
-                                  shrinkToken(
-                                    record.open_fee,
-                                    assetC.metadata.decimals + assetC.config.extra_decimals,
-                                  ),
-                                ),
+                              ) * Number(record.c_token_price),
                             )}`}
                       </p>
                     </div>

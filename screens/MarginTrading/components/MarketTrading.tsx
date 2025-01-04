@@ -4,6 +4,7 @@ import getConfig from "next/config";
 import { ArrowDownIcon, ArrowUpIcon, NearIcon } from "./Icon";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
 import {
+  formatPrice,
   formatWithCommas_usd,
   toInternationalCurrencySystem_number,
 } from "../../../utils/uiNumber";
@@ -47,7 +48,7 @@ const MarketMarginTrading = ({ hidden }: { hidden: boolean }) => {
       try {
         const response = await DataSource.shared.getMarginTradingVolumeStatistics();
         setVolumeStats({
-          totalVolume: response.totalVolume || 0,
+          totalVolume: response.total_volume || 0,
           volume24h: response["24h_volume"] || 0,
         });
       } catch (error) {
@@ -138,9 +139,9 @@ const MarketMarginTrading = ({ hidden }: { hidden: boolean }) => {
             <div className="flex justify-between">
               <DataItem
                 title="Total Volume"
-                value={formatWithCommas_usd(volumeStats.totalVolume)}
+                value={formatPrice(volumeStats.totalVolume).toString()}
               />
-              <DataItem title="24H Volume" value={formatWithCommas_usd(volumeStats.volume24h)} />
+              <DataItem title="24H Volume" value={formatPrice(volumeStats.volume24h).toString()} />
             </div>
             <div className="flex justify-between">
               <DataItem title="Long Open Interest" value={formatWithCommas_usd(totalLongUSD)} />
@@ -159,8 +160,11 @@ const MarketMarginTrading = ({ hidden }: { hidden: boolean }) => {
       ) : (
         <>
           <div className="flex justify-between items-center w-full h-[100px] border border-dark-50 bg-gray-800 rounded-md mb-8">
-            <DataItem title="Total Volume" value={formatWithCommas_usd(volumeStats.totalVolume)} />
-            <DataItem title="24H Volume" value={formatWithCommas_usd(volumeStats.volume24h)} />
+            <DataItem
+              title="Total Volume"
+              value={formatPrice(volumeStats.totalVolume).toString()}
+            />
+            <DataItem title="24H Volume" value={formatPrice(volumeStats.volume24h).toString()} />
             <DataItem title="Long Open Interest" value={formatWithCommas_usd(totalLongUSD)} />
             <DataItem title="Short Open Interest" value={formatWithCommas_usd(totalShortUSD)} />
           </div>
@@ -411,13 +415,13 @@ function TableBody({
               </div>
               <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
                 <div className="flex flex-col items-start ml-3">
-                  <div className="flex items-end">{item.totalVolume}</div>
+                  <div className="flex items-end">${formatPrice(item.totalVolume)}</div>
                   {/* <span className="text-xs text-gray-300">$-</span> */}
                 </div>
               </div>
               <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
                 <div className="flex flex-col items-start ml-3">
-                  <div className="flex items-end">{item.volume24h}</div>
+                  <div className="flex items-end">${formatPrice(item.volume24h)}</div>
                   {/* <span className="text-xs text-gray-300">$-</span> */}
                 </div>
               </div>
@@ -522,7 +526,9 @@ function TableBodyMobile({
                   ) : null}
                 </div>
                 <div className="flex flex-col items-end ml-2">
-                  <div className="flex items-center flex-wrap text-sm">{item.totalVolume}</div>
+                  <div className="flex items-center flex-wrap text-sm">
+                    ${formatPrice(item.totalVolume)}
+                  </div>
                   <span className="text-xs text-gray-300">Total Valume</span>
                 </div>
               </div>
@@ -530,7 +536,7 @@ function TableBodyMobile({
                 <div className="flex items-center justify-between mb-4 text-sm">
                   <p className="text-gray-300 h4">24H Volume</p>
                   <p>
-                    {item.volume24h}
+                    ${formatPrice(item.volume24h)}
                     {/* <span className="text-xs text-gray-300">(-)</span> */}
                   </p>
                 </div>
