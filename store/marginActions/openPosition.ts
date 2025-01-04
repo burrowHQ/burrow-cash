@@ -117,5 +117,5 @@ export async function openPosition({
     ],
   });
 
-  return prepareAndExecuteTransactions(transactions, isMeme);
+  return prepareAndExecuteTransactions(transactions);
 }

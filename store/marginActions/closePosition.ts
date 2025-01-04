@@ -145,6 +145,5 @@ export async function closePosition({
     ],
   });
   const result = await prepareAndExecuteTransactions(transactions);
-  // await prepareAndExecuteTransactions(transactions);
   return result;
 }

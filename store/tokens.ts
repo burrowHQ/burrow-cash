@@ -30,6 +30,7 @@ import {
 } from "./wallet";
 
 import getConfig from "../utils/config";
+import { store } from "../redux/store";
 
 const { SPECIAL_REGISTRATION_TOKEN_IDS } = getConfig() as any;
 
@@ -100,8 +101,7 @@ export const getAllMetadata = async (token_ids: string[]): Promise<IMetadata[]> 
 
 export const prepareAndExecuteTokenTransactions = async (
   tokenContract: Contract,
-  functionCall?: FunctionCallOptions,
-  additionalOperations: Transaction[] = [],
+  functionCall: FunctionCallOptions,
 ) => {
   const { account } = await getBurrow();
   const transactions: Transaction[] = [];
@@ -128,9 +128,6 @@ export const prepareAndExecuteTokenTransactions = async (
     receiverId: tokenContract.contractId,
     functionCalls,
   });
-
-  transactions.push(...additionalOperations);
-
   await prepareAndExecuteTransactions(transactions);
 };
 
@@ -140,9 +137,15 @@ export const prepareAndExecuteTransactions = async (
 ) => {
   const { account, logicContract, view, logicMEMEContract } = await getBurrow();
   const transactions: Transaction[] = [];
-
+  const isMemeCur = store?.getState()?.category?.activeCategory == "meme";
+  let isMemeCategory;
+  if (isMeme == undefined) {
+    isMemeCategory = isMemeCur;
+  } else {
+    isMemeCategory = isMeme;
+  }
   // check if account is registered in burrow cash
-  const burrowContract = isMeme ? logicMEMEContract : logicContract;
+  const burrowContract = isMemeCategory ? logicMEMEContract : logicContract;
   const storageDepositTransaction = (deposit: number) => ({
     receiverId: burrowContract.contractId,
     functionCalls: [
