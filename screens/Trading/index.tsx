@@ -255,7 +255,7 @@ const Trading = () => {
                   )}
                 </div>
               </div>
-              <span>${assets.data[id]?.price?.usd || 0}</span>
+              <span>${beautifyPrice(assets.data[id]?.price?.usd || 0)}</span>
             </div>
             {/* total v */}
             <div className="text-sm">
