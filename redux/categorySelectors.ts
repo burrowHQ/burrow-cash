@@ -8,3 +8,9 @@ export const isMemeCategory = createSelector(
     return category.activeCategory == "meme";
   },
 );
+export const getActiveCategory = createSelector(
+  (state: RootState) => state.category,
+  (category) => {
+    return category.activeCategory;
+  },
+);

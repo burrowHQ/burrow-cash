@@ -59,18 +59,56 @@ import { IToken } from "../../interfaces/asset";
 import LPTokenCell from "./LPTokenCell";
 import AvailableBorrowCell from "./AvailableBorrowCell";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { isMemeCategory } from "../../redux/categorySelectors";
+import { isMemeCategory, getActiveCategory } from "../../redux/categorySelectors";
+import { setActiveCategory } from "../../redux/marginTrading";
 
 const DetailData = createContext(null) as any;
 const TokenDetail = () => {
+  const dispatch = useAppDispatch();
   const isMeme = useAppSelector(isMemeCategory);
+  const activeCategory = useAppSelector(getActiveCategory);
   const router = useRouter();
   const rows = useAvailableAssets();
   const { id } = router.query;
+  const pageType = getPageTypeFromUrl();
   const tokenRow = rows.find((row: UIAsset) => {
     return row.tokenId === id;
   });
-  if (!tokenRow) return null;
+  const match = activeCategory == pageType;
+  // update search params if no pageType on url
+  useEffect(() => {
+    if (id && !pageType) {
+      const updatedQuery = { pageType: "main" };
+      router.replace({
+        pathname: `/tokenDetail/${id}`,
+        query: updatedQuery,
+      });
+    }
+  }, [id, pageType]);
+  // update activeCategory if pageType do not match with cache
+  useEffect(() => {
+    if (pageType && activeCategory && id) {
+      if (pageType !== activeCategory) {
+        if (pageType == "meme") {
+          dispatch(setActiveCategory("meme"));
+        } else if (pageType == "main") {
+          dispatch(setActiveCategory("main"));
+        } else {
+          router.replace({
+            pathname: `/tokenDetail/${id}`,
+            query: { pageType: "main" },
+          });
+          dispatch(setActiveCategory("main"));
+        }
+      }
+    }
+  }, [activeCategory, id, pageType]);
+  function getPageTypeFromUrl() {
+    const url = new URL(window.location.href);
+    const search = new URLSearchParams(url.search);
+    return search.get("pageType");
+  }
+  if (!tokenRow || !match) return null;
   return <TokenDetailView tokenRow={tokenRow} assets={rows} isMeme={isMeme} />;
 };
 
