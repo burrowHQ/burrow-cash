@@ -6,9 +6,7 @@ import Layout from "./Layout";
 import PageTitle from "./PageTitle";
 import OnboardingBRRR from "./OnboardingBRRR";
 import BRRRPrice from "./BRRRPrice";
-import Rewards from "./Rewards";
 import BetaInfo from "./BetaInfo";
-import Ticker from "./Ticker";
 import NonFarmedAssets from "./NonFarmedAssets";
 import ClaimAllRewards from "./ClaimAllRewards";
 import FallbackError from "./FallbackError";
@@ -23,9 +21,7 @@ export {
   PageTitle,
   OnboardingBRRR,
   BRRRPrice,
-  Rewards,
   BetaInfo,
-  Ticker,
   NonFarmedAssets,
   ClaimAllRewards,
   FallbackError,

@@ -1,10 +1,10 @@
 import Decimal from "decimal.js";
 
 import { getAccountPortfolio } from "../redux/accountSelectors";
-import { getAssets } from "../redux/assetsSelectors";
+import { getAssetsCategory } from "../redux/assetsSelectors";
 import { computePoolsDailyAmount } from "../redux/selectors/getAccountRewards";
 import { getStaking } from "../redux/selectors/getStaking";
-import { getConfig } from "../redux/appSelectors";
+import { getConfigCategory } from "../redux/appSelectors";
 import { useAppSelector } from "../redux/hooks";
 import { shrinkToken } from "../store/helper";
 import { getNetTvlAPY, getTotalNetTvlAPY } from "../redux/selectors/getNetAPY";
@@ -23,8 +23,8 @@ export function useExtraAPY({
 }) {
   const { xBRRR, extraXBRRRAmount } = useAppSelector(getStaking);
   const portfolio = useAppSelector(getAccountPortfolio());
-  const appConfig = useAppSelector(getConfig);
-  const assets = useAppSelector(getAssets);
+  const appConfig = useAppSelector(getConfigCategory());
+  const assets = useAppSelector(getAssetsCategory());
   const userNetTvlAPY = useAppSelector(getNetTvlAPY({ isStaking: false }));
   const totalNetTvlApy = useAppSelector(getTotalNetTvlAPY);
   const { hasNegativeNetLiquidity } = useNonFarmedAssets();

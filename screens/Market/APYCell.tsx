@@ -8,7 +8,7 @@ import { useExtraAPY } from "../../hooks/useExtraAPY";
 import { useAPY } from "../../hooks/useAPY";
 import { format_apy } from "../../utils/uiNumber";
 import { standardizeAsset } from "../../utils/index";
-import { getAssets } from "../../redux/assetsSelectors";
+import { getAssetsCategory } from "../../redux/assetsSelectors";
 import { useAppSelector } from "../../redux/hooks";
 import { getProtocolRewards } from "../../redux/selectors/getProtocolRewards";
 
@@ -65,7 +65,7 @@ const ToolTip = ({
   excludeNetApy,
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
-  const assets = useAppSelector(getAssets);
+  const assets = useAppSelector(getAssetsCategory());
   const router = useRouter();
   // suppose only one reward
   const netTvlFarmTokenId = (Object.keys(assets?.netTvlFarm || {}) || [])[0];

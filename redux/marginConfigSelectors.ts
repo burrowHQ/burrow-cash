@@ -12,3 +12,13 @@ export const getMarginConfigMEME = createSelector(
   (state: RootState) => state.marginConfigMEME,
   (marginConfigMEME): IMarginConfigState => marginConfigMEME,
 );
+export const getMarginConfigCategory = (memeCategory?: boolean) => {
+  return createSelector(
+    (state: RootState) => state.marginConfig,
+    (state: RootState) => state.marginConfigMEME,
+    (marginConfig, marginConfigMEME): IMarginConfigState => {
+      if (memeCategory) return marginConfigMEME;
+      return marginConfig;
+    },
+  );
+};
