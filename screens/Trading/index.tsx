@@ -314,12 +314,12 @@ const Trading = () => {
                 {/* total v */}
                 <div className="text-sm">
                   <p className="text-gray-300  mb-1.5">Total Volume</p>
-                  <span>{beautifyPrice(+volumeStats.totalVolume)}</span>
+                  <span>${beautifyPrice(+volumeStats.totalVolume)}</span>
                 </div>
                 {/* 24h v */}
                 <div className="text-sm">
                   <p className="text-gray-300 mb-1.5">24H Volume</p>
-                  <span>{beautifyPrice(+volumeStats.volume24h)}</span>
+                  <span>${beautifyPrice(+volumeStats.volume24h)}</span>
                 </div>
                 {/* long short */}
                 <div className="text-sm">
@@ -405,12 +405,12 @@ const Trading = () => {
                 {/* total v */}
                 <div className="text-sm flex items-center justify-between">
                   <p className="text-gray-300  mb-1.5">Total Volume</p>
-                  <span>{beautifyPrice(+volumeStats.totalVolume)}</span>
+                  <span>${beautifyPrice(+volumeStats.totalVolume)}</span>
                 </div>
                 {/* 24h v */}
                 <div className="text-sm flex items-center justify-between my-[16px]">
                   <p className="text-gray-300 mb-1.5">24H Volume</p>
-                  <span>{beautifyPrice(+volumeStats.volume24h)}</span>
+                  <span>${beautifyPrice(+volumeStats.volume24h)}</span>
                 </div>
                 {/* long short */}
                 <div className="text-sm flex items-center justify-between">
