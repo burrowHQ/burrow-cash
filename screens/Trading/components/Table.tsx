@@ -528,6 +528,9 @@ const TradingTable = ({
                     const assetC = !ifMeme
                       ? getAssetById(record.token_c)
                       : getAssetByIdMEME(record.token_c);
+                    if (!assetD || !assetP || !assetC) {
+                      return null;
+                    }
                     return (
                       <tr key={index}>
                         <td className="py-5 pl-5">
@@ -1078,6 +1081,9 @@ const TradingTable = ({
               const assetC = !ifMeme
                 ? getAssetById(record.token_c)
                 : getAssetByIdMEME(record.token_c);
+              if (!assetD || !assetP || !assetC) {
+                return null;
+              }
               return (
                 <div className="bg-gray-800 rounded-xl mb-4" key={index}>
                   <div className="pt-5 px-4 pb-4 border-b border-dark-950 flex justify-between">

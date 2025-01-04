@@ -48,8 +48,8 @@ const MarketMarginTrading = ({ hidden }: { hidden: boolean }) => {
       try {
         const response = await DataSource.shared.getMarginTradingVolumeStatistics();
         setVolumeStats({
-          totalVolume: response.total_volume || 0,
-          volume24h: response["24h_volume"] || 0,
+          totalVolume: response?.data.total_volume || 0,
+          volume24h: response?.data["24h_volume"] || 0,
         });
       } catch (error) {
         console.error("Failed to fetch volume statistics:", error);
@@ -70,6 +70,7 @@ const MarketMarginTrading = ({ hidden }: { hidden: boolean }) => {
         const results = await Promise.all(promises);
         const mergedData: any[] = Object.values(marginConfigList).map((item, index) => {
           const volumeData: any | undefined = results[index];
+          console.log(volumeData, "volumeData");
           return {
             ...item,
             totalVolume: volumeData?.data.total_volume || 0,
@@ -137,11 +138,18 @@ const MarketMarginTrading = ({ hidden }: { hidden: boolean }) => {
         <>
           <div className="w-full border-b border-dark-950 px-4">
             <div className="flex justify-between">
-              <DataItem
-                title="Total Volume"
-                value={formatPrice(volumeStats.totalVolume).toString()}
-              />
-              <DataItem title="24H Volume" value={formatPrice(volumeStats.volume24h).toString()} />
+              <div className="flex flex-1 justify-center xsm:justify-start xsm:mb-[30px]">
+                <div>
+                  <p className="text-gray-300 text-sm">Total Volume</p>
+                  <h2 className="text-h2">${formatPrice(volumeStats.totalVolume)}</h2>
+                </div>
+              </div>
+              <div className="flex flex-1 justify-center xsm:justify-start xsm:mb-[30px]">
+                <div>
+                  <p className="text-gray-300 text-sm">24H Volume</p>
+                  <h2 className="text-h2">${formatPrice(volumeStats.volume24h)}</h2>
+                </div>
+              </div>
             </div>
             <div className="flex justify-between">
               <DataItem title="Long Open Interest" value={formatWithCommas_usd(totalLongUSD)} />
@@ -160,11 +168,18 @@ const MarketMarginTrading = ({ hidden }: { hidden: boolean }) => {
       ) : (
         <>
           <div className="flex justify-between items-center w-full h-[100px] border border-dark-50 bg-gray-800 rounded-md mb-8">
-            <DataItem
-              title="Total Volume"
-              value={formatPrice(volumeStats.totalVolume).toString()}
-            />
-            <DataItem title="24H Volume" value={formatPrice(volumeStats.volume24h).toString()} />
+            <div className="flex flex-1 justify-center xsm:justify-start xsm:mb-[30px]">
+              <div>
+                <p className="text-gray-300 text-sm">Total Volume</p>
+                <h2 className="text-h2">${formatPrice(volumeStats.totalVolume)}</h2>
+              </div>
+            </div>
+            <div className="flex flex-1 justify-center xsm:justify-start xsm:mb-[30px]">
+              <div>
+                <p className="text-gray-300 text-sm">24H Volume</p>
+                <h2 className="text-h2">${formatPrice(volumeStats.volume24h)}</h2>
+              </div>
+            </div>
             <DataItem title="Long Open Interest" value={formatWithCommas_usd(totalLongUSD)} />
             <DataItem title="Short Open Interest" value={formatWithCommas_usd(totalShortUSD)} />
           </div>
