@@ -161,14 +161,16 @@ const Trading = () => {
 
   const [volumeStats, setVolumeStats] = useState<any>({});
   useEffect(() => {
+    if (!id) return;
+
     const fetchVolumeStats = async () => {
       try {
         const response = await DataSource.shared.getMarginTradingTokenVolumeStatistics(id);
         setVolumeStats({
-          totalVolume: response.totalVolume || 0,
-          volume24h: response.volume24h || 0,
-          long: response.long_open_volume || 0,
-          short: response.short_open_volume || 0,
+          totalVolume: response.data.totalVolume || 0,
+          volume24h: response.data.volume24h || 0,
+          long: response.data.long_open_volume || 0,
+          short: response.data.short_open_volume || 0,
         });
       } catch (error) {
         console.error("Failed to fetch volume statistics:", error);
