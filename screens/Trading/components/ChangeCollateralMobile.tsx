@@ -380,7 +380,6 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
     let maxRemovableFromLeverage = 0;
     let left = 0;
     let right = tokenCInfoBalance;
-
     while (left <= right) {
       const mid = (left + right) / 2;
       const remainingCollateral = tokenCInfoBalance - mid;
