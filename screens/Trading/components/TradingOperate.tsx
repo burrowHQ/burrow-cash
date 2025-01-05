@@ -382,7 +382,9 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
       swapFee:
         ((estimateData?.fee ?? 0) / 10000) *
         Number(tokenInAmount) *
-        (activeTab == "long" ? 1 : getAssetPrice(ReduxcategoryAssets1) || 0),
+        (activeTab == "long"
+          ? getAssetPrice(ReduxcategoryAssets2) || 0
+          : getAssetPrice(ReduxcategoryAssets1) || 0),
       price: getAssetPrice(ReduxcategoryAssets1),
     };
   }, [longInput, shortInput, ReduxcategoryAssets1, estimateData, tokenInAmount]);

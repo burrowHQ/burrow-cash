@@ -140,7 +140,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
       swapFee:
         ((estimateData?.fee ?? 0) / 10000) *
         +shrinkToken(tokenInAmount || "0", assetP.metadata.decimals) *
-        (actionShowRedColor ? 1 : priceD || 0),
+        (assetP?.price?.usd || 0),
     };
   }, [collateral, ReduxcategoryAssets1, estimateData]);
 
