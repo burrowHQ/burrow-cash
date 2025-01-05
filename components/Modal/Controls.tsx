@@ -11,16 +11,8 @@ export default function Controls({ amount, available, action, asset, totalAvaila
   const dispatch = useAppDispatch();
   const isMeme = useAppSelector(isMemeCategory);
   const handleInputChange = (e) => {
-    console.log("---------------e", e);
     const { value } = e.target;
     const numRegex = /^([0-9]*\.?[0-9]*$)/;
-    console.log(
-      "------------------check result",
-      !numRegex.test(value) || Number(value) > Number(available),
-    );
-    console.log("------------------check a", !numRegex.test(value));
-    console.log("------------------check b", Number(value) > Number(available));
-    console.log("------------------check m", value, available);
     if (!numRegex.test(value) || Number(value) > Number(available)) {
       e.preventDefault();
       return;
@@ -77,7 +69,7 @@ export default function Controls({ amount, available, action, asset, totalAvaila
             placeholder="0.0"
             step="any"
             value={inputAmount}
-            onInput={handleInputChange}
+            onChange={handleInputChange}
             className="text-white noselect"
           />
         </div>
