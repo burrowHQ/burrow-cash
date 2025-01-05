@@ -62,7 +62,6 @@ const MarketMarginTrading = ({ hidden }: { hidden: boolean }) => {
         const results = await Promise.all(promises);
         const mergedData: any[] = Object.values(marginConfigList).map((item, index) => {
           const volumeData: any | undefined = results[index];
-          console.log(volumeData, "volumeData");
           return {
             ...item,
             totalVolume: volumeData?.data.total_volume || 0,
