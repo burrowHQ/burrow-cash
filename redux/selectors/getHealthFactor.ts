@@ -18,7 +18,7 @@ export const getHealthFactor = (memeCategory?: boolean) => {
     (state: RootState) => state.category,
     (assetsMain, assetsMEME, portfolioMain, portfolioMEME, category) => {
       let isMeme: boolean;
-      if (memeCategory == undefined) {
+      if (typeof memeCategory !== "boolean") {
         isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
@@ -49,7 +49,7 @@ export const getLPHealthFactor = (memeCategory?: boolean) => {
     (state: RootState) => state.category,
     (assetsMain, assetsMEME, portfolioMain, portfolioMEME, category) => {
       let isMeme: boolean;
-      if (memeCategory == undefined) {
+      if (typeof memeCategory !== "boolean") {
         isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;

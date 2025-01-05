@@ -367,7 +367,7 @@ export function useAdjustTrigger(tokenId: string, memeCategory?: boolean) {
   const dispatch = useAppDispatch();
   const isMemeCur = useAppSelector(isMemeCategory);
   let isMeme: boolean;
-  if (memeCategory == undefined) {
+  if (typeof memeCategory !== "boolean") {
     isMeme = isMemeCur;
   } else {
     isMeme = memeCategory;

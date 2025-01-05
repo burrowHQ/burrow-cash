@@ -15,7 +15,7 @@ export const getAccountPortfolio = (memeCategory?: boolean) => {
     (state: RootState) => state.category,
     (accountMain, accountMEME, category) => {
       let isMeme: boolean;
-      if (memeCategory == undefined) {
+      if (typeof memeCategory !== "boolean") {
         isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
@@ -55,7 +55,7 @@ export const getHasNonFarmedAssets = (memeCategory?: boolean) => {
     (state: RootState) => state.category,
     (accountMain, accountMEME, category) => {
       let isMeme: boolean;
-      if (memeCategory == undefined) {
+      if (typeof memeCategory !== "boolean") {
         isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;

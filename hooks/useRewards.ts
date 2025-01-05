@@ -96,9 +96,9 @@ export function useProRataNetLiquidityReward(tokenId, dailyAmount) {
 }
 
 export function useStakeRewardApy() {
-  const assetRewards = useAppSelector(getAccountRewardsForApy(false));
-  const portfolio = useAppSelector(getAccountPortfolio(false));
-  const assets = useAppSelector(getAssetsCategory(false));
+  const assetRewards = useAppSelector(getAccountRewardsForApy());
+  const portfolio = useAppSelector(getAccountPortfolio());
+  const assets = useAppSelector(getAssetsCategory());
   if (!assets?.data)
     return {
       avgStakeSupplyAPY: 0,

@@ -25,7 +25,7 @@ export const getNetAPY = ({
     getExtraDailyTotals({ isStaking, memeCategory }),
     (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category, extraDaily) => {
       let isMeme: boolean;
-      if (memeCategory == undefined) {
+      if (typeof memeCategory !== "boolean") {
         isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
@@ -71,7 +71,7 @@ export const getYourNetAPY = (memeCategory?: boolean) =>
     getExtraDailyTotals({ isStaking: false, memeCategory }),
     (assetsMain, assetsMEME, accountMain, accountMEME, category, extraDaily) => {
       let isMeme: boolean;
-      if (memeCategory == undefined) {
+      if (typeof memeCategory !== "boolean") {
         isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
@@ -125,7 +125,7 @@ export const getNetTvlAPY = ({
     getAccountRewards(),
     (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category, rewards) => {
       let isMeme: boolean;
-      if (memeCategory == undefined) {
+      if (typeof memeCategory !== "boolean") {
         isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;

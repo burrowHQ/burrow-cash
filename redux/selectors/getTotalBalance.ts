@@ -18,7 +18,7 @@ export const getTotalBalance = ({
     (state: RootState) => state.category,
     (assetsMain, assetsMEME, category) => {
       let isMeme: boolean;
-      if (memeCategory == undefined) {
+      if (typeof memeCategory !== "boolean") {
         isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;

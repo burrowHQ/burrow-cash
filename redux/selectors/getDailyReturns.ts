@@ -16,7 +16,7 @@ export const getDailyReturns = (memeCategory) => {
     getAccountRewards(memeCategory),
     (assetsMain, assetsMEME, accountMain, accountMEME, category, extraDaily, rewards) => {
       let isMeme: boolean;
-      if (memeCategory == undefined) {
+      if (typeof memeCategory !== "boolean") {
         isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;

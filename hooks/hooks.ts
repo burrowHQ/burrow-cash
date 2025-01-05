@@ -115,7 +115,7 @@ export function useUnreadLiquidation({
 }) {
   const isMemeCur = useAppSelector(isMemeCategory);
   let isMeme: boolean;
-  if (memeCategory == undefined) {
+  if (typeof memeCategory !== "boolean") {
     isMeme = isMemeCur;
   } else {
     isMeme = memeCategory;

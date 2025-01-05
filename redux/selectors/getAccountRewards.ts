@@ -352,7 +352,7 @@ export const getAccountRewards = (memeCategory?: boolean) => {
     getStaking(memeCategory),
     (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category, stakingMain) => {
       let isMeme: boolean;
-      if (memeCategory == undefined) {
+      if (typeof memeCategory !== "boolean") {
         isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
@@ -514,7 +514,7 @@ export const getAccountRewardsForApy = (memeCategory?: boolean) => {
     getStaking(memeCategory),
     (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category, stakingMain) => {
       let isMeme: boolean;
-      if (memeCategory == undefined) {
+      if (typeof memeCategory !== "boolean") {
         isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
@@ -655,7 +655,7 @@ export const getAccountBoostRatioData = (memeCategory?: boolean) => {
     getStaking(memeCategory),
     (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category, staking) => {
       let isMeme: boolean;
-      if (memeCategory == undefined) {
+      if (typeof memeCategory !== "boolean") {
         isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
@@ -723,7 +723,7 @@ export const getWeightedNetLiquidity = (memeCategory?: boolean) => {
     (state: RootState) => state.category,
     (assetsMain, assetsMEME, accountMain, accountMEME, category) => {
       let isMeme: boolean;
-      if (memeCategory == undefined) {
+      if (typeof memeCategory !== "boolean") {
         isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
@@ -763,7 +763,7 @@ export const getWeightedAssets = (memeCategory?: boolean) => {
     (state: RootState) => state.category,
     (assetsMain, assetsMEME, category) => {
       let isMeme: boolean;
-      if (memeCategory == undefined) {
+      if (typeof memeCategory !== "boolean") {
         isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
@@ -792,7 +792,7 @@ export const getAccountDailyRewards = (memeCategory?: boolean) => {
     (state: RootState) => state.category,
     (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category) => {
       let isMeme: boolean;
-      if (memeCategory == undefined) {
+      if (typeof memeCategory !== "boolean") {
         isMeme = category.activeCategory == "meme";
       } else {
         isMeme = memeCategory;
