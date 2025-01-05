@@ -15,7 +15,11 @@ export async function get_token_detail(tokenId: string) {
           Authentication: getAuthenticationHeaders(`/burrow/get_token_detail/${tokenId}`),
         },
       })
-    ).json();
+    )
+      .json()
+      .catch(() => {
+        return initResponse;
+      });
   } catch (err) {
     return initResponse;
   }
