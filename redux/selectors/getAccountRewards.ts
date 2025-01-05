@@ -714,59 +714,73 @@ function getBoosterLogBaseFromAccountFarms(accountfarms) {
   }
   return "";
 }
-export const getWeightedNetLiquidity = createSelector(
-  (state: RootState) => state.assets,
-  (state: RootState) => state.assetsMEME,
-  (state: RootState) => state.account,
-  (state: RootState) => state.accountMEME,
-  (state: RootState) => state.category,
-  (assetsMain, assetsMEME, accountMain, accountMEME, category) => {
-    const isMeme = category.activeCategory == "meme";
-    let assets: typeof assetsMain;
-    let account: typeof accountMain;
-    if (isMeme) {
-      assets = assetsMEME;
-      account = accountMEME;
-    } else {
-      assets = assetsMain;
-      account = accountMain;
-    }
-    if (!hasAssets(assets)) return 0;
-    const { borrows, collaterals } = account.portfolio || {};
-    const [, totalSupplied] = getGains(account.portfolio, assets, "supplied", true);
-    const [, totalCollateral] = collaterals
-      ? getGainsArr(account.portfolio.collaterals, assets, true)
-      : getGains(account.portfolio, assets, "collateral", true);
-    const [, totalBorrowed] = borrows
-      ? getGainsArr(account.portfolio.borrows, assets, true)
-      : getGains(account.portfolio, assets, "borrowed", true);
+export const getWeightedNetLiquidity = (memeCategory?: boolean) => {
+  return createSelector(
+    (state: RootState) => state.assets,
+    (state: RootState) => state.assetsMEME,
+    (state: RootState) => state.account,
+    (state: RootState) => state.accountMEME,
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, category) => {
+      let isMeme: boolean;
+      if (memeCategory == undefined) {
+        isMeme = category.activeCategory == "meme";
+      } else {
+        isMeme = memeCategory;
+      }
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
+      if (isMeme) {
+        assets = assetsMEME;
+        account = accountMEME;
+      } else {
+        assets = assetsMain;
+        account = accountMain;
+      }
+      if (!hasAssets(assets)) return 0;
+      const { borrows, collaterals } = account.portfolio || {};
+      const [, totalSupplied] = getGains(account.portfolio, assets, "supplied", true);
+      const [, totalCollateral] = collaterals
+        ? getGainsArr(account.portfolio.collaterals, assets, true)
+        : getGains(account.portfolio, assets, "collateral", true);
+      const [, totalBorrowed] = borrows
+        ? getGainsArr(account.portfolio.borrows, assets, true)
+        : getGains(account.portfolio, assets, "borrowed", true);
 
-    const netLiquidity = new Decimal(totalCollateral)
-      .plus(totalSupplied)
-      .minus(totalBorrowed)
-      .toNumber();
-    return netLiquidity;
-  },
-);
+      const netLiquidity = new Decimal(totalCollateral)
+        .plus(totalSupplied)
+        .minus(totalBorrowed)
+        .toNumber();
+      return netLiquidity;
+    },
+  );
+};
 
-export const getWeightedAssets = createSelector(
-  (state: RootState) => state.assets,
-  (state: RootState) => state.assetsMEME,
-  (state: RootState) => state.category,
-  (assetsMain, assetsMEME, category) => {
-    const isMeme = category.activeCategory == "meme";
-    let assets: typeof assetsMain;
-    if (isMeme) {
-      assets = assetsMEME;
-    } else {
-      assets = assetsMain;
-    }
-    if (!hasAssets(assets)) return [];
-    return Object.entries(assets.data)
-      .map(([, asset]) => (asset.config.net_tvl_multiplier < 10000 ? asset : undefined))
-      .filter(Boolean) as Asset[];
-  },
-);
+export const getWeightedAssets = (memeCategory?: boolean) => {
+  return createSelector(
+    (state: RootState) => state.assets,
+    (state: RootState) => state.assetsMEME,
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, category) => {
+      let isMeme: boolean;
+      if (memeCategory == undefined) {
+        isMeme = category.activeCategory == "meme";
+      } else {
+        isMeme = memeCategory;
+      }
+      let assets: typeof assetsMain;
+      if (isMeme) {
+        assets = assetsMEME;
+      } else {
+        assets = assetsMain;
+      }
+      if (!hasAssets(assets)) return [];
+      return Object.entries(assets.data)
+        .map(([, asset]) => (asset.config.net_tvl_multiplier < 10000 ? asset : undefined))
+        .filter(Boolean) as Asset[];
+    },
+  );
+};
 export const getAccountDailyRewards = (memeCategory?: boolean) => {
   return createSelector(
     (state: RootState) => state.assets,

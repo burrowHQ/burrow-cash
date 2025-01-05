@@ -29,7 +29,7 @@ export function useExtraAPY({
   const assets = useAppSelector(getAssetsCategory(memeCategory));
   const userNetTvlAPY = useAppSelector(getNetTvlAPY({ isStaking: false, memeCategory }));
   const totalNetTvlApy = useAppSelector(getTotalNetTvlAPY(memeCategory));
-  const { hasNegativeNetLiquidity } = useNonFarmedAssets();
+  const { hasNegativeNetLiquidity } = useNonFarmedAssets(memeCategory);
   const asset = assets.data[assetId];
   if (!asset)
     return {

@@ -54,11 +54,11 @@ export function useAccountId() {
   return useAppSelector(getAccountId);
 }
 
-export function useNonFarmedAssets() {
-  const weightedNetLiquidity = useAppSelector(getWeightedNetLiquidity);
-  const hasNonFarmedAssets = useAppSelector(getHasNonFarmedAssets);
+export function useNonFarmedAssets(memeCategory?: boolean) {
+  const weightedNetLiquidity = useAppSelector(getWeightedNetLiquidity(memeCategory));
+  const hasNonFarmedAssets = useAppSelector(getHasNonFarmedAssets(memeCategory));
+  const assets = useAppSelector(getWeightedAssets(memeCategory));
   const hasNegativeNetLiquidity = weightedNetLiquidity < 0;
-  const assets = useAppSelector(getWeightedAssets);
 
   return { hasNonFarmedAssets, weightedNetLiquidity, hasNegativeNetLiquidity, assets };
 }
