@@ -166,13 +166,15 @@ export const getNetTvlAPY = ({
     },
   );
 
-export const getTotalNetTvlAPY = createSelector(getProtocolRewards(), (rewards) => {
-  if (!rewards.length) return 0;
-  const totalDailyNetTvlRewards = rewards.reduce((acc, r) => {
-    if (r.boosted_shares > 0) {
-      acc = acc.plus(new Decimal(r.dailyAmount * r.price * 365).div(r.boosted_shares).mul(100));
-    }
-    return acc;
-  }, new Decimal(0));
-  return totalDailyNetTvlRewards.toNumber();
-});
+export const getTotalNetTvlAPY = (memeCategory?: boolean) => {
+  return createSelector(getProtocolRewards(memeCategory), (rewards) => {
+    if (!rewards.length) return 0;
+    const totalDailyNetTvlRewards = rewards.reduce((acc, r) => {
+      if (r.boosted_shares > 0) {
+        acc = acc.plus(new Decimal(r.dailyAmount * r.price * 365).div(r.boosted_shares).mul(100));
+      }
+      return acc;
+    }, new Decimal(0));
+    return totalDailyNetTvlRewards.toNumber();
+  });
+};

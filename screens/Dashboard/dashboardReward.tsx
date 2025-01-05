@@ -1,7 +1,5 @@
-import millify from "millify";
 import { IReward } from "../../interfaces";
-import { PERCENT_DIGITS, shrinkToken } from "../../store";
-import { formatPortfolioRewardAmount } from "../../components/Table/common/cells";
+import { shrinkToken } from "../../store";
 import { formatUSDValue } from "../../helpers/helpers";
 import { standardizeAsset } from "../../utils";
 

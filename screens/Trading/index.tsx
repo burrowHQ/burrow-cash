@@ -27,7 +27,6 @@ import TradingViewChart from "../../components/marginTrading/TradingViewChart";
 import { standardizeAsset, nearTokenId } from "../../utils";
 import { isMobileDevice } from "../../helpers/helpers";
 import TradingOperateMobile from "./components/TradingOperateMobile";
-import getAssets from "../../api/get-assets";
 import { beautifyPrice } from "../../utils/beautyNumbet";
 import { getSymbolById } from "../../transformers/nearSymbolTrans";
 import { useRegisterTokenType } from "../../hooks/useRegisterTokenType";
@@ -422,11 +421,11 @@ const Trading = () => {
                   </span>
                 </div>
               </div>
-
               <div style={{ height: isMobile ? "488px" : "calc(100% - 100px)" }}>
                 <TradingViewChart
                   baseSymbol={standardizeAsset(currentTokenCate1?.metadata)?.symbol}
                   quoteSymbol={standardizeAsset(currentTokenCate2?.metadata)?.symbol}
+                  isMeme={!isMainStream}
                 />
               </div>
             </div>

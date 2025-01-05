@@ -7,7 +7,21 @@ export const getStaking = createSelector(
   // only main
   (state: RootState) => state.account,
   (state: RootState) => state.app,
-  (account, app) => {
+  (state: RootState) => state.category,
+  (account, app, category) => {
+    const isMeme = category.activeCategory == "meme";
+    if (isMeme) {
+      return {
+        BRRR: 0,
+        xBRRR: 0,
+        extraXBRRRAmount: 0,
+        totalXBRRR: 0,
+        stakingTimestamp: 0,
+        amount: 0,
+        months: 0,
+        totalXBRRRStaked: 0,
+      };
+    }
     const { config } = app;
     const { amount, months } = app.staking;
     const BRRR = Number(

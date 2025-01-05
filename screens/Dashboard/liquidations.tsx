@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import CustomTable from "../../components/CustomTable/CustomTable";
 import { shrinkToken, TOKEN_FORMAT } from "../../store";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { getAssets } from "../../redux/assetsSelectors";
+import { getAssetsCategory } from "../../redux/assetsSelectors";
 import { formatTokenValueWithMilify, getDateString } from "../../helpers/helpers";
 import { getLiquidations } from "../../api/get-liquidations";
 import { setUnreadLiquidation } from "../../redux/appSlice";
@@ -11,7 +11,7 @@ import { getAccountId } from "../../redux/accountSelectors";
 
 const Liquidations = ({ isShow, setLiquidationPage }) => {
   const dispatch = useAppDispatch();
-  const assets = useAppSelector(getAssets);
+  const assets = useAppSelector(getAssetsCategory());
   const accountId = useAppSelector(getAccountId);
   const [isLoading, setIsLoading] = useState(false);
   const [docs, setDocs] = useState([]);

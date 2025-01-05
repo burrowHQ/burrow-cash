@@ -1,10 +1,10 @@
 import Decimal from "decimal.js";
 
 import { getAccountPortfolio } from "../redux/accountSelectors";
-import { getAssets } from "../redux/assetsSelectors";
+import { getAssetsCategory } from "../redux/assetsSelectors";
 import { computePoolsDailyAmount } from "../redux/selectors/getAccountRewards";
 import { getStaking } from "../redux/selectors/getStaking";
-import { getConfig } from "../redux/appSelectors";
+import { getConfigCategory } from "../redux/appSelectors";
 import { useAppSelector } from "../redux/hooks";
 import { shrinkToken } from "../store/helper";
 import { getNetTvlAPY, getTotalNetTvlAPY } from "../redux/selectors/getNetAPY";
@@ -16,17 +16,19 @@ export function useExtraAPY({
   tokenId: assetId,
   isBorrow,
   onlyMarket,
+  memeCategory,
 }: {
   tokenId: string;
   isBorrow: boolean | undefined;
   onlyMarket?: boolean;
+  memeCategory?: boolean;
 }) {
-  const { xBRRR, extraXBRRRAmount } = useAppSelector(getStaking);
-  const portfolio = useAppSelector(getAccountPortfolio());
-  const appConfig = useAppSelector(getConfig);
-  const assets = useAppSelector(getAssets);
-  const userNetTvlAPY = useAppSelector(getNetTvlAPY({ isStaking: false }));
-  const totalNetTvlApy = useAppSelector(getTotalNetTvlAPY);
+  const { xBRRR = 0, extraXBRRRAmount = 0 } = useAppSelector(getStaking);
+  const portfolio = useAppSelector(getAccountPortfolio(memeCategory));
+  const appConfig = useAppSelector(getConfigCategory(memeCategory));
+  const assets = useAppSelector(getAssetsCategory(memeCategory));
+  const userNetTvlAPY = useAppSelector(getNetTvlAPY({ isStaking: false, memeCategory }));
+  const totalNetTvlApy = useAppSelector(getTotalNetTvlAPY(memeCategory));
   const { hasNegativeNetLiquidity } = useNonFarmedAssets();
   const asset = assets.data[assetId];
   if (!asset)

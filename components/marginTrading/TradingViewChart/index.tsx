@@ -3,7 +3,6 @@ import _ from "lodash";
 import { useDebounce } from "react-use";
 import {
   type ChartingLibraryWidgetOptions,
-  type EntityId,
   type IChartingLibraryWidget,
   type ResolutionString,
   type Timezone,
@@ -12,22 +11,24 @@ import {
 import datafeed from "./datafeed";
 import { storageStore } from "../../../utils/commonUtils";
 import { LoadingCircle } from "../../LoadingSpinner";
-import { getAssets } from "../../../redux/assetsSelectors";
-import { getMarginConfig } from "../../../redux/marginConfigSelectors";
+import { getAssetsCategory } from "../../../redux/assetsSelectors";
+import { getMarginConfigCategory } from "../../../redux/marginConfigSelectors";
 import { useAppSelector } from "../../../redux/hooks";
 
 const tvStorage = storageStore("tradingview");
 export default function TradingViewChart({
   baseSymbol,
   quoteSymbol,
+  isMeme,
 }: {
   baseSymbol: string;
   quoteSymbol: string;
+  isMeme: boolean;
 }) {
   const [loading, setLoading] = useState(false);
   const tvWidgetRef = useRef<IChartingLibraryWidget>();
-  const assets = useAppSelector(getAssets);
-  const marginConfig = useAppSelector(getMarginConfig);
+  const assets = useAppSelector(getAssetsCategory(isMeme));
+  const marginConfig = useAppSelector(getMarginConfigCategory(isMeme));
   const assets_cached = !_.isEmpty(assets?.data);
   const margin_cached = !_.isEmpty(marginConfig?.registered_tokens);
   // const symbol = `${baseSymbol}/${quoteSymbol}`;
