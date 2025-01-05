@@ -4,6 +4,7 @@ import CustomTable from "../../components/CustomTable/CustomTable";
 import { shrinkToken, TOKEN_FORMAT } from "../../store";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { getAssetsCategory } from "../../redux/assetsSelectors";
+import { isMemeCategory } from "../../redux/categorySelectors";
 import { formatTokenValueWithMilify, getDateString } from "../../helpers/helpers";
 import { getLiquidations } from "../../api/get-liquidations";
 import { setUnreadLiquidation } from "../../redux/appSlice";
@@ -15,6 +16,7 @@ const Liquidations = ({ isShow, setLiquidationPage }) => {
   const accountId = useAppSelector(getAccountId);
   const [isLoading, setIsLoading] = useState(false);
   const [docs, setDocs] = useState([]);
+  const isMeme = useAppSelector(isMemeCategory);
   const [pagination, setPagination] = useState<{
     page?: number;
     totalPages?: number;
@@ -34,7 +36,13 @@ const Liquidations = ({ isShow, setLiquidationPage }) => {
   const fetchData = async ({ page }) => {
     try {
       setIsLoading(true);
-      const { liquidationData, unreadIds } = await getLiquidations(accountId, page, 10, assets);
+      const { liquidationData, unreadIds } = await getLiquidations(
+        accountId,
+        page,
+        10,
+        assets,
+        isMeme,
+      );
       let newUnreadCount = 0;
       liquidationData?.record_list?.forEach((d) => {
         if (d.isRead === false) newUnreadCount++;

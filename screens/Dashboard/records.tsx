@@ -6,6 +6,7 @@ import { useAccountId, useToastMessage } from "../../hooks/hooks";
 import { shrinkToken, TOKEN_FORMAT } from "../../store";
 import { useAppSelector } from "../../redux/hooks";
 import { getAssetsCategory } from "../../redux/assetsSelectors";
+import { isMemeCategory } from "../../redux/categorySelectors";
 import { getDateString } from "../../helpers/helpers";
 import { nearNativeTokens, nearTokenId, standardizeAsset } from "../../utils";
 import {
@@ -20,6 +21,7 @@ const Records = ({ isShow }) => {
   const { activeCategory } = useAppSelector((state) => state.category);
   const { toastMessage, showToast } = useToastMessage();
   const assets = useAppSelector(getAssetsCategory(false));
+  const isMeme = useAppSelector(isMemeCategory);
   const [isLoading, setIsLoading] = useState(false);
   const [docs, setDocs] = useState<any>([]);
   const [pagination, setPagination] = useState<{
@@ -42,7 +44,7 @@ const Records = ({ isShow }) => {
   const fetchData = async ({ page }) => {
     try {
       setIsLoading(true);
-      const response = await Datasource.shared.getRecords(accountId, page, 10);
+      const response = await Datasource.shared.getRecords(accountId, page, 10, isMeme);
       const list = response?.record_list?.map(async (d) => {
         let tokenId = d.token_id;
         if (nearNativeTokens.includes(tokenId)) {

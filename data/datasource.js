@@ -47,19 +47,15 @@ class DataSource {
     }
   }
 
-  getLiquidations(account, pageNumber = 1, pageSize = 10) {
+  getLiquidations(account, pageNumber = 1, pageSize = 10, isMemeCategory) {
     const qryObj = {
       page_number: pageNumber,
       page_size: pageSize,
     };
-    return this.callAPI(
-      `/burrow/get_burrow_liquidate_records/${account}`,
-      "GET",
-      qryObj,
-      null,
-      config?.liquidationUrl,
-      true,
-    );
+    const path = isMemeCategory
+      ? "/burrow/get_meme_burrow_liquidate_records"
+      : "/burrow/get_burrow_liquidate_records";
+    return this.callAPI(`${path}/${account}`, "GET", qryObj, null, config?.liquidationUrl, true);
   }
 
   markLiquidationRead(receipt_ids) {
@@ -76,13 +72,14 @@ class DataSource {
     );
   }
 
-  getRecords(accountId, pageNumber = 1, pageSize = 10) {
+  getRecords(accountId, pageNumber = 1, pageSize = 10, isMemeCategory) {
     const qryObj = {
       account_id: accountId,
       page_number: pageNumber,
       page_size: pageSize,
     };
-    return this.callAPI(`/get-burrow-records`, "GET", qryObj, null, config?.recordsUrl, true);
+    const path = isMemeCategory ? "/get-meme-burrow-records" : "/get-burrow-records";
+    return this.callAPI(path, "GET", qryObj, null, config?.recordsUrl, true);
   }
 
   getTokenDetails(tokenId, period = 1) {

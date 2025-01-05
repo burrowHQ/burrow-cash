@@ -9,11 +9,13 @@ export async function getLiquidations(
   page?: number,
   pageSize?: number,
   assets?: AssetsProps,
+  isMeme?: boolean,
 ) {
   const liquidationData = await Datasource.shared.getLiquidations(
     accountId,
     page || 1,
     pageSize || 10,
+    isMeme,
   );
   const unreadIds: Array<string> = [];
   liquidationData?.record_list?.forEach((d) => {
