@@ -100,7 +100,11 @@ const Index = () => {
     supplyBorrowNode = (
       <StyledSupplyBorrow className="gap-6 lg:flex mb-10">
         <YourSupplied suppliedRows={suppliedRows} total={totalSuppliedUSD as number} />
-        <YourBorrowed borrowedRows={borrowedAll} accountId={accountId} total={totalBorrowedUSD} />
+        <YourBorrowed
+          borrowedRows={borrowedAll}
+          accountId={accountId}
+          total={totalBorrowedUSD as number}
+        />
       </StyledSupplyBorrow>
     );
     supplyBorrowNodeMEME = (
@@ -113,7 +117,8 @@ const Index = () => {
         <YourBorrowed
           borrowedRows={borrowedAllMEME}
           accountId={accountId}
-          total={totalBorrowedUSDMEME}
+          total={totalBorrowedUSDMEME as number}
+          memeCategory={true}
         />
       </StyledSupplyBorrow>
     );
@@ -159,7 +164,7 @@ const StyledSupplyBorrow = styled.div`
   }
 `;
 
-const yourSuppliedColumns = [
+const yourSuppliedColumns = (memeCategory?: boolean) => [
   {
     header: "Assets",
     size: 130,
@@ -230,6 +235,7 @@ const yourSuppliedColumns = [
           page="deposit"
           tokenId={originalData?.tokenId}
           onlyMarket
+          memeCategory={!!memeCategory}
         />
       );
     },
@@ -317,7 +323,7 @@ const YourSupplied = ({
       </div>
       <StyledCustomTable
         data={suppliedRows}
-        columns={yourSuppliedColumns}
+        columns={yourSuppliedColumns(memeCategory)}
         noDataText="Your supplied assets will appear here"
         onSelectRow={handleRowSelect}
         selectedRowIndex={selected?.index}
@@ -376,7 +382,7 @@ const StyledCustomTable = styled(CustomTable)`
   }
 `;
 
-const yourBorrowedColumns = [
+const yourBorrowedColumns = (memeCategory?: boolean) => [
   {
     header: "Assets",
     size: 140,
@@ -423,6 +429,7 @@ const yourBorrowedColumns = [
           page="borrow"
           tokenId={originalData?.tokenId}
           onlyMarket
+          memeCategory={!!memeCategory}
         />
       );
     },
@@ -457,7 +464,17 @@ const yourBorrowedColumns = [
     },
   },
 ];
-const YourBorrowed = ({ borrowedRows, accountId, total }) => {
+const YourBorrowed = ({
+  borrowedRows,
+  accountId,
+  total,
+  memeCategory,
+}: {
+  borrowedRows: any;
+  accountId: string;
+  total: number;
+  memeCategory?: boolean;
+}) => {
   const [selected, setSelected] = useState<TableRowSelect>({ data: null, index: null });
 
   const handleRowSelect = (rowData, rowIndex) => {
@@ -479,7 +496,7 @@ const YourBorrowed = ({ borrowedRows, accountId, total }) => {
 
       <StyledCustomTable
         data={borrowedRows}
-        columns={yourBorrowedColumns}
+        columns={yourBorrowedColumns(memeCategory)}
         noDataText="You borrowed assets will appear here"
         onSelectRow={handleRowSelect}
         selectedRowIndex={selected?.index}

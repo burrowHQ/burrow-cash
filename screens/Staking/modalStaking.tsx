@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import _ from "lodash";
 import Decimal from "decimal.js";
 import { DateTime } from "luxon";
@@ -10,7 +10,7 @@ import { useStaking } from "../../hooks/useStaking";
 import { trackMaxStaking, trackStaking } from "../../utils/telemetry";
 import { stake } from "../../store/actions/stake";
 import CustomModal from "../../components/CustomModal/CustomModal";
-import { APY_FORMAT, TOKEN_FORMAT } from "../../store";
+import { TOKEN_FORMAT } from "../../store";
 import CustomButton from "../../components/CustomButton/CustomButton";
 import { useRewards, useStakeRewardApy } from "../../hooks/useRewards";
 import { ContentTipBox } from "../../components/ContentBox/ContentBox";
@@ -121,7 +121,7 @@ const ModalStaking = ({ isOpen, onClose }) => {
       onClose={handleModalClose}
       onOutsideClick={handleModalClose}
       className="modal-mobile-bottom"
-      style={{ width: "500px", height: "80vh", overflow: "auto" }}
+      style={{ width: "500px", maxHeight: "80vh", overflow: "auto" }}
       title="Stake BRRR"
     >
       <div className="px-2">

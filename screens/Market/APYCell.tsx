@@ -8,7 +8,7 @@ import { useExtraAPY } from "../../hooks/useExtraAPY";
 import { useAPY } from "../../hooks/useAPY";
 import { format_apy } from "../../utils/uiNumber";
 import { standardizeAsset } from "../../utils/index";
-import { getAssets } from "../../redux/assetsSelectors";
+import { getAssetsCategory } from "../../redux/assetsSelectors";
 import { useAppSelector } from "../../redux/hooks";
 import { getProtocolRewards } from "../../redux/selectors/getProtocolRewards";
 
@@ -20,7 +20,10 @@ export const APYCell = ({
   isStaking = false,
   onlyMarket = false,
   excludeNetApy = false,
-}) => {
+  memeCategory,
+}: {
+  memeCategory?: boolean;
+} & Record<string, any>) => {
   // Filter out the ones rewards sent out
   const list = rewards.filter((reward) => reward.rewards.remaining_rewards !== "0");
   const isBorrow = page === "borrow";
@@ -31,6 +34,7 @@ export const APYCell = ({
     page,
     onlyMarket,
     excludeNetApy,
+    memeCategory,
   });
   const stakeBooster = new Decimal(stakeBoostedAPY).gt(boostedAPY);
   return (
@@ -42,6 +46,7 @@ export const APYCell = ({
       isStaking={isStaking}
       onlyMarket={onlyMarket}
       excludeNetApy={excludeNetApy}
+      memeCategory={memeCategory}
     >
       <span
         className={`border-b border-dashed border-dark-800 pb-0.5 whitespace-nowrap ${
@@ -63,9 +68,10 @@ const ToolTip = ({
   isStaking,
   onlyMarket,
   excludeNetApy,
+  memeCategory,
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
-  const assets = useAppSelector(getAssets);
+  const assets = useAppSelector(getAssetsCategory());
   const router = useRouter();
   // suppose only one reward
   const netTvlFarmTokenId = (Object.keys(assets?.netTvlFarm || {}) || [])[0];
@@ -79,6 +85,7 @@ const ToolTip = ({
     tokenId,
     isBorrow,
     onlyMarket,
+    memeCategory,
   });
   const netTvlRewards = useAppSelector(getProtocolRewards());
   function getNetTvlFarmRewardIcon() {

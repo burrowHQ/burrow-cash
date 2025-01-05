@@ -13,7 +13,28 @@ export const getConfigMEME = createSelector(
   (state: RootState) => state.appMEME,
   (app) => app.config,
 );
-
+export const getConfigCategory = (memeCategory?: boolean) => {
+  return createSelector(
+    (state: RootState) => state.app,
+    (state: RootState) => state.appMEME,
+    (state: RootState) => state.category,
+    (appMain, appMEME, category) => {
+      let isMeme: boolean;
+      if (memeCategory == undefined) {
+        isMeme = category.activeCategory == "meme";
+      } else {
+        isMeme = memeCategory;
+      }
+      let app: typeof appMain;
+      if (isMeme) {
+        app = appMEME;
+      } else {
+        app = appMain;
+      }
+      return app.config;
+    },
+  );
+};
 export const getModalStatus = createSelector(
   (state: RootState) => state.app,
   (state: RootState) => state.appMEME,
