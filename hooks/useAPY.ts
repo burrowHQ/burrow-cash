@@ -8,7 +8,10 @@ export const useAPY = ({
   onlyMarket = false,
   isStaking = false,
   excludeNetApy = false,
-}) => {
+  memeCategory,
+}: {
+  memeCategory?: boolean;
+} & Record<string, any>) => {
   const isBorrow = page === "borrow";
   const {
     computeRewardAPY,
@@ -20,6 +23,7 @@ export const useAPY = ({
     tokenId,
     isBorrow,
     onlyMarket: !!onlyMarket,
+    memeCategory,
   });
 
   const extraAPY = list.reduce((acc: number, { metadata, rewards, price, config }) => {

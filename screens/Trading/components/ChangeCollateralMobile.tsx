@@ -347,21 +347,53 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
     const maxLeverage = isMainStream
       ? marginConfigTokens["max_leverage_rate"]
       : marginConfigTokensMEME["max_leverage_rate"];
+
+    const k2 =
+      1 -
+      (isMainStream
+        ? marginConfigTokens.min_safety_buffer
+        : marginConfigTokensMEME.min_safety_buffer) /
+        10000;
+    let maxRemovableFromLiq = tokenCInfoBalance;
+
+    if (positionType.label === "Long") {
+      const k1 = Number(netValue) * leverage * priceC;
+      if (k1 !== 0) {
+        const minRequiredNetValue = Math.max(((size * priceP) / priceC) * (1 - k2), 0);
+        maxRemovableFromLiq = (tokenCInfoBalance - minRequiredNetValue) * 0.9;
+      }
+    } else {
+      const denominator = k2 * priceC;
+      if (denominator !== 0) {
+        const minRequiredNetValue = ((sizeValueShort + holding) * priceD) / denominator;
+        maxRemovableFromLiq =
+          (tokenCInfoBalance - (minRequiredNetValue - sizeValueLong) / priceC) * 0.9;
+      }
+    }
+    if (
+      Number.isNaN(maxRemovableFromLiq) ||
+      !Number.isFinite(maxRemovableFromLiq) ||
+      maxRemovableFromLiq < 0
+    ) {
+      maxRemovableFromLiq = 0;
+    }
+    let maxRemovableFromLeverage = 0;
     let left = 0;
     let right = tokenCInfoBalance;
-    let result = 0;
+
     while (left <= right) {
       const mid = (left + right) / 2;
       const remainingCollateral = tokenCInfoBalance - mid;
       const newLeverage = calculateLeverage(tokenDInfoBalance, priceD, remainingCollateral, priceC);
       if (newLeverage <= maxLeverage) {
-        result = mid;
+        maxRemovableFromLeverage = mid;
         left = mid + 0.0001;
       } else {
         right = mid - 0.0001;
       }
     }
-    return result;
+    const finalMax = Math.min(maxRemovableFromLeverage, maxRemovableFromLiq);
+    return finalMax;
   };
   const handleLeverAddClick = (value) => {
     if (selectedLever === value) {

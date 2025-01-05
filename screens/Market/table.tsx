@@ -1,5 +1,5 @@
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { TableProps } from "../../components/Table";
 import {
   ArrowDownIcon,
@@ -168,14 +168,13 @@ function HeadMobile({ sorting }) {
 function TableBody({ rows, sorting, isMeme }: TableProps) {
   const [depositApyMap, setDepositApyMap] = useState<Record<string, number>>({});
   const [borrowApyMap, setBorrowApyMap] = useState<Record<string, number>>({});
-  const [sortedRows, setSortedRows] = useState<any>();
   const { property, order } = sorting;
-  useEffect(() => {
+  const sortedRows = useMemo(() => {
     if (rows?.length) {
-      setSortedRows(rows.sort(comparator));
+      return rows.sort(comparator);
     }
   }, [rows, Object.keys(depositApyMap).length, Object.keys(borrowApyMap).length, property, order]);
-  if (!rows?.length) return null;
+  if (!sortedRows?.length) return null;
   function comparator(b: UIAsset, a: UIAsset) {
     let a_comparator_value;
     let b_comparator_value;
