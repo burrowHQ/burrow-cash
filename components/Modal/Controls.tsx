@@ -11,6 +11,7 @@ export default function Controls({ amount, available, action, asset, totalAvaila
   const dispatch = useAppDispatch();
   const isMeme = useAppSelector(isMemeCategory);
   const handleInputChange = (e) => {
+    console.log("---------------e", e);
     const { value } = e.target;
     const numRegex = /^([0-9]*\.?[0-9]*$)/;
     console.log(
@@ -76,7 +77,7 @@ export default function Controls({ amount, available, action, asset, totalAvaila
             placeholder="0.0"
             step="any"
             value={inputAmount}
-            onChange={handleInputChange}
+            onInput={handleInputChange}
             className="text-white noselect"
           />
         </div>
