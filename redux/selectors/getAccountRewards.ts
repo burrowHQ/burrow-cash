@@ -349,7 +349,7 @@ export const getAccountRewards = (memeCategory?: boolean) => {
     (state: RootState) => state.app,
     (state: RootState) => state.appMEME,
     (state: RootState) => state.category,
-    getStaking,
+    getStaking(memeCategory),
     (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category, stakingMain) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {
@@ -511,7 +511,7 @@ export const getAccountRewardsForApy = (memeCategory?: boolean) => {
     (state: RootState) => state.app,
     (state: RootState) => state.appMEME,
     (state: RootState) => state.category,
-    getStaking,
+    getStaking(memeCategory),
     (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category, stakingMain) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {
@@ -652,7 +652,7 @@ export const getAccountBoostRatioData = (memeCategory?: boolean) => {
     (state: RootState) => state.app,
     (state: RootState) => state.appMEME,
     (state: RootState) => state.category,
-    getStaking,
+    getStaking(memeCategory),
     (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category, staking) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {

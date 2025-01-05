@@ -22,7 +22,7 @@ export const getNetAPY = ({
     (state: RootState) => state.app,
     (state: RootState) => state.appMEME,
     (state: RootState) => state.category,
-    getExtraDailyTotals({ isStaking }),
+    getExtraDailyTotals({ isStaking, memeCategory }),
     (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category, extraDaily) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {
@@ -68,7 +68,7 @@ export const getYourNetAPY = (memeCategory?: boolean) =>
     (state: RootState) => state.account,
     (state: RootState) => state.accountMEME,
     (state: RootState) => state.category,
-    getExtraDailyTotals({ isStaking: false }),
+    getExtraDailyTotals({ isStaking: false, memeCategory }),
     (assetsMain, assetsMEME, accountMain, accountMEME, category, extraDaily) => {
       let isMeme: boolean;
       if (memeCategory == undefined) {

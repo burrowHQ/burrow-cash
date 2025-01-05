@@ -23,7 +23,7 @@ export function useExtraAPY({
   onlyMarket?: boolean;
   memeCategory?: boolean;
 }) {
-  const { xBRRR = 0, extraXBRRRAmount = 0 } = useAppSelector(getStaking);
+  const { xBRRR = 0, extraXBRRRAmount = 0 } = useAppSelector(getStaking(memeCategory));
   const portfolio = useAppSelector(getAccountPortfolio(memeCategory));
   const appConfig = useAppSelector(getConfigCategory(memeCategory));
   const assets = useAppSelector(getAssetsCategory(memeCategory));

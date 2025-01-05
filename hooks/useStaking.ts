@@ -4,7 +4,7 @@ import { setStaking } from "../redux/appSlice";
 import { getNetAPY, getNetTvlAPY } from "../redux/selectors/getNetAPY";
 
 export function useStaking() {
-  const staking = useAppSelector(getStaking);
+  const staking = useAppSelector(getStaking(false));
   const dispatch = useAppDispatch();
   const stakingNetAPY = useAppSelector(getNetAPY({ isStaking: true, memeCategory: false }));
   const stakingNetTvlAPY = useAppSelector(getNetTvlAPY({ isStaking: true }));
