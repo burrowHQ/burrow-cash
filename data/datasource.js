@@ -53,7 +53,7 @@ class DataSource {
       page_size: pageSize,
     };
     return this.callAPI(
-      `/burrow/get_burrow_liquidate_records/${account}`,
+      `/burrow/get_meme_burrow_liquidate_records/${account}`,
       "GET",
       qryObj,
       null,
@@ -82,7 +82,7 @@ class DataSource {
       page_number: pageNumber,
       page_size: pageSize,
     };
-    return this.callAPI(`/get-burrow-records`, "GET", qryObj, null, config?.recordsUrl, true);
+    return this.callAPI(`/get-meme-burrow-records`, "GET", qryObj, null, config?.recordsUrl, true);
   }
 
   getTokenDetails(tokenId, period = 1) {
