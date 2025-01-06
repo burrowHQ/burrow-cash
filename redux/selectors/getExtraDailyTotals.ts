@@ -16,7 +16,7 @@ export const getExtraDailyTotals = ({
     (state: RootState) => state.assets,
     (state: RootState) => state.assetsMEME,
     (state: RootState) => state.category,
-    getAccountRewards(),
+    getAccountRewards(memeCategory),
     (assetsMain, assetsMEME, category, rewards) => {
       let isMeme: boolean;
       if (typeof memeCategory !== "boolean") {

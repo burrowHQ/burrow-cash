@@ -84,22 +84,6 @@ export const StakingCard = ({
   );
 };
 
-export const LiveUnclaimedAmount = ({ addAmount = 0 }) => {
-  const rewards = useAppSelector(getAccountRewards());
-  const { unclaimedAmount = 0, dailyAmount = 0 } = rewards.brrr;
-  const [unclaimed, setUnclaimed] = useState<number>(unclaimedAmount);
-
-  const count = dailyAmount / 24 / 3600 / 10;
-
-  useLayoutEffect(() => {
-    setUnclaimed(unclaimedAmount);
-    const timer = setInterval(() => setUnclaimed((u) => u + count), 60);
-    return () => clearInterval(timer);
-  }, [unclaimedAmount]);
-
-  return <span>{(addAmount + unclaimed).toLocaleString(undefined, TOKEN_FORMAT)}</span>;
-};
-
 export const Separator = ({ sx = {} }) => (
   <Box
     flex={1}

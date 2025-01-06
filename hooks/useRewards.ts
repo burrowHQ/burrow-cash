@@ -95,10 +95,10 @@ export function useProRataNetLiquidityReward(tokenId, dailyAmount) {
   return dailyAmount * share;
 }
 
-export function useStakeRewardApy() {
-  const assetRewards = useAppSelector(getAccountRewardsForApy());
-  const portfolio = useAppSelector(getAccountPortfolio());
-  const assets = useAppSelector(getAssetsCategory());
+export function useStakeRewardApy(memeCategory?: boolean) {
+  const assetRewards = useAppSelector(getAccountRewardsForApy(memeCategory));
+  const portfolio = useAppSelector(getAccountPortfolio(memeCategory));
+  const assets = useAppSelector(getAssetsCategory(memeCategory));
   if (!assets?.data)
     return {
       avgStakeSupplyAPY: 0,

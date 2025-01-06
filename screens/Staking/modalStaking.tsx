@@ -24,11 +24,16 @@ import { getMarketRewardsData } from "../../redux/selectors/getMarketRewards";
 import { getAppState } from "../../redux/appSelectors";
 
 const ModalStaking = ({ isOpen, onClose }) => {
-  const [total, totalUnclaim, totalToken] = useAppSelector(getTotalBRRR(false));
-  const app = useAppSelector(getAppState(false));
   const [monthPercent, setMonthPercent] = useState(0);
   const [loadingStake, setLoadingStake] = useState(false);
-  const { stakingTimestamp, amount, months, setAmount, setMonths } = useStaking();
+  const { stakingTimestamp, amount, months, setAmount, setMonths } = useStaking(false);
+  const app = useAppSelector(getAppState(false));
+  const [total, totalUnclaim, totalToken] = useAppSelector(getTotalBRRR(false));
+  const { avgStakeSupplyAPY, avgStakeBorrowAPY, avgStakeNetAPY, totalTokenNetMap } =
+    useStakeRewardApy(false);
+  const [, , multiplier] = useAppSelector(getAccountBoostRatioData(false));
+  const { tokenNetBalance } = useAppSelector(getMarketRewardsData(false));
+
   const [minMonth, maxMonth, monthList] = useMemo(() => {
     if (app?.config) {
       const { minimum_staking_duration_sec, maximum_staking_duration_sec } = app?.config || {};
@@ -47,11 +52,6 @@ const ModalStaking = ({ isOpen, onClose }) => {
   const invalidAmount = +amount > +total;
   const invalidMonths = months === maxMonth ? false : months < selectedMonths;
   const disabledStake = !amount || invalidAmount || invalidMonths || Number(amount) === 0;
-  const { avgStakeSupplyAPY, avgStakeBorrowAPY, avgStakeNetAPY, totalTokenNetMap } =
-    useStakeRewardApy();
-  const [, , multiplier] = useAppSelector(getAccountBoostRatioData(false));
-  const { tokenNetBalance } = useAppSelector(getMarketRewardsData);
-
   const inputAmount = `${amount}`
     .replace(/[^0-9.-]/g, "")
     .replace(/(?!^)-/g, "")

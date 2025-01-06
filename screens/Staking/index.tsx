@@ -28,16 +28,16 @@ import HtmlTooltip from "../../components/common/html-tooltip";
 import YourAPY from "./yourAPY";
 
 const Staking = () => {
-  const [total] = useAppSelector(getTotalBRRR(false));
-  const accountBalances = useAppSelector((state) => state.account.balances);
-  const assets = useAppSelector(getAssets);
-  const { BRRR, stakingTimestamp } = useStaking();
-  const [, , , multiplierStaked] = useAppSelector(getAccountBoostRatioData(false));
   const [loadingUnstake, setLoadingUnstake] = useState(false);
   const [modal, setModal] = useState<modalProps>();
   const [showTooltip, setShowTooltip] = useState(false);
   const accountId = useAccountId();
   const isMobile = isMobileDevice();
+  const [total] = useAppSelector(getTotalBRRR(false));
+  const accountBalances = useAppSelector((state) => state.account.balances);
+  const assets = useAppSelector(getAssets);
+  const [, , , multiplierStaked] = useAppSelector(getAccountBoostRatioData(false));
+  const { BRRR, stakingTimestamp } = useStaking(false);
   const unstakeDate = DateTime.fromMillis(stakingTimestamp / 1e6);
   const disabledUnstake = !BRRR || DateTime.now() < unstakeDate;
   const displayMultiplierStaked = toPrecision(
