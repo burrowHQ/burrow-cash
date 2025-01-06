@@ -126,8 +126,8 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
 
   const getTabClassName = (tabName: string) => {
     return activeTab === tabName
-      ? "bg-primary text-dark-200 py-2.5 px-5 rounded-md"
-      : "text-gray-300 py-2.5 px-5";
+      ? "bg-primary text-dark-200 py-2.5 px-5 rounded-md h-11 w-[50%] overflow-hidden text-ellipsis whitespace-nowrap"
+      : "text-gray-300 py-2.5 px-5 h-11 w-[50%] overflow-hidden text-ellipsis whitespace-nowrap";
   };
 
   const cateSymbol = getSymbolById(
@@ -486,17 +486,22 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
   return (
     <div className="lg:w-full pt-4 lg:px-4 pb-9">
       <div className="flex justify-between items-center">
-        <div className="flex bg-dark-200 px-0.5 py-0.5 rounded-md cursor-pointer mr-3">
-          <div className={getTabClassName("long")} onClick={() => handleTabClick("long")}>
+        <div className="flex bg-dark-200 px-0.5 py-0.5 rounded-md cursor-pointer mr-3 w-full">
+          <div
+            className={getTabClassName("long")}
+            onClick={() => handleTabClick("long")}
+            title={`Long ${cateSymbol}`}
+          >
             Long {cateSymbol}
           </div>
           <div
             className={
               activeTab === "short"
-                ? "bg-red-50 text-dark-200 py-2.5 px-5 rounded-md"
+                ? "bg-red-50 text-dark-200 py-2.5 px-5 rounded-md h-11 w-[50%] overflow-hidden text-ellipsis whitespace-nowrap"
                 : getTabClassName("short")
             }
             onClick={() => handleTabClick("short")}
+            title={`Short ${cateSymbol}`}
           >
             Short {cateSymbol}
           </div>
