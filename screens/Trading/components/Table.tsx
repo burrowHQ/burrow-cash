@@ -1020,13 +1020,13 @@ const TradingTable = ({
                     <div className="flex items-center">
                       <div className="flex items-center justify-center mr-3.5">
                         <img
-                          src={assetD.metadata.icon}
+                          src={assetP.metadata.icon}
                           alt=""
                           className="rounded-2xl border border-gray-800"
                           style={{ width: "26px", height: "26px" }}
                         />
                         <img
-                          src={assetP.metadata.icon}
+                          src={assetD.metadata.icon}
                           alt=""
                           className="rounded-2xl border border-gray-800"
                           style={{ width: "26px", height: "26px", marginLeft: "-6px" }}
