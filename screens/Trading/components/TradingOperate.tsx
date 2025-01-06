@@ -486,7 +486,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
   return (
     <div className="lg:w-full pt-4 lg:px-4 pb-9">
       <div className="flex justify-between items-center">
-        <div className="flex bg-dark-200 px-0.5 py-0.5 rounded-md cursor-pointer mr-3 w-full">
+        <div className="flex bg-dark-200 px-0.5 py-0.5 rounded-md cursor-pointer mr-3 w-[80%]">
           <div
             className={getTabClassName("long")}
             onClick={() => handleTabClick("long")}
