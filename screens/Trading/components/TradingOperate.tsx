@@ -495,7 +495,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
         </div>
         <div />
         <div
-          className="cursor-pointer border border-dark-500 rounded-md p-[8px] flex items-center justify-center"
+          className="cursor-pointer border border-dark-500 rounded-md p-[8px] flex items-center justify-center mr-1"
           onClick={() => {
             if (!tokenInAmount || forceUpdateLoading) {
               return;
