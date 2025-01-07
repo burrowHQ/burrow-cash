@@ -67,7 +67,7 @@ class DataSource {
       receipt_ids,
     };
     return this.callAPI(
-      "/burrow/set_liquidation",
+      "/burrow/set_meme_liquidation",
       "POST",
       null,
       qryObj,
@@ -90,7 +90,7 @@ class DataSource {
       period,
     };
     return this.callAPI(
-      `/burrow/get_token_detail/${tokenId}`,
+      `/burrow/get_meme_token_detail/${tokenId}`,
       "GET",
       qryObj,
       null,
@@ -101,7 +101,7 @@ class DataSource {
 
   getInterestRate(tokenId) {
     return this.callAPI(
-      `/burrow/get_token_interest_rate/${tokenId}`,
+      `/burrow/get_meme_token_interest_rate/${tokenId}`,
       "GET",
       null,
       null,

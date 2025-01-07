@@ -9,10 +9,10 @@ export async function get_token_detail(tokenId: string) {
   const initResponse = [];
   try {
     response = (
-      await fetch(`${liquidationUrl}/burrow/get_token_detail/${tokenId}`, {
+      await fetch(`${liquidationUrl}/burrow/get_meme_token_detail/${tokenId}`, {
         method: "GET",
         headers: {
-          Authentication: getAuthenticationHeaders(`/burrow/get_token_detail/${tokenId}`),
+          Authentication: getAuthenticationHeaders(`/burrow/get_meme_token_detail/${tokenId}`),
         },
       })
     ).json();
