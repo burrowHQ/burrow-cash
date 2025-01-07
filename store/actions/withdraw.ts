@@ -56,6 +56,7 @@ export async function withdraw({ tokenId, extraDecimals, amount, isMax, isMeme }
   const isNEAR = tokenId === nearTokenId;
   const { isLpToken } = asset;
   const suppliedBalance = new Decimal(account.portfolio?.supplied[tokenId]?.balance || 0);
+  const hasBorrow = account.portfolio?.borrows?.length > 0;
   const maxAmount = computeWithdrawMaxAmount(tokenId, assets, account.portfolio!);
 
   const expandedAmount = isMax
@@ -99,7 +100,7 @@ export async function withdraw({ tokenId, extraDecimals, amount, isMax, isMeme }
                     {
                       DecreaseCollateral: {
                         token_id: tokenId,
-                        amount: decreaseCollateralAmount.toFixed(0),
+                        amount: hasBorrow ? decreaseCollateralAmount.toFixed(0) : undefined,
                       },
                     },
                     withdrawAction,

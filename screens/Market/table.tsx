@@ -441,6 +441,7 @@ function TableRowPc({
                 page="deposit"
                 tokenId={row.tokenId}
                 onlyMarket
+                memeCategory={isMeme}
               />
             ) : (
               "-"
@@ -544,6 +545,7 @@ function TableRowMobile({
             row={row}
             canShow={row.can_deposit}
             booster={incentiveTokens.includes(row.tokenId)}
+            isMeme={isMeme}
           />
           <TemplateMobile
             title="Total Borrowed"
@@ -597,7 +599,7 @@ function TemplateMobile({
     </div>
   );
 }
-function TemplateMobileAPY({ title, row, canShow, booster }) {
+function TemplateMobileAPY({ title, row, canShow, booster, isMeme }) {
   return (
     <div className="flex flex-col">
       <span className="text-gray-300 text-sm">{title}</span>
@@ -609,6 +611,7 @@ function TemplateMobileAPY({ title, row, canShow, booster }) {
             page="deposit"
             tokenId={row.tokenId}
             onlyMarket
+            memeCategory={isMeme}
           />
         ) : (
           <>-</>

@@ -125,6 +125,7 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
               .div(365 * 24 * 60)
               .div(100)
               .mul(borrowed)
+              .mul(3)
               .toFixed(),
             decimals,
             0,

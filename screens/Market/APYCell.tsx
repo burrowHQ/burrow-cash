@@ -144,10 +144,16 @@ const ToolTip = ({
                         );
                       })}
                     </div>
-                    {format_apy(apy)} ~ {format_apy(Number(apy || 0) * 1.5)}
+                    {format_apy(apy)}{" "}
+                    {memeCategory ? "" : `~ ${format_apy(Number(apy || 0) * 1.5)}`}
                   </div>
                 </Typography>,
-                <div className="flex items-center whitespace-nowrap gap-1 text-xs" key={8}>
+                <div
+                  className={`flex items-center whitespace-nowrap gap-1 text-xs ${
+                    memeCategory ? "hidden" : ""
+                  }`}
+                  key={8}
+                >
                   Max Boost <span className="text-white font-extrabold">1.5X</span> by{" "}
                   <span
                     className="text-xs text-primary underline cursor-pointer"

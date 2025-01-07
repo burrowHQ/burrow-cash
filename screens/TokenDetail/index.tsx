@@ -517,7 +517,7 @@ function TokenOverviewMobile() {
         }
         hidden={isLpToken}
       />
-      <LabelMobileAPY title="Supply APY" tokenRow={tokenRow} />
+      <LabelMobileAPY title="Supply APY" tokenRow={tokenRow} isMeme={isMemeCategory} />
       <LabelMobile
         title="Borrow APY"
         value={!tokenRow?.can_borrow ? "-" : format_apy(tokenRow?.borrowApy)}
@@ -582,6 +582,7 @@ function TokenOverview() {
     getIcons,
     getSymbols,
     assets,
+    isMeme,
   } = useContext(DetailData) as any;
   let isLpToken = false;
   if (tokenRow?.tokenId?.indexOf(lpTokenPrefix) > -1) {
@@ -624,6 +625,7 @@ function TokenOverview() {
                   page="deposit"
                   tokenId={tokenRow.tokenId}
                   onlyMarket
+                  memeCategory={isMeme}
                 />
               </div>
             </div>
@@ -728,6 +730,7 @@ function TokenOverview() {
                   page="deposit"
                   tokenId={tokenRow.tokenId}
                   onlyMarket
+                  memeCategory={isMeme}
                 />
               </div>
             </div>
@@ -764,7 +767,7 @@ function TokenOverview() {
 
 function TokenSupplyChart({ tokenDetails, handlePeriodClick }) {
   const { tokenSupplyDays, supplyAnimating } = tokenDetails || {};
-  const { tokenRow, depositAPY } = useContext(DetailData) as any;
+  const { tokenRow, depositAPY, isMeme } = useContext(DetailData) as any;
   const value = toInternationalCurrencySystem_number(tokenRow?.totalSupply);
   const value_value = toInternationalCurrencySystem_usd(tokenRow?.totalSupplyMoney);
   const apy = format_apy(depositAPY);
@@ -790,6 +793,7 @@ function TokenSupplyChart({ tokenDetails, handlePeriodClick }) {
               page="deposit"
               tokenId={tokenRow.tokenId}
               onlyMarket
+              memeCategory={isMeme}
             />
           </span>
         </div>
@@ -808,7 +812,7 @@ function TokenSupplyChart({ tokenDetails, handlePeriodClick }) {
       {/* only mobile */}
       <div className="grid grid-cols-1 gap-y-4 lg:hidden">
         <LabelMobile title="Total Supplied" value={value} subValue={value_value} subMode="space" />
-        <LabelMobileAPY title="APY" tokenRow={tokenRow} />
+        <LabelMobileAPY title="APY" tokenRow={tokenRow} isMeme={isMeme} />
         <LabelMobile
           title="Rewards/day"
           value={
@@ -1103,19 +1107,6 @@ function YouSupplied() {
               </span>
             </div>
           </div>
-          {/* <Label
-            title="Your APY"
-            content={
-              <APYCell
-                rewards={tokenRow.depositRewards}
-                baseAPY={tokenRow.supplyApy}
-                page="deposit"
-                tokenId={tokenRow.tokenId}
-                // excludeNetApy={!incentiveTokens.includes(tokenRow.tokenId)}
-              />
-            }
-          />
-          <Label title="Daily rewards" content={RewardsReactNode} /> */}
           <Label title="Collateral" content={formatWithCommas_number(supplied?.collateral)} />
           <div className="flex items-center justify-between gap-2 mt-[35px]">
             <YellowLineButton
@@ -1531,7 +1522,7 @@ function LabelMobile({
     </div>
   );
 }
-function LabelMobileAPY({ tokenRow, title }) {
+function LabelMobileAPY({ tokenRow, title, isMeme }) {
   return (
     <div className="flex items-center justify-between">
       <span className="text-sm text-gray-300">{title}</span>
@@ -1542,6 +1533,7 @@ function LabelMobileAPY({ tokenRow, title }) {
           page="deposit"
           tokenId={tokenRow.tokenId}
           onlyMarket
+          memeCategory={isMeme}
         />
       </span>
     </div>
