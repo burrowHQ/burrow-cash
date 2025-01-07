@@ -4,7 +4,7 @@ import { TokenInfo } from "../../../hooks/useMarginAccount";
 
 interface IAssetDetailedWithMetadata extends IAssetDetailed {
   metadata: IMetadata;
-  uahpi: number | string;
+  uahpi: string;
 }
 
 export interface IConfirmMobileProps {

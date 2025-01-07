@@ -69,6 +69,7 @@ export const transformAsset = (
     .toFixed();
   const totalBorrowedD = new Decimal(asset.borrowed.balance)
     .plus(new Decimal(asset?.margin_debt?.balance || 0))
+    .plus(new Decimal(asset?.margin_pending_debt || 0))
     .toFixed();
   const totalSupply = Number(
     shrinkToken(totalSupplyD, asset.metadata.decimals + asset.config.extra_decimals),
@@ -80,7 +81,9 @@ export const transformAsset = (
   const temp1 = new Decimal(asset.supplied.balance)
     .plus(new Decimal(asset.reserved))
     .plus(asset.prot_fee)
-    .minus(new Decimal(asset.borrowed.balance));
+    .minus(new Decimal(asset.borrowed.balance || 0))
+    .minus(new Decimal(asset.margin_debt.balance || 0))
+    .minus(new Decimal(asset.margin_pending_debt || 0));
   const temp2 = temp1.minus(temp1.mul(0.001)).toFixed(0);
   const availableLiquidity = Number(
     shrinkToken(temp2, asset.metadata.decimals + asset.config.extra_decimals),
