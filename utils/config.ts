@@ -15,11 +15,10 @@ export const defaultNetwork = (process.env.NEXT_PUBLIC_DEFAULT_NETWORK ||
 const META_TOKEN = { testnet: undefined, mainnet: "meta-token.near" };
 const REF_TOKEN = { testnet: "ref.fakes.testnet", mainnet: "token.v2.ref-finance.near" };
 interface IAppConfig {
-  REF_FI_CONTRACT_ID: string;
-  PYTH_ORACLE_CONTRACT_ID: string;
-  DCL_SWAP_CONTRACT_ID: string;
-  PRICE_ORACLE_ACCOUNT_ID: string;
-  MEME_PRICE_ORACLE_ACCOUNT_ID: string;
+  PYTH_ORACLE_ID: string;
+  DCL_EXCHANGE_ID: string;
+  PRICE_ORACLE_ID: string;
+  MEME_PRICE_ORACLE_ID: string;
   REF_EXCHANGE_ID: string;
   recordsUrl: string;
   findPathUrl: string;
@@ -98,12 +97,11 @@ const getConfig = (env: string = defaultNetwork) => {
           "shadow_ref_v1-4179",
           // "aurora",
         ],
-        REF_FI_CONTRACT_ID: "v2.ref-finance.near",
-        DCL_SWAP_CONTRACT_ID: "dclv2.ref-labs.near",
-        PYTH_ORACLE_CONTRACT_ID: "pyth-oracle.near",
-        PRICE_ORACLE_ACCOUNT_ID: "priceoracle.near",
-        MEME_PRICE_ORACLE_ACCOUNT_ID: "meme-priceoracle.ref-labs.near",
+        PYTH_ORACLE_ID: "pyth-oracle.near",
+        PRICE_ORACLE_ID: "priceoracle.near",
+        MEME_PRICE_ORACLE_ID: "meme-priceoracle.ref-labs.near",
         REF_EXCHANGE_ID: "v2.ref-finance.near",
+        DCL_EXCHANGE_ID: "dclv2.ref-labs.near",
         findPathUrl: "smartrouter.ref.finance",
         indexUrl: "https://api.ref.finance",
       } as unknown as ConnectConfig & IAppConfig;
@@ -125,11 +123,10 @@ const getConfig = (env: string = defaultNetwork) => {
         ],
         NATIVE_TOKENS: ["usdc.fakes.testnet"],
         NEW_TOKENS: ["usdc.fakes.testnet", "shadow_ref_v1-0", "shadow_ref_v1-2"],
-        REF_FI_CONTRACT_ID: "exchange.ref-dev.testnet",
-        DCL_SWAP_CONTRACT_ID: "refv2-dev.ref-dev.testnet", // dclv2.ref-dev.testnet
-        PYTH_ORACLE_CONTRACT_ID: "pyth-oracle.testnet",
-        PRICE_ORACLE_ACCOUNT_ID: "mock-priceoracle.testnet",
-        MEME_PRICE_ORACLE_ACCOUNT_ID: "mock-priceoracle.testnet",
+        DCL_EXCHANGE_ID: "refv2-dev.ref-dev.testnet", // dclv2.ref-dev.testnet
+        PYTH_ORACLE_ID: "pyth-oracle.testnet",
+        PRICE_ORACLE_ID: "mock-priceoracle.testnet",
+        MEME_PRICE_ORACLE_ID: "mock-priceoracle.testnet",
         REF_EXCHANGE_ID: "exchange.ref-dev.testnet",
         findPathUrl: "smartrouterdev.refburrow.top",
         // findPathUrl: "smartrouter.ref.finance",
@@ -171,6 +168,5 @@ const getConfig = (env: string = defaultNetwork) => {
 };
 
 export const isTestnet = getConfig(defaultNetwork).networkId === "testnet";
-export const REFV1_CONTRACT_NAME = getConfig().REF_FI_CONTRACT_ID;
 
 export default getConfig;

@@ -159,8 +159,8 @@ export const getBurrow = async ({
     ViewMethodsLogic,
     ChangeMethodsLogic,
   );
-  const price_oracle_account_id = getConfig().PRICE_ORACLE_ACCOUNT_ID;
-  const meme_price_oracle_account_id = getConfig().MEME_PRICE_ORACLE_ACCOUNT_ID;
+  const price_oracle_account_id = getConfig().PRICE_ORACLE_ID;
+  const meme_price_oracle_account_id = getConfig().MEME_PRICE_ORACLE_ID;
   const ref_exchange_id = getConfig().REF_EXCHANGE_ID;
   const oracleContract: Contract = await getContract(
     account,
@@ -182,13 +182,13 @@ export const getBurrow = async ({
   );
   const pythContract: Contract = await getContract(
     account,
-    getConfig().PYTH_ORACLE_CONTRACT_ID,
+    getConfig().PYTH_ORACLE_ID,
     ViewMethodsPyth,
     ChangeMethodsPyth,
   );
   const dclContract: Contract = await getContract(
     account,
-    getConfig().DCL_SWAP_CONTRACT_ID,
+    getConfig().DCL_EXCHANGE_ID,
     ViewMethodsDcl,
     ChangeMethodsDcl,
   );
