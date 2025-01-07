@@ -55,21 +55,15 @@ class DataSource {
     const path = isMemeCategory
       ? "/burrow/get_meme_burrow_liquidate_records"
       : "/burrow/get_burrow_liquidate_records";
-    return this.callAPI(`${path}/${account}`, "GET", qryObj, null, config?.liquidationUrl, true);
+    return this.callAPI(`${path}/${account}`, "GET", qryObj, null, config?.dataServiceUrl, true);
   }
 
-  markLiquidationRead(receipt_ids) {
+  markLiquidationRead(receipt_ids, isMemeCategory) {
     const qryObj = {
       receipt_ids,
     };
-    return this.callAPI(
-      "/burrow/set_liquidation",
-      "POST",
-      null,
-      qryObj,
-      config?.liquidationUrl,
-      true,
-    );
+    const path = isMemeCategory ? "/burrow/set_meme_liquidation" : "/burrow/set_liquidation";
+    return this.callAPI(path, "POST", null, qryObj, config?.dataServiceUrl, true);
   }
 
   getRecords(accountId, pageNumber = 1, pageSize = 10, isMemeCategory) {
@@ -79,32 +73,24 @@ class DataSource {
       page_size: pageSize,
     };
     const path = isMemeCategory ? "/get-meme-burrow-records" : "/get-burrow-records";
-    return this.callAPI(path, "GET", qryObj, null, config?.recordsUrl, true);
+    return this.callAPI(path, "GET", qryObj, null, config?.indexUrl, true);
   }
 
-  getTokenDetails(tokenId, period = 1) {
+  getTokenDetails(tokenId, period = 1, isMemeCategory) {
     const qryObj = {
       period,
     };
-    return this.callAPI(
-      `/burrow/get_token_detail/${tokenId}`,
-      "GET",
-      qryObj,
-      null,
-      config?.liquidationUrl,
-      true,
-    );
+    const path = isMemeCategory
+      ? `/burrow/get_meme_token_detail/${tokenId}`
+      : `/burrow/get_token_detail/${tokenId}`;
+    return this.callAPI(path, "GET", qryObj, null, config?.dataServiceUrl, true);
   }
 
-  getInterestRate(tokenId) {
-    return this.callAPI(
-      `/burrow/get_token_interest_rate/${tokenId}`,
-      "GET",
-      null,
-      null,
-      config?.liquidationUrl,
-      true,
-    );
+  getInterestRate(tokenId, isMemeCategory) {
+    const path = isMemeCategory
+      ? `/burrow/get_meme_token_interest_rate/${tokenId}`
+      : `/burrow/get_token_interest_rate/${tokenId}`;
+    return this.callAPI(path, "GET", null, null, config?.dataServiceUrl, true);
   }
 
   getTxId(receipt_id) {
@@ -112,13 +98,7 @@ class DataSource {
   }
 
   getMarginTradingPosition(params) {
-    return this.callAPI(
-      `/v3/margin-trading/position`,
-      "POST",
-      null,
-      params,
-      config?.marginTradingUrl,
-    );
+    return this.callAPI(`/v3/margin-trading/position`, "POST", null, params, config?.indexUrl);
   }
 
   getMarginTradingVolumeStatistics() {
@@ -127,7 +107,7 @@ class DataSource {
       "GET",
       null,
       null,
-      config?.marginTradingUrl,
+      config?.indexUrl,
     );
   }
 
@@ -137,18 +117,12 @@ class DataSource {
       "GET",
       { token_address: id },
       null,
-      config?.marginTradingUrl,
+      config?.indexUrl,
     );
   }
 
   getFee() {
-    return this.callAPI(
-      `/v3/margin-trading/position/fee`,
-      "GET",
-      null,
-      null,
-      config?.marginTradingUrl,
-    );
+    return this.callAPI(`/v3/margin-trading/position/fee`, "GET", null, null, config?.indexUrl);
   }
 
   getMarginTradingRecordEntryPrice(id) {
@@ -157,7 +131,7 @@ class DataSource {
       "GET",
       { pos_ids: id },
       null,
-      config?.marginTradingUrl,
+      config?.indexUrl,
     );
   }
 
@@ -167,7 +141,7 @@ class DataSource {
       "GET",
       params,
       null,
-      config?.marginTradingUrl,
+      config?.indexUrl,
     );
   }
 }

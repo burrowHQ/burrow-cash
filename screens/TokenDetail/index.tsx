@@ -167,7 +167,7 @@ function TokenDetailView({
 
   useEffect(() => {
     fetchTokenDetails(tokenRow.tokenId, 365).catch();
-    get_token_detail(tokenRow.tokenId).then((response) => {
+    get_token_detail(tokenRow.tokenId, isMeme).then((response) => {
       const { total_suppliers, total_borrowers } = response[0] || {};
       if (!isInvalid(total_suppliers)) {
         set_suppliers_number(total_suppliers);

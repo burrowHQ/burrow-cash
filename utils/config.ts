@@ -20,9 +20,8 @@ interface IAppConfig {
   PRICE_ORACLE_ID: string;
   MEME_PRICE_ORACLE_ID: string;
   REF_EXCHANGE_ID: string;
-  recordsUrl: string;
-  findPathUrl: string;
   indexUrl: string;
+  findPathUrl: string;
   explorerUrl: string;
 }
 export const STABLE_POOL_IDS = [
@@ -77,10 +76,9 @@ const getConfig = (env: string = defaultNetwork) => {
         walletUrl: "https://wallet.near.org",
         helperUrl: "https://helper.mainnet.near.org",
         explorerUrl: "https://explorer.mainnet.near.org",
-        liquidationUrl: "https://api.data-service.burrow.finance",
-        recordsUrl: "https://api.ref.finance",
+        dataServiceUrl: "https://api.data-service.burrow.finance",
+        indexUrl: "https://api.ref.finance",
         txIdApiUrl: "https://api3.nearblocks.io",
-        marginTradingUrl: "https://api.ref.finance",
         SPECIAL_REGISTRATION_TOKEN_IDS: [
           "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
         ],
@@ -103,7 +101,6 @@ const getConfig = (env: string = defaultNetwork) => {
         REF_EXCHANGE_ID: "v2.ref-finance.near",
         DCL_EXCHANGE_ID: "dclv2.ref-labs.near",
         findPathUrl: "smartrouter.ref.finance",
-        indexUrl: "https://api.ref.finance",
       } as unknown as ConnectConfig & IAppConfig;
 
     case "development":
@@ -114,10 +111,8 @@ const getConfig = (env: string = defaultNetwork) => {
         walletUrl: "https://wallet.testnet.near.org",
         helperUrl: "https://helper.testnet.near.org",
         explorerUrl: "https://testnet.nearblocks.io",
-        liquidationUrl: "https://dev.data-service.ref-finance.com",
-        recordsUrl: "https://dev-indexer.ref-finance.com",
+        dataServiceUrl: "https://dev.data-service.ref-finance.com",
         txIdApiUrl: "https://api-testnet.nearblocks.io",
-        marginTradingUrl: "https://testnet-indexer.ref-finance.com",
         SPECIAL_REGISTRATION_TOKEN_IDS: [
           "3e2210e1184b45b64c8a434c0a7e7b23cc04ea7eb7a6c3c32520d03d4afcb8af",
         ],

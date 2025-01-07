@@ -3,6 +3,8 @@ import { DateTime } from "luxon";
 import Decimal from "decimal.js";
 import Datasource from "../data/datasource";
 import { getAssets } from "../store";
+import { useAppSelector } from "../redux/hooks";
+import { isMemeCategory } from "../redux/categorySelectors";
 
 const getSupplyDetails = (tokenDetailDays) => {
   return tokenDetailDays.map((d) => {
@@ -23,7 +25,7 @@ export const useTokenDetails = () => {
   const [interestRates, setInterestRates] = useState<any[]>([]);
   const [borrowAnimating, setBorrowAnimating] = useState(false);
   const [supplyAnimating, setSupplyAnimating] = useState(false);
-
+  const isMeme = useAppSelector(isMemeCategory);
   const changePeriodDisplay = async ({ tokenId, borrowPeriod, supplyPeriod }) => {
     try {
       const isBorrowPeriodChange =
@@ -74,8 +76,8 @@ export const useTokenDetails = () => {
 
     try {
       const [tokenDetailsRes, interestRateRes, currentUtilizationRes] = await Promise.allSettled([
-        Datasource.shared.getTokenDetails(tokenId, period),
-        Datasource.shared.getInterestRate(tokenId),
+        Datasource.shared.getTokenDetails(tokenId, period, isMeme),
+        Datasource.shared.getInterestRate(tokenId, isMeme),
         getCurrentUtilization(tokenId),
       ]);
 

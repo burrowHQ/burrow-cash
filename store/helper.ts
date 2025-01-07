@@ -175,7 +175,7 @@ const getPythPrices = async () => {
       };
     }
     try {
-      const listTokenPrice = await fetch(`${getConfig().recordsUrl}/list-token-price`, {
+      const listTokenPrice = await fetch(`${getConfig().indexUrl}/list-token-price`, {
         method: "GET",
         headers: {
           Authentication: getAuthenticationHeaders("/list-token-price"),

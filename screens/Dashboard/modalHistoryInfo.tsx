@@ -6,12 +6,14 @@ import { CloseIcon } from "../../components/Icons/Icons";
 import Records from "./records";
 import { useUnreadLiquidation } from "../../hooks/hooks";
 import Datasource from "../../data/datasource";
+import { useAppSelector } from "../../redux/hooks";
+import { isMemeCategory } from "../../redux/categorySelectors";
 
 const ModalHistoryInfo = ({ isOpen, onClose, tab }) => {
   const [tabIndex, setTabIndex] = useState(tab);
   const [liquidationPage, setLiquidationPage] = useState(1);
   const { unreadLiquidation, fetchUnreadLiquidation } = useUnreadLiquidation({ liquidationPage });
-
+  const isMeme = useAppSelector(isMemeCategory);
   useEffect(() => {
     if (tab !== undefined) {
       setTabIndex(tab);
@@ -27,7 +29,7 @@ const ModalHistoryInfo = ({ isOpen, onClose, tab }) => {
 
   const markReads = async (unreadIds) => {
     try {
-      await Datasource.shared.markLiquidationRead(unreadIds);
+      await Datasource.shared.markLiquidationRead(unreadIds, isMeme);
       await fetchUnreadLiquidation();
     } catch (e) {
       console.error("markReadsErr", e);
