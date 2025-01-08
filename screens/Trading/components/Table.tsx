@@ -34,6 +34,7 @@ import { checkIfMeme } from "../../../utils/margin";
 import { ArrowLineDownIcon, CheckIcon } from "../../Market/svg";
 import { isMobileDevice } from "../../../helpers/helpers";
 import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
+import { useLiqPrice } from "../../../hooks/useLiqPrice";
 
 const TradingTable = ({
   positionsList,
@@ -1485,6 +1486,28 @@ const PositionRow = ({
     }, 3000);
     return () => clearTimeout(timeoutId);
   }, [itemKey, item, index]);
+  const positionType = getPositionType(item.token_d_info.token_id);
+  const isMainStream = filteredTokenTypeMap.mainStream.includes(
+    positionType.label === "Long" ? item.token_p_id : item.token_d_info.token_id,
+  );
+  const LiqPrice = useLiqPrice({
+    token_c_info: {
+      token_id: item.token_c_info.token_id,
+      balance: item.token_c_info.balance,
+    },
+    token_d_info: {
+      token_id: item.token_d_info.token_id,
+      balance: item.token_d_info.balance,
+    },
+    token_p_info: {
+      token_id: item.token_p_id,
+      balance: item.token_p_amount,
+    },
+    position_type: positionType.label,
+    uahpi_at_open: item.uahpi_at_open,
+    memeCategory: !isMainStream,
+    debt_cap: item.debt_cap,
+  });
   const assetD = getAssetById(item.token_d_info.token_id, item);
   const assetC = getAssetById(item.token_c_info.token_id, item);
   const assetP = getAssetById(item.token_p_id, item);
@@ -1497,15 +1520,11 @@ const PositionRow = ({
   const leverageC = parseTokenValue(item.token_c_info.balance, decimalsC);
   const leverage = calculateLeverage(leverageD, priceD, leverageC, priceC);
 
-  const positionType = getPositionType(item.token_d_info.token_id);
   const marketTitle =
     positionType.label === "Long" ? `${symbolP}/${symbolC}` : `${symbolD}/${symbolC}`;
   if (filterTitle && marketTitle !== filterTitle) {
     return null;
   }
-  const isMainStream = filteredTokenTypeMap.mainStream.includes(
-    positionType.label === "Long" ? item.token_p_id : item.token_d_info.token_id,
-  );
   const sizeValueLong = parseTokenValue(item.token_p_amount, decimalsP);
   const sizeValueShort = parseTokenValue(item.token_d_info.balance, decimalsD);
   const size = positionType.label === "Long" ? sizeValueLong : sizeValueShort;
@@ -1539,20 +1558,20 @@ const PositionRow = ({
       amplitude = ((entryPrice - indexPrice) / entryPrice) * 100;
     }
   }
-  let LiqPrice = 0;
-  if (leverage > 1) {
-    if (positionType.label === "Long") {
-      const k1 = Number(netValue) * leverage * priceC;
-      const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
-      LiqPrice = ((Number(netValue) * priceC + size * priceP) * k2) / (k1 + holding);
-      if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
-    } else {
-      LiqPrice =
-        ((netValue + sizeValueLong) * priceC * (1 - marginConfigTokens.min_safety_buffer / 10000)) /
-        (sizeValueShort + holding);
-      if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
-    }
-  }
+  // let LiqPrice = 0;
+  // if (leverage > 1) {
+  //   if (positionType.label === "Long") {
+  //     const k1 = Number(netValue) * leverage * priceC;
+  //     const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
+  //     LiqPrice = ((Number(netValue) * priceC + size * priceP) * k2) / (k1 + holding);
+  //     if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
+  //   } else {
+  //     LiqPrice =
+  //       ((netValue + sizeValueLong) * priceC * (1 - marginConfigTokens.min_safety_buffer / 10000)) /
+  //       (sizeValueShort + holding);
+  //     if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
+  //   }
+  // }
   const rowData = {
     pos_id: itemKey,
     data: item,

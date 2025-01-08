@@ -42,6 +42,7 @@ export interface IMetadata {
   name: string;
   symbol: string;
   decimals: number;
+  tokens?: any;
 }
 
 export interface IAssetFarmReward {

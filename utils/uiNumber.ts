@@ -91,8 +91,8 @@ export const toDecimal = (v) => {
   return new Decimal(v).toFixed();
 };
 
-export const formatPrice = (price: number, isDollar: boolean = false) => {
-  if (price >= 100) {
+export const formatPrice = (price: string | number, isDollar: boolean = false) => {
+  if (new Decimal(price || 0).gte(100)) {
     return `${toInternationalCurrencySystem_number(price)}`;
   } else {
     return beautifyPrice(price);

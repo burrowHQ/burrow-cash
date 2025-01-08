@@ -1,7 +1,7 @@
 import { twMerge } from "tailwind-merge";
 
 export const beautifyPrice = (
-  num: number,
+  num: string | number,
   isDollar: boolean = false,
   decimalPlaces: number = 5,
   digitsPlaces: number = 4,
