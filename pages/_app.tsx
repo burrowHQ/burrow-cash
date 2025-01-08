@@ -114,7 +114,7 @@ function Upgrade({ Component, pageProps }) {
     accountSupplied.length > 0 &&
     accountSupplied.some((token) => {
       const assetDetails = getAssetById(token.token_id);
-      return token.balance.toString().length >= assetDetails.config.extra_decimals;
+      return assetDetails && token.balance.toString().length >= assetDetails.config.extra_decimals;
     });
   useEffect(() => {
     if (
