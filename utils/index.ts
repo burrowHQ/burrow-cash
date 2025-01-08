@@ -150,20 +150,21 @@ export const getBurrow = async ({
     ChangeMethodsLogic,
   );
   // get oracle address from
-  const config = (await view(
-    logicContract,
-    ViewMethodsLogic[ViewMethodsLogic.get_config],
-  )) as IConfig;
-
+  // const config = (await view(
+  //   logicContract,
+  //   ViewMethodsLogic[ViewMethodsLogic.get_config],
+  // )) as IConfig;
+  const oracle_account_id = "priceoracle.near";
+  const ref_exchange_id = "v2.ref-finance.near";
   const oracleContract: Contract = await getContract(
     account,
-    config.oracle_account_id,
+    oracle_account_id,
     ViewMethodsOracle,
     ChangeMethodsOracle,
   );
   const refv1Contract: Contract = await getContract(
     account,
-    config.ref_exchange_id,
+    ref_exchange_id,
     ViewMethodsREFV1,
     ChangeMethodsREFV1,
   );
@@ -197,7 +198,6 @@ export const getBurrow = async ({
     pythContract,
     view,
     call,
-    config,
   } as IBurrow;
 
   return burrow;

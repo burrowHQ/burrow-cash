@@ -58,7 +58,7 @@ export async function supply({
         amount: expandedAmount.toFixed(0),
         msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
       },
-      isDev: true,
+      env: "private_mainnet",
     });
   } catch (error) {
     if (hideModal) hideModal();

@@ -33,11 +33,13 @@ export function useBtcAction({ updater, inputAmount, decimals }: any) {
       if (inputAmountDecimal.lte(0)) {
         setReceiveAmount("0");
       } else {
-        estimateDepositAmount(expandInputAmount, { isDev: true }).then((received: number) => {
-          setReceiveAmount(shrinkToken(received || "0", decimals));
-          // eslint-disable-next-line no-console
-          console.log("---------------receivedBalance", shrinkToken(received || "0", decimals));
-        });
+        estimateDepositAmount(expandInputAmount, { env: "private_mainnet" }).then(
+          (received: number) => {
+            setReceiveAmount(shrinkToken(received || "0", decimals));
+            // eslint-disable-next-line no-console
+            console.log("---------------receivedBalance", shrinkToken(received || "0", decimals));
+          },
+        );
       }
     },
     500,

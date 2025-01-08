@@ -48,7 +48,7 @@ export const incentiveTokens = [
 export const topTokens = ["shadow_ref_v1-4179"];
 export const NBTCTokenId = {
   testnet: "nbtc-dev.testnet",
-  mainnet: "",
+  mainnet: "nbtc.toalice.near",
 }[defaultNetwork];
 const getConfig = (env: string = defaultNetwork) => {
   const RPC_LIST = getRpcList();

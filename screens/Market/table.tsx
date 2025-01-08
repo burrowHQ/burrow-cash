@@ -25,12 +25,12 @@ import getConfig, { incentiveTokens, topTokens, NBTCTokenId } from "../../utils/
 
 function MarketsTable({ rows, sorting }: TableProps) {
   const allowedTokenIds = [
-    "wbtc.ft.ref-labs.testnet",
+    "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
     NBTCTokenId,
-    "eth.ft.ref-labs.testnet",
-    "usdcc.ft.ref-labs.testnet",
-    "usdtt.ft.ref-labs.testnet",
-    "frax.ft.ref-labs.testnet",
+    "aurora",
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
+    "usdt.tether-token.near",
+    "853d955acef822db058eb8505911ed77f175b99e.factory.bridge.near",
   ];
   const filteredRows = rows.filter((row) => allowedTokenIds.includes(row.tokenId));
   return (
