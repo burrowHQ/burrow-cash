@@ -132,7 +132,7 @@ function Upgrade({ Component, pageProps }) {
     combinedAccountSupplied?.some((token) => {
       const assetDetails =
         token.type === "main" ? getAssetById(token.token_id) : getAssetByIdMEME(token.token_id);
-      return token.balance.toString().length >= assetDetails.config.extra_decimals;
+      return assetDetails && token.balance.toString().length >= assetDetails.config.extra_decimals;
     });
   useEffect(() => {
     if (
