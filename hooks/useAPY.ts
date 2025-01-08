@@ -50,7 +50,7 @@ export const useAPY = ({
   const stakeBoostedAPY =
     baseAPY +
     (isBorrow || excludeNetApy ? 0 : netLiquidityAPY) * netTvlMultiplier +
-    (isBorrow ? 0 : Number(tokenNetAPY) * 1.5) +
+    (isBorrow ? 0 : Number(tokenNetAPY) * (memeCategory ? 1 : 1.5)) +
     sign * apy;
   return [boostedAPY, stakeBoostedAPY];
 };

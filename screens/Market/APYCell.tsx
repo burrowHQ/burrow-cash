@@ -47,6 +47,7 @@ export const APYCell = ({
       onlyMarket={onlyMarket}
       excludeNetApy={excludeNetApy}
       memeCategory={memeCategory}
+      stakeBooster={stakeBooster}
     >
       <span
         className={`border-b border-dashed border-dark-800 pb-0.5 whitespace-nowrap ${
@@ -69,6 +70,7 @@ const ToolTip = ({
   onlyMarket,
   excludeNetApy,
   memeCategory,
+  stakeBooster,
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const assets = useAppSelector(getAssetsCategory());
@@ -145,12 +147,12 @@ const ToolTip = ({
                       })}
                     </div>
                     {format_apy(apy)}{" "}
-                    {memeCategory ? "" : `~ ${format_apy(Number(apy || 0) * 1.5)}`}
+                    {stakeBooster ? `~ ${format_apy(Number(apy || 0) * 1.5)}` : ""}
                   </div>
                 </Typography>,
                 <div
                   className={`flex items-center whitespace-nowrap gap-1 text-xs ${
-                    memeCategory ? "hidden" : ""
+                    stakeBooster ? "" : "hidden"
                   }`}
                   key={8}
                 >
