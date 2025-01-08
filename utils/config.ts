@@ -125,7 +125,7 @@ const getConfig = (env: string = defaultNetwork) => {
         REF_EXCHANGE_ID: "exchange.ref-dev.testnet",
         findPathUrl: "smartrouterdev.refburrow.top",
         // findPathUrl: "smartrouter.ref.finance",
-        indexUrl: "https://dev-indexer.ref-finance.com",
+        indexUrl: "https://testnet-indexer.ref-finance.com",
         // indexUrl: "https://api.ref.finance",
       } as unknown as ConnectConfig & IAppConfig;
     case "betanet":
