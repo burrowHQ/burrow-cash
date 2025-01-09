@@ -199,7 +199,7 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
       // setupCoin98Wallet(),
       setupBTCWallet({
         autoConnect: true,
-        isDev: true,
+        env: "dev",
       }) as any,
     ],
     network: {
