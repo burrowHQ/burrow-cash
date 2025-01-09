@@ -59,6 +59,7 @@ export async function supply({
         msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
       },
       env: "private_mainnet",
+      registerDeposit: "100000000000000000000000",
     });
   } catch (error) {
     if (hideModal) hideModal();
