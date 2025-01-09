@@ -27,7 +27,7 @@ import TradingViewChart from "../../components/marginTrading/TradingViewChart";
 import { standardizeAsset, nearTokenId } from "../../utils";
 import { isMobileDevice } from "../../helpers/helpers";
 import TradingOperateMobile from "./components/TradingOperateMobile";
-import { beautifyPrice } from "../../utils/beautyNumbet";
+import { beautifyPrice } from "../../utils/beautyNumber";
 import { getSymbolById } from "../../transformers/nearSymbolTrans";
 import { useRegisterTokenType } from "../../hooks/useRegisterTokenType";
 

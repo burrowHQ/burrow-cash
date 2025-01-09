@@ -15,7 +15,7 @@ import {
   RedSolidSubmitButton as RedSolidButton,
 } from "../../../components/Modal/button";
 import { shrinkToken, expandToken } from "../../../store";
-import { beautifyPrice } from "../../../utils/beautyNumbet";
+import { beautifyPrice } from "../../../utils/beautyNumber";
 import { getAccountId } from "../../../redux/accountSelectors";
 import { handleTransactionResults, handleTransactionHash } from "../../../services/transaction";
 import { showPositionFailure } from "../../../components/HashResultModal";

@@ -22,7 +22,7 @@ import { setActiveTab } from "../../../redux/marginTabSlice";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { checkIfMeme } from "../../../utils/margin";
 import { ChangeCollateralMobileProps } from "../comInterface";
-import { beautifyPrice } from "../../../utils/beautyNumbet";
+import { beautifyPrice } from "../../../utils/beautyNumber";
 import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
 
 export const ModalContext = createContext(null) as any;

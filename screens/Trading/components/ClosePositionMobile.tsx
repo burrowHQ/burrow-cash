@@ -23,7 +23,7 @@ import {
   RedSolidSubmitButton as RedSolidButton,
 } from "../../../components/Modal/button";
 import { showPositionClose } from "../../../components/HashResultModal";
-import { beautifyPrice } from "../../../utils/beautyNumbet";
+import { beautifyPrice } from "../../../utils/beautyNumber";
 import { findPathReserve } from "../../../api/get-swap-path";
 import { getAssets, getAssetsMEME } from "../../../redux/assetsSelectors";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";

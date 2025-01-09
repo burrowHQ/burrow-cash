@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { NearIcon, NearIconMini } from "../../screens/MarginTrading/components/Icon";
 import { CloseIcon } from "../Icons/Icons";
-import { beautifyPrice } from "../../utils/beautyNumbet";
+import { beautifyPrice } from "../../utils/beautyNumber";
 
 interface PositionResultProps {
   show: boolean;

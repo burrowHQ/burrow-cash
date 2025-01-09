@@ -21,7 +21,7 @@ import {
   YellowSolidSubmitButton as YellowSolidButton,
   RedSolidSubmitButton as RedSolidButton,
 } from "../../../components/Modal/button";
-import { beautifyPrice } from "../../../utils/beautyNumbet";
+import { beautifyPrice } from "../../../utils/beautyNumber";
 import { ConnectWalletButton } from "../../../components/Header/WalletButton";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";

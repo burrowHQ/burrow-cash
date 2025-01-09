@@ -28,7 +28,7 @@ import { setAccountDetailsOpen, setSelectedTab } from "../../../redux/marginTabS
 import { showCheckTxBeforeShowToast } from "../../../components/HashResultModal";
 import { shrinkToken } from "../../../store/helper";
 import { getAssets, getAssetsMEME } from "../../../redux/assetsSelectors";
-import { beautifyPrice } from "../../../utils/beautyNumbet";
+import { beautifyPrice } from "../../../utils/beautyNumber";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { checkIfMeme } from "../../../utils/margin";
 import { ArrowLineDownIcon, CheckIcon } from "../../Market/svg";
@@ -1558,20 +1558,6 @@ const PositionRow = ({
       amplitude = ((entryPrice - indexPrice) / entryPrice) * 100;
     }
   }
-  // let LiqPrice = 0;
-  // if (leverage > 1) {
-  //   if (positionType.label === "Long") {
-  //     const k1 = Number(netValue) * leverage * priceC;
-  //     const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
-  //     LiqPrice = ((Number(netValue) * priceC + size * priceP) * k2) / (k1 + holding);
-  //     if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
-  //   } else {
-  //     LiqPrice =
-  //       ((netValue + sizeValueLong) * priceC * (1 - marginConfigTokens.min_safety_buffer / 10000)) /
-  //       (sizeValueShort + holding);
-  //     if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
-  //   }
-  // }
   const rowData = {
     pos_id: itemKey,
     data: item,
