@@ -1,4 +1,5 @@
 import { useState, createContext, useEffect, FC } from "react";
+import Decimal from "decimal.js";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
 import { useDispatch } from "react-redux";
@@ -14,20 +15,19 @@ import { useAppSelector } from "../../../redux/hooks";
 import { getAssets, getAssetsMEME } from "../../../redux/assetsSelectors";
 import { decreaseCollateral } from "../../../store/marginActions/decreaseCollateral";
 import { getAccountBalance } from "../../../redux/accountSelectors";
-import DataSource from "../../../data/datasource";
-import { shrinkToken } from "../../../store";
+import { shrinkToken, expandToken } from "../../../store";
 import { showChangeCollateralPosition } from "../../../components/HashResultModal";
-import { useRouterQuery } from "../../../utils/txhashContract";
 import { setActiveTab } from "../../../redux/marginTabSlice";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { checkIfMeme } from "../../../utils/margin";
 import { ChangeCollateralMobileProps } from "../comInterface";
 import { beautifyPrice } from "../../../utils/beautyNumber";
 import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
+import { useLiqPrice } from "../../../hooks/useLiqPrice";
+import { IPositionType } from "../../../interfaces/margin";
 
 export const ModalContext = createContext(null) as any;
 const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose, rowData }) => {
-  const { query } = useRouterQuery();
   const dispatch = useDispatch();
   const account = useAppSelector((state) => state.account);
   const { marginConfigTokens, marginConfigTokensMEME, getPositionType } = useMarginConfigToken();
@@ -106,7 +106,6 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
     const value = parseFloat(event.target.value);
     const tokenCInfoBalance = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
     const tokenDInfoBalance = parseTokenValue(rowData.data.token_d_info.balance, decimalsD);
-    const leverage = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
     const { newNetValue, newLeverage, newLiqPrice } = calculateChange(
       value,
       isAddition,
@@ -210,38 +209,58 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
   const uahpi_at_open: any = isMainStream
     ? shrinkToken(marginAccountList[rowData.data.itemKey]?.uahpi_at_open ?? 0, 18)
     : shrinkToken(marginAccountListMEME[rowData.data.itemKey]?.uahpi_at_open ?? 0, 18);
-  const holdingFee =
-    +shrinkToken(rowData.data.debt_cap, decimalsD) * priceD * (uahpi - uahpi_at_open);
   const holding = +shrinkToken(rowData.data.debt_cap, decimalsD) * (uahpi - uahpi_at_open);
-  let LiqPrice = 0;
-  if (leverage > 1) {
-    if (positionType.label === "Long") {
-      const k1 = Number(netValue) * leverage * priceC;
-      const k2 =
-        1 -
-        (isMainStream
-          ? marginConfigTokens.min_safety_buffer
-          : marginConfigTokensMEME.min_safety_buffer) /
-          10000;
-      LiqPrice = ((Number(netValue) * priceC + size * priceP) * k2) / (k1 + holding);
-      if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
-    } else {
-      LiqPrice =
-        ((netValue + sizeValueLong) *
-          priceC *
-          (1 -
-            (isMainStream
-              ? marginConfigTokens.min_safety_buffer
-              : marginConfigTokensMEME.min_safety_buffer) /
-              10000)) /
-        (sizeValueShort + holding);
-      if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
-    }
-  }
   const { pos_id } = rowData;
   const token_c_id = rowData.data.token_c_info.token_id;
   const token_d_id = rowData.data.token_d_info.token_id;
   const token_p_id = rowData.data.token_p_id;
+  const LiqPrice = useLiqPrice({
+    token_c_info: {
+      token_id: rowData.data.token_c_info.token_id,
+      balance: rowData.data.token_c_info.balance,
+    },
+    token_d_info: {
+      token_id: rowData.data.token_d_info.token_id,
+      balance: rowData.data.token_d_info.balance,
+    },
+    token_p_info: {
+      token_id: rowData.data.token_p_id,
+      balance: rowData.data.token_p_amount,
+    },
+    position_type: positionType.label as IPositionType,
+    uahpi_at_open: rowData.data.uahpi_at_open,
+    memeCategory: !isMainStream,
+    debt_cap: rowData.data.debt_cap,
+  });
+  // const input_amount_decimals = expandToken(
+  //   inputValue || 0,
+  //   assetC.metadata.decimals + assetC.config.extra_decimals,
+  // );
+  // const LiqPriceNew = useLiqPrice({
+  //   token_c_info: {
+  //     token_id: rowData.data.token_c_info.token_id,
+  //     balance:
+  //       ChangeCollateralTab == "Add"
+  //         ? new Decimal(rowData.data.token_c_info.balance)
+  //             .plus(input_amount_decimals || 0)
+  //             .toFixed(0)
+  //         : new Decimal(rowData.data.token_c_info.balance)
+  //             .minus(input_amount_decimals || 0)
+  //             .toFixed(0),
+  //   },
+  //   token_d_info: {
+  //     token_id: rowData.data.token_d_info.token_id,
+  //     balance: rowData.data.token_d_info.balance,
+  //   },
+  //   token_p_info: {
+  //     token_id: rowData.data.token_p_id,
+  //     balance: rowData.data.token_p_amount,
+  //   },
+  //   position_type: positionType.label as IPositionType,
+  //   uahpi_at_open: rowData.data.uahpi_at_open,
+  //   memeCategory: !isMainStream,
+  //   debt_cap: rowData.data.debt_cap,
+  // });
   const amount = `${inputValue}`;
   const getAssetsdata = useAppSelector(getAssets);
   const assets = getAssetsdata.data;

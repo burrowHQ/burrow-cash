@@ -4,6 +4,7 @@ import { getAssetsCategory } from "../redux/assetsSelectors";
 import { getMarginConfigCategory } from "../redux/marginConfigSelectors";
 import { IMarginAsset } from "../interfaces/account";
 import { shrinkToken } from "../store";
+import { IPositionType } from "../interfaces/margin";
 
 export function useLiqPrice({
   token_c_info,
@@ -17,7 +18,7 @@ export function useLiqPrice({
   token_c_info: IMarginAsset;
   token_d_info: IMarginAsset;
   token_p_info: IMarginAsset;
-  position_type: "Long" | "Short";
+  position_type: IPositionType;
   uahpi_at_open?: string;
   memeCategory?: boolean;
   debt_cap?: string;

@@ -73,3 +73,5 @@ export interface IServerPool {
   token_in: string;
   token_out: string;
 }
+
+export type IPositionType = "Long" | "Short";
