@@ -1,6 +1,8 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
+import { useDebounce } from "react-use";
 import _ from "lodash";
 import { BeatLoader } from "react-spinners";
+import Decimal from "decimal.js";
 import TradingToken from "./tokenbox";
 import { SetUp, ShrinkArrow, MaxPositionIcon, RefreshIcon } from "./TradingIcon";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
@@ -11,11 +13,10 @@ import { getAssets, getAssetsMEME } from "../../../redux/assetsSelectors";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
 import { usePoolsData } from "../../../hooks/useGetPoolsData";
 import { getMarginConfig } from "../../../redux/marginConfigSelectors";
-import { toInternationalCurrencySystem_number, toDecimal } from "../../../utils/uiNumber";
+import { toDecimal } from "../../../utils/uiNumber";
 import { useEstimateSwap } from "../../../hooks/useEstimateSwap";
 import { setSlippageToleranceFromRedux, setReduxActiveTab } from "../../../redux/marginTrading";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";
-import { shrinkToken } from "../../../store/helper";
 import {
   YellowSolidSubmitButton as YellowSolidButton,
   RedSolidSubmitButton as RedSolidButton,
@@ -47,9 +48,12 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
     categoryAssets2,
     categoryAssets2MEME,
     marginConfigTokens,
+    marginConfigTokensMEME,
   } = useMarginConfigToken();
   const { marginAccountList, getAssetById, getAssetByIdMEME } = useMarginAccount();
-  const { max_active_user_margin_position } = marginConfigTokens;
+  const { max_active_user_margin_position, min_safety_buffer } = isMainStream
+    ? marginConfigTokens
+    : marginConfigTokensMEME;
   const {
     ReduxcategoryAssets1,
     ReduxcategoryAssets2,
@@ -102,7 +106,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
 
   // for tab change
   const initCateState = (tabString: string) => {
-    setLiqPrice(0);
+    setLiqPrice("0");
     // setRangeMount(1);
     if (tabString == "long") {
       setShortInput("");
@@ -202,8 +206,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
 
   // get cate1 amount start
   const [tokenInAmount, setTokenInAmount] = useState<number>(0);
-  const [LiqPrice, setLiqPrice] = useState<number>(0);
-  const [entryPrice, setEntryPrice] = useState<number>(0);
+  const [LiqPrice, setLiqPrice] = useState<string>("");
   const [forceUpdate, setForceUpdate] = useState<number>(0);
   const estimateData = useEstimateSwap({
     tokenIn_id:
@@ -249,7 +252,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       setLongOutputUsd(0);
       setShortOutputUsd(0);
       setTokenInAmount(0);
-      setLiqPrice(0);
+      setLiqPrice("");
       return;
     }
     setEstimateLoading(true);
@@ -290,64 +293,61 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
     activeTab, // Add activeTab to dependencies if needed
     ReduxcategoryAssets1,
   ]);
-
-  // update token in amount
-  // useEffect(() => {
-  //   const inputUsdCharcate1 = getAssetPrice(ReduxcategoryAssets1);
-  //   if (inputUsdCharcate1 && estimateData) {
-  //     updateOutput(activeTab, inputUsdCharcate1);
-  //   }
-  // }, [tokenInAmount, activeTab, estimateData, ReduxcategoryAssets1]);
-
-  // update liq price for short
-  useEffect(() => {
-    if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
-      const assetC = isMainStream
-        ? getAssetById(ReduxcategoryAssets2?.token_id)
-        : getAssetByIdMEME(ReduxcategoryAssets2?.token_id);
-      let liqPriceX = 0;
-      if (rangeMount > 1) {
-        const safetyBufferFactor = 1 - marginConfigTokens.min_safety_buffer / 10000;
-        const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
-
-        if (activeTab === "short" && shortInput) {
-          const adjustedShortInput =
-            Number(shortInput) +
-            Number(shrinkToken(estimateData?.min_amount_out, assetC.metadata.decimals));
-          liqPriceX = (adjustedShortInput * assetPrice * safetyBufferFactor) / shortOutput;
-        }
-      }
-      if (activeTab === "short") {
-        setLiqPrice(liqPriceX);
-      }
-      setEstimateLoading(false);
-    }
-    console.log(estimateData, "....estimateData");
-    setForceUpdateLoading(!estimateData?.loadingComplete);
-  }, [estimateData]);
-
   // update liq price for long
-  useEffect(() => {
-    if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
-      let liqPriceX = 0;
-
-      if (rangeMount > 1) {
-        const safetyBufferFactor = 1 - marginConfigTokens.min_safety_buffer / 10000;
-        const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
-        const assetPriceP = getAssetPrice(ReduxcategoryAssets1) as any;
-
-        if (activeTab === "long" && longInput) {
-          const k1 = Number(longInput) * rangeMount * assetPrice; // debt cap
-          liqPriceX =
-            ((Number(longInput) * assetPrice + longOutput * assetPriceP) * safetyBufferFactor) / k1;
+  useDebounce(
+    () => {
+      if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
+        if (
+          activeTab == "long" &&
+          +(longInput || 0) > 0 &&
+          // rangeMount > 1 &&
+          (longOutput || 0) > 0
+        ) {
+          const safetyBufferFactor = 1 - min_safety_buffer / 10000;
+          const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
+          const token_c_value = new Decimal(longInput).mul(assetPrice || 0);
+          const token_d_value = token_c_value.mul(rangeMount || 0);
+          const liqPriceX = token_d_value
+            .div(safetyBufferFactor)
+            .minus(token_c_value)
+            .div(longOutput)
+            .toFixed();
+          setLiqPrice(liqPriceX || "0");
         }
+        setEstimateLoading(false);
       }
-      if (activeTab === "long") {
-        setLiqPrice(liqPriceX);
+    },
+    200,
+    [activeTab, longOutput, longInput],
+  );
+  // update liq price for short
+  useDebounce(
+    () => {
+      if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
+        if (
+          // rangeMount > 1 &&
+          activeTab === "short" &&
+          +(shortInput || 0) > 0 &&
+          +(estimateData.amount_out || 0) > 0 &&
+          +(shortOutput || 0) > 0
+        ) {
+          const safetyBufferFactor = 1 - min_safety_buffer / 10000;
+          const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
+          const token_c_value = new Decimal(shortInput).mul(assetPrice || 0);
+          const token_p_value = new Decimal(estimateData.amount_out).mul(assetPrice || 0);
+          const liqPriceX = new Decimal(token_c_value)
+            .plus(token_p_value)
+            .mul(safetyBufferFactor)
+            .div(shortOutput);
+          setLiqPrice(liqPriceX.toFixed());
+        }
+        setEstimateLoading(false);
       }
-      setEstimateLoading(false);
-    }
-  }, [longOutput]);
+      setForceUpdateLoading(!estimateData?.loadingComplete);
+    },
+    200,
+    [estimateData, activeTab, shortOutput, shortInput],
+  );
 
   // interval refresh price
   const [lastTokenInAmount, setLastTokenInAmount] = useState(0);
@@ -431,7 +431,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
     if (input === undefined || !input || input === "0" || input === "0.") {
       outputSetter(0);
       outputUsdSetter(0);
-      setLiqPrice(0);
+      setLiqPrice("");
       setTokenInAmount(0);
     } else if (tab === "long") {
       console.log("......", estimateData?.amount_out);
@@ -777,7 +777,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                   {estimateLoading ? (
                     <BeatLoader size={5} color="white" />
                   ) : (
-                    `$${toInternationalCurrencySystem_number(LiqPrice)}`
+                    <span>${beautifyPrice(LiqPrice)}</span>
                   )}
                 </div>
               </div>
