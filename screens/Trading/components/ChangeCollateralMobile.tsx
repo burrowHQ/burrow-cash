@@ -46,7 +46,6 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
   const [inputValue, setInputValue] = useState("");
   const [addedValue, setAddedValue] = useState(0);
   const [addLeverage, setAddLeverage] = useState(0);
-  const [addPnl, setAddPnl] = useState(0);
   const balance = useAppSelector(getAccountBalance);
   const [selectedLever, setSelectedLever] = useState(null);
   const [isAddCollateralLoading, setIsAddCollateralLoading] = useState(false);
@@ -56,7 +55,6 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
     setInputValue("");
     setAddedValue(0);
     setAddLeverage(0);
-    setAddPnl(0);
     setSelectedLever(null);
   };
   const leverData = [
@@ -76,37 +74,14 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
     const newValue = isAddition ? tokenCInfoBalance + value : tokenCInfoBalance - value;
     const newNetValue = newValue * priceC;
     const newLeverage = calculateLeverage(tokenDInfoBalance, priceD, newValue, priceC);
-    let newLiqPrice = 0;
-    if (positionType.label === "Long") {
-      const k1 = Number(newNetValue) * newLeverage * priceC;
-      const k2 =
-        1 -
-        (isMainStream
-          ? marginConfigTokens.min_safety_buffer
-          : marginConfigTokensMEME.min_safety_buffer) /
-          10000;
-      newLiqPrice = ((Number(newNetValue) * priceC + size * priceP) * k2) / (k1 + holding);
-      if (Number.isNaN(newLiqPrice) || !Number.isFinite(newLiqPrice)) newLiqPrice = 0;
-    } else {
-      newLiqPrice =
-        ((newNetValue + sizeValueLong) *
-          priceC *
-          (1 -
-            (isMainStream
-              ? marginConfigTokens.min_safety_buffer
-              : marginConfigTokensMEME.min_safety_buffer) /
-              10000)) /
-        (sizeValueShort + holding);
-      if (Number.isNaN(newLiqPrice) || !Number.isFinite(newLiqPrice)) newLiqPrice = 0;
-    }
-    return { newNetValue, newLeverage, newLiqPrice };
+    return { newNetValue, newLeverage };
   };
 
   const handleCollateralChange = (event, isAddition) => {
     const value = parseFloat(event.target.value);
     const tokenCInfoBalance = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
     const tokenDInfoBalance = parseTokenValue(rowData.data.token_d_info.balance, decimalsD);
-    const { newNetValue, newLeverage, newLiqPrice } = calculateChange(
+    const { newNetValue, newLeverage } = calculateChange(
       value,
       isAddition,
       tokenCInfoBalance,
@@ -116,11 +91,9 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
     );
     setAddedValue(newNetValue);
     setAddLeverage(newLeverage);
-    setAddPnl(newLiqPrice);
     if (event.target.value === "") {
       setAddedValue(0);
       setAddLeverage(0);
-      setAddPnl(0);
     }
   };
   const handleAddChange = (event) => {
@@ -129,7 +102,6 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
       setInputValue("");
       setAddedValue(0);
       setAddLeverage(0);
-      setAddPnl(0);
       return;
     }
     if (selectedLever !== null && value !== "") {
@@ -155,7 +127,6 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
       setInputValue("");
       setAddedValue(0);
       setAddLeverage(0);
-      setAddPnl(0);
       return;
     }
     if (selectedLever !== null && value !== "") {
@@ -232,35 +203,35 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
     memeCategory: !isMainStream,
     debt_cap: rowData.data.debt_cap,
   });
-  // const input_amount_decimals = expandToken(
-  //   inputValue || 0,
-  //   assetC.metadata.decimals + assetC.config.extra_decimals,
-  // );
-  // const LiqPriceNew = useLiqPrice({
-  //   token_c_info: {
-  //     token_id: rowData.data.token_c_info.token_id,
-  //     balance:
-  //       ChangeCollateralTab == "Add"
-  //         ? new Decimal(rowData.data.token_c_info.balance)
-  //             .plus(input_amount_decimals || 0)
-  //             .toFixed(0)
-  //         : new Decimal(rowData.data.token_c_info.balance)
-  //             .minus(input_amount_decimals || 0)
-  //             .toFixed(0),
-  //   },
-  //   token_d_info: {
-  //     token_id: rowData.data.token_d_info.token_id,
-  //     balance: rowData.data.token_d_info.balance,
-  //   },
-  //   token_p_info: {
-  //     token_id: rowData.data.token_p_id,
-  //     balance: rowData.data.token_p_amount,
-  //   },
-  //   position_type: positionType.label as IPositionType,
-  //   uahpi_at_open: rowData.data.uahpi_at_open,
-  //   memeCategory: !isMainStream,
-  //   debt_cap: rowData.data.debt_cap,
-  // });
+  const input_amount_decimals = expandToken(
+    inputValue || 0,
+    assetC.metadata.decimals + assetC.config.extra_decimals,
+  );
+  const LiqPriceNew = useLiqPrice({
+    token_c_info: {
+      token_id: rowData.data.token_c_info.token_id,
+      balance:
+        ChangeCollateralTab == "Add"
+          ? new Decimal(rowData.data.token_c_info.balance)
+              .plus(input_amount_decimals || 0)
+              .toFixed(0)
+          : new Decimal(rowData.data.token_c_info.balance)
+              .minus(input_amount_decimals || 0)
+              .toFixed(0),
+    },
+    token_d_info: {
+      token_id: rowData.data.token_d_info.token_id,
+      balance: rowData.data.token_d_info.balance,
+    },
+    token_p_info: {
+      token_id: rowData.data.token_p_id,
+      balance: rowData.data.token_p_amount,
+    },
+    position_type: positionType.label as IPositionType,
+    uahpi_at_open: rowData.data.uahpi_at_open,
+    memeCategory: !isMainStream,
+    debt_cap: rowData.data.debt_cap,
+  });
   const amount = `${inputValue}`;
   const getAssetsdata = useAppSelector(getAssets);
   const assets = getAssetsdata.data;
@@ -419,7 +390,6 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
       setInputValue("");
       setAddedValue(0);
       setAddLeverage(0);
-      setAddPnl(0);
       return;
     }
     setSelectedLever(value);
@@ -440,7 +410,6 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
       setInputValue("");
       setAddedValue(0);
       setAddLeverage(0);
-      setAddPnl(0);
       return;
     }
     setSelectedLever(value);
@@ -617,13 +586,13 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                   <div className="flex items-center justify-between text-sm mb-4">
                     <div className="text-gray-300">Liq. Price</div>
                     <div className="flex items-center justify-center">
-                      {addPnl ? (
+                      {+(inputValue || 0) > 0 ? (
                         <>
                           <span className="text-gray-300 mr-2 line-through">
                             ${formatPrice(LiqPrice)}
                           </span>
                           <RightArrow />
-                          <p className="ml-2">${formatPrice(addPnl)}</p>
+                          <p className="ml-2">${formatPrice(LiqPriceNew)}</p>
                         </>
                       ) : (
                         <p>${formatPrice(LiqPrice)}</p>
@@ -756,13 +725,13 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                   <div className="flex items-center justify-between text-sm mb-4">
                     <div className="text-gray-300">Liq. Price</div>
                     <div className="flex items-center justify-center">
-                      {addPnl ? (
+                      {+(inputValue || 0) > 0 ? (
                         <>
                           <span className="text-gray-300 mr-2 line-through">
                             ${formatPrice(LiqPrice)}
                           </span>
                           <RightArrow />
-                          <p className="ml-2">${formatPrice(addPnl)}</p>
+                          <p className="ml-2">${formatPrice(LiqPriceNew)}</p>
                         </>
                       ) : (
                         <p>${formatPrice(LiqPrice)}</p>
