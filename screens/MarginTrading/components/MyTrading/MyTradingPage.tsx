@@ -9,6 +9,7 @@ import { shrinkToken } from "../../../../store/helper";
 import { useAppSelector } from "../../../../redux/hooks";
 import { getAssets, getAssetsMEME } from "../../../../redux/assetsSelectors";
 import { useRegisterTokenType } from "../../../../hooks/useRegisterTokenType";
+import { beautifyPrice } from "../../../../utils/beautyNumber";
 
 const MyMarginTradingPage = () => {
   const isMobile = isMobileDevice();
@@ -124,11 +125,11 @@ const MyMarginTradingPage = () => {
           <div className="flex justify-between mb-[30px]">
             <div className="flex-1">
               <p className="text-gray-300 text-sm">Long Open Interest</p>
-              <h2 className="text-h2"> {formatCurrency(totalLongSizeValue)}</h2>
+              <h2 className="text-h2"> {beautifyPrice(totalLongSizeValue, true)}</h2>
             </div>
             <div className="flex-1">
               <p className="text-gray-300 text-sm">Short Open Interest</p>
-              <h2 className="text-h2">{formatCurrency(totalShortSizeValue)}</h2>
+              <h2 className="text-h2">{beautifyPrice(totalShortSizeValue, true)}</h2>
             </div>
           </div>
           <div className="flex justify-between mb-[30px]">
@@ -142,7 +143,7 @@ const MyMarginTradingPage = () => {
                 onMouseLeave={hasCollateral ? handleMouseLeave : undefined}
               >
                 <div className="text-h2" onMouseEnter={handleMouseEnter}>
-                  {formatCurrency(totalCollateral)}
+                  {beautifyPrice(totalCollateral, true)}
                 </div>
                 {hasCollateral && showCollateralPopup && (
                   <div
@@ -189,7 +190,7 @@ const MyMarginTradingPage = () => {
                           <img src={data.icon} alt="" className="w-4 h-4" />
                           <p className="ml-2 mr-8 text-xs text-gray-300">{data.symbol}</p>
                           <div className="text-xs ml-auto">
-                            ${toInternationalCurrencySystem_number(data.totalValue)}
+                            {beautifyPrice(data.totalValue, true)}
                           </div>
                         </div>
                       ));
@@ -202,7 +203,7 @@ const MyMarginTradingPage = () => {
               <p className="text-gray-300 text-sm">PLN</p>
               <h2 className="text-h2">
                 {totalPLN === 0 ? "" : `${totalPLN > 0 ? `+` : `-`}`}
-                {formatCurrency(Math.abs(totalPLN))}
+                {beautifyPrice(Math.abs(totalPLN), true)}
               </h2>
             </div>
           </div>
@@ -212,13 +213,13 @@ const MyMarginTradingPage = () => {
           <div className="flex flex-1 justify-center">
             <div>
               <p className="text-gray-300 text-sm">Long Open Interest</p>
-              <h2 className="text-h2"> {formatCurrency(totalLongSizeValue)}</h2>
+              <h2 className="text-h2"> {beautifyPrice(totalLongSizeValue, true)}</h2>
             </div>
           </div>
           <div className="flex flex-1 justify-center">
             <div>
               <p className="text-gray-300 text-sm">Short Open Interest</p>
-              <h2 className="text-h2">{formatCurrency(totalShortSizeValue)}</h2>
+              <h2 className="text-h2">{beautifyPrice(totalShortSizeValue, true)}</h2>
             </div>
           </div>
           <div className="flex flex-1 justify-center">
@@ -232,7 +233,7 @@ const MyMarginTradingPage = () => {
                 onMouseLeave={hasCollateral ? handleMouseLeave : undefined}
               >
                 <div className="text-h2 " onMouseEnter={handleMouseEnter}>
-                  {formatCurrency(totalCollateral)}
+                  {beautifyPrice(totalCollateral, true)}
                 </div>
                 {hasCollateral && showCollateralPopup && (
                   <div
@@ -294,7 +295,7 @@ const MyMarginTradingPage = () => {
               <p className="text-gray-300 text-sm">PNL</p>
               <h2 className="text-h2">
                 {totalPLN === 0 ? "" : `${totalPLN > 0 ? `+` : `-`}`}
-                {formatCurrency(Math.abs(totalPLN))}
+                {beautifyPrice(Math.abs(totalPLN), true)}
               </h2>
             </div>
           </div>
