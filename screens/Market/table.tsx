@@ -22,6 +22,7 @@ import {
 } from "../../utils/uiNumber";
 import { APYCell } from "./APYCell";
 import getConfig, { incentiveTokens, topTokens } from "../../utils/config";
+import { beautifyPrice } from "../../utils/beautyNumber";
 
 function MarketsTable({ rows, sorting, isMeme }: TableProps) {
   return (
@@ -425,7 +426,7 @@ function TableRowPc({
                 {toInternationalCurrencySystem_number(row.totalSupply)}
               </span>
               <span className="text-xs text-gray-300">
-                {toInternationalCurrencySystem_usd(row.totalSupplyMoney)}
+                {beautifyPrice(row.totalSupplyMoney, true)}
               </span>
             </>
           ) : (
@@ -456,7 +457,7 @@ function TableRowPc({
                 {toInternationalCurrencySystem_number(row.totalBorrowed)}
               </span>
               <span className="text-xs text-gray-300">
-                {toInternationalCurrencySystem_usd(row.totalBorrowedMoney)}
+                {beautifyPrice(row.totalBorrowedMoney, true)}
               </span>
             </>
           ) : (
@@ -485,7 +486,7 @@ function TableRowPc({
                 {toInternationalCurrencySystem_number(row.availableLiquidity)}
               </span>
               <span className="text-xs text-gray-300">
-                {toInternationalCurrencySystem_usd(row.availableLiquidityMoney)}
+                {beautifyPrice(row.availableLiquidityMoney, true)}
               </span>
             </>
           ) : (

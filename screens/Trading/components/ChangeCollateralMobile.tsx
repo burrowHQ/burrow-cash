@@ -1,4 +1,4 @@
-import { useState, createContext, useEffect, FC } from "react";
+import { useState, createContext, FC } from "react";
 import Decimal from "decimal.js";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
@@ -7,7 +7,7 @@ import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
 import { CloseIcon } from "../../../components/Modal/svg";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";
-import { formatPrice, toInternationalCurrencySystem_number } from "../../../utils/uiNumber";
+import { toInternationalCurrencySystem_number } from "../../../utils/uiNumber";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
 import { RightArrow } from "./TradingIcon";
 import { increaseCollateral } from "../../../store/marginActions/increaseCollateral";
@@ -581,7 +581,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                   </div>
                   <div className="flex items-center justify-between text-sm mb-4">
                     <div className="text-gray-300">Entry Price</div>
-                    <div>${formatPrice(rowData.entryPrice ?? 0)}</div>
+                    <div>${beautifyPrice(rowData.entryPrice ?? 0)}</div>
                   </div>
                   <div className="flex items-center justify-between text-sm mb-4">
                     <div className="text-gray-300">Liq. Price</div>
@@ -589,13 +589,13 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                       {+(inputValue || 0) > 0 ? (
                         <>
                           <span className="text-gray-300 mr-2 line-through">
-                            ${formatPrice(LiqPrice)}
+                            ${beautifyPrice(LiqPrice)}
                           </span>
                           <RightArrow />
-                          <p className="ml-2">${formatPrice(LiqPriceNew)}</p>
+                          <p className="ml-2">${beautifyPrice(LiqPriceNew)}</p>
                         </>
                       ) : (
-                        <p>${formatPrice(LiqPrice)}</p>
+                        <p>${beautifyPrice(LiqPrice)}</p>
                       )}
                     </div>
                   </div>
@@ -720,7 +720,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                   </div>
                   <div className="flex items-center justify-between text-sm mb-4">
                     <div className="text-gray-300">Entry Price</div>
-                    <div>${formatPrice(rowData.entryPrice ?? 0)}</div>
+                    <div>${beautifyPrice(rowData.entryPrice ?? 0)}</div>
                   </div>
                   <div className="flex items-center justify-between text-sm mb-4">
                     <div className="text-gray-300">Liq. Price</div>
@@ -728,13 +728,13 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                       {+(inputValue || 0) > 0 ? (
                         <>
                           <span className="text-gray-300 mr-2 line-through">
-                            ${formatPrice(LiqPrice)}
+                            ${beautifyPrice(LiqPrice)}
                           </span>
                           <RightArrow />
-                          <p className="ml-2">${formatPrice(LiqPriceNew)}</p>
+                          <p className="ml-2">${beautifyPrice(LiqPriceNew)}</p>
                         </>
                       ) : (
-                        <p>${formatPrice(LiqPrice)}</p>
+                        <p>${beautifyPrice(LiqPrice)}</p>
                       )}
                     </div>
                   </div>

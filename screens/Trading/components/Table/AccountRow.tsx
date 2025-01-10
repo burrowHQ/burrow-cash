@@ -1,5 +1,5 @@
 import { isMobileDevice } from "../../../../helpers/helpers";
-import { formatPrice } from "../../../../utils/uiNumber";
+import { beautifyPrice } from "../../../../utils/beautyNumber";
 
 const AccountRow = ({ assetDetails, marginAssetDetails, parseTokenValue, token }) => {
   const isMobile = isMobileDevice();
@@ -11,12 +11,12 @@ const AccountRow = ({ assetDetails, marginAssetDetails, parseTokenValue, token }
           <p className="ml-1"> {assetDetails.metadata.symbol}</p>
         </div>
       </td>
-      <td>{formatPrice(parseTokenValue(token.balance, marginAssetDetails.decimals))}</td>
-      <td>{marginAssetDetails.price ? formatPrice(marginAssetDetails.price) : "-"}</td>
+      <td>{beautifyPrice(parseTokenValue(token.balance, marginAssetDetails.decimals))}</td>
+      <td>{marginAssetDetails.price ? beautifyPrice(marginAssetDetails.price) : "-"}</td>
       <td>
         $
         {marginAssetDetails.price
-          ? formatPrice(
+          ? beautifyPrice(
               parseTokenValue(token.balance, marginAssetDetails.decimals) *
                 marginAssetDetails.price,
             )
@@ -31,16 +31,16 @@ const AccountRow = ({ assetDetails, marginAssetDetails, parseTokenValue, token }
           <div className="ml-2">
             <p className="text-sm"> {assetDetails.metadata.symbol}</p>
             <p className="text-xs text-gray-300 -mt-0.5">
-              {marginAssetDetails.price ? formatPrice(marginAssetDetails.price) : "/"}
+              {marginAssetDetails.price ? beautifyPrice(marginAssetDetails.price) : "/"}
             </p>
           </div>
         </div>
       </td>
-      <td>{formatPrice(parseTokenValue(token.balance, marginAssetDetails.decimals))}</td>
+      <td>{beautifyPrice(parseTokenValue(token.balance, marginAssetDetails.decimals))}</td>
       <td className="text-right pr-[32px]">
         $
         {marginAssetDetails.price
-          ? formatPrice(
+          ? beautifyPrice(
               parseTokenValue(token.balance, marginAssetDetails.decimals) *
                 marginAssetDetails.price,
             )

@@ -2,7 +2,7 @@ import { isMobileDevice } from "../../../../helpers/helpers";
 import { shrinkToken } from "../../../../store/helper";
 import { getSymbolById } from "../../../../transformers/nearSymbolTrans";
 import { beautifyPrice } from "../../../../utils/beautyNumber";
-import { formatPrice, toInternationalCurrencySystem_number } from "../../../../utils/uiNumber";
+import { toInternationalCurrencySystem_number } from "../../../../utils/uiNumber";
 
 const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
   const isMobile = isMobileDevice();
@@ -73,9 +73,13 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
         <span className="ml-1">{getSymbolById(assetC.token_id, assetC.metadata?.symbol)}</span>
       </td>
       <td>
-        {record.entry_price !== "0" ? <span>${formatPrice(Number(record.entry_price))}</span> : "-"}
+        {record.entry_price !== "0" ? (
+          <span>${beautifyPrice(Number(record.entry_price))}</span>
+        ) : (
+          "-"
+        )}
       </td>
-      <td>{record.price !== "0" ? <span>${formatPrice(Number(record.price))}</span> : "-"}</td>
+      <td>{record.price !== "0" ? <span>${beautifyPrice(Number(record.price))}</span> : "-"}</td>
       <td>
         {beautifyPrice(
           Number(shrinkToken(record.fee, assetD.metadata.decimals + assetD.config.extra_decimals)),
@@ -215,7 +219,7 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
           <p className="text-gray-300">Entry price</p>
           <p>
             {record.entry_price !== "0" ? (
-              <span>${formatPrice(Number(record.entry_price))}</span>
+              <span>${beautifyPrice(Number(record.entry_price))}</span>
             ) : (
               "-"
             )}
@@ -223,7 +227,7 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Close price</p>
-          <p>{record.price !== "0" ? <span>${formatPrice(Number(record.price))}</span> : "-"}</p>
+          <p>{record.price !== "0" ? <span>${beautifyPrice(Number(record.price))}</span> : "-"}</p>
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Fee</p>

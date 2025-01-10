@@ -3,11 +3,7 @@ import Link from "next/link";
 import getConfig from "next/config";
 import { ArrowDownIcon, ArrowUpIcon, NearIcon } from "./Icon";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
-import {
-  formatPrice,
-  formatWithCommas_usd,
-  toInternationalCurrencySystem_number,
-} from "../../../utils/uiNumber";
+import { formatWithCommas_usd } from "../../../utils/uiNumber";
 import { ArrowLineDownIcon, CheckIcon, NewTagIcon } from "../../Market/svg";
 import { shrinkToken } from "../../../store/helper";
 import DataSource from "../../../data/datasource";
@@ -16,6 +12,7 @@ import { nearTokenId } from "../../../utils";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
 import { MemeTagIcon } from "../../Trading/components/TradingIcon";
+import { beautifyPrice } from "../../../utils/beautyNumber";
 
 type TokenTypeMap = {
   mainStream: string[];
@@ -141,19 +138,29 @@ const MarketMarginTrading = ({ hidden }: { hidden: boolean }) => {
               <div className="flex flex-1 justify-center xsm:justify-start xsm:mb-[30px]">
                 <div>
                   <p className="text-gray-300 text-sm">Total Volume</p>
-                  <h2 className="text-h2">${formatPrice(volumeStats.totalVolume)}</h2>
+                  <h2 className="text-h2">${beautifyPrice(volumeStats.totalVolume)}</h2>
                 </div>
               </div>
               <div className="flex flex-1 justify-center xsm:justify-start xsm:mb-[30px]">
                 <div>
                   <p className="text-gray-300 text-sm">24H Volume</p>
-                  <h2 className="text-h2">${formatPrice(volumeStats.volume24h)}</h2>
+                  <h2 className="text-h2">${beautifyPrice(volumeStats.volume24h)}</h2>
                 </div>
               </div>
             </div>
             <div className="flex justify-between">
-              <DataItem title="Long Open Interest" value={formatWithCommas_usd(totalLongUSD)} />
-              <DataItem title="Short Open Interest" value={formatWithCommas_usd(totalShortUSD)} />
+              <div className="flex flex-1 justify-center xsm:justify-start xsm:mb-[30px]">
+                <div>
+                  <p className="text-gray-300 text-sm">Long Open Interest</p>
+                  <h2 className="text-h2">${beautifyPrice(totalLongUSD)}</h2>
+                </div>
+              </div>
+              <div className="flex flex-1 justify-center xsm:justify-start xsm:mb-[30px]">
+                <div>
+                  <p className="text-gray-300 text-sm">Short Open Interest</p>
+                  <h2 className="text-h2">${beautifyPrice(totalShortUSD)}</h2>
+                </div>
+              </div>
             </div>
           </div>
           <TableHeadMobile onSort={handleSort} sortDirection={sortDirection} sortBy={sortBy} />
@@ -171,17 +178,27 @@ const MarketMarginTrading = ({ hidden }: { hidden: boolean }) => {
             <div className="flex flex-1 justify-center xsm:justify-start xsm:mb-[30px]">
               <div>
                 <p className="text-gray-300 text-sm">Total Volume</p>
-                <h2 className="text-h2">${formatPrice(volumeStats.totalVolume)}</h2>
+                <h2 className="text-h2">${beautifyPrice(volumeStats.totalVolume)}</h2>
               </div>
             </div>
             <div className="flex flex-1 justify-center xsm:justify-start xsm:mb-[30px]">
               <div>
                 <p className="text-gray-300 text-sm">24H Volume</p>
-                <h2 className="text-h2">${formatPrice(volumeStats.volume24h)}</h2>
+                <h2 className="text-h2">${beautifyPrice(volumeStats.volume24h)}</h2>
               </div>
             </div>
-            <DataItem title="Long Open Interest" value={formatWithCommas_usd(totalLongUSD)} />
-            <DataItem title="Short Open Interest" value={formatWithCommas_usd(totalShortUSD)} />
+            <div className="flex flex-1 justify-center xsm:justify-start xsm:mb-[30px]">
+              <div>
+                <p className="text-gray-300 text-sm">Long Open Interest</p>
+                <h2 className="text-h2">${beautifyPrice(totalLongUSD)}</h2>
+              </div>
+            </div>
+            <div className="flex flex-1 justify-center xsm:justify-start xsm:mb-[30px]">
+              <div>
+                <p className="text-gray-300 text-sm">Short Open Interest</p>
+                <h2 className="text-h2">${beautifyPrice(totalShortUSD)}</h2>
+              </div>
+            </div>
           </div>
           <TableHead onSort={handleSort} sortDirection={sortDirection} sortBy={sortBy} />
           <TableBody
@@ -195,15 +212,6 @@ const MarketMarginTrading = ({ hidden }: { hidden: boolean }) => {
     </div>
   );
 };
-
-const DataItem = ({ title, value }: { title: string; value: string }) => (
-  <div className="flex flex-1 justify-center xsm:justify-start xsm:mb-[30px]">
-    <div>
-      <p className="text-gray-300 text-sm">{title}</p>
-      <h2 className="text-h2">{value}</h2>
-    </div>
-  </div>
-);
 
 function SortButton({
   sort,
@@ -423,40 +431,34 @@ function TableBody({
                     ) : null}
                     {!isMainStream && <MemeTagIcon />}
                   </div>
-                  <span className="text-xs text-gray-300">
-                    {formatWithCommas_usd(item.price?.usd)}
-                  </span>
+                  <span className="text-xs text-gray-300">{beautifyPrice(item.price?.usd)}</span>
                 </div>
               </div>
               <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
                 <div className="flex flex-col items-start ml-3">
-                  <div className="flex items-end">${formatPrice(item.totalVolume)}</div>
+                  <div className="flex items-end">${beautifyPrice(item.totalVolume)}</div>
                   {/* <span className="text-xs text-gray-300">$-</span> */}
                 </div>
               </div>
               <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
                 <div className="flex flex-col items-start ml-3">
-                  <div className="flex items-end">${formatPrice(item.volume24h)}</div>
+                  <div className="flex items-end">${beautifyPrice(item.volume24h)}</div>
                   {/* <span className="text-xs text-gray-300">$-</span> */}
                 </div>
               </div>
               <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
                 <div className="flex flex-col items-start ml-3">
-                  <div className="flex items-end">
-                    {toInternationalCurrencySystem_number(formattedMarginPosition)}
-                  </div>
+                  <div className="flex items-end">{beautifyPrice(formattedMarginPosition)}</div>
                   <span className="text-xs text-gray-300">
-                    {calculateAndFormatUSD(formattedMarginPosition, item.price?.usd)}
+                    {beautifyPrice(formattedMarginPosition, item.price?.usd)}
                   </span>
                 </div>
               </div>
               <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
                 <div className="flex flex-col items-start ml-3">
-                  <div className="flex items-end">
-                    {toInternationalCurrencySystem_number(formattedMarginBalance)}
-                  </div>
+                  <div className="flex items-end">{beautifyPrice(formattedMarginBalance)}</div>
                   <span className="text-xs text-gray-300">
-                    {calculateAndFormatUSD(formattedMarginBalance, item.price?.usd)}
+                    {beautifyPrice(formattedMarginBalance, item.price?.usd)}
                   </span>
                 </div>
               </div>
@@ -528,9 +530,7 @@ function TableBodyMobile({
                         </span>
                       ) : null}
                     </div>
-                    <span className="text-xs text-gray-300">
-                      {formatWithCommas_usd(item.price?.usd)}
-                    </span>
+                    <span className="text-xs text-gray-300">{beautifyPrice(item.price?.usd)}</span>
                   </div>
                   {is_new ? (
                     <NewTagIcon
@@ -542,7 +542,7 @@ function TableBodyMobile({
                 </div>
                 <div className="flex flex-col items-end ml-2">
                   <div className="flex items-center flex-wrap text-sm">
-                    ${formatPrice(item.totalVolume)}
+                    ${beautifyPrice(item.totalVolume)}
                   </div>
                   <span className="text-xs text-gray-300">Total Valume</span>
                 </div>
@@ -551,25 +551,25 @@ function TableBodyMobile({
                 <div className="flex items-center justify-between mb-4 text-sm">
                   <p className="text-gray-300 h4">24H Volume</p>
                   <p>
-                    ${formatPrice(item.volume24h)}
+                    ${beautifyPrice(item.volume24h)}
                     {/* <span className="text-xs text-gray-300">(-)</span> */}
                   </p>
                 </div>
                 <div className="flex items-center justify-between mb-4 text-sm">
                   <p className="text-gray-300 h4">Long Position</p>
                   <p className="text-primary">
-                    {toInternationalCurrencySystem_number(formattedMarginPosition)}
+                    {beautifyPrice(formattedMarginPosition)}
                     <span className="text-xs text-gray-300 ml-1">
-                      ({calculateAndFormatUSD(formattedMarginPosition, item.price?.usd)})
+                      ({beautifyPrice(formattedMarginPosition, item.price?.usd)})
                     </span>
                   </p>
                 </div>
                 <div className="flex items-center justify-between mb-4 text-sm">
                   <p className="text-gray-300 h4">Short Position</p>
                   <p className="text-red-50">
-                    {toInternationalCurrencySystem_number(formattedMarginBalance)}
+                    {beautifyPrice(formattedMarginBalance)}
                     <span className="text-xs text-gray-300 ml-1">
-                      ({calculateAndFormatUSD(formattedMarginBalance, item.price?.usd)})
+                      ({beautifyPrice(formattedMarginBalance, item.price?.usd)})
                     </span>
                   </p>
                 </div>

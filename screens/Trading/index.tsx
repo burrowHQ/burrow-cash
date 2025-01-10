@@ -270,7 +270,7 @@ const Trading = () => {
                 {/* cate2 */}
                 <div className="text-sm">
                   <div className="flex justify-center items-center">
-                    <p className="text-gray-300 mr-1.5">Price</p>
+                    <p className="text-gray-300 mr-5">Price</p>
                     {/* drop down */}
                     <div
                       className="relative hover:bg-gray-300 hover:bg-opacity-20 py-1 px-1.5 rounded-sm cursor-pointer min-w-24"

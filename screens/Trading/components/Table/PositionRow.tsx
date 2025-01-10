@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import DataSource from "../../../../data/datasource";
 import { useLiqPrice } from "../../../../hooks/useLiqPrice";
 import { shrinkToken } from "../../../../store/helper";
-import { formatPrice, toInternationalCurrencySystem_number } from "../../../../utils/uiNumber";
+import { toInternationalCurrencySystem_number } from "../../../../utils/uiNumber";
 import { beautifyPrice } from "../../../../utils/beautyNumber";
 import { AddCollateral } from "../../../MarginTrading/components/Icon";
 import { isMobileDevice } from "../../../../helpers/helpers";
@@ -168,16 +168,16 @@ const PositionRow = ({
         className="cursor-default"
       >
         {entryPrice !== null && entryPrice !== undefined ? (
-          <span>${formatPrice(entryPrice)}</span>
+          <span>${beautifyPrice(entryPrice)}</span>
         ) : (
           <span className="text-gray-500">-</span>
         )}
       </td>
       <td title={`$${indexPrice?.toString()}`} className="cursor-default">
-        ${formatPrice(indexPrice)}
+        ${beautifyPrice(indexPrice)}
       </td>
       <td title={`$${LiqPrice?.toString()}`} className="cursor-default">
-        ${formatPrice(LiqPrice)}
+        ${beautifyPrice(LiqPrice)}
       </td>
       <td>
         <p className={`${pnl > 0 ? "text-green-150" : pnl < 0 ? "text-red-150" : "text-gray-400"}`}>
@@ -282,7 +282,7 @@ const PositionRow = ({
           <p className="text-gray-300">Entry Price</p>
           <p title={entryPrice !== null && entryPrice !== undefined ? `$${entryPrice}` : ""}>
             {entryPrice !== null ? (
-              <span>${formatPrice(entryPrice)}</span>
+              <span>${beautifyPrice(entryPrice)}</span>
             ) : (
               <span className="text-gray-500">-</span>
             )}
@@ -290,11 +290,11 @@ const PositionRow = ({
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Index Price</p>
-          <p title={indexPrice?.toString()}>${formatPrice(indexPrice)}</p>
+          <p title={indexPrice?.toString()}>${beautifyPrice(indexPrice)}</p>
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Liq. Price</p>
-          <p title={LiqPrice?.toString()}>${formatPrice(LiqPrice)}</p>
+          <p title={LiqPrice?.toString()}>${beautifyPrice(LiqPrice)}</p>
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Opening time</p>

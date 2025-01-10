@@ -24,6 +24,7 @@ import { hiddenAssets } from "../../utils/config";
 import { APYCell } from "../Market/APYCell";
 import { setActiveCategory } from "../../redux/marginTrading";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
+import { beautifyPrice } from "../../utils/beautyNumber";
 
 const Index = () => {
   const accountId = useAccountId();
@@ -260,7 +261,7 @@ const yourSuppliedColumns = (memeCategory?: boolean) => [
           </div>
           <div className="h6 text-gray-300">
             {originalData?.collateral
-              ? formatUSDValue(originalData.collateral * originalData.price)
+              ? beautifyPrice(originalData.collateral * originalData.price, true)
               : ""}
           </div>
         </>
@@ -276,7 +277,7 @@ const yourSuppliedColumns = (memeCategory?: boolean) => [
             {formatTokenValueWithMilify(originalData.supplied, 4)}
           </div>
           <div className="h6 text-gray-300">
-            {formatUSDValue(originalData.supplied * originalData.price)}
+            {beautifyPrice(originalData.supplied * originalData.price, true)}
           </div>
         </>
       );
@@ -319,7 +320,7 @@ const YourSupplied = ({
           <SupplyTokenSvg className="mr-10" />
           <div className="h3">You Supplied</div>
         </div>
-        <div className="h3">{total > 0 ? formatUSDValue(total) : "$0"}</div>
+        <div className="h3">{total > 0 ? beautifyPrice(total, true) : "$0"}</div>
       </div>
       <StyledCustomTable
         data={suppliedRows}
@@ -457,7 +458,7 @@ const yourBorrowedColumns = (memeCategory?: boolean) => [
             {formatTokenValueWithMilify(originalData.borrowed, 4)}
           </div>
           <div className="h6 text-gray-300">
-            ${millifyNumber(originalData.borrowed * originalData.price)}
+            {beautifyPrice(originalData.borrowed * originalData.price, true)}
           </div>
         </>
       );
@@ -491,7 +492,7 @@ const YourBorrowed = ({
           <BorrowTokenSvg className="mr-10" />
           <div className="h3">You Borrowed</div>
         </div>
-        <div className="h3">{total > 0 ? formatUSDValue(total) : "$0"}</div>
+        <div className="h3">{total > 0 ? beautifyPrice(total, true) : "$0"}</div>
       </div>
 
       <StyledCustomTable

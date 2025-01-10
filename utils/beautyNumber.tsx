@@ -20,6 +20,30 @@ export const beautifyPrice = (
   const [integerPart, decimalPart = ""] = numStr.split(".");
   const isPositive = +integerPart >= 0;
 
+  const absValue = Math.abs(Number(num));
+  if (absValue >= 1.0e9) {
+    return (
+      <span key={num} className="animate-flipIn">
+        {isDollar ? "$" : ""}
+        {(absValue / 1.0e9).toFixed(2)}B
+      </span>
+    );
+  } else if (absValue >= 1.0e6) {
+    return (
+      <span key={num} className="animate-flipIn">
+        {isDollar ? "$" : ""}
+        {(absValue / 1.0e6).toFixed(2)}M
+      </span>
+    );
+  } else if (absValue >= 1.0e3) {
+    return (
+      <span key={num} className="animate-flipIn">
+        {isDollar ? "$" : ""}
+        {(absValue / 1.0e3).toFixed(2)}K
+      </span>
+    );
+  }
+
   if (isPositive) {
     if (+integerPart >= 100) {
       const significantDigits = decimalPart.slice(0, 2).replace(/0+$/, "");
