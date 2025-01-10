@@ -1,18 +1,9 @@
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
 import { BeatLoader } from "react-spinners";
-import {
-  AddCollateral,
-  ArrowDownIcon,
-  ArrowUpIcon,
-  Export,
-} from "../../MarginTrading/components/Icon";
 import ClosePositionMobile from "./ClosePositionMobile";
 import ChangeCollateralMobile from "./ChangeCollateralMobile";
 import { useMarginAccount } from "../../../hooks/useMarginAccount";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
-import { formatPrice, toInternationalCurrencySystem_number } from "../../../utils/uiNumber";
-import { IAssetEntry } from "../../../interfaces";
 import DataSource from "../../../data/datasource";
 import { useAccountId } from "../../../hooks/hooks";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
@@ -23,18 +14,18 @@ import {
 import { withdrawActionsAll } from "../../../store/marginActions/withdrawAll";
 import { MarginAccountDetailIcon, YellowBallIcon } from "../../TokenDetail/svg";
 import { useRouterQuery } from "../../../utils/txhashContract";
-import { handleTransactionHash, handleTransactionResults } from "../../../services/transaction";
+import { handleTransactionResults } from "../../../services/transaction";
 import { setAccountDetailsOpen, setSelectedTab } from "../../../redux/marginTabSlice";
 import { showCheckTxBeforeShowToast } from "../../../components/HashResultModal";
-import { shrinkToken } from "../../../store/helper";
 import { getAssets, getAssetsMEME } from "../../../redux/assetsSelectors";
-import { beautifyPrice } from "../../../utils/beautyNumber";
-import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { checkIfMeme } from "../../../utils/margin";
 import { ArrowLineDownIcon, CheckIcon } from "../../Market/svg";
 import { isMobileDevice } from "../../../helpers/helpers";
 import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
-import { useLiqPrice } from "../../../hooks/useLiqPrice";
+import PositionRow from "./Table/PositionRow";
+import HistoryRow from "./Table/HistoryRow";
+import AccountRow from "./Table/AccountRow";
+import { SortButton, SortHistoryButton, Tab } from "./Table/SortButton";
 
 const TradingTable = ({
   positionsList,
@@ -187,7 +178,7 @@ const TradingTable = ({
   const filteredAccountSupplied = combinedAccountSupplied.filter((token) => {
     const assetDetails =
       token.type === "main" ? getAssetById(token.token_id) : getAssetByIdMEME(token.token_id);
-    return token.balance.toString().length >= assetDetails.config.extra_decimals;
+    return assetDetails && token.balance.toString().length >= assetDetails.config.extra_decimals;
   });
 
   const handleWithdrawAllClick = async () => {
@@ -533,142 +524,14 @@ const TradingTable = ({
                       return null;
                     }
                     return (
-                      <tr key={index}>
-                        <td className="py-5 pl-5">
-                          {`${getSymbolById(
-                            assetP.token_id,
-                            assetP.metadata?.symbol,
-                          )}/${getSymbolById(assetD.token_id, assetD.metadata?.symbol)}`}
-                          <div
-                            className={
-                              record.trend === "long"
-                                ? "text-primary text-xs"
-                                : record.trend === "short"
-                                ? "text-red-50 text-xs"
-                                : ""
-                            }
-                          >
-                            {record.trend}
-                          </div>
-                        </td>
-                        <td>
-                          {record.trend === "long"
-                            ? record.amount_d === "0"
-                              ? "-"
-                              : beautifyPrice(
-                                  Number(
-                                    shrinkToken(
-                                      record.amount_p,
-                                      assetP.metadata.decimals + assetP.config.extra_decimals,
-                                    ),
-                                  ),
-                                )
-                            : record.trend === "short"
-                            ? record.amount_p === "0"
-                              ? "-"
-                              : beautifyPrice(
-                                  Number(
-                                    shrinkToken(
-                                      record.amount_d,
-                                      assetD.metadata.decimals + assetD.config.extra_decimals,
-                                    ),
-                                  ),
-                                )
-                            : null}
-                        </td>
-                        <td>
-                          {Number(
-                            shrinkToken(
-                              record.amount_c,
-                              assetC.metadata.decimals + assetC.config.extra_decimals,
-                            ),
-                          ) === 0
-                            ? "-"
-                            : `$${toInternationalCurrencySystem_number(
-                                Number(
-                                  shrinkToken(
-                                    record.amount_c,
-                                    assetC.metadata.decimals + assetC.config.extra_decimals,
-                                  ),
-                                ) * Number(record.c_token_price),
-                              )}`}
-                        </td>
-                        <td>
-                          {toInternationalCurrencySystem_number(
-                            Number(
-                              shrinkToken(
-                                record.amount_c,
-                                assetC.metadata.decimals + assetC.config.extra_decimals,
-                              ),
-                            ),
-                          )}
-                          <span className="ml-1">
-                            {getSymbolById(assetC.token_id, assetC.metadata?.symbol)}
-                          </span>
-                        </td>
-                        <td>
-                          {record.entry_price !== "0" ? (
-                            <span>${formatPrice(Number(record.entry_price))}</span>
-                          ) : (
-                            "-"
-                          )}
-                        </td>
-                        <td>
-                          {record.price !== "0" ? (
-                            <span>${formatPrice(Number(record.price))}</span>
-                          ) : (
-                            "-"
-                          )}
-                        </td>
-                        <td>
-                          {beautifyPrice(
-                            Number(
-                              shrinkToken(
-                                record.fee,
-                                assetD.metadata.decimals + assetD.config.extra_decimals,
-                              ),
-                            ),
-                            true,
-                            3,
-                            3,
-                          )}
-                        </td>
-                        <td
-                          className={`ml-1 ${
-                            record.pnl > 0 ? "text-green-150" : record.pnl < 0 ? "text-red-150" : ""
-                          }`}
-                        >
-                          {record.pnl > 0 ? "+" : record.pnl < 0 ? "-" : ""}
-                          {record.pnl !== "0"
-                            ? beautifyPrice(Math.abs(record.pnl), true, 3, 3)
-                            : ""}
-                        </td>
-                        <td>
-                          <div className="text-sm">
-                            {record.open_timestamp !== 0
-                              ? new Date(record.open_timestamp).toLocaleDateString()
-                              : "-"}
-                          </div>
-                          <div className="text-sm">
-                            {record.open_timestamp !== 0
-                              ? new Date(record.open_timestamp).toLocaleTimeString()
-                              : ""}
-                          </div>
-                        </td>
-                        <td>
-                          <div className="text-sm">
-                            {record.close_timestamp !== 0
-                              ? new Date(record.close_timestamp).toLocaleDateString()
-                              : "-"}
-                          </div>
-                          <div className="text-sm">
-                            {record.close_timestamp !== 0
-                              ? new Date(record.close_timestamp).toLocaleTimeString()
-                              : ""}
-                          </div>
-                        </td>
-                        <td>{record.close_type}</td>
-                      </tr>
+                      <HistoryRow
+                        key={index}
+                        index={index}
+                        record={record}
+                        assetD={assetD}
+                        assetP={assetP}
+                        assetC={assetC}
+                      />
                     );
                   })
                 ) : (
@@ -774,33 +637,13 @@ const TradingTable = ({
                         : getAssetByIdMEME(token.token_id);
                     const marginAssetDetails = getAssetDetails(assetDetails);
                     return (
-                      <tr key={index} className="text-base hover:bg-dark-100 font-normal">
-                        <td className="py-5 pl-5">
-                          <div className="flex items-center">
-                            <img
-                              src={assetDetails.metadata.icon}
-                              alt=""
-                              className="w-4 h-4 rounded-2xl"
-                            />
-                            <p className="ml-1"> {assetDetails.metadata.symbol}</p>
-                          </div>
-                        </td>
-                        <td>
-                          {formatPrice(parseTokenValue(token.balance, marginAssetDetails.decimals))}
-                        </td>
-                        <td>
-                          {marginAssetDetails.price ? formatPrice(marginAssetDetails.price) : "-"}
-                        </td>
-                        <td>
-                          $
-                          {marginAssetDetails.price
-                            ? formatPrice(
-                                parseTokenValue(token.balance, marginAssetDetails.decimals) *
-                                  marginAssetDetails.price,
-                              )
-                            : "-"}
-                        </td>
-                      </tr>
+                      <AccountRow
+                        key={index}
+                        token={token}
+                        assetDetails={assetDetails}
+                        marginAssetDetails={marginAssetDetails}
+                        parseTokenValue={parseTokenValue}
+                      />
                     );
                   })
                 ) : (
@@ -921,7 +764,7 @@ const TradingTable = ({
         <div className={isSelectedMobileTab === "positions" ? "" : "hidden"}>
           {Array.isArray(currentItems) && currentItems.length > 0 ? (
             currentItems.map((item, index) => (
-              <PositionMobileRow
+              <PositionRow
                 index={index}
                 key={item.itemKey}
                 item={item}
@@ -1086,172 +929,14 @@ const TradingTable = ({
                 return null;
               }
               return (
-                <div className="bg-gray-800 rounded-xl mb-4" key={index}>
-                  <div className="pt-5 px-4 pb-4 border-b border-dark-950 flex justify-between">
-                    <div className="flex items-center">
-                      <div className="flex items-center justify-center mr-3.5">
-                        <img
-                          src={assetP.metadata.icon}
-                          alt=""
-                          className="rounded-2xl border border-gray-800"
-                          style={{ width: "26px", height: "26px" }}
-                        />
-                        <img
-                          src={assetD.metadata.icon}
-                          alt=""
-                          className="rounded-2xl border border-gray-800"
-                          style={{ width: "26px", height: "26px", marginLeft: "-6px" }}
-                        />
-                      </div>
-                      <div>
-                        <p>{`${getSymbolById(
-                          assetP.token_id,
-                          assetP.metadata?.symbol,
-                        )}/${getSymbolById(assetD.token_id, assetD.metadata?.symbol)}`}</p>
-                        <p
-                          className={
-                            record.trend === "long"
-                              ? "text-primary text-xs"
-                              : record.trend === "short"
-                              ? "text-red-50 text-xs"
-                              : ""
-                          }
-                        >
-                          <span>{record.trend}</span>
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-4">
-                    <div className="flex items-center justify-between text-sm mb-[18px]">
-                      <p className="text-gray-300">Size</p>
-                      <p>
-                        {record.trend === "long"
-                          ? record.amount_d === "0"
-                            ? "-"
-                            : beautifyPrice(
-                                Number(
-                                  shrinkToken(
-                                    record.amount_p,
-                                    assetP.metadata.decimals + assetP.config.extra_decimals,
-                                  ),
-                                ),
-                              )
-                          : record.trend === "short"
-                          ? record.amount_p === "0"
-                            ? "-"
-                            : beautifyPrice(
-                                Number(
-                                  shrinkToken(
-                                    record.amount_d,
-                                    assetD.metadata.decimals + assetD.config.extra_decimals,
-                                  ),
-                                ),
-                              )
-                          : null}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between text-sm mb-[18px]">
-                      <p className="text-gray-300">Net Value</p>
-                      <p>
-                        {Number(
-                          shrinkToken(
-                            record.amount_c,
-                            assetC.metadata.decimals + assetC.config.extra_decimals,
-                          ),
-                        ) === 0
-                          ? "-"
-                          : `$${toInternationalCurrencySystem_number(
-                              Number(
-                                shrinkToken(
-                                  record.amount_c,
-                                  assetC.metadata.decimals + assetC.config.extra_decimals,
-                                ),
-                              ) * Number(record.c_token_price),
-                            )}`}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between text-sm mb-[18px]">
-                      <p className="text-gray-300">Collateral</p>
-                      <p>
-                        {toInternationalCurrencySystem_number(
-                          Number(
-                            shrinkToken(
-                              record.amount_c,
-                              assetC.metadata.decimals + assetC.config.extra_decimals,
-                            ),
-                          ),
-                        )}
-                        <span className="ml-1">
-                          {getSymbolById(assetC.token_id, assetC.metadata?.symbol)}
-                        </span>
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between text-sm mb-[18px]">
-                      <p className="text-gray-300">Entry price</p>
-                      <p>
-                        {record.entry_price !== "0" ? (
-                          <span>${formatPrice(Number(record.entry_price))}</span>
-                        ) : (
-                          "-"
-                        )}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between text-sm mb-[18px]">
-                      <p className="text-gray-300">Close price</p>
-                      <p>
-                        {record.price !== "0" ? (
-                          <span>${formatPrice(Number(record.price))}</span>
-                        ) : (
-                          "-"
-                        )}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between text-sm mb-[18px]">
-                      <p className="text-gray-300">Fee</p>
-                      <p>
-                        {beautifyPrice(
-                          Number(
-                            shrinkToken(
-                              record.fee,
-                              assetD.metadata.decimals + assetD.config.extra_decimals,
-                            ),
-                          ),
-                          true,
-                          3,
-                          3,
-                        )}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between text-sm mb-[18px]">
-                      <p className="text-gray-300">Opening time</p>
-                      <p>
-                        {record.open_timestamp !== 0
-                          ? new Date(record.open_timestamp).toLocaleString()
-                          : "-"}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between text-sm mb-[18px]">
-                      <p className="text-gray-300">Close time</p>
-                      <p>{new Date(record.close_timestamp).toLocaleString()}</p>
-                    </div>
-                    <div className="flex items-center justify-between text-sm mb-[18px]">
-                      <p className="text-gray-300">Operation</p>
-                      <p>{record.close_type}</p>
-                    </div>
-                    <div className="bg-dark-100 rounded-2xl flex items-center justify-center text-xs py-1 text-gray-300 mb-4">
-                      PNL & ROE
-                      <p
-                        className={`ml-1 ${
-                          record.pnl > 0 ? "text-green-150" : record.pnl < 0 ? "text-red-150" : ""
-                        }`}
-                      >
-                        {record.pnl > 0 ? "+" : record.pnl < 0 ? "-" : ""}
-                        {record.pnl !== "0" ? beautifyPrice(Math.abs(record.pnl), false, 3, 3) : ""}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <HistoryRow
+                  key={index}
+                  index={index}
+                  record={record}
+                  assetP={assetP}
+                  assetD={assetD}
+                  assetC={assetC}
+                />
               );
             })
           ) : (
@@ -1368,39 +1053,13 @@ const TradingTable = ({
                             : getAssetByIdMEME(token.token_id);
                         const marginAssetDetails = getAssetDetails(assetDetails);
                         return (
-                          <tr key={index} className="text-sm hover:bg-dark-100 font-normal ">
-                            <td className="pb-[10px] pl-[30px] pt-[10px]">
-                              <div className="flex items-center">
-                                <img
-                                  src={assetDetails.metadata.icon}
-                                  alt=""
-                                  className="w-[26px] h-[26px] rounded-2xl"
-                                />
-                                <div className="ml-2">
-                                  <p className="text-sm"> {assetDetails.metadata.symbol}</p>
-                                  <p className="text-xs text-gray-300 -mt-0.5">
-                                    {marginAssetDetails.price
-                                      ? formatPrice(marginAssetDetails.price)
-                                      : "/"}
-                                  </p>
-                                </div>
-                              </div>
-                            </td>
-                            <td>
-                              {formatPrice(
-                                parseTokenValue(token.balance, marginAssetDetails.decimals),
-                              )}
-                            </td>
-                            <td className="text-right pr-[32px]">
-                              $
-                              {marginAssetDetails.price
-                                ? formatPrice(
-                                    parseTokenValue(token.balance, marginAssetDetails.decimals) *
-                                      marginAssetDetails.price,
-                                  )
-                                : "-"}
-                            </td>
-                          </tr>
+                          <AccountRow
+                            key={index}
+                            token={token}
+                            assetDetails={assetDetails}
+                            marginAssetDetails={marginAssetDetails}
+                            parseTokenValue={parseTokenValue}
+                          />
                         );
                       })
                     ) : (
@@ -1434,489 +1093,5 @@ const TradingTable = ({
     </div>
   );
 };
-const Tab = ({ tabName, isSelected, onClick }) => (
-  <div
-    className={`pt-6 pl-10 pb-4 pr-7 text-gray-300 text-lg cursor-pointer ${
-      isSelected ? "border-b-2 border-primary text-white" : ""
-    }`}
-    onClick={onClick}
-  >
-    {tabName}
-  </div>
-);
-
-const PositionRow = ({
-  itemKey,
-  index,
-  item,
-  getAssetById,
-  getPositionType,
-  handleChangeCollateralButtonClick,
-  handleClosePositionButtonClick,
-  getAssetDetails,
-  parseTokenValue,
-  calculateLeverage,
-  assets,
-  assetsMEME,
-  marginConfigTokens,
-  filterTitle,
-  marginAccountList,
-  marginAccountListMEME,
-  filteredTokenTypeMap,
-}) => {
-  // console.log(itemKey, item, index);
-  const [entryPrice, setEntryPrice] = useState<number | null>(null);
-  useEffect(() => {
-    const fetchEntryPrice = async () => {
-      try {
-        const response = await DataSource.shared.getMarginTradingRecordEntryPrice(itemKey);
-        if (response?.code === 0 && response?.data?.[0]?.entry_price) {
-          const price = parseFloat(response.data[0].entry_price);
-          setEntryPrice(price);
-        } else {
-          setEntryPrice(null);
-        }
-      } catch (error) {
-        console.error("Failed to fetch entry price:", error);
-        setEntryPrice(null);
-      }
-    };
-    const timeoutId = setTimeout(() => {
-      fetchEntryPrice();
-    }, 3000);
-    return () => clearTimeout(timeoutId);
-  }, [itemKey, item, index]);
-  const positionType = getPositionType(item.token_d_info.token_id);
-  const isMainStream = filteredTokenTypeMap.mainStream.includes(
-    positionType.label === "Long" ? item.token_p_id : item.token_d_info.token_id,
-  );
-  const LiqPrice = useLiqPrice({
-    token_c_info: {
-      token_id: item.token_c_info.token_id,
-      balance: item.token_c_info.balance,
-    },
-    token_d_info: {
-      token_id: item.token_d_info.token_id,
-      balance: item.token_d_info.balance,
-    },
-    token_p_info: {
-      token_id: item.token_p_id,
-      balance: item.token_p_amount,
-    },
-    position_type: positionType.label,
-    uahpi_at_open: item.uahpi_at_open,
-    memeCategory: !isMainStream,
-    debt_cap: item.debt_cap,
-  });
-  const assetD = getAssetById(item.token_d_info.token_id, item);
-  const assetC = getAssetById(item.token_c_info.token_id, item);
-  const assetP = getAssetById(item.token_p_id, item);
-
-  const { price: priceD, symbol: symbolD, decimals: decimalsD } = getAssetDetails(assetD);
-  const { price: priceC, symbol: symbolC, decimals: decimalsC } = getAssetDetails(assetC);
-  const { price: priceP, symbol: symbolP, decimals: decimalsP } = getAssetDetails(assetP);
-
-  const leverageD = parseTokenValue(item.token_d_info.balance, decimalsD);
-  const leverageC = parseTokenValue(item.token_c_info.balance, decimalsC);
-  const leverage = calculateLeverage(leverageD, priceD, leverageC, priceC);
-
-  const marketTitle =
-    positionType.label === "Long" ? `${symbolP}/${symbolC}` : `${symbolD}/${symbolC}`;
-  if (filterTitle && marketTitle !== filterTitle) {
-    return null;
-  }
-  const sizeValueLong = parseTokenValue(item.token_p_amount, decimalsP);
-  const sizeValueShort = parseTokenValue(item.token_d_info.balance, decimalsD);
-  const size = positionType.label === "Long" ? sizeValueLong : sizeValueShort;
-  const sizeValue =
-    positionType.label === "Long" ? sizeValueLong * (priceP || 0) : sizeValueShort * (priceD || 0);
-
-  const netValue = parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
-  const collateral = parseTokenValue(item.token_c_info.balance, decimalsC);
-  const indexPrice = positionType.label === "Long" ? priceP : priceD;
-  const openTime = new Date(Number(item.open_ts) / 1e6);
-  const uahpi: any = isMainStream
-    ? shrinkToken((assets as any).data[item.token_d_info.token_id]?.uahpi, 18)
-    : shrinkToken((assetsMEME as any).data[item.token_d_info.token_id]?.uahpi, 18);
-  const uahpi_at_open: any = isMainStream
-    ? shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18)
-    : shrinkToken(marginAccountListMEME[itemKey]?.uahpi_at_open ?? 0, 18);
-  const holdingFee = +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi - uahpi_at_open);
-  const holding = +shrinkToken(item.debt_cap, decimalsD) * (uahpi - uahpi_at_open);
-  const profitOrLoss =
-    entryPrice !== null && entryPrice !== 0
-      ? positionType.label === "Long"
-        ? (indexPrice - entryPrice) * size
-        : (entryPrice - indexPrice) * size
-      : 0;
-  const pnl = entryPrice !== null && entryPrice !== 0 ? profitOrLoss - holdingFee : 0;
-  let amplitude = 0;
-  if (entryPrice !== null && entryPrice !== 0 && pnl !== 0) {
-    if (positionType.label === "Long") {
-      amplitude = ((indexPrice - entryPrice) / entryPrice) * 100;
-    } else if (positionType.label === "Short") {
-      amplitude = ((entryPrice - indexPrice) / entryPrice) * 100;
-    }
-  }
-  const rowData = {
-    pos_id: itemKey,
-    data: item,
-    marginConfigTokens,
-    entryPrice,
-  };
-  return (
-    <tr className="text-base hover:bg-dark-100 font-normal">
-      <td className="py-5 pl-5">
-        <div className="-mb-1.5">{marketTitle}</div>
-        <span className={`text-xs ${getPositionType(item.token_d_info.token_id).class}`}>
-          {getPositionType(item.token_d_info.token_id).label}
-          <span className="ml-1.5">{toInternationalCurrencySystem_number(leverage)}x</span>
-        </span>
-      </td>
-      <td>
-        <div className="flex mr-4 items-center">
-          <p className="mr-2"> {beautifyPrice(size)}</p>
-          <span className="text-gray-300 text-sm">({beautifyPrice(sizeValue, true, 3, 3)})</span>
-        </div>
-      </td>
-      <td>${toInternationalCurrencySystem_number(netValue)}</td>
-      <td>
-        <div className="flex items-center">
-          <p className="mr-2.5">
-            {toInternationalCurrencySystem_number(collateral)}
-            <span className="ml-1">{symbolC}</span>
-          </p>
-          <div
-            className="cursor-pointer"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleChangeCollateralButtonClick(rowData);
-            }}
-          >
-            <AddCollateral />
-          </div>
-        </div>
-      </td>
-      <td
-        title={entryPrice !== null && entryPrice !== undefined ? `$${entryPrice}` : ""}
-        className="cursor-default"
-      >
-        {entryPrice !== null && entryPrice !== undefined ? (
-          <span>${formatPrice(entryPrice)}</span>
-        ) : (
-          <span className="text-gray-500">-</span>
-        )}
-      </td>
-      <td title={`$${indexPrice?.toString()}`} className="cursor-default">
-        ${formatPrice(indexPrice)}
-      </td>
-      <td title={`$${LiqPrice?.toString()}`} className="cursor-default">
-        ${formatPrice(LiqPrice)}
-      </td>
-      <td>
-        <p className={`${pnl > 0 ? "text-green-150" : pnl < 0 ? "text-red-150" : "text-gray-400"}`}>
-          {pnl === 0 ? "" : `${pnl > 0 ? `+$` : `-$`}`}
-          {beautifyPrice(Math.abs(pnl), false, 3, 3)}
-          <span className="text-gray-400 text-xs ml-0.5">
-            {amplitude !== null && amplitude !== 0
-              ? `(${amplitude > 0 ? `+` : `-`}${toInternationalCurrencySystem_number(
-                  Math.abs(amplitude),
-                )}%)`
-              : ``}
-          </span>
-        </p>
-      </td>
-      <td>
-        <div className="text-sm">{new Date(openTime).toLocaleDateString()}</div>
-        <div className="text-sm">{new Date(openTime).toLocaleTimeString()}</div>
-      </td>
-      <td className="pr-5">
-        <div
-          className="text-gray-300 text-sm border cursor-pointer  border-dark-300 text-center h-6 rounded flex justify-center items-center"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handleClosePositionButtonClick({
-              itemKey,
-              index,
-              item,
-              getAssetById,
-              getPositionType,
-              getAssetDetails,
-              parseTokenValue,
-              calculateLeverage,
-              LiqPrice,
-              entryPrice,
-              pnl,
-            });
-          }}
-        >
-          Close
-        </div>
-      </td>
-    </tr>
-  );
-};
-
-const PositionMobileRow = ({
-  itemKey,
-  index,
-  item,
-  getAssetById,
-  getPositionType,
-  handleChangeCollateralButtonClick,
-  handleClosePositionButtonClick,
-  getAssetDetails,
-  parseTokenValue,
-  calculateLeverage,
-  assets,
-  assetsMEME,
-  marginConfigTokens,
-  filterTitle,
-  marginAccountList,
-  marginAccountListMEME,
-  filteredTokenTypeMap,
-}) => {
-  // console.log(itemKey, item, index);
-  const [entryPrice, setEntryPrice] = useState<number | null>(null);
-  useEffect(() => {
-    const fetchEntryPrice = async () => {
-      try {
-        const response = await DataSource.shared.getMarginTradingRecordEntryPrice(itemKey);
-        if (response?.code === 0 && response?.data?.[0]?.entry_price) {
-          const price = parseFloat(response.data[0].entry_price);
-          setEntryPrice(price);
-        } else {
-          setEntryPrice(null);
-        }
-      } catch (error) {
-        console.error("Failed to fetch entry price:", error);
-        setEntryPrice(null);
-      }
-    };
-    const timeoutId = setTimeout(() => {
-      fetchEntryPrice();
-    }, 3000);
-    return () => clearTimeout(timeoutId);
-  }, [itemKey, item, index]);
-  const assetD = getAssetById(item.token_d_info.token_id, item);
-  const assetC = getAssetById(item.token_c_info.token_id, item);
-  const assetP = getAssetById(item.token_p_id, item);
-
-  const { price: priceD, symbol: symbolD, decimals: decimalsD } = getAssetDetails(assetD);
-  const { price: priceC, symbol: symbolC, decimals: decimalsC } = getAssetDetails(assetC);
-  const { price: priceP, symbol: symbolP, decimals: decimalsP } = getAssetDetails(assetP);
-
-  const leverageD = parseTokenValue(item.token_d_info.balance, decimalsD);
-  const leverageC = parseTokenValue(item.token_c_info.balance, decimalsC);
-  const leverage = calculateLeverage(leverageD, priceD, leverageC, priceC);
-
-  const positionType = getPositionType(item.token_d_info.token_id);
-  const marketIcon =
-    positionType.label === "Long" ? assetP?.metadata?.icon : assetD?.metadata?.icon;
-  const marketTitle =
-    positionType.label === "Long" ? `${symbolP}/${symbolC}` : `${symbolD}/${symbolC}`;
-  if (filterTitle && marketTitle !== filterTitle) {
-    return null;
-  }
-  const isMainStream = filteredTokenTypeMap.mainStream.includes(
-    positionType.label === "Long" ? item.token_p_id : item.token_d_info.token_id,
-  );
-  const sizeValueLong = parseTokenValue(item.token_p_amount, decimalsP);
-  const sizeValueShort = parseTokenValue(item.token_d_info.balance, decimalsD);
-  const size = positionType.label === "Long" ? sizeValueLong : sizeValueShort;
-  const sizeValue =
-    positionType.label === "Long" ? sizeValueLong * (priceP || 0) : sizeValueShort * (priceD || 0);
-
-  const netValue = parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
-  const collateral = parseTokenValue(item.token_c_info.balance, decimalsC);
-  const indexPrice = positionType.label === "Long" ? priceP : priceD;
-  const openTime = new Date(Number(item.open_ts) / 1e6);
-  const uahpi: any = isMainStream
-    ? shrinkToken((assets as any).data[item.token_d_info.token_id]?.uahpi, 18)
-    : shrinkToken((assetsMEME as any).data[item.token_d_info.token_id]?.uahpi, 18);
-  const uahpi_at_open: any = isMainStream
-    ? shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18)
-    : shrinkToken(marginAccountListMEME[itemKey]?.uahpi_at_open ?? 0, 18);
-  const holdingFee = +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi - uahpi_at_open);
-  const holding = +shrinkToken(item.debt_cap, decimalsD) * (uahpi - uahpi_at_open);
-  const profitOrLoss =
-    entryPrice !== null && entryPrice !== 0
-      ? positionType.label === "Long"
-        ? (indexPrice - entryPrice) * size
-        : (entryPrice - indexPrice) * size
-      : 0;
-  const pnl = entryPrice !== null && entryPrice !== 0 ? profitOrLoss - holdingFee : 0;
-  let amplitude = 0;
-  if (entryPrice !== null && entryPrice !== 0 && pnl !== 0) {
-    if (positionType.label === "Long") {
-      amplitude = ((indexPrice - entryPrice) / entryPrice) * 100;
-    } else if (positionType.label === "Short") {
-      amplitude = ((entryPrice - indexPrice) / entryPrice) * 100;
-    }
-  }
-  let LiqPrice = 0;
-  if (leverage > 1) {
-    if (positionType.label === "Long") {
-      const k1 = Number(netValue) * leverage * priceC;
-      const k2 = 1 - marginConfigTokens.min_safety_buffer / 10000;
-      LiqPrice = ((Number(netValue) * priceC + size * priceP) * k2) / (k1 + holding);
-      if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
-    } else {
-      LiqPrice =
-        ((netValue + sizeValueLong) * priceC * (1 - marginConfigTokens.min_safety_buffer / 10000)) /
-        (sizeValueShort + holding);
-      if (Number.isNaN(LiqPrice) || !Number.isFinite(LiqPrice)) LiqPrice = 0;
-    }
-  }
-  const rowData = {
-    pos_id: itemKey,
-    data: item,
-    marginConfigTokens,
-    entryPrice,
-  };
-  return (
-    <div className="bg-gray-800 rounded-xl mb-4">
-      <div className="pt-5 px-4 pb-4 border-b border-dark-950 flex justify-between">
-        <div className="flex items-center">
-          <div className="flex items-center justify-center mr-3.5">
-            <img
-              src={marketIcon}
-              alt=""
-              className="rounded-2xl border border-gray-800"
-              style={{ width: "26px", height: "26px" }}
-            />
-            <img
-              src={assetC?.metadata?.icon}
-              alt=""
-              className="rounded-2xl border border-gray-800"
-              style={{ width: "26px", height: "26px", marginLeft: "-6px" }}
-            />
-          </div>
-          <div>
-            <p>{marketTitle}</p>
-            <p className={`text-xs -mt-0 ${getPositionType(item.token_d_info.token_id).class}`}>
-              {getPositionType(item.token_d_info.token_id).label}
-              <span className="ml-1.5">{toInternationalCurrencySystem_number(leverage)}x</span>
-            </p>
-          </div>
-        </div>
-        <div className="text-right">
-          <div className="flex items-center">
-            <p className="mr-2"> {beautifyPrice(size)}</p>
-            <span className="text-gray-300 text-sm">({beautifyPrice(sizeValue, true, 3, 3)})</span>
-          </div>
-          <p className="text-xs text-gray-300">Size</p>
-        </div>
-      </div>
-      <div className="p-4">
-        <div className="flex items-center justify-between text-sm mb-[18px]">
-          <p className="text-gray-300">Net Value</p>
-          <p>${toInternationalCurrencySystem_number(netValue)}</p>
-        </div>
-        <div className="flex items-center justify-between text-sm mb-[18px]">
-          <p className="text-gray-300">Collateral</p>
-          <div className="flex items-center">
-            <p className="mr-2.5">
-              {toInternationalCurrencySystem_number(collateral)}
-              <span className="ml-1">{symbolC}</span>
-            </p>
-            <div
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleChangeCollateralButtonClick(rowData);
-              }}
-            >
-              <AddCollateral />
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center justify-between text-sm mb-[18px]">
-          <p className="text-gray-300">Entry Price</p>
-          <p title={entryPrice !== null && entryPrice !== undefined ? `$${entryPrice}` : ""}>
-            {entryPrice !== null ? (
-              <span>${formatPrice(entryPrice)}</span>
-            ) : (
-              <span className="text-gray-500">-</span>
-            )}
-          </p>
-        </div>
-        <div className="flex items-center justify-between text-sm mb-[18px]">
-          <p className="text-gray-300">Index Price</p>
-          <p title={indexPrice?.toString()}>${formatPrice(indexPrice)}</p>
-        </div>
-        <div className="flex items-center justify-between text-sm mb-[18px]">
-          <p className="text-gray-300">Liq. Price</p>
-          <p title={LiqPrice?.toString()}>${formatPrice(LiqPrice)}</p>
-        </div>
-        <div className="flex items-center justify-between text-sm mb-[18px]">
-          <p className="text-gray-300">Opening time</p>
-          <p>{new Date(openTime).toLocaleString()}</p>
-        </div>
-        <div className="bg-dark-100 rounded-2xl flex items-center justify-center text-xs py-1 text-gray-300 mb-4">
-          PNL & ROE{" "}
-          <p
-            className={`ml-1 ${
-              pnl > 0 ? "text-green-150" : pnl < 0 ? "text-red-150" : "text-gray-400"
-            }`}
-          >
-            {pnl === 0 ? "" : `${pnl > 0 ? `+$` : `-$`}`}
-            {beautifyPrice(Math.abs(pnl), false, 3, 3)}
-            <span className="text-gray-400 text-xs ml-0.5">
-              {amplitude !== null && amplitude !== 0
-                ? `(${amplitude > 0 ? `+` : `-`}${toInternationalCurrencySystem_number(
-                    Math.abs(amplitude),
-                  )}%)`
-                : ``}
-            </span>
-            {/* <span className="text-gray-400 text-xs ml-0.5">(-%)</span> */}
-          </p>
-        </div>
-        <div
-          className="w-full rounded-md h-9 flex items-center justify-center border border-marginCloseBtn text-gray-300"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handleClosePositionButtonClick({
-              itemKey,
-              index,
-              item,
-              getAssetById,
-              getPositionType,
-              getAssetDetails,
-              parseTokenValue,
-              calculateLeverage,
-              LiqPrice,
-              entryPrice,
-              pnl,
-            });
-          }}
-        >
-          Close
-        </div>
-      </div>
-    </div>
-  );
-};
-
-function SortButton({ sort, activeColor, inactiveColor }) {
-  return (
-    <div className="flex flex-col items-center gap-0.5 ml-1.5">
-      <ArrowUpIcon fill={`${sort === "asc" ? activeColor : inactiveColor}`} />
-      <ArrowDownIcon fill={`${sort === "desc" ? activeColor : inactiveColor}`} />
-    </div>
-  );
-}
-
-function SortHistoryButton({ sort, activeColor, inactiveColor }) {
-  return (
-    <div className="flex flex-col items-center gap-0.5 ml-1.5">
-      <ArrowUpIcon fill={`${sort === "ASC" ? activeColor : inactiveColor}`} />
-      <ArrowDownIcon fill={`${sort === "DESC" ? activeColor : inactiveColor}`} />
-    </div>
-  );
-}
 
 export default TradingTable;
