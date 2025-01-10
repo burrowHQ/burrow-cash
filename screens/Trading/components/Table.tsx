@@ -26,6 +26,7 @@ import PositionRow from "./Table/PositionRow";
 import HistoryRow from "./Table/HistoryRow";
 import AccountRow from "./Table/AccountRow";
 import { SortButton, SortHistoryButton, Tab } from "./Table/SortButton";
+import Pagination from "./Table/Pagination";
 
 const TradingTable = ({
   positionsList,
@@ -92,6 +93,9 @@ const TradingTable = ({
       dispatch(setSelectedTab(tab));
     }
     setStateSelectedTab(tab);
+    setCurrentPage(1);
+    setInputPage("");
+    setPageNum(0);
   };
 
   const handleClosePositionButtonClick = (key) => {
@@ -410,53 +414,14 @@ const TradingTable = ({
               </tbody>
             </table>
             {Array.isArray(currentItems) && currentItems.length > 0 ? (
-              <div className="flex items-center justify-center mt-4">
-                {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => {
-                  if (
-                    page === 1 ||
-                    page === totalPages ||
-                    (page >= currentPage - 1 && page <= currentPage + 1)
-                  ) {
-                    return (
-                      <button
-                        type="button"
-                        key={page}
-                        onClick={() => setCurrentPage(page)}
-                        className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
-                          currentPage === page ? "font-bold bg-dark-1200 bg-opacity-30" : ""
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    );
-                  }
-                  if (page === 2 && currentPage > 3) {
-                    return <span key={page}>...</span>;
-                  }
-                  if (page === totalPages - 1 && currentPage < totalPages - 2) {
-                    return <span key={page}>...</span>;
-                  }
-                  return null;
-                })}
-                <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
-                <input
-                  className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
-                  type="text"
-                  value={inputPage}
-                  onChange={(e) => {
-                    const { value } = e.target;
-                    if (value === "" || (Number.isInteger(Number(value)) && !value.includes("."))) {
-                      setInputPage(value);
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      const pageNumber = Number(inputPage);
-                      handlePageJump(pageNumber);
-                    }
-                  }}
-                />
-              </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                inputPage={inputPage}
+                setInputPage={setInputPage}
+                handlePageJump={handlePageJump}
+              />
             ) : null}
           </div>
           <div className={selectedTab === "history" ? "" : "hidden"}>
@@ -546,76 +511,16 @@ const TradingTable = ({
               </tbody>
             </table>
             {totalHistoryPages !== 0 && (
-              <div className="flex items-center justify-center mt-4">
-                {totalHistoryPages > 1 && totalHistoryPages > 1 ? (
-                  <>
-                    {Array.from({ length: Math.min(totalHistoryPages, 5) }, (_, index) => {
-                      const page = index + 1;
-                      if (
-                        page === 1 ||
-                        page === totalHistoryPages ||
-                        (page >= pageNum && page <= pageNum + 2)
-                      ) {
-                        return (
-                          <button
-                            type="button"
-                            key={page}
-                            onClick={() => setPageNum(page - 1)}
-                            className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
-                              pageNum === page - 1 ? "font-bold bg-dark-1200 bg-opacity-30" : ""
-                            }`}
-                          >
-                            {page}
-                          </button>
-                        );
-                      }
-                      return null;
-                    })}
-
-                    {totalHistoryPages > 5 && pageNum < totalHistoryPages - 2 && (
-                      <span key="ellipsis" className="text-gray-300">
-                        ...
-                      </span>
-                    )}
-
-                    {totalHistoryPages > 5 && pageNum > 2 && (
-                      <button
-                        type="button"
-                        onClick={() => setPageNum(totalHistoryPages - 1)}
-                        className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
-                          pageNum === totalHistoryPages - 1
-                            ? "font-bold bg-dark-1200 bg-opacity-30"
-                            : ""
-                        }`}
-                      >
-                        {totalHistoryPages}
-                      </button>
-                    )}
-                  </>
-                ) : totalHistoryPages === 1 ? (
-                  <span className="text-gray-300">1</span>
-                ) : null}
-                <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
-                <input
-                  className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
-                  type="text"
-                  value={inputPage}
-                  onChange={(e) => {
-                    const { value } = e.target;
-                    if (value === "" || (Number.isInteger(Number(value)) && !value.includes("."))) {
-                      setInputPage(value);
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      const pageNumber = Number(inputPage);
-                      if (pageNumber > 0 && pageNumber <= totalHistoryPages) {
-                        setPageNum(pageNumber - 1);
-                      }
-                    }
-                  }}
-                />
-              </div>
+              <Pagination
+                currentPage={pageNum + 1}
+                totalPages={totalHistoryPages}
+                onPageChange={(page) => {
+                  setPageNum(page - 1);
+                }}
+                inputPage={inputPage}
+                setInputPage={setInputPage}
+                handlePageJump={(pageNumber) => setPageNum(pageNumber - 1)}
+              />
             )}
           </div>
           <div className={selectedTab === "account" && !filterTitle ? "" : "hidden"}>
@@ -658,59 +563,14 @@ const TradingTable = ({
               </tbody>
             </table>
             {filteredAccountSupplied.length > 0 ? (
-              <div className="flex items-center justify-center mt-4">
-                {Array.from(
-                  { length: Math.ceil(filteredAccountSupplied.length / itemsPerPage) },
-                  (_, index) => index + 1,
-                ).map((page) => {
-                  if (
-                    page === 1 ||
-                    page === Math.ceil(filteredAccountSupplied.length / itemsPerPage) ||
-                    (page >= currentPage - 1 && page <= currentPage + 1)
-                  ) {
-                    return (
-                      <button
-                        type="button"
-                        key={page}
-                        onClick={() => setCurrentPage(page)}
-                        className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
-                          currentPage === page ? "font-bold bg-dark-1200 bg-opacity-30" : ""
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    );
-                  }
-                  if (page === 2 && currentPage > 3) {
-                    return <span key={page}>...</span>;
-                  }
-                  if (
-                    page === Math.ceil(filteredAccountSupplied.length / itemsPerPage) - 1 &&
-                    currentPage < Math.ceil(filteredAccountSupplied.length / itemsPerPage) - 2
-                  ) {
-                    return <span key={page}>...</span>;
-                  }
-                  return null;
-                })}
-                <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
-                <input
-                  className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
-                  type="text"
-                  value={inputPage}
-                  onChange={(e) => {
-                    const { value } = e.target;
-                    if (value === "" || (Number.isInteger(Number(value)) && !value.includes("."))) {
-                      setInputPage(value);
-                    }
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      const pageNumber = Number(inputPage);
-                      handlePageJump(pageNumber);
-                    }
-                  }}
-                />
-              </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={Math.ceil(filteredAccountSupplied.length / itemsPerPage)}
+                onPageChange={setCurrentPage}
+                inputPage={inputPage}
+                setInputPage={setInputPage}
+                handlePageJump={handlePageJump}
+              />
             ) : null}
           </div>
         </div>
@@ -821,53 +681,14 @@ const TradingTable = ({
             />
           )}
           {Array.isArray(currentItems) && currentItems.length > 0 ? (
-            <div className="flex items-center justify-center mt-4">
-              {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => {
-                if (
-                  page === 1 ||
-                  page === totalPages ||
-                  (page >= currentPage - 1 && page <= currentPage + 1)
-                ) {
-                  return (
-                    <button
-                      type="button"
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
-                        currentPage === page ? "font-bold bg-dark-1200 bg-opacity-30" : ""
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  );
-                }
-                if (page === 2 && currentPage > 3) {
-                  return <span key={page}>...</span>;
-                }
-                if (page === totalPages - 1 && currentPage < totalPages - 2) {
-                  return <span key={page}>...</span>;
-                }
-                return null;
-              })}
-              <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
-              <input
-                className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
-                type="text"
-                value={inputPage}
-                onChange={(e) => {
-                  const { value } = e.target;
-                  if (value === "" || (Number.isInteger(Number(value)) && !value.includes("."))) {
-                    setInputPage(value);
-                  }
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    const pageNumber = Number(inputPage);
-                    handlePageJump(pageNumber);
-                  }
-                }}
-              />
-            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              inputPage={inputPage}
+              setInputPage={setInputPage}
+              handlePageJump={handlePageJump}
+            />
           ) : null}
         </div>
         <div className={isSelectedMobileTab === "history" ? "" : "hidden"}>
@@ -945,76 +766,16 @@ const TradingTable = ({
             </div>
           )}
           {totalHistoryPages !== 0 && (
-            <div className="flex items-center justify-center mt-4">
-              {totalHistoryPages > 1 && totalHistoryPages > 1 ? (
-                <>
-                  {Array.from({ length: Math.min(totalHistoryPages, 5) }, (_, index) => {
-                    const page = index + 1;
-                    if (
-                      page === 1 ||
-                      page === totalHistoryPages ||
-                      (page >= pageNum && page <= pageNum + 2)
-                    ) {
-                      return (
-                        <button
-                          type="button"
-                          key={page}
-                          onClick={() => setPageNum(page - 1)}
-                          className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
-                            pageNum === page - 1 ? "font-bold bg-dark-1200 bg-opacity-30" : ""
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      );
-                    }
-                    return null;
-                  })}
-
-                  {totalHistoryPages > 5 && pageNum < totalHistoryPages - 2 && (
-                    <span key="ellipsis" className="text-gray-300">
-                      ...
-                    </span>
-                  )}
-
-                  {totalHistoryPages > 5 && pageNum > 2 && (
-                    <button
-                      type="button"
-                      onClick={() => setPageNum(totalHistoryPages - 1)}
-                      className={`px-2 py-1 text-gray-300 w-6 h-6 flex items-center justify-center rounded mr-2 ${
-                        pageNum === totalHistoryPages - 1
-                          ? "font-bold bg-dark-1200 bg-opacity-30"
-                          : ""
-                      }`}
-                    >
-                      {totalHistoryPages}
-                    </button>
-                  )}
-                </>
-              ) : totalHistoryPages === 1 ? (
-                <span className="text-gray-300">1</span>
-              ) : null}
-              <p className="text-gray-1400 text-sm mr-1.5 ml-10">Go to</p>
-              <input
-                className="w-[42px] h-[22px] bg-dark-100 border border-dark-1250 text-sm text-center border rounded"
-                type="text"
-                value={inputPage}
-                onChange={(e) => {
-                  const { value } = e.target;
-                  if (value === "" || (Number.isInteger(Number(value)) && !value.includes("."))) {
-                    setInputPage(value);
-                  }
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    const pageNumber = Number(inputPage);
-                    if (pageNumber > 0 && pageNumber <= totalHistoryPages) {
-                      setPageNum(pageNumber - 1);
-                    }
-                  }
-                }}
-              />
-            </div>
+            <Pagination
+              currentPage={pageNum + 1}
+              totalPages={totalHistoryPages}
+              onPageChange={(page) => {
+                setPageNum(page - 1);
+              }}
+              inputPage={inputPage}
+              setInputPage={setInputPage}
+              handlePageJump={(pageNumber) => setPageNum(pageNumber - 1)}
+            />
           )}
         </div>
         {!filterTitle && filteredAccountSupplied.length > 0 && (
