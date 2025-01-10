@@ -450,7 +450,7 @@ function TableBody({
                 <div className="flex flex-col items-start ml-3">
                   <div className="flex items-end">{beautifyPrice(formattedMarginPosition)}</div>
                   <span className="text-xs text-gray-300">
-                    {beautifyPrice(formattedMarginPosition, item.price?.usd)}
+                    {beautifyPrice(calculateAndFormatUSD(formattedMarginPosition, item.price?.usd))}
                   </span>
                 </div>
               </div>
@@ -458,7 +458,7 @@ function TableBody({
                 <div className="flex flex-col items-start ml-3">
                   <div className="flex items-end">{beautifyPrice(formattedMarginBalance)}</div>
                   <span className="text-xs text-gray-300">
-                    {beautifyPrice(formattedMarginBalance, item.price?.usd)}
+                    {beautifyPrice(calculateAndFormatUSD(formattedMarginBalance, item.price?.usd))}
                   </span>
                 </div>
               </div>
@@ -560,7 +560,11 @@ function TableBodyMobile({
                   <p className="text-primary">
                     {beautifyPrice(formattedMarginPosition)}
                     <span className="text-xs text-gray-300 ml-1">
-                      ({beautifyPrice(formattedMarginPosition, item.price?.usd)})
+                      (
+                      {beautifyPrice(
+                        calculateAndFormatUSD(formattedMarginPosition, item.price?.usd),
+                      )}
+                      )
                     </span>
                   </p>
                 </div>
@@ -569,7 +573,11 @@ function TableBodyMobile({
                   <p className="text-red-50">
                     {beautifyPrice(formattedMarginBalance)}
                     <span className="text-xs text-gray-300 ml-1">
-                      ({beautifyPrice(formattedMarginBalance, item.price?.usd)})
+                      (
+                      {beautifyPrice(
+                        calculateAndFormatUSD(formattedMarginBalance, item.price?.usd),
+                      )}
+                      )
                     </span>
                   </p>
                 </div>
