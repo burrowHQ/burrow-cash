@@ -6,6 +6,8 @@ import {
 } from "../../components/Modal/components";
 import CustomButton from "../../components/CustomButton/CustomButton";
 import { ArrowUpIcon } from "../../components/Icons/Icons";
+import { isMemeCategory } from "../../redux/categorySelectors";
+import { useAppSelector } from "../../redux/hooks";
 
 export const MarketButton = ({
   tokenId,
@@ -15,8 +17,9 @@ export const MarketButton = ({
   style?: object;
 }) => {
   const router = useRouter();
+  const isMeme = useAppSelector(isMemeCategory);
   const handleMarketClick = () => {
-    window.open(`/tokenDetail/${tokenId}`);
+    window.open(`/tokenDetail/${tokenId}?pageType=${isMeme ? "meme" : "main"}`);
     // router.push(`/tokenDetail/${tokenId}`);
   };
   return (

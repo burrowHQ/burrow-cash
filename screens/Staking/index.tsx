@@ -187,7 +187,7 @@ const StakingBox = ({
   disabled,
 }: StakingBoxProps) => {
   function GotoDetailPage() {
-    window.open(`/tokenDetail/${BRRR_TOKEN[defaultNetwork]}`);
+    window.open(`/tokenDetail/${BRRR_TOKEN[defaultNetwork]}?pageType=main`);
   }
   return (
     <ContentBox className="mb-4 md:w-[363px]" padding="26px">

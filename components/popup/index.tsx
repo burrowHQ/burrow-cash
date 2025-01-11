@@ -54,7 +54,7 @@ const Popup = ({ className }) => {
                   className="cursor-pointer mr-4 xsm:right-4 z-50"
                   onClick={closePopup}
                 />
-                <div onClick={() => router.push(`/tokenDetail/shadow_ref_v1-4179/`)}>
+                <div onClick={() => router.push(`/tokenDetail/shadow_ref_v1-4179?pageType=main`)}>
                   <LpTokenCarouse />
                 </div>
               </div>

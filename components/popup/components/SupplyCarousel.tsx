@@ -35,7 +35,7 @@ const SupplyCarousel = () => {
     return 0;
   }, [needJoinAndClaim, accountId, suppliedRows]);
   function jump(tokenId) {
-    router.push(`/tokenDetail/${tokenId}`);
+    router.push(`/tokenDetail/${tokenId}?pageType=main`);
   }
   return (
     <div className="flex items-center justify-center">
