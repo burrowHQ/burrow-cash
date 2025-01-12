@@ -429,8 +429,10 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
     const input = tab === "long" ? longInput : shortInput;
     const inputAmount = input ? Number(input) : 0;
     const openFeeAmount = (inputAmount * config.open_position_fee_rate) / 10000;
+    const rangeMountSafty =
+      config.max_leverage_rate == rangeMount ? rangeMount * 0.999 : rangeMount;
     const adjustedInputAmount =
-      inputAmount * inputUsdCharcate2 * rangeMount - openFeeAmount * inputUsdCharcate2;
+      inputAmount * inputUsdCharcate2 * rangeMountSafty - openFeeAmount * inputUsdCharcate2;
     const inputUsdSetter = tab === "long" ? setLongInputUsd : setShortInputUsd;
 
     // set input usd
