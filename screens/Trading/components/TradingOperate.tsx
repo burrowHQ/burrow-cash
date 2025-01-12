@@ -12,7 +12,7 @@ import { getAccountId } from "../../../redux/accountSelectors";
 import { getAssets, getAssetsMEME } from "../../../redux/assetsSelectors";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
 import { usePoolsData } from "../../../hooks/useGetPoolsData";
-import { getMarginConfig } from "../../../redux/marginConfigSelectors";
+import { getMarginConfigCategory } from "../../../redux/marginConfigSelectors";
 import { toDecimal } from "../../../utils/uiNumber";
 import { useEstimateSwap } from "../../../hooks/useEstimateSwap";
 import { setSlippageToleranceFromRedux, setReduxActiveTab } from "../../../redux/marginTrading";
@@ -33,15 +33,14 @@ interface TradingOperateProps {
 
 // main components
 const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) => {
-  //
   const customInputRef = useRef<HTMLInputElement>(null);
+  const accountId = useAppSelector(getAccountId);
   const { filteredTokenTypeMap } = useRegisterTokenType();
   const isMainStream = filteredTokenTypeMap.mainStream.includes(id);
   const assets = useAppSelector(getAssets);
   const assetsMEME = useAppSelector(getAssetsMEME);
   const combinedAssetsData = isMainStream ? assets.data : assetsMEME.data;
-
-  const config = useAppSelector(getMarginConfig);
+  const config = useAppSelector(getMarginConfigCategory(!isMainStream));
   const {
     categoryAssets1,
     categoryAssets1MEME,
@@ -89,9 +88,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
   const [longOutputUsd, setLongOutputUsd] = useState<number>(0);
   const [shortInputUsd, setShortInputUsd] = useState<number>(0);
   const [shortOutputUsd, setShortOutputUsd] = useState<number>(0);
-
-  //
-  const accountId = useAppSelector(getAccountId);
 
   // pools
   const { simplePools, stablePools, stablePoolsDetail } = usePoolsData();
@@ -450,8 +446,10 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
     const input = tab === "long" ? longInput : shortInput;
     const inputAmount = input ? Number(input) : 0;
     const openFeeAmount = (inputAmount * config.open_position_fee_rate) / 10000;
+    const rangeMountSafty =
+      +config.max_leverage_rate == +rangeMount ? +rangeMount * 0.999 : +rangeMount;
     const adjustedInputAmount =
-      inputAmount * inputUsdCharcate2 * rangeMount - openFeeAmount * inputUsdCharcate2;
+      inputAmount * inputUsdCharcate2 * rangeMountSafty - openFeeAmount * inputUsdCharcate2;
     const inputUsdSetter = tab === "long" ? setLongInputUsd : setShortInputUsd;
 
     // set input usd

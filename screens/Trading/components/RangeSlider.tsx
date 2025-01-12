@@ -59,12 +59,6 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRang
     }
   }, [value, JSON.stringify(splitList || [])]);
 
-  // add center
-  // useEffect(() => {
-  //   setValue(splitList[2]);
-  //   setRangeMount(splitList[2]);
-  // }, [JSON.stringify(splitList || [])]);
-
   function changeValue(v: string | number) {
     const numValue = Number(v);
     const nearestValue = splitList.reduce((prev, curr) => {
