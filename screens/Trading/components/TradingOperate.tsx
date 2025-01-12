@@ -280,14 +280,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
     ReduxcategoryAssets1,
   ]);
 
-  // update token in amount
-  // useEffect(() => {
-  //   const inputUsdCharcate1 = getAssetPrice(ReduxcategoryAssets1);
-  //   if (inputUsdCharcate1 && estimateData) {
-  //     updateOutput(activeTab, inputUsdCharcate1);
-  //   }
-  // }, [tokenInAmount, activeTab, estimateData, ReduxcategoryAssets1]);
-
   // update liq price for short
   useEffect(() => {
     if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
@@ -688,7 +680,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
                     longOutputUsd,
                     rangeMount,
                     estimateData,
-                    // indexPrice: assets.data[ReduxcategoryAssets1["token_id"]].price?.usd,
                     longInputName: ReduxcategoryAssets2,
                     longOutputName: ReduxcategoryAssets1,
                     assets,
@@ -823,7 +814,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose }) => {
                     longOutputUsd: shortOutputUsd,
                     rangeMount,
                     estimateData,
-                    // indexPrice: assets.data[ReduxcategoryAssets1["token_id"]].price?.usd,
                     longInputName: ReduxcategoryAssets2,
                     longOutputName: ReduxcategoryAssets1,
                     assets,

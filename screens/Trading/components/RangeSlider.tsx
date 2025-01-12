@@ -12,7 +12,6 @@ interface RangeSliderProps {
 
 const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRangeMount }) => {
   const dispatch = useAppDispatch();
-  //
   const generateArithmeticSequence = (value: number) => {
     const increment = (value - 1) / 4;
     const sequence: number[] = [];
@@ -23,14 +22,12 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRang
 
     return sequence;
   };
-  //
   const { marginConfigTokens } = useMarginConfigToken();
 
   const [value, setValue] = useState(defaultValue);
   const [splitList, setSplitList] = useState([0]);
   const [matchValue, setMatchValue] = useState(value);
   const valueRef = useRef<HTMLInputElement>(null);
-  const [selectedItem, setSelectedItem] = useState(defaultValue);
 
   useEffect(() => {
     const newAllowedValues = generateArithmeticSequence(marginConfigTokens["max_leverage_rate"]);
@@ -49,19 +46,12 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRang
     }
   }, [value, JSON.stringify(splitList || [])]);
 
-  // add center
-  // useEffect(() => {
-  //   setValue(splitList[2]);
-  //   setRangeMount(splitList[2]);
-  // }, [JSON.stringify(splitList || [])]);
-
   function changeValue(v: string | number) {
     const numValue = Number(v);
     const nearestValue = splitList.reduce((prev, curr) => {
       return Math.abs(curr - numValue) < Math.abs(prev - numValue) ? curr : prev;
     });
     setValue(nearestValue);
-    setSelectedItem(nearestValue);
     setRangeMount(nearestValue);
     dispatch(setReduxRangeMount(nearestValue));
   }
@@ -93,7 +83,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRang
               className={twMerge(
                 `flex items-center justify-center text-xs text-gray-400 w-11 py-0.5 border border-transparent hover:border-v3LiquidityRemoveBarColor
                  rounded-lg`,
-                p === selectedItem && "bg-black bg-opacity-20",
+                p === value && "bg-black bg-opacity-20",
               )}
             >
               {p}X
