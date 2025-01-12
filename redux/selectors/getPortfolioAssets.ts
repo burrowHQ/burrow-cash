@@ -168,7 +168,7 @@ export const getPortfolioAssets = (memeCategory?: boolean) => {
             borrowApy: Number(asset.borrow_apr) * 100,
             borrowed: borrowedToken,
             brrrUnclaimedAmount: Number(
-              shrinkToken(brrrUnclaimedAmount, assets.data[brrrTokenId].metadata.decimals),
+              shrinkToken(brrrUnclaimedAmount, assets.data[brrrTokenId]?.metadata?.decimals || 0),
             ),
             rewards: getPortfolioRewards(
               "borrowed",
@@ -211,7 +211,7 @@ export const getPortfolioAssets = (memeCategory?: boolean) => {
               borrowApy: Number(asset.borrow_apr) * 100,
               borrowed: borrowedToken,
               brrrUnclaimedAmount: Number(
-                shrinkToken(brrrUnclaimedAmount, assets.data[brrrTokenId].metadata.decimals),
+                shrinkToken(brrrUnclaimedAmount, assets.data[brrrTokenId]?.metadata?.decimals || 0),
               ),
               rewards: getPortfolioRewards(
                 "borrowed",

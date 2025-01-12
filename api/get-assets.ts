@@ -40,7 +40,9 @@ const getLptMetadata = (lp_token_details: IUnitLptAssetDetail, priceMap, metadat
 };
 
 const getAssets = async () => {
-  const assets = await getAssetsDetailed();
+  const assets_pending = await getAssetsDetailed();
+  // TODO for private mainnet need to revert before go live
+  const assets = assets_pending.filter((asset) => asset.token_id.indexOf(lpTokenPrefix) === -1);
   const token_ids_from_regular = assets
     .filter((asset) => asset.token_id.indexOf(lpTokenPrefix) === -1)
     .map((asset) => asset.token_id);

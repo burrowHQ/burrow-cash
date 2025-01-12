@@ -152,7 +152,7 @@ export const transformAsset = (
       ? Number(
           shrinkToken(
             asset.farms.borrowed[brrrTokenId]?.["reward_per_day"] || "0",
-            assets[brrrTokenId]?.metadata?.decimals,
+            assets[brrrTokenId]?.metadata?.decimals || 0,
           ),
         )
       : 0,
@@ -160,7 +160,7 @@ export const transformAsset = (
       ? Number(
           shrinkToken(
             asset.farms.supplied[brrrTokenId]?.["reward_per_day"] || "0",
-            assets[brrrTokenId]?.metadata?.decimals,
+            assets[brrrTokenId]?.metadata?.decimals || 0,
           ),
         )
       : 0,
