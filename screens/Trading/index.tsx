@@ -31,8 +31,6 @@ import { beautifyPrice } from "../../utils/beautyNumber";
 import { getSymbolById } from "../../transformers/nearSymbolTrans";
 import { useRegisterTokenType } from "../../hooks/useRegisterTokenType";
 
-init_env("dev");
-
 const Trading = () => {
   const isMobile = isMobileDevice();
   const marginConfig = useAppSelector(getMarginConfig);

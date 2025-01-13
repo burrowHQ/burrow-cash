@@ -5,7 +5,6 @@ import { useV1EstimateSwap } from "./useV1EstimateSwap";
 import { useDclEstimateSwap } from "./useDclEstimateSwap";
 import { IEstimateResult } from "../interfaces";
 
-init_env("dev");
 export const useEstimateSwap = ({
   tokenIn_id,
   tokenOut_id,
