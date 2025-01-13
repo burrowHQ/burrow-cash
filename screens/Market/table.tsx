@@ -409,7 +409,7 @@ function TableRowPc({
           {getIcons()}
           <div className="flex flex-col items-start ml-3">
             <div className="flex items-end">{getSymbols()}</div>
-            <span className="text-xs text-gray-300">{formatWithCommas_usd(row?.price)}</span>
+            <span className="text-xs text-gray-300">{beautifyPrice(row?.price, true)}</span>
           </div>
           {is_new ? (
             <NewTagIcon
@@ -565,7 +565,7 @@ function TableRowMobile({
               row.can_borrow ? toInternationalCurrencySystem_usd(row.availableLiquidityMoney) : ""
             }
           />
-          <TemplateMobile title="Price" value={formatWithCommas_usd(row?.price)} />
+          <TemplateMobile title="Price" value={beautifyPrice(row?.price, true)} />
         </div>
       </div>
     </Link>
@@ -585,7 +585,7 @@ function TemplateMobile({
   subValue,
 }: {
   title: string;
-  value: string;
+  value: string | React.ReactNode;
   subValue?: string;
 }) {
   return (

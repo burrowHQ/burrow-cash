@@ -407,7 +407,11 @@ function TableBody({
                 {item.token_id == nearTokenId ? (
                   <NearIcon />
                 ) : (
-                  <img alt="" src={item.metadata?.icon} style={{ width: "26px", height: "26px" }} />
+                  <img
+                    alt=""
+                    src={item.metadata?.icon}
+                    style={{ width: "26px", height: "26px", borderRadius: "50%" }}
+                  />
                 )}
                 {is_new ? (
                   <NewTagIcon
@@ -431,7 +435,9 @@ function TableBody({
                     ) : null}
                     {!isMainStream && <MemeTagIcon />}
                   </div>
-                  <span className="text-xs text-gray-300">{beautifyPrice(item.price?.usd)}</span>
+                  <span className="text-xs text-gray-300">
+                    {beautifyPrice(item.price?.usd, true)}
+                  </span>
                 </div>
               </div>
               <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
@@ -515,7 +521,7 @@ function TableBodyMobile({
                     <img
                       alt=""
                       src={item.metadata?.icon}
-                      style={{ width: "26px", height: "26px" }}
+                      style={{ width: "26px", height: "26px", borderRadius: "50%" }}
                     />
                   )}
                   <div className="flex flex-col items-start ml-2">
@@ -530,7 +536,9 @@ function TableBodyMobile({
                         </span>
                       ) : null}
                     </div>
-                    <span className="text-xs text-gray-300">{beautifyPrice(item.price?.usd)}</span>
+                    <span className="text-xs text-gray-300">
+                      {beautifyPrice(item.price?.usd, true)}
+                    </span>
                   </div>
                   {is_new ? (
                     <NewTagIcon
