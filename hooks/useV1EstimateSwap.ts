@@ -24,7 +24,6 @@ import {
   get_registered_dexes,
 } from "../utils/margin";
 
-init_env("dev");
 const SHUTDOWN_SERVER = false;
 export const useV1EstimateSwap = ({
   tokenIn_id,
