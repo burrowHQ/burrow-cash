@@ -15,11 +15,6 @@ const Market = () => {
   const { activeCategory: activeTab = "main" } = useAppSelector((state) => state.category);
   const rows = useAvailableAssets();
   const { sorting, setSorting } = useTableSorting();
-  // useEffect(() => {
-  //   return () => {
-  //     dispatch(setActiveCategory("main"));
-  //   };
-  // }, [dispatch]);
   useEffect(() => {
     if (router?.query?.vault === "true") {
       setSorting("market", "depositApy", "desc");

@@ -63,7 +63,7 @@ export const getPrices = async ({ isMeme }: { isMeme?: boolean }): Promise<IPric
     const pythResponse = await getPythPrices();
     return pythResponse;
   } else {
-    const oracleResponse = await getOraclePrices();
+    const oracleResponse = await getOraclePrices(isMeme);
     return oracleResponse;
   }
 };
@@ -202,11 +202,11 @@ const getPythPrices = async () => {
     return undefined;
   }
 };
-const getOraclePrices = async () => {
-  const { view, oracleContract } = await getBurrow();
+const getOraclePrices = async (isMeme?: boolean) => {
+  const { view, oracleContract, memeOracleContract } = await getBurrow();
   try {
     const priceResponse: IPrices = (await view(
-      oracleContract,
+      isMeme ? memeOracleContract : oracleContract,
       ViewMethodsOracle[ViewMethodsOracle.get_price_data],
     )) as IPrices;
 
