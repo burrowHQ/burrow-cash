@@ -336,7 +336,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Index Price</div>
-              <div>${indexPrice}</div>
+              <div>{beautifyPrice(indexPrice, true)}</div>
             </div>
             {/*  */}
             <div className="flex items-center justify-between text-sm mb-4">
