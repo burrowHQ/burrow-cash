@@ -7,6 +7,7 @@ export const DUST_THRESHOLD = 0.001;
 
 export const hiddenAssets = ["meta-token.near", "usn"];
 export const lpTokenPrefix = "shadow_ref_v1";
+export const blackAssets = ["shadow_ref_v1-0"];
 
 export const defaultNetwork = (process.env.NEXT_PUBLIC_DEFAULT_NETWORK ||
   process.env.NODE_ENV ||

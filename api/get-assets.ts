@@ -1,7 +1,7 @@
 import Decimal from "decimal.js";
 import { getAllMetadata, getAssetsDetailed, getPrices, getUnitLptAssets } from "../store";
 import { shrinkToken } from "../store/helper";
-import { lpTokenPrefix } from "../utils/config";
+import { lpTokenPrefix, blackAssets } from "../utils/config";
 import { IToken, IUnitLptAssetDetail, IMetadata } from "../interfaces/asset";
 import { standardizeAsset } from "../utils";
 
@@ -41,8 +41,7 @@ const getLptMetadata = (lp_token_details: IUnitLptAssetDetail, priceMap, metadat
 
 const getAssets = async () => {
   const assets_pending = await getAssetsDetailed();
-  // TODO for private mainnet need to revert before go live
-  const assets = assets_pending.filter((asset) => asset.token_id.indexOf(lpTokenPrefix) === -1);
+  const assets = assets_pending.filter((asset) => !blackAssets.includes(asset.token_id));
   const token_ids_from_regular = assets
     .filter((asset) => asset.token_id.indexOf(lpTokenPrefix) === -1)
     .map((asset) => asset.token_id);
