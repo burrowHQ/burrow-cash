@@ -80,7 +80,7 @@ export async function increaseCollateral({
       },
     ],
   });
-  const result = await prepareAndExecuteTransactions(transactions);
+  const result = await prepareAndExecuteTransactions(transactions, isMeme);
 
   return result;
 }

@@ -99,7 +99,7 @@ export async function decreaseCollateral({
       },
     ],
   });
-  const result = await prepareAndExecuteTransactions(transactions);
+  const result = await prepareAndExecuteTransactions(transactions, isMeme);
 
   return result;
 }

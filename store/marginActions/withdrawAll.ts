@@ -53,6 +53,7 @@ export async function withdrawActionsAll({
       ],
     });
   }
+  // main
   if (main_token_ids.length) {
     const { enable_pyth_oracle } = await getConfig();
     const dWithDrawActionsTemplate = createWithdrawActionsTemplate(main_token_ids);

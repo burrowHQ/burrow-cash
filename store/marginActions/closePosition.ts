@@ -144,6 +144,6 @@ export async function closePosition({
       },
     ],
   });
-  const result = await prepareAndExecuteTransactions(transactions);
+  const result = await prepareAndExecuteTransactions(transactions, isMeme);
   return result;
 }
