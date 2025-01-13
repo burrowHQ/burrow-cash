@@ -280,7 +280,7 @@ const MyMarginTradingPage = () => {
                           <img src={data.icon} alt="" className="w-4 h-4" />
                           <p className="ml-2 mr-8 text-xs text-gray-300">{data.symbol}</p>
                           <div className="text-xs ml-auto">
-                            ${toInternationalCurrencySystem_number(data.totalValue)}
+                            {beautifyPrice(data.totalValue, true)}
                           </div>
                         </div>
                       ));
