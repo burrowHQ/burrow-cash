@@ -104,7 +104,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
   // for tab change
   const initCateState = (tabString: string) => {
     setLiqPrice("0");
-    // setRangeMount(1);
     if (tabString == "long") {
       setShortInput("");
       setShortInputUsd(0);
@@ -611,6 +610,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                   setOwnBanlance={setOwnBanlance}
                   tokenList={isMainStream ? categoryAssets2 : categoryAssets2MEME}
                   type="cate2"
+                  isMemeCategory={!isMainStream}
                   setForceUpdate={() => setForceUpdate((prev) => prev + 1)}
                 />
               </div>
@@ -627,6 +627,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                 <TradingToken
                   tokenList={isMainStream ? categoryAssets1 : categoryAssets1MEME}
                   type="cate1"
+                  isMemeCategory={!isMainStream}
                 />
               </div>
               <p className="text-gray-300 mt-2 text-xs">
@@ -751,6 +752,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                   setOwnBanlance={setOwnBanlance}
                   tokenList={isMainStream ? categoryAssets2 : categoryAssets2MEME}
                   type="cate2"
+                  isMemeCategory={!isMainStream}
                   setForceUpdate={() => setForceUpdate((prev) => prev + 1)}
                 />
               </div>
@@ -767,6 +769,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                 <TradingToken
                   tokenList={isMainStream ? categoryAssets1 : categoryAssets1MEME}
                   type="cate1"
+                  isMemeCategory={!isMainStream}
                 />
               </div>
               <p className="text-gray-300 mt-2 text-xs">

@@ -19,7 +19,6 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRang
   const { id }: any = router.query;
   const isMainStream = filteredTokenTypeMap.mainStream.includes(id);
 
-  //
   const generateArithmeticSequence = (value: number) => {
     const increment = (value - 1) / 4;
     const sequence: number[] = [];
@@ -30,12 +29,11 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRang
 
     return sequence;
   };
-  //
   const { marginConfigTokens, marginConfigTokensMEME } = useMarginConfigToken();
   const marginConfigTokensCombined = isMainStream ? marginConfigTokens : marginConfigTokensMEME;
 
   const [value, setValue] = useState(defaultValue);
-  const [splitList, setSplitList] = useState([0]);
+  const [splitList, setSplitList] = useState<number[]>([]);
   const [matchValue, setMatchValue] = useState(value);
   const valueRef = useRef<HTMLInputElement>(null);
   const [selectedItem, setSelectedItem] = useState(defaultValue);
@@ -46,7 +44,12 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRang
     );
     setSplitList(newAllowedValues);
   }, [marginConfigTokensCombined["max_leverage_rate"]]);
-
+  // init value
+  useEffect(() => {
+    if (splitList.length > 0 && !splitList.includes(value)) {
+      changeValue(splitList[0]);
+    }
+  }, [value, splitList]);
   useEffect(() => {
     if (valueRef.current && splitList.length > 0) {
       const nearestValue = splitList.reduce((prev, curr) => {

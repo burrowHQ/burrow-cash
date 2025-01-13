@@ -7,6 +7,28 @@ export const getAccountId = createSelector(
   (state: RootState) => state.account,
   (account) => account.accountId,
 );
+export const getAccountCategory = (memeCategory?: boolean) => {
+  return createSelector(
+    (state: RootState) => state.account,
+    (state: RootState) => state.accountMEME,
+    (state: RootState) => state.category,
+    (accountMain, accountMeme, category) => {
+      let isMeme: boolean;
+      if (typeof memeCategory !== "boolean") {
+        isMeme = category.activeCategory == "meme";
+      } else {
+        isMeme = memeCategory;
+      }
+      let account: typeof accountMain;
+      if (isMeme) {
+        account = accountMeme;
+      } else {
+        account = accountMain;
+      }
+      return account;
+    },
+  );
+};
 
 export const getAccountPortfolio = (memeCategory?: boolean) => {
   return createSelector(

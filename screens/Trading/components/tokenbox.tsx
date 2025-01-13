@@ -3,8 +3,7 @@ import { useDebounce } from "react-use";
 import { NearIcon } from "../../MarginTrading/components/Icon";
 import { TokenThinArrow, TokenSelected } from "./TradingIcon";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { getAssets } from "../../../redux/assetsSelectors";
-import { getAccountId } from "../../../redux/accountSelectors";
+import { getAccountId, getAccountCategory } from "../../../redux/accountSelectors";
 import {
   setCategoryAssets1,
   setCategoryAssets2,
@@ -21,17 +20,18 @@ interface TradingTokenInter {
   type: string;
   setOwnBanlance?: (key: string) => void;
   setForceUpdate?: () => void;
+  isMemeCategory?: boolean;
 }
 const TradingToken: React.FC<TradingTokenInter> = ({
   tokenList,
   type,
   setOwnBanlance,
   setForceUpdate,
+  isMemeCategory,
 }) => {
   let timer: NodeJS.Timeout;
   const dispatch = useAppDispatch();
-  const account = useAppSelector((state) => state.account);
-  const assets = useAppSelector(getAssets);
+  const account = useAppSelector(getAccountCategory(isMemeCategory));
   const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
   const [ownBalance, setOwnBalance] = useState<string>("-");
   const [ownBalanceDetail, setOwnBalanceDetail] = useState<string>("");
@@ -40,53 +40,15 @@ const TradingToken: React.FC<TradingTokenInter> = ({
   const [selectedItem, setSelectedItem] = useState<any>(
     type === "cate1" ? ReduxcategoryAssets1 : ReduxcategoryAssets2,
   );
-  const sendBalance = () => {
-    if (setOwnBanlance) {
-      setOwnBanlance(ownBalanceDetail);
-    }
-  };
-  //
   useDebounce(
     () => {
-      const getSelectedAssetAndBalanceSetter = () => {
-        if (type === "cate1" && ReduxcategoryAssets1) {
-          return {
-            selectedAsset: ReduxcategoryAssets1,
-            setReduxcategoryCurrentBalance: (value: any) =>
-              dispatch(setReduxcategoryCurrentBalance1(value)),
-          };
-        } else if (type === "cate2" && ReduxcategoryAssets2) {
-          return {
-            selectedAsset: ReduxcategoryAssets2,
-            setReduxcategoryCurrentBalance: (value: any) =>
-              dispatch(setReduxcategoryCurrentBalance2(value)),
-          };
-        }
-        return { selectedAsset: null, setReduxcategoryCurrentBalance: null };
-      };
-
       const { selectedAsset, setReduxcategoryCurrentBalance } = getSelectedAssetAndBalanceSetter();
-
-      if (!selectedAsset) {
-        setSelectedItem(type === "cate1" ? ReduxcategoryAssets1 : ReduxcategoryAssets2);
-        // setOwnBalance("-");
-        return;
-      }
-
       const tokenId = selectedAsset?.metadata["token_id"];
       const balance = account?.balances[tokenId];
-
-      if (!tokenId || !balance) {
-        // setOwnBalance("-");
-        // setReduxcategoryCurrentBalance && setReduxcategoryCurrentBalance("-");
-        setSelectedItem(type === "cate1" ? ReduxcategoryAssets1 : ReduxcategoryAssets2);
-        return;
-      }
-
+      if (!tokenId) return;
       const { decimals } = selectedAsset.metadata;
       const waitUseKey = shrinkToken(balance, decimals);
       const formattedBalance = toInternationalCurrencySystem_number(waitUseKey);
-
       setOwnBalance(formattedBalance);
       setOwnBalanceDetail(waitUseKey);
       setReduxcategoryCurrentBalance && setReduxcategoryCurrentBalance(waitUseKey);
@@ -95,12 +57,25 @@ const TradingToken: React.FC<TradingTokenInter> = ({
     300,
     [type, accountId, account.balances, ReduxcategoryAssets1, ReduxcategoryAssets2],
   );
-
-  //
+  const getSelectedAssetAndBalanceSetter = () => {
+    if (type === "cate1" && ReduxcategoryAssets1) {
+      return {
+        selectedAsset: ReduxcategoryAssets1,
+        setReduxcategoryCurrentBalance: (value: any) =>
+          dispatch(setReduxcategoryCurrentBalance1(value)),
+      };
+    } else if (type === "cate2" && ReduxcategoryAssets2) {
+      return {
+        selectedAsset: ReduxcategoryAssets2,
+        setReduxcategoryCurrentBalance: (value: any) =>
+          dispatch(setReduxcategoryCurrentBalance2(value)),
+      };
+    }
+    return { selectedAsset: null, setReduxcategoryCurrentBalance: null };
+  };
   const handleTokenClick = (item: any) => {
     if (!item) return;
     setSelectedItem(item);
-
     const typeDispatchMap: Record<string, ((item: any) => any) | undefined> = {
       cate1: setCategoryAssets1,
       cate2: setCategoryAssets2,
@@ -127,6 +102,11 @@ const TradingToken: React.FC<TradingTokenInter> = ({
     timer = setTimeout(() => {
       setShowModal(false);
     }, 200);
+  };
+  const sendBalance = () => {
+    if (setOwnBanlance) {
+      setOwnBanlance(ownBalanceDetail);
+    }
   };
   return (
     <div
@@ -162,7 +142,6 @@ const TradingToken: React.FC<TradingTokenInter> = ({
           <span className="text-white border-b border-dark-800">{ownBalance}</span>
         </div>
       )}
-      {/*  */}
       {showModal && type === "cate2" && (
         <div
           className="absolute top-10 right-0 py-1.5 bg-dark-250 border border-dark-500 rounded-md z-80 w-52"

@@ -1,6 +1,4 @@
-import Link from "next/link";
-import { useEffect, useMemo, useState, createContext } from "react";
-import { fetchAllPools, getStablePools, init_env } from "@ref-finance/ref-sdk";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
@@ -10,8 +8,7 @@ import TradingTable from "./components/Table";
 import TradingOperate from "./components/TradingOperate";
 import { getAssets as getAssetsSelector, getAssetsMEME } from "../../redux/assetsSelectors";
 import { shrinkToken } from "../../store";
-import { getMarginConfig } from "../../redux/marginConfigSelectors";
-import { formatWithCommas_usd, toInternationalCurrencySystem_number } from "../../utils/uiNumber";
+import { toInternationalCurrencySystem_number } from "../../utils/uiNumber";
 import { useMarginConfigToken } from "../../hooks/useMarginConfig";
 import {
   setCategoryAssets1,
@@ -33,7 +30,6 @@ import { useRegisterTokenType } from "../../hooks/useRegisterTokenType";
 
 const Trading = () => {
   const isMobile = isMobileDevice();
-  const marginConfig = useAppSelector(getMarginConfig);
   const { query } = useRouterQuery();
   const accountId = useAccountId();
   const { marginAccountList, marginAccountListMEME } = useMarginAccount();
@@ -55,18 +51,13 @@ const Trading = () => {
   const assets = useAppSelector(getAssetsSelector);
   const assetsMEME = useAppSelector(getAssetsMEME);
   const isLoading = Object.keys(assetsMEME.data).length === 0 && !isMainStream;
-
-  const combinedAssetsData = isMainStream ? assets.data : assetsMEME.data;
   const [showPopupCate1, setShowPopup1] = useState(false);
   const [showPopupCate2, setShowPopup2] = useState(false);
-
-  //
   const [currentTokenCate1, setCurrentTokenCate1] = useState<any>({});
-  const [currentTokenCate2, setCurrentTokenCate2] = useState<any>(
-    isMainStream ? categoryAssets2[0] : categoryAssets2MEME[0],
-  );
+  const [currentTokenCate2, setCurrentTokenCate2] = useState<any>();
   const [longAndShortPosition, setLongAndShortPosition] = useState<any>([]);
-
+  const combinedAssetsData = isMainStream ? assets.data : assetsMEME.data;
+  const categoryAssets2Current = isMainStream ? categoryAssets2 : categoryAssets2MEME;
   const assetData: any = combinedAssetsData[id];
   const margin_position = assetData ? assetData?.margin_position : null;
   const metadata = assetData ? assetData?.metadata : {};
@@ -76,14 +67,6 @@ const Trading = () => {
   const extra_decimals = config?.extra_decimals || 0;
 
   let timer;
-  // change current category2
-  useEffect(() => {
-    if (!isMainStream) {
-      setCurrentTokenCate2(categoryAssets2MEME[0]);
-    } else {
-      setCurrentTokenCate2(categoryAssets2[0]);
-    }
-  }, [isMainStream, categoryAssets2MEME.length, categoryAssets2.length]);
 
   useEffect(() => {
     if (id || !isLoading) {
@@ -91,16 +74,6 @@ const Trading = () => {
       dispatch(setCategoryAssets1(combinedAssetsData[id]));
     }
   }, [id, currentTokenCate1, isLoading]);
-
-  useEffect(() => {
-    if (id) {
-      dispatch(
-        setCategoryAssets2(
-          currentTokenCate2 || (isMainStream ? categoryAssets2[0] : categoryAssets2MEME[0]),
-        ),
-      );
-    }
-  }, [id, currentTokenCate2]);
 
   useMemo(() => {
     setLongAndShortPosition([
@@ -119,19 +92,31 @@ const Trading = () => {
     setCurrentTokenCate1(ReduxcategoryAssets1);
   }, [ReduxcategoryAssets1]);
 
-  useMemo(() => {
-    setCurrentTokenCate2(ReduxcategoryAssets2);
-  }, [ReduxcategoryAssets2]);
+  // get selected category 2
+  useEffect(() => {
+    if (id) {
+      if (
+        !ReduxcategoryAssets2 ||
+        (ReduxcategoryAssets2 && !isIncludes(categoryAssets2Current, ReduxcategoryAssets2))
+      ) {
+        dispatch(setCategoryAssets2(categoryAssets2Current[0]));
+        setCurrentTokenCate2(categoryAssets2Current[0]);
+      } else {
+        setCurrentTokenCate2(ReduxcategoryAssets2);
+      }
+    }
+  }, [id, ReduxcategoryAssets2, categoryAssets2Current]);
 
+  function isIncludes(assets: any[], asset: any) {
+    const target = assets.find((a) => a.token_id == asset.token_id);
+    return !!target;
+  }
   // mouseenter and leave inter
   const handlePopupToggle = () => {
     setShowPopup2(!showPopupCate2);
   };
-
   const handleTokenSelectCate2 = (item) => {
-    // setSelectedItem(item);
     dispatch(setCategoryAssets2(item));
-    setCurrentTokenCate2(item);
     setShowPopup2(false);
   };
 
@@ -224,12 +209,7 @@ const Trading = () => {
         <>
           {/* back */}
           <div onClick={() => router.push("/marginTrading")}>
-            <div
-              className="flex items-center text-sm text-gray-300 cursor-pointer lg:mb-8 xsm:m-2 xsm:mb-9"
-              onClick={() => {
-                dispatch(setReduxRangeMount(1));
-              }}
-            >
+            <div className="flex items-center text-sm text-gray-300 cursor-pointer lg:mb-8 xsm:m-2 xsm:mb-9">
               <ComeBackIcon />
               <p className="ml-3.5"> Margin Trading Markets</p>
             </div>
