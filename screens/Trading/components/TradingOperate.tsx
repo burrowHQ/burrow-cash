@@ -25,6 +25,7 @@ import { beautifyPrice } from "../../../utils/beautyNumber";
 import { ConnectWalletButton } from "../../../components/Header/WalletButton";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
+import { MARGIN_MIN_COLLATERAL_USD } from "../../../utils/config";
 
 interface TradingOperateProps {
   onMobileClose?: () => void;
@@ -403,6 +404,28 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       customInputRef.current.focus();
     }
   }, [selectedSetUpOption]);
+  //  whether the collateral is too small
+  const [longInputTooSmall, shortInputTooSmall] = useMemo(() => {
+    return [longInputUsd < MARGIN_MIN_COLLATERAL_USD, shortInputUsd < MARGIN_MIN_COLLATERAL_USD];
+  }, [longInputUsd, shortInputUsd]);
+  // long tip
+  const tip_leverage = "Leverage must be greater than 1";
+  const tip_usd = `Deposit at least $${MARGIN_MIN_COLLATERAL_USD}`;
+  const longTip = useMemo(() => {
+    if (accountId && longOutput > 0) {
+      if (rangeMount <= 1) return tip_leverage;
+      else if (longInputTooSmall) return tip_usd;
+    }
+    return "";
+  }, [rangeMount, accountId, longOutput, longInputTooSmall]);
+  // short tip
+  const shortTip = useMemo(() => {
+    if (accountId && shortOutput > 0) {
+      if (rangeMount <= 1) return tip_leverage;
+      else if (shortInputTooSmall) return tip_usd;
+    }
+    return "";
+  }, [rangeMount, accountId, shortOutput, shortInputTooSmall]);
 
   const handleMouseEnter = () => {
     if (selectedSetUpOption === "custom" && customInputRef.current) {
@@ -670,15 +693,15 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                   <span className="ml-1">Exceeded the maximum number of open positions.</span>
                 </div>
               )}
-              {rangeMount <= 1 && accountId && longOutput > 0 && (
+              {longTip && (
                 <span className="text-[#EA3F68] text-sm font-normal flex items-start mb-1">
-                  Leverage must be greater than 1
+                  {longTip}
                 </span>
               )}
               {accountId ? (
                 <YellowSolidButton
                   className="w-full"
-                  disabled={isDisabled || isMaxPosition}
+                  disabled={isDisabled || isMaxPosition || longInputTooSmall}
                   onClick={handleConfirmButtonClick}
                 >
                   Long {cateSymbol} {rangeMount}x
@@ -701,7 +724,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                     longOutputUsd,
                     rangeMount,
                     estimateData,
-                    // indexPrice: assets.data[ReduxcategoryAssets1["token_id"]].price?.usd,
                     longInputName: ReduxcategoryAssets2,
                     longOutputName: ReduxcategoryAssets1,
                     assets: isMainStream ? assets : assetsMEME,
@@ -808,9 +830,9 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                   <span className="ml-1">Exceeded the maximum number of open positions.</span>
                 </div>
               )}
-              {rangeMount <= 1 && accountId && shortOutput > 0 && (
+              {shortTip && (
                 <span className="text-[#EA3F68] text-sm font-normal flex items-start mb-1">
-                  Leverage must be greater than 1
+                  {shortTip}
                 </span>
               )}
               {accountId ? (
@@ -839,7 +861,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                     longOutputUsd: shortOutputUsd,
                     rangeMount,
                     estimateData,
-                    // indexPrice: assets.data[ReduxcategoryAssets1["token_id"]].price?.usd,
                     longInputName: ReduxcategoryAssets2,
                     longOutputName: ReduxcategoryAssets1,
                     assets: isMainStream ? assets : assetsMEME,
