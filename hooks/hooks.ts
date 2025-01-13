@@ -75,6 +75,7 @@ export function usePortfolioAssets(memeCategory?: boolean) {
 
 export function useDegenMode() {
   const degenMode = useAppSelector(getDegenMode);
+  const isMeme = useAppSelector(isMemeCategory);
   const dispatch = useAppDispatch();
 
   const setDegenMode = () => {
@@ -82,7 +83,6 @@ export function useDegenMode() {
   };
 
   const setRepayFromDeposits = (repayFromDeposits: boolean) => {
-    const isMeme = useAppSelector(isMemeCategory);
     if (isMeme) {
       dispatch(setRepayFromMEME({ repayFromDeposits }));
     } else {
