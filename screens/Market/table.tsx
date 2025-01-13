@@ -433,7 +433,11 @@ function TableRowPc({
             <>-</>
           )}
         </div>
-        <div className="col-span-1 flex flex-col justify-center pl-3 xl:pl-7 whitespace-nowrap">
+        <div
+          className={`col-span-1 flex flex-col justify-center pl-3 ${
+            isMeme ? "xl:pl-14" : "xl:pl-7"
+          } whitespace-nowrap`}
+        >
           <span className="flex items-center gap-2 text-sm text-white">
             {row.can_deposit ? (
               <APYCell
@@ -447,7 +451,7 @@ function TableRowPc({
             ) : (
               "-"
             )}
-            {incentiveTokens.includes(row.tokenId) ? <BoosterTag /> : null}
+            {incentiveTokens.includes(row.tokenId) && !isMeme ? <BoosterTag /> : null}
           </span>
         </div>
         <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
@@ -545,7 +549,7 @@ function TableRowMobile({
             title="Supply APY"
             row={row}
             canShow={row.can_deposit}
-            booster={incentiveTokens.includes(row.tokenId)}
+            booster={incentiveTokens.includes(row.tokenId) && !isMeme}
             isMeme={isMeme}
           />
           <TemplateMobile
