@@ -27,21 +27,26 @@ export function useMarginConfigToken() {
   const filteredMarginConfigTokens2 = filterTokens(marginConfigTokens, 2);
   const filteredMarginConfigTokens2MEME = filterTokens(marginConfigTokensMEME, 2);
 
-  const createFilteredMarginConfigList = (tokens, categoryAssets) =>
+  const createFilteredMarginConfigList = (tokens, categoryAssets, assetsData) =>
     tokens.reduce((item, token) => {
-      if (combinedAssetsData[token]) {
-        item[token] = combinedAssetsData[token];
-        categoryAssets.push({ ...combinedAssetsData[token] });
+      if (assetsData[token]) {
+        item[token] = assetsData[token];
+        categoryAssets.push({ ...assetsData[token] });
       }
       return item;
     }, {});
   const filterMarginConfigList = createFilteredMarginConfigList(
     filteredMarginConfigTokens1,
     categoryAssets1,
+    assets.data,
   );
   const filterMarginConfigListMEME =
     Object.entries(assetsMEME.data).length > 0
-      ? createFilteredMarginConfigList(filteredMarginConfigTokens1MEME, categoryAssets1MEME)
+      ? createFilteredMarginConfigList(
+          filteredMarginConfigTokens1MEME,
+          categoryAssets1MEME,
+          assetsMEME.data,
+        )
       : null;
 
   const processTokens = (tokens, categoryAssets) => {
