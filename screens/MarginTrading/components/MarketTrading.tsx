@@ -456,7 +456,7 @@ function TableBody({
                 <div className="flex flex-col items-start ml-3">
                   <div className="flex items-end">{beautifyPrice(formattedMarginPosition)}</div>
                   <span className="text-xs text-gray-300">
-                    {beautifyPrice(calculateAndFormatUSD(formattedMarginPosition, item.price?.usd))}
+                    {beautifyPrice(Number(formattedMarginPosition) * Number(item.price?.usd), true)}
                   </span>
                 </div>
               </div>
@@ -464,7 +464,7 @@ function TableBody({
                 <div className="flex flex-col items-start ml-3">
                   <div className="flex items-end">{beautifyPrice(formattedMarginBalance)}</div>
                   <span className="text-xs text-gray-300">
-                    {beautifyPrice(calculateAndFormatUSD(formattedMarginBalance, item.price?.usd))}
+                    {beautifyPrice(Number(formattedMarginBalance) * Number(item.price?.usd), true)}
                   </span>
                 </div>
               </div>
@@ -570,7 +570,8 @@ function TableBodyMobile({
                     <span className="text-xs text-gray-300 ml-1">
                       (
                       {beautifyPrice(
-                        calculateAndFormatUSD(formattedMarginPosition, item.price?.usd),
+                        Number(formattedMarginPosition) * Number(item.price?.usd),
+                        true,
                       )}
                       )
                     </span>
@@ -583,7 +584,8 @@ function TableBodyMobile({
                     <span className="text-xs text-gray-300 ml-1">
                       (
                       {beautifyPrice(
-                        calculateAndFormatUSD(formattedMarginBalance, item.price?.usd),
+                        Number(formattedMarginBalance) * Number(item.price?.usd),
+                        true,
                       )}
                       )
                     </span>
