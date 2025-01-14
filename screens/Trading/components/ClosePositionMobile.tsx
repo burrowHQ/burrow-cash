@@ -203,7 +203,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
         });
 
         const txHash = await handleTransactionHash(transactionHashes);
-
+        // TODOXX
         await Promise.all(
           txHash
             .filter((item) => item.hasStorageDepositClosePosition)

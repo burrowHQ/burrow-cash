@@ -141,6 +141,7 @@ const Trading = () => {
   };
 
   useEffect(() => {
+    // TODOXX
     if (query?.transactionHashes) {
       (async () => {
         const txHash = await handleTransactionHash(query?.transactionHashes);

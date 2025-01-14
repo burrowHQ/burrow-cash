@@ -212,7 +212,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
         }
         return item.transaction.hash;
       });
-
+      // TODOXX
       const txHash = await handleTransactionHash(transactionHashes);
       await Promise.all(
         txHash
