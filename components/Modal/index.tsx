@@ -144,7 +144,9 @@ const Modal = () => {
   };
   const repay_to_lp =
     action === "Repay" && isRepayFromDeposits && selectedCollateralType !== DEFAULT_POSITION;
-  const isBtc = action === "Supply" && asset.tokenId === NBTCTokenId;
+  const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
+  const isBtc =
+    action === "Supply" && asset.tokenId === NBTCTokenId && selectedWalletId === "btc-wallet";
   return (
     <MUIModal open={isOpen} onClose={handleClose}>
       <Wrapper
@@ -182,10 +184,11 @@ const Modal = () => {
             <RepayTab asset={asset} />
             <Controls
               amount={amount}
-              available={available}
+              available={isBtc ? btcAvailableBalance : available}
               action={action}
+              tokenId={tokenId}
               asset={asset}
-              totalAvailable={available}
+              totalAvailable={isBtc ? btcAvailableBalance : available}
               available$={available$}
             />
             <div className="flex flex-col gap-4 mt-6">

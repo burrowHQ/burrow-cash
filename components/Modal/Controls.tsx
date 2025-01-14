@@ -7,7 +7,15 @@ import RangeSlider from "./RangeSlider";
 import TokenBox from "./TokenBox";
 import { isMemeCategory } from "../../redux/categorySelectors";
 
-export default function Controls({ amount, available, action, asset, totalAvailable, available$ }) {
+export default function Controls({
+  amount,
+  available,
+  action,
+  tokenId,
+  asset,
+  totalAvailable,
+  available$,
+}) {
   const dispatch = useAppDispatch();
   const isMeme = useAppSelector(isMemeCategory);
   const handleInputChange = (e) => {
