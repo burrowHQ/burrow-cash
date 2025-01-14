@@ -209,7 +209,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
             .filter((item) => item.hasStorageDepositClosePosition)
             .map(async (item) => {
               try {
-                await DataSource.shared.getMarginTradingPosition({
+                await DataSource.shared.postMarginTradingPosition({
                   addr: accountId,
                   process_type: "close",
                   tx_hash: item.txHash,

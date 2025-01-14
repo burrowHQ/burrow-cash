@@ -97,7 +97,7 @@ class DataSource {
     return this.callAPI(`/v1/search/?keyword=${receipt_id}`, "GET", null, null, config?.txIdApiUrl);
   }
 
-  getMarginTradingPosition(params) {
+  postMarginTradingPosition(params) {
     return this.callAPI(`/v3/margin-trading/position`, "POST", null, params, config?.indexUrl);
   }
 

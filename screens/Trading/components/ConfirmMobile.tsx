@@ -219,7 +219,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
           .filter((item) => item.hasStorageDeposit)
           .map(async (item) => {
             try {
-              await DataSource.shared.getMarginTradingPosition({
+              await DataSource.shared.postMarginTradingPosition({
                 addr: accountId,
                 process_type: "open",
                 tx_hash: item.txHash,

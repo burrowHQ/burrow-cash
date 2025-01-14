@@ -148,7 +148,7 @@ const Trading = () => {
           .filter((item) => item.hasStorageDeposit || item.hasStorageDepositClosePosition)
           .forEach(async (item) => {
             try {
-              await DataSource.shared.getMarginTradingPosition({
+              await DataSource.shared.postMarginTradingPosition({
                 addr: accountId,
                 process_type: item.hasStorageDepositClosePosition ? "close" : "open",
                 tx_hash: item.txHash,
