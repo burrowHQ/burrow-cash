@@ -14,7 +14,7 @@ import {
 import { withdrawActionsAll } from "../../../store/marginActions/withdrawAll";
 import { MarginAccountDetailIcon, YellowBallIcon } from "../../TokenDetail/svg";
 import { useRouterQuery } from "../../../utils/txhashContract";
-import { handleTransactionResults } from "../../../services/transaction";
+import { handleTransactionHash } from "../../../services/transaction";
 import { setAccountDetailsOpen, setSelectedTab } from "../../../redux/marginTabSlice";
 import { showCheckTxBeforeShowToast } from "../../../components/HashResultModal";
 import { getAssets, getAssetsMEME } from "../../../redux/assetsSelectors";
@@ -122,14 +122,12 @@ const TradingTable = ({
       setStateSelectedTab("positions");
     }
   }, [storeSelectedTab]);
-
+  // TODOXX
   useEffect(() => {
-    handleTransactionResults(
-      query?.transactionHashes,
-      query?.errorMessage,
-      Object.keys(filterMarginConfigList || []),
-    );
-  }, [query?.transactionHashes, query?.errorMessage]);
+    if (query?.transactionHashes && accountId) {
+      handleTransactionHash(query?.transactionHashes);
+    }
+  }, [query?.transactionHashes, query?.errorMessage, accountId]);
   const fetchPositionHistory = async () => {
     try {
       setIsLoading(true);
@@ -146,7 +144,7 @@ const TradingTable = ({
       setNextPageToken(response.next_page_token);
       setPositionHistoryTotal(response.data.total);
     } catch (error) {
-      console.error("Napakyas sa pagkuha sa makasaysayanong mga rekord sa posisyon:", error);
+      console.error(error);
     } finally {
       setIsLoading(false);
     }

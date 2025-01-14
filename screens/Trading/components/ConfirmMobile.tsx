@@ -17,10 +17,9 @@ import {
 import { shrinkToken, expandToken } from "../../../store";
 import { beautifyPrice } from "../../../utils/beautyNumber";
 import { getAccountId } from "../../../redux/accountSelectors";
-import { handleTransactionResults, handleTransactionHash } from "../../../services/transaction";
+import { handleTransactionHash } from "../../../services/transaction";
 import { showPositionFailure } from "../../../components/HashResultModal";
 import { getBurrow } from "../../../utils";
-import DataSource from "../../../data/datasource";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { IConfirmMobileProps } from "../comInterface";
 import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
@@ -205,36 +204,13 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
       if (!res || !Array.isArray(res)) {
         throw new Error("Invalid response from openPosition");
       }
-
       const transactionHashes = res.map((item) => {
         if (!item?.transaction?.hash) {
           throw new Error("Invalid transaction hash");
         }
         return item.transaction.hash;
       });
-      // TODOXX
-      const txHash = await handleTransactionHash(transactionHashes);
-      await Promise.all(
-        txHash
-          .filter((item) => item.hasStorageDeposit)
-          .map(async (item) => {
-            try {
-              await DataSource.shared.postMarginTradingPosition({
-                addr: accountId,
-                process_type: "open",
-                tx_hash: item.txHash,
-              });
-            } catch (error) {
-              console.error("Failed to get margin trading position:", error);
-            }
-          }),
-      );
-
-      await handleTransactionResults(
-        transactionHashes,
-        "",
-        Object.keys(filterMarginConfigList || []),
-      );
+      await handleTransactionHash(transactionHashes);
     } catch (error) {
       console.error("Open position error:", error);
       showPositionFailure({
