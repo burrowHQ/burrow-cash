@@ -3,18 +3,20 @@ import {
   showPositionResult,
   showPositionClose,
   showChangeCollateralPosition,
+  showPositionFailure,
 } from "../components/HashResultModal";
 import { store } from "../redux/store";
 import DataSource from "../data/datasource";
+import { getErrorMessage } from "../utils/transactionUtils";
 
 interface ITransactionResult {
   txHash: string;
-  result: any;
   isOpenPosition?: boolean;
   isCloseMTPosition?: boolean;
   isDecreaseCollateral?: boolean;
   isIncreaseCollateral?: boolean;
   action?: Record<string, string>;
+  error?: string | null | undefined;
 }
 export const handleTransactionHash = async (
   transactionHashes: string | string[] | undefined,
@@ -48,22 +50,22 @@ export const handleTransactionHash = async (
               : JSON.parse(parsed_Args.msg)?.MarginExecute?.actions?.[0];
             return {
               txHash,
-              result,
               isOpenPosition: Reflect.has(action, "OpenPosition"),
               isCloseMTPosition: Reflect.has(action, "CloseMTPosition"),
               isDecreaseCollateral: Reflect.has(action, "DecreaseCollateral"),
               isIncreaseCollateral: Reflect.has(action, "IncreaseCollateral"),
               action,
+              error: getErrorMessage(result?.receipts_outcome),
             };
           }
           return {
             txHash,
-            result,
             isOpenPosition: false,
             isCloseMTPosition: false,
             isDecreaseCollateral: false,
             isIncreaseCollateral: false,
             action: undefined,
+            error: undefined,
           };
         }),
       );
@@ -73,8 +75,9 @@ export const handleTransactionHash = async (
       const targetCollateralTx = results.find(
         (item) => item.isDecreaseCollateral || item.isIncreaseCollateral,
       );
+      const hasErrorTx = results.find((item) => item.error);
       // Reporting transactions
-      if (targetPositionTx) {
+      if (targetPositionTx && !hasErrorTx) {
         const currentState = store.getState();
         await DataSource.shared.postMarginTradingPosition({
           addr: currentState?.account?.accountId,
@@ -83,7 +86,12 @@ export const handleTransactionHash = async (
         });
       }
       // Show transactions pop
-      if (targetPositionTx?.isCloseMTPosition) {
+      if (hasErrorTx) {
+        showPositionFailure({
+          title: "Transactions error",
+          errorMessage: hasErrorTx.error || "Unknown error",
+        });
+      } else if (targetPositionTx?.isCloseMTPosition) {
         // close position
         const marginPopType = localStorage.getItem("marginPopType") as "Long" | "Short" | undefined;
         showPositionClose({ type: marginPopType || "Long" });

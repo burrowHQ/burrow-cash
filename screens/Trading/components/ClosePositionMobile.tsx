@@ -6,7 +6,7 @@ import { useAppSelector } from "../../../redux/hooks";
 import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
 import { CloseIcon } from "../../../components/Modal/svg";
-import { RefLogoIcon, RightArrow, MaxPositionIcon } from "./TradingIcon";
+import { RightArrow, MaxPositionIcon } from "./TradingIcon";
 import { toInternationalCurrencySystem_number, toDecimal } from "../../../utils/uiNumber";
 import { closePosition } from "../../../store/marginActions/closePosition";
 import { useEstimateSwap } from "../../../hooks/useEstimateSwap";
@@ -22,7 +22,6 @@ import {
   YellowSolidSubmitButton as YellowSolidButton,
   RedSolidSubmitButton as RedSolidButton,
 } from "../../../components/Modal/button";
-import { showPositionClose } from "../../../components/HashResultModal";
 import { beautifyPrice } from "../../../utils/beautyNumber";
 import { findPathReserve } from "../../../api/get-swap-path";
 import { getAssets, getAssetsMEME } from "../../../redux/assetsSelectors";
@@ -30,7 +29,7 @@ import { useMarginAccount } from "../../../hooks/useMarginAccount";
 import { IClosePositionMobileProps } from "../comInterface";
 import { getMarginConfig, getMarginConfigMEME } from "../../../redux/marginConfigSelectors";
 import { handleTransactionHash } from "../../../services/transaction";
-import DataSource from "../../../data/datasource";
+import { showPositionFailure } from "../../../components/HashResultModal";
 import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
 
 export const ModalContext = createContext(null) as any;
@@ -204,7 +203,10 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
         await handleTransactionHash(transactionHashes);
       }
     } catch (error) {
-      console.error("Failed to close position:", error);
+      showPositionFailure({
+        title: "Transactions error",
+        errorMessage: error instanceof Error ? error.message : JSON.stringify(error),
+      });
     } finally {
       setIsDisabled(false);
     }
