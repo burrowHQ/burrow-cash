@@ -24,7 +24,7 @@ export const handleTransactionHash = async (
       // Parsing transactions
       const txhash = Array.isArray(transactionHashes)
         ? transactionHashes
-        : transactionHashes.split(",");
+        : decodeURIComponent(decodeURIComponent(transactionHashes)).split(",");
       const results = await Promise.all(
         txhash.map(async (txHash: string): Promise<ITransactionResult> => {
           const result: any = await getTransactionResult(txHash);

@@ -122,7 +122,6 @@ const TradingTable = ({
       setStateSelectedTab("positions");
     }
   }, [storeSelectedTab]);
-  // TODOXX
   useEffect(() => {
     if (query?.transactionHashes && accountId) {
       handleTransactionHash(query?.transactionHashes);
