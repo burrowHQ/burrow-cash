@@ -63,6 +63,7 @@ export const NBTCTokenId = {
   testnet: "nbtc-dev.testnet",
   mainnet: "nbtc.toalice.near",
 }[defaultNetwork];
+export const MARGIN_WHITELIST = ["lini.near"];
 const getConfig = (env: string = defaultNetwork) => {
   const RPC_LIST = getRpcList();
   let endPoint = "defaultRpc";

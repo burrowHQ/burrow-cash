@@ -80,10 +80,10 @@ const TokenDetail = () => {
   const { account, autoConnect } = useBtcWalletSelector();
   const { id } = router.query;
   const [updaterCounter, setUpDaterCounter] = useState(1);
-  const isNBTC = NBTCTokenId === id;
   const btcChainDetail = useBtcAction({ updater: updaterCounter });
   const accountId = useAccountId();
   const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
+  const isNBTC = NBTCTokenId === id && selectedWalletId === "btc-wallet";
   useEffect(() => {
     const t = setInterval(() => {
       setUpDaterCounter((pre) => {
@@ -99,7 +99,7 @@ const TokenDetail = () => {
   }, [isNBTC]);
   // connect btc wallet to get btc balance;
   useEffect(() => {
-    if (accountId && isNBTC && selectedWalletId === "btc-wallet" && !account) {
+    if (accountId && isNBTC && !account) {
       autoConnect();
     }
   }, [isNBTC, account, accountId, selectedWalletId]);
@@ -1017,7 +1017,8 @@ function TokenUserInfo() {
     (acc, { maxBorrowAmount }) => acc + maxBorrowAmount,
     0,
   );
-  const isNBTC = NBTCTokenId === tokenId;
+  const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
+  const isNBTC = NBTCTokenId === tokenId && selectedWalletId === "btc-wallet";
   return (
     <UserBox className="mb-[29px] xsm:mb-2.5">
       <div className="flex justify-between items-center">
