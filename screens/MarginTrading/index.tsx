@@ -15,21 +15,27 @@ import { ConnectWalletButton } from "../../components/Header/WalletButton";
 const MarginTrading = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
   const activeTab = useSelector((state: RootState) => state.tab.activeTab);
   const accountId = useAccountId();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showWhitelistModal, setShowWhitelistModal] = useState(false);
   useEffect(() => {
-    if (!accountId) {
-      setShowLoginModal(true);
-    } else {
+    if (selectedWalletId === "btc-wallet") {
       setShowLoginModal(false);
-      const isInWhitelist = MARGIN_WHITELIST.includes(accountId);
-      if (!isInWhitelist) {
-        setShowWhitelistModal(true);
+      setShowWhitelistModal(false);
+    } else {
+      if (!accountId) {
+        setShowLoginModal(true);
+      } else {
+        setShowLoginModal(false);
+        const isInWhitelist = MARGIN_WHITELIST.includes(accountId);
+        if (!isInWhitelist) {
+          setShowWhitelistModal(true);
+        }
       }
     }
-  }, [accountId]);
+  }, [accountId, selectedWalletId]);
 
   const handleTabChange = (tab: string) => {
     dispatch(setActiveTab(tab));
