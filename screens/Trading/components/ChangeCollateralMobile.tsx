@@ -503,12 +503,9 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                       <p className="text-xs text-gray-300 mt-1.5">
                         Max Available:{" "}
                         <span className="text-white">
-                          $
                           {Number.isNaN(getMaxAvailableAmount()) || getMaxAvailableAmount() === null
                             ? "-"
-                            : toInternationalCurrencySystem_number(
-                                getMaxAvailableAmount() * priceC,
-                              )}
+                            : toInternationalCurrencySystem_number(getMaxAvailableAmount())}
                         </span>
                       </p>
                     </div>
@@ -548,15 +545,15 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                       {addedValue ? (
                         <>
                           <span className="text-gray-300 mr-2 line-through">
-                            ${toInternationalCurrencySystem_number(netValue)}
+                            {toInternationalCurrencySystem_number(netValue / priceC)}
                           </span>
                           <RightArrow />
                           <p className="ml-2">
-                            ${toInternationalCurrencySystem_number(addedValue)}
+                            {toInternationalCurrencySystem_number(addedValue / priceC)}
                           </p>
                         </>
                       ) : (
-                        <p>${toInternationalCurrencySystem_number(netValue)}</p>
+                        <p>{toInternationalCurrencySystem_number(netValue / priceC)}</p>
                       )}
                     </div>
                   </div>
@@ -647,7 +644,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                       <p className="text-xs text-gray-300 mt-1.5">
                         Max Available:{" "}
                         <span className="text-white">
-                          ${toInternationalCurrencySystem_number(calculateMaxRemovable() * priceC)}
+                          {toInternationalCurrencySystem_number(calculateMaxRemovable())}
                         </span>
                       </p>
                     </div>
@@ -687,15 +684,15 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                       {addedValue ? (
                         <>
                           <span className="text-gray-300 mr-2 line-through">
-                            ${toInternationalCurrencySystem_number(netValue)}
+                            {toInternationalCurrencySystem_number(netValue / priceC)}
                           </span>
                           <RightArrow />
                           <p className="ml-2">
-                            ${toInternationalCurrencySystem_number(addedValue)}
+                            {toInternationalCurrencySystem_number(addedValue / priceC)}
                           </p>
                         </>
                       ) : (
-                        <p>${toInternationalCurrencySystem_number(netValue)}</p>
+                        <p>{toInternationalCurrencySystem_number(netValue / priceC)}</p>
                       )}
                     </div>
                   </div>
