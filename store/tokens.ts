@@ -152,7 +152,7 @@ export const prepareAndExecuteTransactions = async (
       {
         methodName: ChangeMethodsLogic[ChangeMethodsLogic.storage_deposit],
         args: {
-          registration_only: true,
+          registration_only: false,
           account_id: account.accountId,
         },
         attachedDeposit: new BN(expandToken(deposit, NEAR_DECIMALS)),

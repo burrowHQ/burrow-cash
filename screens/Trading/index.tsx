@@ -18,7 +18,7 @@ import {
 import { useMarginAccount } from "../../hooks/useMarginAccount";
 import { useAccountId } from "../../hooks/hooks";
 import { useRouterQuery } from "../../utils/txhashContract";
-import { handleTransactionResults, handleTransactionHash } from "../../services/transaction";
+import { handleTransactionHash } from "../../services/transaction";
 import DataSource from "../../data/datasource";
 import TradingViewChart from "../../components/marginTrading/TradingViewChart";
 import { standardizeAsset, nearTokenId } from "../../utils";
@@ -141,30 +141,11 @@ const Trading = () => {
   };
 
   useEffect(() => {
-    if (query?.transactionHashes) {
-      (async () => {
-        const txHash = await handleTransactionHash(query?.transactionHashes);
-        txHash
-          .filter((item) => item.hasStorageDeposit || item.hasStorageDepositClosePosition)
-          .forEach(async (item) => {
-            try {
-              await DataSource.shared.getMarginTradingPosition({
-                addr: accountId,
-                process_type: item.hasStorageDepositClosePosition ? "close" : "open",
-                tx_hash: item.txHash,
-              });
-            } catch (error) {
-              console.error("Failed to get margin trading position:", error);
-            }
-          });
-      })();
+    // TODOXX
+    if (query?.transactionHashes && accountId) {
+      handleTransactionHash(query?.transactionHashes);
     }
-    handleTransactionResults(
-      query?.transactionHashes,
-      query?.errorMessage,
-      Object.keys(filterMarginConfigList || []),
-    );
-  }, [query?.transactionHashes, query?.errorMessage]);
+  }, [query?.transactionHashes, query?.errorMessage, accountId]);
 
   const filterTitle = `${getSymbolById(
     currentTokenCate1?.token_id,

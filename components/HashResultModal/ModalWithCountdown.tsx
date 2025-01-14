@@ -48,9 +48,9 @@ const ModalWithCountdown = ({
       startCountdown();
     } else {
       setIsModalVisible(false);
-      clearTimeoutOrInterval(countdownTimer); //
+      clearTimeoutOrInterval(countdownTimer);
     }
-    return () => clearTimeoutOrInterval(countdownTimer); //
+    return () => clearTimeoutOrInterval(countdownTimer);
   }, [show, countdown]);
 
   const clearTimeoutOrInterval = (timerId) => {

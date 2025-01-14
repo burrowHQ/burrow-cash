@@ -1,116 +1,115 @@
-import { shrinkToken } from "../store";
 import { getTransactionResult, parsedArgs } from "../utils/txhashContract";
 import {
   showPositionResult,
   showPositionClose,
-  showPositionFailure,
   showChangeCollateralPosition,
 } from "../components/HashResultModal";
-import { useMarginConfigToken } from "../hooks/useMarginConfig";
-import { LOGIC_MEMECONTRACT_NAME } from "../utils/config";
+import { store } from "../redux/store";
+import DataSource from "../data/datasource";
 
-interface TransactionResult {
+interface ITransactionResult {
   txHash: string;
   result: any;
-  hasStorageDeposit: boolean;
-  hasStorageDepositClosePosition?: boolean;
+  isOpenPosition?: boolean;
+  isCloseMTPosition?: boolean;
+  isDecreaseCollateral?: boolean;
+  isIncreaseCollateral?: boolean;
+  action?: Record<string, string>;
 }
-
-export const handleTransactionResults = async (
+export const handleTransactionHash = async (
   transactionHashes: string | string[] | undefined,
-  errorMessage?: string | string[],
-  cate1?: Array<string>,
-) => {
+): Promise<ITransactionResult[]> => {
   if (transactionHashes) {
     try {
+      // Parsing transactions
       const txhash = Array.isArray(transactionHashes)
         ? transactionHashes
         : transactionHashes.split(",");
-
       const results = await Promise.all(
-        txhash.map(async (txHash: string): Promise<TransactionResult> => {
+        txhash.map(async (txHash: string): Promise<ITransactionResult> => {
           const result: any = await getTransactionResult(txHash);
-          let hasStorageDeposit = false;
-          let hasStorageDepositClosePosition = false;
-
-          const args = parsedArgs(result?.transaction?.actions?.[0]?.FunctionCall?.args || "");
-          const parsed_Args = JSON.parse(args || "");
-          const { actions } = parsed_Args;
-          if (actions) {
-            hasStorageDeposit = Reflect.has(parsed_Args.actions[0], "OpenPosition");
-            hasStorageDepositClosePosition = Reflect.has(parsed_Args.actions[0], "CloseMTPosition");
-          } else {
-            const msg = JSON.parse(parsed_Args.msg);
-            if (typeof msg != "string") {
-              hasStorageDeposit = Reflect.has(msg?.MarginExecute?.actions?.[0], "OpenPosition");
-              hasStorageDepositClosePosition = Reflect.has(
-                msg?.MarginExecute?.actions?.[0],
-                "CloseMTPosition",
-              );
-            }
+          const targetReceipt_pyth = result?.receipts?.find((receipt) => {
+            return (
+              receipt?.receipt?.Action?.actions?.[0]?.FunctionCall?.method_name ==
+              "margin_execute_with_pyth"
+            );
+          });
+          const targetReceipt_oracle = result?.receipts?.find((receipt) => {
+            return (
+              receipt?.receipt?.Action?.actions?.[0]?.FunctionCall?.method_name == "oracle_call"
+            );
+          });
+          if (targetReceipt_pyth || targetReceipt_oracle) {
+            const actions = (targetReceipt_pyth || targetReceipt_oracle)?.receipt?.Action?.actions;
+            const args = parsedArgs(actions?.[0]?.FunctionCall?.args || "");
+            const parsed_Args = JSON.parse(args || "");
+            const action = targetReceipt_pyth
+              ? parsed_Args.actions[0]
+              : JSON.parse(parsed_Args.msg)?.MarginExecute?.actions?.[0];
+            return {
+              txHash,
+              result,
+              isOpenPosition: Reflect.has(action, "OpenPosition"),
+              isCloseMTPosition: Reflect.has(action, "CloseMTPosition"),
+              isDecreaseCollateral: Reflect.has(action, "DecreaseCollateral"),
+              isIncreaseCollateral: Reflect.has(action, "IncreaseCollateral"),
+              action,
+            };
           }
-          return { txHash, result, hasStorageDeposit, hasStorageDepositClosePosition };
+          return {
+            txHash,
+            result,
+            isOpenPosition: false,
+            isCloseMTPosition: false,
+            isDecreaseCollateral: false,
+            isIncreaseCollateral: false,
+            action: undefined,
+          };
         }),
       );
-
-      const shouldShowClose = results.some(
-        ({ hasStorageDepositClosePosition }: TransactionResult) => {
-          return hasStorageDepositClosePosition;
-        },
+      const targetPositionTx = results.find(
+        (item) => item.isOpenPosition || item.isCloseMTPosition,
       );
-
-      if (shouldShowClose) {
+      const targetCollateralTx = results.find(
+        (item) => item.isDecreaseCollateral || item.isIncreaseCollateral,
+      );
+      // Reporting transactions
+      if (targetPositionTx) {
+        const currentState = store.getState();
+        await DataSource.shared.postMarginTradingPosition({
+          addr: currentState?.account?.accountId,
+          process_type: targetPositionTx.isOpenPosition ? "open" : "close",
+          tx_hash: targetPositionTx.txHash,
+        });
+      }
+      // Show transactions pop
+      if (targetPositionTx?.isCloseMTPosition) {
+        // close position
         const marginPopType = localStorage.getItem("marginPopType") as "Long" | "Short" | undefined;
         showPositionClose({ type: marginPopType || "Long" });
-        return;
+      } else if (targetPositionTx?.isOpenPosition) {
+        const cateSymbolAndDecimals = JSON.parse(
+          localStorage.getItem("cateSymbolAndDecimals") || "{}",
+        );
+        const { token_c_id, token_d_id } = targetPositionTx?.action?.OpenPosition || ({} as any);
+        const isLong = token_c_id == token_d_id;
+        showPositionResultWrapper(isLong, txhash[0], cateSymbolAndDecimals);
+      } else if (targetCollateralTx) {
+        // adjust collateral
+        const collateralInfo = JSON.parse(localStorage.getItem("collateralInfo") || "{}");
+        showChangeCollateralPosition({
+          title: "Change Collateral",
+          icon: collateralInfo.iconC,
+          type: collateralInfo.positionType,
+          symbol: collateralInfo.symbol,
+          collateral: collateralInfo.addedValue,
+        });
       }
-
-      results.forEach(({ result, hasStorageDeposit }: TransactionResult) => {
-        const marginTransactionType = localStorage.getItem("marginTransactionType");
-        if (marginTransactionType === "changeCollateral") {
-          const collateralInfo = JSON.parse(localStorage.getItem("collateralInfo") || "{}");
-          showChangeCollateralPosition({
-            title: "Change Collateral",
-            icon: collateralInfo.iconC,
-            type: collateralInfo.positionType,
-            symbol: collateralInfo.symbol,
-            collateral: collateralInfo.addedValue,
-          });
-          return;
-        }
-        if (hasStorageDeposit) {
-          const args = parsedArgs(result?.transaction?.actions?.[0]?.FunctionCall?.args || "");
-          const { actions } = JSON.parse(args || "");
-          const cateSymbolAndDecimals = JSON.parse(
-            localStorage.getItem("cateSymbolAndDecimals") || "{}",
-          );
-
-          if (actions) {
-            const isLong = cate1?.includes(actions[0]?.OpenPosition?.token_p_id);
-            showPositionResultWrapper(isLong, txhash[0], cateSymbolAndDecimals);
-          } else {
-            const msg = JSON.parse(
-              parsedArgs(result?.transaction?.actions?.[0]?.FunctionCall?.args || ""),
-            );
-            const msg_ = JSON.parse(msg.msg);
-            const isLong = cate1?.includes(
-              msg_?.MarginExecute?.actions?.[0]?.OpenPosition?.token_p_id,
-            );
-            showPositionResultWrapper(isLong, txhash[0], cateSymbolAndDecimals);
-          }
-        }
-      });
     } catch (error) {
       console.error("Error processing transactions:", error);
     }
   }
-
-  if (errorMessage) {
-    showPositionFailure({
-      title: "Transactions error",
-      errorMessage: decodeURIComponent(errorMessage as string),
-    });
-  }
+  return [];
 };
 
 function showPositionResultWrapper(
@@ -130,49 +129,3 @@ function showPositionResultWrapper(
     },
   });
 }
-
-export const handleTransactionHash = async (
-  transactionHashes: string | string[] | undefined,
-  errorMessage?: string | string[],
-): Promise<TransactionResult[]> => {
-  if (transactionHashes) {
-    try {
-      const txhash = Array.isArray(transactionHashes)
-        ? transactionHashes
-        : transactionHashes.split(",");
-      const results = await Promise.all(
-        txhash.map(async (txHash: string): Promise<TransactionResult> => {
-          const result: any = await getTransactionResult(txHash);
-          let hasStorageDeposit = false;
-          let hasStorageDepositClosePosition = false;
-
-          // const isMarginExecute = result.transaction.actions.some(
-          //   (action: any) => action?.FunctionCall?.method_name === "margin_execute_with_pyth",
-          // );
-          const args = parsedArgs(result?.transaction?.actions?.[0]?.FunctionCall?.args || "");
-          const parsed_Args = JSON.parse(args || "");
-          const { actions } = parsed_Args;
-          if (actions) {
-            hasStorageDeposit = Reflect.has(parsed_Args.actions[0], "OpenPosition");
-            hasStorageDepositClosePosition = Reflect.has(parsed_Args.actions[0], "CloseMTPosition");
-          } else {
-            const msg = JSON.parse(parsed_Args.msg);
-            if (typeof msg != "string") {
-              hasStorageDeposit = Reflect.has(msg?.MarginExecute?.actions?.[0], "OpenPosition");
-              hasStorageDepositClosePosition = Reflect.has(
-                msg?.MarginExecute?.actions?.[0],
-                "CloseMTPosition",
-              );
-            }
-          }
-          return { txHash, result, hasStorageDeposit, hasStorageDepositClosePosition };
-        }),
-      );
-      return results;
-    } catch (error) {
-      console.error("Error processing transactions:", error);
-      return [];
-    }
-  }
-  return [];
-};

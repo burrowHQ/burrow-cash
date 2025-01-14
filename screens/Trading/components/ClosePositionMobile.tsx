@@ -201,28 +201,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
           }
           return item.transaction.hash;
         });
-
-        const txHash = await handleTransactionHash(transactionHashes);
-
-        await Promise.all(
-          txHash
-            .filter((item) => item.hasStorageDepositClosePosition)
-            .map(async (item) => {
-              try {
-                await DataSource.shared.getMarginTradingPosition({
-                  addr: accountId,
-                  process_type: "close",
-                  tx_hash: item.txHash,
-                });
-              } catch (error) {
-                console.error("Failed to get margin trading position:", error);
-              }
-            }),
-        );
-
-        showPositionClose({
-          type: positionType.label as "Long" | "Short",
-        });
+        await handleTransactionHash(transactionHashes);
       }
     } catch (error) {
       console.error("Failed to close position:", error);
