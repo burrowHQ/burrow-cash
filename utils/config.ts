@@ -59,6 +59,10 @@ export const incentiveTokens = [
   // "aurora",
 ];
 export const topTokens = ["shadow_ref_v1-4179"];
+export const NBTCTokenId = {
+  testnet: "nbtc-dev.testnet",
+  mainnet: "nbtc.toalice.near",
+}[defaultNetwork];
 const getConfig = (env: string = defaultNetwork) => {
   const RPC_LIST = getRpcList();
   let endPoint = "defaultRpc";

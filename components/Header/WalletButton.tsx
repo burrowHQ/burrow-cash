@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, createContext, useContext } from "react";
 import { Button, Box, useTheme, Modal as MUIModal } from "@mui/material";
 import type { WalletSelector } from "@near-wallet-selector/core";
 import { BeatLoader } from "react-spinners";
+import { useDebounce } from "react-use";
 import { fetchAssets, fetchRefPrices } from "../../redux/assetsSlice";
 import { fetchAssetsMEME } from "../../redux/assetsSliceMEME";
 import { logoutAccount, fetchAccount, setAccountId } from "../../redux/accountSlice";
@@ -77,9 +78,13 @@ const WalletButton = () => {
     }
   };
 
-  useEffect(() => {
-    onMount();
-  }, [accountId]);
+  useDebounce(
+    () => {
+      onMount();
+    },
+    500,
+    [accountId],
+  );
 
   const onWalletButtonClick = async () => {
     if (!hasAgreedDisclaimer) {

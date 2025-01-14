@@ -417,3 +417,12 @@ export function useRepayTrigger(tokenId: string, position?: string) {
     }
   };
 }
+
+export const Receive = ({ value }: { value: string }) => {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-sm text-gray-300">Receive Amount</span>
+      <span className="text-sm">{value}</span>
+    </div>
+  );
+};

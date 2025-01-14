@@ -1,7 +1,8 @@
 import Decimal from "decimal.js";
-
+import { executeBTCDepositAndAction } from "btc-wallet";
 import { decimalMin, getBurrow } from "../../utils";
 import { expandTokenDecimal } from "../helper";
+import { NBTCTokenId } from "../../utils/config";
 import { ChangeMethodsToken } from "../../interfaces";
 import { getTokenContract, getMetadata, prepareAndExecuteTokenTransactions } from "../tokens";
 import getBalance from "../../api/get-balance";
@@ -21,17 +22,19 @@ export async function supply({
   isMax: boolean;
   isMeme: boolean;
 }): Promise<void> {
-  const { account, logicContract, logicMEMEContract } = await getBurrow();
+  const { account, logicContract, hideModal } = await getBurrow();
   const { decimals } = (await getMetadata(tokenId))!;
   const tokenContract = await getTokenContract(tokenId);
-  const tokenBalance = new Decimal(await getBalance(tokenId, account.accountId));
-  const burrowContractId = isMeme ? logicMEMEContract.contractId : logicContract.contractId;
-  const expandedAmount = isMax
-    ? tokenBalance
-    : decimalMin(expandTokenDecimal(amount, decimals), tokenBalance);
-
+  let expandedAmount;
+  if (tokenId === NBTCTokenId) {
+    expandedAmount = expandTokenDecimal(amount, decimals);
+  } else {
+    const tokenBalance = new Decimal(await getBalance(tokenId, account.accountId));
+    expandedAmount = isMax
+      ? tokenBalance
+      : decimalMin(expandTokenDecimal(amount, decimals), tokenBalance);
+  }
   const collateralAmount = expandTokenDecimal(expandedAmount, extraDecimals);
-
   const collateralActions = {
     actions: [
       {
@@ -43,12 +46,25 @@ export async function supply({
     ],
   };
 
-  await prepareAndExecuteTokenTransactions(tokenContract, {
-    methodName: ChangeMethodsToken[ChangeMethodsToken.ft_transfer_call],
-    args: {
-      receiver_id: burrowContractId,
-      amount: expandedAmount.toFixed(0),
-      msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
-    },
-  });
+  // await prepareAndExecuteTokenTransactions(tokenContract, {
+  //   methodName: ChangeMethodsToken[ChangeMethodsToken.ft_transfer_call],
+  //   args: {
+  //     receiver_id: logicContract.contractId,
+  //     amount: expandedAmount.toFixed(0),
+  //     msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
+  //   },
+  // });
+  try {
+    await executeBTCDepositAndAction({
+      action: {
+        receiver_id: logicContract.contractId,
+        amount: expandedAmount.toFixed(0),
+        msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
+      },
+      env: "private_mainnet",
+      registerDeposit: "100000000000000000000000",
+    });
+  } catch (error) {
+    if (hideModal) hideModal();
+  }
 }

@@ -12,7 +12,10 @@ const getAccountMEME = async () => {
     const assets = await getAssetsMEMEDetailed();
     const tokenIds = assets.map((asset) => asset.token_id);
     const shadowRecords = await getShadowRecords();
-    const accountBalance = (await account.getAccountBalance()).available;
+    let accountBalance = "0";
+    try {
+      accountBalance = (await account.getAccountBalance()).available;
+    } catch (error) {}
     const balances = await Promise.all(
       tokenIds.map((id) => getBalance(id, accountId, shadowRecords)),
     );

@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import Decimal from "decimal.js";
+import { useBtcWalletSelector } from "btc-wallet";
 import { nearTokenId } from "../../utils";
 import { toggleUseAsCollateral, hideModal } from "../../redux/appSlice";
 import {
@@ -28,8 +29,10 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
   const [loading, setLoading] = useState(false);
   const { amount, useAsCollateral, isMax } = useAppSelector(getSelectedValues);
   const { enable_pyth_oracle } = useAppSelector(getConfig); // TODO33 need query from api？
+  const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
   const dispatch = useAppDispatch();
   const asset = useAppSelector(getAssetData);
+  const { account, autoConnect } = useBtcWalletSelector();
   const { action = "Deposit", tokenId, borrowApy, price, portfolio, isLpToken, position } = asset;
   const { isRepayFromDeposits } = useDegenMode();
   const isMeme = useAppSelector(isMemeCategory);
@@ -56,6 +59,10 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
   }, [useAsCollateral]);
 
   const handleActionButtonClick = async () => {
+    if (!account && selectedWalletId === "btc-wallet") {
+      autoConnect();
+      return;
+    }
     setLoading(true);
     trackActionButton(action, {
       tokenId,

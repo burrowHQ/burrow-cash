@@ -21,6 +21,7 @@ import BN from "bn.js";
 import { map, distinctUntilChanged } from "rxjs";
 import { setupKeypom } from "@keypom/selector";
 import { setupOKXWallet } from "@near-wallet-selector/okx-wallet";
+import { setupBTCWallet } from "btc-wallet";
 // @ts-nocheck
 import type { Config } from "@wagmi/core";
 // @ts-nocheck
@@ -197,6 +198,10 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         deprecated: false,
       }),
       setupCoin98Wallet(),
+      setupBTCWallet({
+        autoConnect: true,
+        env: "private_mainnet",
+      }) as any,
     ],
     network: {
       networkId: defaultNetwork,

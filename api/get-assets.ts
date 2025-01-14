@@ -40,8 +40,9 @@ const getLptMetadata = (lp_token_details: IUnitLptAssetDetail, priceMap, metadat
 };
 
 const getAssets = async () => {
-  const assets_pending = await getAssetsDetailed();
-  const assets = assets_pending.filter((asset) => !blackAssets.includes(asset.token_id));
+  const assetsPendng = await getAssetsDetailed();
+  // TODO for satoshi
+  const assets = assetsPendng.filter((asset) => asset.token_id.indexOf(lpTokenPrefix) === -1);
   const token_ids_from_regular = assets
     .filter((asset) => asset.token_id.indexOf(lpTokenPrefix) === -1)
     .map((asset) => asset.token_id);

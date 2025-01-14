@@ -13,6 +13,7 @@ import ModalReact from "react-modal";
 import "../styles/global.css";
 import LoadingBar from "react-top-loading-bar";
 import { useRouter } from "next/router";
+import { BtcWalletSelectorContextProvider } from "btc-wallet";
 import { store, persistor } from "../redux/store";
 import { FallbackError, Layout, Modal } from "../components";
 import { posthog, isPostHogEnabled } from "../utils/telemetry";
@@ -88,8 +89,8 @@ init({
   release: "v1",
 });
 
-const IDLE_INTERVAL = 90e3;
-const REFETCH_INTERVAL = 60e3;
+const IDLE_INTERVAL = 400e3;
+const REFETCH_INTERVAL = 300e3;
 
 const Init = () => {
   const isIdle = useIdle(IDLE_INTERVAL);
@@ -239,42 +240,44 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         progress={progress}
         onLoaderFinished={() => setProgress(0)}
       />
-      <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <Head>
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <title>Burrow Finance</title>
-          </Head>
-          <Upgrade Component={Component} pageProps={pageProps} />
-        </PersistGate>
-      </Provider>
-      {isBlocked && blockFeatureEnabled && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center"
-          style={{
-            zIndex: "999999999",
-            backdropFilter: "blur(6px)",
-            height: "100vh",
-            overflow: "hidden",
-          }}
-        >
+      <BtcWalletSelectorContextProvider>
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
+            <Head>
+              <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <title>Burrow Finance</title>
+            </Head>
+            <Upgrade Component={Component} pageProps={pageProps} />
+          </PersistGate>
+        </Provider>
+        {isBlocked && blockFeatureEnabled && (
           <div
-            className="text-white text-center bg-dark-100 px-5 pt-9 pb-7 rounded-md border border-dark-300"
-            style={{ width: "278px" }}
+            className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center"
+            style={{
+              zIndex: "999999999",
+              backdropFilter: "blur(6px)",
+              height: "100vh",
+              overflow: "hidden",
+            }}
           >
-            <p className="text-sm">
-              You are prohibited from accessing app.burrow.finance due to your location or other
-              infringement of the Terms of Services.
-            </p>
             <div
-              onClick={handleBlockConfirmation}
-              className="mt-6 border border-primary h-9 flex items-center justify-center rounded-md text-sm text-black text-primary cursor-pointer ml-1.5 mr-1.5"
+              className="text-white text-center bg-dark-100 px-5 pt-9 pb-7 rounded-md border border-dark-300"
+              style={{ width: "278px" }}
             >
-              Confirm
+              <p className="text-sm">
+                You are prohibited from accessing app.burrow.finance due to your location or other
+                infringement of the Terms of Services.
+              </p>
+              <div
+                onClick={handleBlockConfirmation}
+                className="mt-6 border border-primary h-9 flex items-center justify-center rounded-md text-sm text-black text-primary cursor-pointer ml-1.5 mr-1.5"
+              >
+                Confirm
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </BtcWalletSelectorContextProvider>
     </ErrorBoundary>
   );
 }
