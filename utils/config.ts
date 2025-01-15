@@ -102,6 +102,15 @@ export const MARGIN_WHITELIST = [
   "zcamm7417.near",
   "quangle613.tg",
   "kenny22.near",
+  "henryisai.near",
+  "jackindeeper.near",
+  "enleap.near",
+  "ibohigboze.near",
+  "donorsfoundation.near",
+  "leon_mitte.near",
+  "0xg1enn.near",
+  "bobbypack.near",
+  "itsmarcus.near",
 ];
 const getConfig = (env: string = defaultNetwork) => {
   const RPC_LIST = getRpcList();
