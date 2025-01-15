@@ -213,6 +213,7 @@ const Trading = () => {
                         alt=""
                         src={currentTokenCate1?.metadata?.icon}
                         style={{ width: "26px", height: "26px" }}
+                        className="rounded-full"
                       />
                     )}
                     <p className="ml-2 mr-3.5 text-lg">
