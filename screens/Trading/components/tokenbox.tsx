@@ -127,6 +127,7 @@ const TradingToken: React.FC<TradingTokenInter> = ({
               alt=""
               src={selectedItem?.metadata?.icon}
               style={{ width: "26px", height: "26px" }}
+              className="rounded-full"
             />
           )}
         </div>

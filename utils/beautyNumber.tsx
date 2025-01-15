@@ -6,7 +6,7 @@ export const beautifyPrice = (
   decimalPlaces: number = 5,
   digitsPlaces: number = 4,
 ) => {
-  if (!num) return "-";
+  if (!num && num !== 0) return "-";
   let numStr = num.toString();
   if (numStr.includes("e")) {
     const [base, exp] = numStr.split("e");
