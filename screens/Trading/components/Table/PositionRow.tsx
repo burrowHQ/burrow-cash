@@ -163,22 +163,15 @@ const PositionRow = ({
           </div>
         </div>
       </td>
-      <td
-        title={entryPrice !== null && entryPrice !== undefined ? `$${entryPrice}` : ""}
-        className="cursor-default"
-      >
+      <td>
         {entryPrice !== null && entryPrice !== undefined ? (
           <span>${beautifyPrice(entryPrice)}</span>
         ) : (
           <span className="text-gray-500">-</span>
         )}
       </td>
-      <td title={`$${indexPrice?.toString()}`} className="cursor-default">
-        ${beautifyPrice(indexPrice)}
-      </td>
-      <td title={`$${LiqPrice?.toString()}`} className="cursor-default">
-        ${beautifyPrice(LiqPrice)}
-      </td>
+      <td>${beautifyPrice(indexPrice)}</td>
+      <td>${beautifyPrice(LiqPrice)}</td>
       <td>
         <p className={`${pnl > 0 ? "text-green-150" : pnl < 0 ? "text-red-150" : "text-gray-400"}`}>
           {pnl === 0 ? "" : `${pnl > 0 ? `+$` : `-$`}`}
@@ -280,7 +273,7 @@ const PositionRow = ({
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Entry Price</p>
-          <p title={entryPrice !== null && entryPrice !== undefined ? `$${entryPrice}` : ""}>
+          <p>
             {entryPrice !== null ? (
               <span>${beautifyPrice(entryPrice)}</span>
             ) : (
@@ -290,11 +283,11 @@ const PositionRow = ({
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Index Price</p>
-          <p title={indexPrice?.toString()}>${beautifyPrice(indexPrice)}</p>
+          <p>${beautifyPrice(indexPrice)}</p>
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Liq. Price</p>
-          <p title={LiqPrice?.toString()}>${beautifyPrice(LiqPrice)}</p>
+          <p>${beautifyPrice(LiqPrice)}</p>
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Opening time</p>
