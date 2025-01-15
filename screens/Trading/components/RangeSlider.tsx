@@ -13,30 +13,17 @@ interface RangeSliderProps {
 }
 
 const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRangeMount }) => {
-  const dispatch = useAppDispatch();
-  const { filteredTokenTypeMap } = useRegisterTokenType();
-  const router = useRouter();
-  const { id }: any = router.query;
-  const isMainStream = filteredTokenTypeMap.mainStream.includes(id);
-
-  const generateArithmeticSequence = (value: number) => {
-    const increment = (value - 1) / 4;
-    const sequence: number[] = [];
-
-    for (let i = 0; i <= 4; i++) {
-      sequence.push(+(1 + i * increment).toFixed(2));
-    }
-
-    return sequence;
-  };
-  const { marginConfigTokens, marginConfigTokensMEME } = useMarginConfigToken();
-  const marginConfigTokensCombined = isMainStream ? marginConfigTokens : marginConfigTokensMEME;
-
   const [value, setValue] = useState(defaultValue);
   const [splitList, setSplitList] = useState<number[]>([]);
   const [matchValue, setMatchValue] = useState(value);
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { filteredTokenTypeMap } = useRegisterTokenType();
+  const { marginConfigTokens, marginConfigTokensMEME } = useMarginConfigToken();
   const valueRef = useRef<HTMLInputElement>(null);
-  const [selectedItem, setSelectedItem] = useState(defaultValue);
+  const { id }: any = router.query;
+  const isMainStream = filteredTokenTypeMap.mainStream.includes(id);
+  const marginConfigTokensCombined = isMainStream ? marginConfigTokens : marginConfigTokensMEME;
 
   useEffect(() => {
     const newAllowedValues = generateArithmeticSequence(
@@ -46,10 +33,14 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRang
   }, [marginConfigTokensCombined["max_leverage_rate"]]);
   // init value
   useEffect(() => {
-    if (splitList.length > 0 && !splitList.includes(value)) {
-      changeValue(splitList[0]);
+    if (splitList.length > 0) {
+      if (!splitList.includes(value)) {
+        changeValue(splitList[0]);
+      } else if (value !== defaultValue) {
+        changeValue(defaultValue);
+      }
     }
-  }, [value, splitList]);
+  }, [value, splitList, defaultValue]);
   useEffect(() => {
     if (valueRef.current && splitList.length > 0) {
       const nearestValue = splitList.reduce((prev, curr) => {
@@ -68,10 +59,19 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRang
       return Math.abs(curr - numValue) < Math.abs(prev - numValue) ? curr : prev;
     });
     setValue(nearestValue);
-    setSelectedItem(nearestValue);
     setRangeMount(nearestValue);
     dispatch(setReduxRangeMount(nearestValue));
   }
+  const generateArithmeticSequence = (value: number) => {
+    const increment = (value - 1) / 4;
+    const sequence: number[] = [];
+
+    for (let i = 0; i <= 4; i++) {
+      sequence.push(+(1 + i * increment).toFixed(2));
+    }
+
+    return sequence;
+  };
   const actionShowRedColor = action === "Long";
   return (
     <div className="mt-5 pb-5 border-b border-dark-700 -mx-4 px-4">
@@ -100,7 +100,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRang
               className={twMerge(
                 `flex items-center justify-center text-xs text-gray-400 w-11 py-0.5 border border-transparent hover:border-v3LiquidityRemoveBarColor
                  rounded-lg`,
-                p === selectedItem && "bg-black bg-opacity-20",
+                p === value && "bg-black bg-opacity-20",
               )}
             >
               {p}X

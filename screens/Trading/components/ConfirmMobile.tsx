@@ -16,10 +16,8 @@ import {
 } from "../../../components/Modal/button";
 import { shrinkToken, expandToken } from "../../../store";
 import { beautifyPrice } from "../../../utils/beautyNumber";
-import { getAccountId } from "../../../redux/accountSelectors";
 import { handleTransactionHash } from "../../../services/transaction";
 import { showPositionFailure } from "../../../components/HashResultModal";
-import { getBurrow } from "../../../utils";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { IConfirmMobileProps } from "../comInterface";
 import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
@@ -31,20 +29,6 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
   action,
   confirmInfo,
 }) => {
-  const [burrowData, setBurrowData] = useState<{
-    selector?: {
-      wallet: () => Promise<{ id: string }>;
-    };
-  } | null>(null);
-
-  useEffect(() => {
-    const initBurrow = async () => {
-      const data: any = await getBurrow();
-      setBurrowData(data);
-    };
-    initBurrow();
-  }, []);
-  const accountId = useAppSelector(getAccountId);
   const theme = useTheme();
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
   const { ReduxcategoryAssets1 } = useAppSelector((state) => state.category);
@@ -193,26 +177,17 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
               : minAmountOutForPopUp / confirmInfo.tokenInAmount,
         }),
       );
-
-      const wallet = await burrowData?.selector?.wallet();
-      if (wallet?.id && ["my-near-wallet", "mintbase-wallet", "bitte-wallet"].includes(wallet.id)) {
-        await openPosition(openPositionParams);
-        return;
-      }
-
       const res: any = await openPosition(openPositionParams);
-      if (!res || !Array.isArray(res)) {
-        throw new Error("Invalid response from openPosition");
+      if (res) {
+        const transactionHashes = res.map((item) => {
+          if (!item?.transaction?.hash) {
+            throw new Error("Invalid transaction hash");
+          }
+          return item.transaction.hash;
+        });
+        await handleTransactionHash(transactionHashes);
       }
-      const transactionHashes = res.map((item) => {
-        if (!item?.transaction?.hash) {
-          throw new Error("Invalid transaction hash");
-        }
-        return item.transaction.hash;
-      });
-      await handleTransactionHash(transactionHashes);
     } catch (error) {
-      console.error("Open position error:", error);
       showPositionFailure({
         title: "Transactions error",
         errorMessage: error instanceof Error ? error.message : JSON.stringify(error),

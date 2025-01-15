@@ -141,7 +141,6 @@ const Trading = () => {
   };
 
   useEffect(() => {
-    // TODOXX
     if (query?.transactionHashes && accountId) {
       handleTransactionHash(query?.transactionHashes);
     }
