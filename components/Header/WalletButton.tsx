@@ -384,10 +384,12 @@ export const ConnectWalletButton = ({
   accountId,
   className,
   isShort,
+  loading,
 }: {
   accountId;
   className?: string;
   isShort?: boolean;
+  loading?: boolean;
 }) => {
   const [isDisclaimerOpen, setDisclaimer] = useState(false);
   const { getDisclaimer: hasAgreedDisclaimer } = useDisclaimer();
@@ -427,7 +429,7 @@ export const ConnectWalletButton = ({
         onClick={onWalletButtonClick}
         disableRipple={!!accountId}
       >
-        Connect Wallet
+        {loading ? <BeatLoader size={4} color="black" /> : <>Connect Wallet</>}
       </Button>
       <Disclaimer isOpen={isDisclaimerOpen} onClose={() => setDisclaimer(false)} />
     </>

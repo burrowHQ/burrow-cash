@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Decimal from "decimal.js";
-import { init_env } from "@ref-finance/ref-sdk";
 import { useV1EstimateSwap } from "./useV1EstimateSwap";
 import { useDclEstimateSwap } from "./useDclEstimateSwap";
 import { IEstimateResult } from "../interfaces";
@@ -11,9 +10,6 @@ export const useEstimateSwap = ({
   tokenIn_amount,
   slippageTolerance,
   account_id,
-  simplePools,
-  stablePools,
-  stablePoolsDetail,
   forceUpdate,
 }: {
   tokenIn_id: string;
@@ -21,33 +17,29 @@ export const useEstimateSwap = ({
   tokenIn_amount: string;
   slippageTolerance: number;
   account_id?: string;
-  simplePools: any[];
-  stablePools: any[];
-  stablePoolsDetail: any[];
   forceUpdate?: number;
 }) => {
   const [estimateResult, setEstimateResult] = useState<IEstimateResult>();
-  const dclEstimateResult: any = useDclEstimateSwap({
+  const [estimateLoading, setEstimateLoading] = useState<boolean>(false);
+  const { estimateData: dclEstimateResult, loading: dclLoading }: any = useDclEstimateSwap({
     tokenIn_id,
     tokenOut_id,
     tokenIn_amount,
     slippageTolerance,
     forceUpdate,
   });
-  const v1EstimateResult: any = useV1EstimateSwap({
+  const { estimateData: v1EstimateResult, loading: v1Loading }: any = useV1EstimateSwap({
     tokenIn_id,
     tokenOut_id,
     tokenIn_amount,
     slippageTolerance,
     account_id,
-    simplePools,
-    stablePools,
-    stablePoolsDetail,
     forceUpdate,
   });
   useEffect(() => {
     if (dclEstimateResult?.tag && v1EstimateResult?.tag && validator()) {
       getBestEstimateResult();
+      setEstimateLoading(false);
     }
     if (tokenIn_amount == "0" || !tokenIn_amount) {
       setEstimateResult((prev: any) => {
@@ -64,6 +56,9 @@ export const useEstimateSwap = ({
     v1EstimateResult?.amount_out,
     tokenIn_amount,
   ]);
+  useEffect(() => {
+    setEstimateLoading(v1Loading || dclLoading);
+  }, [v1Loading, dclLoading]);
   function getBestEstimateResult() {
     const { amount_out: dcl_amount_out } = dclEstimateResult!;
     const { amount_out: v1_amount_out } = v1EstimateResult!;
@@ -93,5 +88,8 @@ export const useEstimateSwap = ({
     }
     return false;
   }
-  return estimateResult;
+  return {
+    estimateResult,
+    estimateLoading,
+  };
 };

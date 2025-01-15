@@ -11,13 +11,7 @@ import { toInternationalCurrencySystem_number, toDecimal } from "../../../utils/
 import { closePosition } from "../../../store/marginActions/closePosition";
 import { useEstimateSwap } from "../../../hooks/useEstimateSwap";
 import { useAccountId } from "../../../hooks/hooks";
-import { usePoolsData } from "../../../hooks/useGetPoolsData";
-import {
-  expandToken,
-  shrinkToken,
-  shrinkTokenDecimal,
-  expandTokenDecimal,
-} from "../../../store/helper";
+import { expandToken, shrinkToken, shrinkTokenDecimal } from "../../../store/helper";
 import {
   YellowSolidSubmitButton as YellowSolidButton,
   RedSolidSubmitButton as RedSolidButton,
@@ -73,8 +67,6 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     (state) => state.category,
   );
   const accountId = useAccountId();
-  const { simplePools, stablePools, stablePoolsDetail } = usePoolsData();
-
   const assetD = getAssetById(item.token_d_info.token_id, item);
   const assetC = getAssetById(item.token_c_info.token_id, item);
   const assetP = getAssetById(item.token_p_id, item);
@@ -114,14 +106,11 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   }, [positionType.label]);
 
   // estimate
-  const estimateData = useEstimateSwap({
+  const { estimateResult: estimateData } = useEstimateSwap({
     tokenIn_id: item.token_p_id,
     tokenOut_id: item.token_d_info.token_id,
     tokenIn_amount: shrinkToken(tokenInAmount || "0", assetP.metadata.decimals),
     account_id: accountId,
-    simplePools,
-    stablePools,
-    stablePoolsDetail,
     slippageTolerance: ReduxSlippageTolerance / 100,
     forceUpdate,
   });

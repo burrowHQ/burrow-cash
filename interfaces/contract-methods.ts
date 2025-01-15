@@ -82,6 +82,7 @@ export enum ViewMethodsREFV1 {
   get_shadow_records,
   get_pool_volumes_by_ids,
   list_pool_volumes,
+  get_pool_detail_info_by_ids,
 }
 export enum ChangeMethodsREFV1 {
   shadow_action,
