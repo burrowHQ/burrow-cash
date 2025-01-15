@@ -26,20 +26,59 @@ import { ConnectWalletButton } from "../../../components/Header/WalletButton";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
 import { MARGIN_MIN_COLLATERAL_USD } from "../../../utils/config";
+import type { Asset } from "../../../redux/assetState";
+import { expandToken, shrinkToken } from "../../../store";
 
 interface TradingOperateProps {
   onMobileClose?: () => void;
   id: string;
 }
+const tip_leverage = "Leverage must be greater than 1";
+const tip_min_usd = `Deposit at least $${MARGIN_MIN_COLLATERAL_USD}`;
+const tip_max_positions = "Exceeded the maximum number of open positions.";
+const tip_max_available_debt = "Current maximum available position:";
+const tip_min_available_debt = "Current minimum available position:";
+const insufficient_balance = "Insufficient Balance";
 
-// main components
 const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) => {
+  const {
+    ReduxcategoryAssets1,
+    ReduxcategoryAssets2,
+    ReduxcategoryCurrentBalance1,
+    ReduxcategoryCurrentBalance2,
+    ReduxSlippageTolerance,
+    ReduxRangeMount,
+    ReduxActiveTab,
+  } = useAppSelector((state) => state.category);
+  const [slippageTolerance, setSlippageTolerance] = useState<number>(0.5);
+  const [showFeeModal, setShowFeeModal] = useState<boolean>(false);
+  const [forceUpdateLoading, setForceUpdateLoading] = useState<boolean>(false);
+  const dispatch = useAppDispatch();
+  const [activeTab, setActiveTab] = useState<string>(ReduxActiveTab || "long");
+  const [estimateLoading, setEstimateLoading] = useState<boolean>(false);
+  const [selectedSetUpOption, setSelectedSetUpOption] = useState<string>("custom");
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
+  const [rangeMount, setRangeMount] = useState<number>(ReduxRangeMount || 1);
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
+  const [longInput, setLongInput] = useState<string>("");
+  const [shortInput, setShortInput] = useState<string>("");
+  const [longOutput, setLongOutput] = useState<number>(0);
+  const [shortOutput, setShortOutput] = useState<number>(0);
+  const [longInputUsd, setLongInputUsd] = useState<number>(0);
+  const [longOutputUsd, setLongOutputUsd] = useState<number>(0);
+  const [shortInputUsd, setShortInputUsd] = useState<number>(0);
+  const [shortOutputUsd, setShortOutputUsd] = useState<number>(0);
+  const [tokenInAmount, setTokenInAmount] = useState<number>(0);
+  const [warnTip, setWarnTip] = useState<React.ReactElement | string>("");
+  const [LiqPrice, setLiqPrice] = useState<string>("");
+  const [forceUpdate, setForceUpdate] = useState<number>(0);
+  const [lastTokenInAmount, setLastTokenInAmount] = useState(0);
   const customInputRef = useRef<HTMLInputElement>(null);
   const accountId = useAppSelector(getAccountId);
   const { filteredTokenTypeMap } = useRegisterTokenType();
-  const isMainStream = filteredTokenTypeMap.mainStream.includes(id);
   const assets = useAppSelector(getAssets);
   const assetsMEME = useAppSelector(getAssetsMEME);
+  const isMainStream = filteredTokenTypeMap.mainStream.includes(id);
   const combinedAssetsData = isMainStream ? assets.data : assetsMEME.data;
   const config = useAppSelector(getMarginConfigCategory(!isMainStream));
   const {
@@ -50,48 +89,271 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
     marginConfigTokens,
     marginConfigTokensMEME,
   } = useMarginConfigToken();
-  const { marginAccountList, getAssetById, getAssetByIdMEME } = useMarginAccount();
+  const { marginAccountList: marginAccountListMain, marginAccountListMEME } = useMarginAccount();
   const { max_active_user_margin_position, min_safety_buffer } = isMainStream
     ? marginConfigTokens
     : marginConfigTokensMEME;
-  const {
-    ReduxcategoryAssets1,
-    ReduxcategoryAssets2,
-    ReduxcategoryCurrentBalance1,
-    ReduxcategoryCurrentBalance2,
-    ReduxSlippageTolerance,
-    ReduxRangeMount,
-    ReduxActiveTab,
-  } = useAppSelector((state) => state.category);
-  //
-  const [slippageTolerance, setSlippageTolerance] = useState<number>(0.5);
-  const [showFeeModal, setShowFeeModal] = useState<boolean>(false);
-  const [forceUpdateLoading, setForceUpdateLoading] = useState<boolean>(false);
-  const dispatch = useAppDispatch();
-  const [activeTab, setActiveTab] = useState<string>(ReduxActiveTab || "long");
-  const [estimateLoading, setEstimateLoading] = useState<boolean>(false);
-
-  //
-  const [selectedSetUpOption, setSelectedSetUpOption] = useState<string>("custom");
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
-  const [rangeMount, setRangeMount] = useState<number>(ReduxRangeMount || 1);
-  const [isDisabled, setIsDisabled] = useState<boolean>(false);
-  const [isMaxPosition, setIsMaxPosition] = useState<boolean>(false);
-
-  //
-  const [longInput, setLongInput] = useState<string>("");
-  const [shortInput, setShortInput] = useState<string>("");
-  const [longOutput, setLongOutput] = useState<number>(0);
-  const [shortOutput, setShortOutput] = useState<number>(0);
-
-  // amount
-  const [longInputUsd, setLongInputUsd] = useState<number>(0);
-  const [longOutputUsd, setLongOutputUsd] = useState<number>(0);
-  const [shortInputUsd, setShortInputUsd] = useState<number>(0);
-  const [shortOutputUsd, setShortOutputUsd] = useState<number>(0);
-
-  // pools
+  const marginAccountList = isMainStream ? marginAccountListMain : marginAccountListMEME;
+  // fetch all pools for script estimate TODOXX
   const { simplePools, stablePools, stablePoolsDetail } = usePoolsData();
+  // estimate
+  const estimateData = useEstimateSwap({
+    tokenIn_id:
+      activeTab === "long" ? ReduxcategoryAssets2?.token_id : ReduxcategoryAssets1?.token_id,
+    tokenOut_id:
+      activeTab === "long" ? ReduxcategoryAssets1?.token_id : ReduxcategoryAssets2?.token_id,
+    tokenIn_amount: toDecimal(tokenInAmount),
+    account_id: accountId,
+    simplePools,
+    stablePools,
+    stablePoolsDetail,
+    slippageTolerance: slippageTolerance / 100,
+    forceUpdate,
+  });
+  // slippageTolerance change ecent
+  useEffect(() => {
+    dispatch(setSlippageToleranceFromRedux(0.5));
+  }, []);
+  // condition btn iswhether disabled
+  useEffect(() => {
+    const setDisableBasedOnInputs = () => {
+      const currentBalance2 = Number(ReduxcategoryCurrentBalance2) || 0;
+
+      const inputValue = activeTab === "long" ? longInput : shortInput;
+      const outputValue = activeTab === "long" ? longOutput : shortOutput;
+      const isValidInput = isValidDecimalString(inputValue);
+
+      setIsDisabled(
+        !isValidInput ||
+          !(Number(inputValue) <= currentBalance2) ||
+          !outputValue ||
+          rangeMount == 1,
+      );
+    };
+    setDisableBasedOnInputs();
+  }, [activeTab, ReduxcategoryCurrentBalance2, longInput, shortInput, longOutput, shortOutput]);
+  /**
+   * longInput shortInput deal start
+   *  */
+  useEffect(() => {
+    const inputUsdCharcate1 = getAssetPrice(ReduxcategoryAssets1);
+    const inputUsdCharcate2 = getAssetPrice(ReduxcategoryAssets2);
+    if (inputUsdCharcate1 && estimateData) {
+      updateOutput(activeTab, inputUsdCharcate1);
+    }
+
+    if (inputUsdCharcate2) {
+      updateInputAmounts(activeTab, inputUsdCharcate2, inputUsdCharcate1);
+    }
+  }, [
+    longInput,
+    shortInput,
+    rangeMount,
+    estimateData,
+    slippageTolerance,
+    forceUpdate,
+    tokenInAmount,
+    activeTab, // Add activeTab to dependencies if needed
+    ReduxcategoryAssets1,
+  ]);
+  // update liq price for long
+  useDebounce(
+    () => {
+      if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
+        if (activeTab == "long" && +(longInput || 0) > 0 && (longOutput || 0) > 0) {
+          const safetyBufferFactor = 1 - min_safety_buffer / 10000;
+          const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
+          const token_c_value = new Decimal(longInput).mul(assetPrice || 0);
+          const token_d_value = token_c_value.mul(rangeMount || 0);
+          const liqPriceX = token_d_value
+            .div(safetyBufferFactor)
+            .minus(token_c_value)
+            .div(longOutput)
+            .toFixed();
+          setLiqPrice(liqPriceX || "0");
+        }
+        setEstimateLoading(false);
+      }
+    },
+    200,
+    [activeTab, longOutput, longInput],
+  );
+  // update liq price for short
+  useDebounce(
+    () => {
+      if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
+        if (
+          activeTab === "short" &&
+          +(shortInput || 0) > 0 &&
+          +(estimateData.amount_out || 0) > 0 &&
+          +(shortOutput || 0) > 0
+        ) {
+          const safetyBufferFactor = 1 - min_safety_buffer / 10000;
+          const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
+          const token_c_value = new Decimal(shortInput).mul(assetPrice || 0);
+          const token_p_value = new Decimal(estimateData.amount_out).mul(assetPrice || 0);
+          const liqPriceX = new Decimal(token_c_value)
+            .plus(token_p_value)
+            .mul(safetyBufferFactor)
+            .div(shortOutput);
+          setLiqPrice(liqPriceX.toFixed());
+        }
+        setEstimateLoading(false);
+      }
+      setForceUpdateLoading(!estimateData?.loadingComplete);
+    },
+    200,
+    [estimateData, activeTab, shortOutput, shortInput],
+  );
+  // update price and make refresh icon spin
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (tokenInAmount === lastTokenInAmount && longInput) {
+        setTokenInAmount((prev) => prev);
+        setForceUpdate((prev) => prev + 1);
+        setForceUpdateLoading(true);
+      } else {
+        setLastTokenInAmount(tokenInAmount);
+      }
+    }, 20_000);
+
+    return () => clearInterval(interval);
+  }, [tokenInAmount, lastTokenInAmount]);
+  // for same input, estimateLoading or forceUpdateLoading is true
+  useEffect(() => {
+    if (forceUpdateLoading) {
+      const timer = setTimeout(() => {
+        setForceUpdateLoading(false);
+      }, 4000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [forceUpdateLoading]);
+  useEffect(() => {
+    if (estimateLoading) {
+      const timer = setTimeout(() => {
+        setEstimateLoading(false);
+      }, 4000); // 3 seconds
+
+      return () => clearTimeout(timer); // Cleanup the timer on component unmount or when estimateLoading changes
+    }
+  }, [estimateLoading]);
+  useEffect(() => {
+    if (selectedSetUpOption === "custom" && customInputRef.current) {
+      customInputRef.current.focus();
+    }
+  }, [selectedSetUpOption]);
+  const Fee = useMemo(() => {
+    return {
+      openPFee:
+        ((Number(longInput || shortInput) * config.open_position_fee_rate) / 10000) *
+        (ReduxcategoryAssets2?.price?.usd || 1),
+      swapFee:
+        ((estimateData?.fee ?? 0) / 10000) *
+        Number(tokenInAmount) *
+        (activeTab == "long"
+          ? getAssetPrice(ReduxcategoryAssets2) || 0
+          : getAssetPrice(ReduxcategoryAssets1) || 0),
+      price: getAssetPrice(ReduxcategoryAssets1),
+    };
+  }, [longInput, shortInput, ReduxcategoryAssets1, estimateData, tokenInAmount]);
+  // check to show tip
+  useDebounce(
+    () => {
+      if (!accountId) {
+        setWarnTip("");
+      } else if (Object.values(marginAccountList).length >= max_active_user_margin_position) {
+        setWarnTip(tip_max_positions);
+      } else if (activeTab == "long" && longOutput > 0) {
+        if (rangeMount <= 1) {
+          setWarnTip(tip_leverage);
+        } else if (longInputUsd < MARGIN_MIN_COLLATERAL_USD) {
+          setWarnTip(tip_min_usd);
+        } else if (new Decimal(longInput || 0).gt(ReduxcategoryCurrentBalance2 || 0)) {
+          setWarnTip(insufficient_balance);
+        } else {
+          const borrowLimit = getBorrowLimit(ReduxcategoryAssets2, tokenInAmount);
+          const price_1 = getAssetPrice(ReduxcategoryAssets1);
+          const price_2 = getAssetPrice(ReduxcategoryAssets2);
+          if (borrowLimit?.isExceed) {
+            if (Number(price_1 || 0) > 0) {
+              const max_position = new Decimal(borrowLimit.availableLiquidity || 0)
+                .mul(price_2 || 0)
+                .div(price_1!);
+              setWarnTip(
+                <>
+                  {tip_max_available_debt} {beautifyPrice(Number(max_position.toFixed() || 0))}{" "}
+                  {ReduxcategoryAssets1?.metadata?.symbol}
+                </>,
+              );
+            }
+          } else if (borrowLimit?.lowLoanLimit) {
+            if (Number(price_1 || 0) > 0) {
+              const min_position = new Decimal(borrowLimit.lowAmount || 0)
+                .mul(price_2 || 0)
+                .div(price_1!);
+              setWarnTip(
+                <>
+                  {tip_min_available_debt} {beautifyPrice(Number(min_position.toFixed() || 0))}{" "}
+                  {ReduxcategoryAssets1?.metadata?.symbol}
+                </>,
+              );
+            }
+          } else {
+            setWarnTip("");
+          }
+        }
+      } else if (activeTab == "short" && shortOutput > 0) {
+        if (rangeMount <= 1) {
+          setWarnTip(tip_leverage);
+        } else if (shortInputUsd < MARGIN_MIN_COLLATERAL_USD) {
+          setWarnTip(tip_min_usd);
+        } else if (new Decimal(shortInput || 0).gt(ReduxcategoryCurrentBalance2 || 0)) {
+          setWarnTip(insufficient_balance);
+        } else {
+          const borrowLimit = getBorrowLimit(ReduxcategoryAssets1, tokenInAmount);
+          if (borrowLimit?.isExceed) {
+            setWarnTip(
+              <>
+                {tip_max_available_debt} {beautifyPrice(borrowLimit.availableLiquidity || 0)}{" "}
+                {ReduxcategoryAssets1?.metadata?.symbol}
+              </>,
+            );
+          } else if (borrowLimit?.lowLoanLimit) {
+            setWarnTip(
+              <>
+                {tip_min_available_debt} {beautifyPrice(borrowLimit.lowAmount || 0)}{" "}
+                {ReduxcategoryAssets1?.metadata?.symbol}
+              </>,
+            );
+          } else {
+            setWarnTip("");
+          }
+        }
+      } else {
+        setWarnTip("");
+      }
+    },
+    100,
+    [
+      marginAccountList,
+      max_active_user_margin_position,
+      longInputUsd,
+      shortInputUsd,
+      rangeMount,
+      accountId,
+      shortOutput,
+      longOutput,
+      activeTab,
+      tokenInAmount,
+      ReduxcategoryAssets1,
+      ReduxcategoryAssets2,
+      ReduxcategoryCurrentBalance2,
+      longInput,
+      shortInput,
+    ],
+  );
+  console.log("-----------ReduxcategoryAssets1", ReduxcategoryAssets1);
 
   const setOwnBanlance = (key: string) => {
     if (activeTab === "long") {
@@ -100,7 +362,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       setShortInput(key);
     }
   };
-
   // for tab change
   const initCateState = (tabString: string) => {
     setLiqPrice("0");
@@ -123,23 +384,15 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
     initCateState(tabString);
     setForceUpdate((prev) => prev + 1);
   };
-
   const getTabClassName = (tabName: string) => {
     return activeTab === tabName
       ? "bg-primary text-dark-200 py-2.5 px-5 rounded-md h-11 w-[50%] overflow-hidden text-ellipsis whitespace-nowrap"
       : "text-gray-300 py-2.5 px-5 h-11 w-[50%] overflow-hidden text-ellipsis whitespace-nowrap";
   };
-
   const cateSymbol = getSymbolById(
     ReduxcategoryAssets1?.token_id,
     ReduxcategoryAssets1?.metadata?.symbol,
   );
-
-  // slippageTolerance change ecent
-  useEffect(() => {
-    dispatch(setSlippageToleranceFromRedux(0.5));
-  }, []);
-
   const handleSetUpOptionClick = (option: string) => {
     setSelectedSetUpOption(option);
     if (option === "auto") {
@@ -153,44 +406,15 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       customInputRef.current.focus();
     }
   };
-
   const slippageToleranceChange = (e: any) => {
     setSlippageTolerance(e);
     dispatch(setSlippageToleranceFromRedux(e));
   };
-
   // open position btn click eve.
   const handleConfirmButtonClick = () => {
     if (isDisabled) return;
     setIsConfirmModalOpen(true);
   };
-
-  // condition btn iswhether disabled
-  useEffect(() => {
-    const setDisableBasedOnInputs = () => {
-      const currentBalance2 = Number(ReduxcategoryCurrentBalance2) || 0;
-
-      const inputValue = activeTab === "long" ? longInput : shortInput;
-      const outputValue = activeTab === "long" ? longOutput : shortOutput;
-      const isValidInput = isValidDecimalString(inputValue);
-
-      setIsDisabled(
-        !isValidInput ||
-          !(Number(inputValue) <= currentBalance2) ||
-          !outputValue ||
-          rangeMount == 1,
-      );
-    };
-    setDisableBasedOnInputs();
-  }, [activeTab, ReduxcategoryCurrentBalance2, longInput, shortInput, longOutput, shortOutput]);
-
-  useEffect(() => {
-    if (Object.values(marginAccountList).length >= max_active_user_margin_position) {
-      setIsMaxPosition(true);
-    } else {
-      setIsMaxPosition(false);
-    }
-  }, [marginAccountList, max_active_user_margin_position]);
 
   const isValidDecimalString = (str) => {
     if (str <= 0) return false;
@@ -198,33 +422,12 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
     const regex = /^\d+(\.\d+)?$/;
     return regex.test(str);
   };
-  // pools end
-
-  // get cate1 amount start
-  const [tokenInAmount, setTokenInAmount] = useState<number>(0);
-  const [LiqPrice, setLiqPrice] = useState<string>("");
-  const [forceUpdate, setForceUpdate] = useState<number>(0);
-  const estimateData = useEstimateSwap({
-    tokenIn_id:
-      activeTab === "long" ? ReduxcategoryAssets2?.token_id : ReduxcategoryAssets1?.token_id,
-    tokenOut_id:
-      activeTab === "long" ? ReduxcategoryAssets1?.token_id : ReduxcategoryAssets2?.token_id,
-    tokenIn_amount: toDecimal(tokenInAmount),
-    account_id: accountId,
-    simplePools,
-    stablePools,
-    stablePoolsDetail,
-    slippageTolerance: slippageTolerance / 100,
-    forceUpdate,
-  });
-
   // long & short input change fn.
   const inputPriceChange = _.debounce((newValue: string) => {
     // eslint-disable-next-line no-unused-expressions
     activeTab === "long" ? setLongInput(newValue) : setShortInput(newValue);
   }, 10);
   let lastValue = "";
-
   // validate input
   const isValidInput = (value: string): boolean => {
     if (value === "") return true;
@@ -234,7 +437,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
     if (Number.isNaN(num)) return false;
     return true;
   };
-
   // handle input change
   const tokenChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -264,178 +466,14 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
 
     lastValue = value;
   };
-
-  /**
-   * longInput shortInput deal start
-   *  */
-  useEffect(() => {
-    const inputUsdCharcate1 = getAssetPrice(ReduxcategoryAssets1);
-    const inputUsdCharcate2 = getAssetPrice(ReduxcategoryAssets2);
-    if (inputUsdCharcate1 && estimateData) {
-      updateOutput(activeTab, inputUsdCharcate1);
-    }
-
-    if (inputUsdCharcate2) {
-      updateInputAmounts(activeTab, inputUsdCharcate2, inputUsdCharcate1);
-    }
-  }, [
-    longInput,
-    shortInput,
-    rangeMount,
-    estimateData,
-    slippageTolerance,
-    forceUpdate,
-    tokenInAmount,
-    activeTab, // Add activeTab to dependencies if needed
-    ReduxcategoryAssets1,
-  ]);
-  // update liq price for long
-  useDebounce(
-    () => {
-      if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
-        if (
-          activeTab == "long" &&
-          +(longInput || 0) > 0 &&
-          // rangeMount > 1 &&
-          (longOutput || 0) > 0
-        ) {
-          const safetyBufferFactor = 1 - min_safety_buffer / 10000;
-          const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
-          const token_c_value = new Decimal(longInput).mul(assetPrice || 0);
-          const token_d_value = token_c_value.mul(rangeMount || 0);
-          const liqPriceX = token_d_value
-            .div(safetyBufferFactor)
-            .minus(token_c_value)
-            .div(longOutput)
-            .toFixed();
-          setLiqPrice(liqPriceX || "0");
-        }
-        setEstimateLoading(false);
-      }
-    },
-    200,
-    [activeTab, longOutput, longInput],
-  );
-  // update liq price for short
-  useDebounce(
-    () => {
-      if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
-        if (
-          // rangeMount > 1 &&
-          activeTab === "short" &&
-          +(shortInput || 0) > 0 &&
-          +(estimateData.amount_out || 0) > 0 &&
-          +(shortOutput || 0) > 0
-        ) {
-          const safetyBufferFactor = 1 - min_safety_buffer / 10000;
-          const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
-          const token_c_value = new Decimal(shortInput).mul(assetPrice || 0);
-          const token_p_value = new Decimal(estimateData.amount_out).mul(assetPrice || 0);
-          const liqPriceX = new Decimal(token_c_value)
-            .plus(token_p_value)
-            .mul(safetyBufferFactor)
-            .div(shortOutput);
-          setLiqPrice(liqPriceX.toFixed());
-        }
-        setEstimateLoading(false);
-      }
-      setForceUpdateLoading(!estimateData?.loadingComplete);
-    },
-    200,
-    [estimateData, activeTab, shortOutput, shortInput],
-  );
-
-  // interval refresh price
-  const [lastTokenInAmount, setLastTokenInAmount] = useState(0);
-
-  // update price and make refresh icon spin
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (tokenInAmount === lastTokenInAmount && longInput) {
-        setTokenInAmount((prev) => prev);
-        setForceUpdate((prev) => prev + 1);
-        setForceUpdateLoading(true);
-      } else {
-        setLastTokenInAmount(tokenInAmount);
-      }
-    }, 20_000);
-
-    return () => clearInterval(interval);
-  }, [tokenInAmount, lastTokenInAmount]);
-
-  // for same input, estimateLoading or forceUpdateLoading is true
-  useEffect(() => {
-    if (forceUpdateLoading) {
-      const timer = setTimeout(() => {
-        setForceUpdateLoading(false);
-      }, 4000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [forceUpdateLoading]);
-
-  useEffect(() => {
-    if (estimateLoading) {
-      const timer = setTimeout(() => {
-        setEstimateLoading(false);
-      }, 4000); // 3 seconds
-
-      return () => clearTimeout(timer); // Cleanup the timer on component unmount or when estimateLoading changes
-    }
-  }, [estimateLoading]);
-  const Fee = useMemo(() => {
-    return {
-      openPFee:
-        ((Number(longInput || shortInput) * config.open_position_fee_rate) / 10000) *
-        (ReduxcategoryAssets2?.price?.usd || 1),
-      swapFee:
-        ((estimateData?.fee ?? 0) / 10000) *
-        Number(tokenInAmount) *
-        (activeTab == "long"
-          ? getAssetPrice(ReduxcategoryAssets2) || 0
-          : getAssetPrice(ReduxcategoryAssets1) || 0),
-      price: getAssetPrice(ReduxcategoryAssets1),
-    };
-  }, [longInput, shortInput, ReduxcategoryAssets1, estimateData, tokenInAmount]);
-
-  useEffect(() => {
-    if (selectedSetUpOption === "custom" && customInputRef.current) {
-      customInputRef.current.focus();
-    }
-  }, [selectedSetUpOption]);
-  //  whether the collateral is too small
-  const [longInputTooSmall, shortInputTooSmall] = useMemo(() => {
-    return [longInputUsd < MARGIN_MIN_COLLATERAL_USD, shortInputUsd < MARGIN_MIN_COLLATERAL_USD];
-  }, [longInputUsd, shortInputUsd]);
-  // long tip
-  const tip_leverage = "Leverage must be greater than 1";
-  const tip_usd = `Deposit at least $${MARGIN_MIN_COLLATERAL_USD}`;
-  const longTip = useMemo(() => {
-    if (accountId && longOutput > 0) {
-      if (rangeMount <= 1) return tip_leverage;
-      else if (longInputTooSmall) return tip_usd;
-    }
-    return "";
-  }, [rangeMount, accountId, longOutput, longInputTooSmall]);
-  // short tip
-  const shortTip = useMemo(() => {
-    if (accountId && shortOutput > 0) {
-      if (rangeMount <= 1) return tip_leverage;
-      else if (shortInputTooSmall) return tip_usd;
-    }
-    return "";
-  }, [rangeMount, accountId, shortOutput, shortInputTooSmall]);
-
   const handleMouseEnter = () => {
     if (selectedSetUpOption === "custom" && customInputRef.current) {
       customInputRef.current.focus();
     }
   };
-
   function getAssetPrice(categoryId) {
     return categoryId ? combinedAssetsData[categoryId["token_id"]]?.price?.usd : 0;
   }
-
   function updateOutput(tab: string, inputUsdCharcate: number) {
     /**
      * @param inputUsdCharcate  category1 current price
@@ -460,7 +498,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       outputUsdSetter(inputUsdCharcate * tokenInAmount);
     }
   }
-
   function updateInputAmounts(tab, inputUsdCharcate2, inputUsdCharcate1) {
     /**
      * @param inputUsdCharcate2  category2 current price
@@ -481,27 +518,50 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       setTokenInAmount(adjustedInputAmount / inputUsdCharcate1);
     }
   }
-
-  // end
-
   function formatNumber(value, len) {
-    let formattedValue = value.toFixed(len); //
+    let formattedValue = value.toFixed(len);
     if (formattedValue.endsWith(".00")) {
-      //
       formattedValue = formattedValue.substring(0, formattedValue.length - 3);
     } else if (formattedValue.endsWith("0")) {
-      // 0
       formattedValue = formattedValue.substring(0, formattedValue.length - 1);
     }
     return formattedValue;
   }
-
   const formatDecimal = (value: number) => {
     if (!value) return "0";
-    //
     return value.toFixed(6).replace(/\.?0+$/, "");
   };
-
+  function getBorrowLimit(assetDebt: Asset, debt_amount: number) {
+    const assetsMap = isMainStream ? assets.data : assetsMEME.data;
+    const asset = assetsMap[assetDebt.token_id];
+    const temp1 = new Decimal(asset.supplied.balance)
+      .plus(new Decimal(asset.reserved))
+      .plus(asset.prot_fee)
+      .minus(new Decimal(asset.borrowed.balance || 0))
+      .minus(new Decimal(asset.margin_debt.balance || 0))
+      .minus(new Decimal(asset.margin_pending_debt || 0));
+    const temp2 = temp1.minus(temp1.mul(0.001)).toFixed(0);
+    const availableLiquidity = Number(
+      shrinkToken(temp2, asset.metadata.decimals + asset.config.extra_decimals),
+    );
+    // asset.config.min_borrowed_amount;
+    if (new Decimal(debt_amount || 0).gte(availableLiquidity || 0)) {
+      return {
+        isExceed: true,
+        availableLiquidity,
+      };
+    }
+    if (new Decimal(asset.config.min_borrowed_amount || 0).gt(0)) {
+      const asset_decimals = asset.metadata.decimals + asset.config.extra_decimals;
+      const debt_amount_decimals = expandToken(debt_amount, asset_decimals);
+      if (new Decimal(debt_amount_decimals).lte(asset.config.min_borrowed_amount || 0)) {
+        return {
+          lowLoanLimit: true,
+          lowAmount: shrinkToken(asset.config.min_borrowed_amount || 0, asset_decimals),
+        };
+      }
+    }
+  }
   return (
     <div className="lg:w-full pt-4 lg:px-4 pb-9">
       <div className="flex justify-between items-center">
@@ -595,287 +655,273 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
         {/* slip end */}
       </div>
       <div className="mt-5">
-        {activeTab === "long" && (
-          <>
-            <div className="relative bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-30">
-              <input
-                onChange={tokenChange}
-                type="text"
-                value={longInput}
-                placeholder="0"
-                className="lg:max-w-[60%]"
+        <div className={`${activeTab == "long" ? "" : "hidden"}`}>
+          <div className="relative bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-30">
+            <input
+              onChange={tokenChange}
+              type="text"
+              value={longInput}
+              placeholder="0"
+              className="lg:max-w-[60%]"
+            />
+            <div className="absolute top-2 right-2">
+              <TradingToken
+                setOwnBanlance={setOwnBanlance}
+                tokenList={isMainStream ? categoryAssets2 : categoryAssets2MEME}
+                type="cate2"
+                isMemeCategory={!isMainStream}
+                setForceUpdate={() => setForceUpdate((prev) => prev + 1)}
               />
-              <div className="absolute top-2 right-2">
-                <TradingToken
-                  setOwnBanlance={setOwnBanlance}
-                  tokenList={isMainStream ? categoryAssets2 : categoryAssets2MEME}
-                  type="cate2"
-                  isMemeCategory={!isMainStream}
-                  setForceUpdate={() => setForceUpdate((prev) => prev + 1)}
-                />
-              </div>
-              <p className="text-gray-300 mt-2 text-xs">${longInputUsd.toFixed(2)}</p>
             </div>
-            <div className="relative my-2.5 flex justify-end z-0 w-1/2" style={{ zoom: "2" }}>
-              <ShrinkArrow />
-            </div>
-            <div className="relative bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-20">
-              {/* long out  */}
-              <div>{longOutput && beautifyPrice(Number(longOutput))}</div>
-              {/*  */}
-              <div className="absolute top-2 right-2">
-                <TradingToken
-                  tokenList={isMainStream ? categoryAssets1 : categoryAssets1MEME}
-                  type="cate1"
-                  isMemeCategory={!isMainStream}
-                />
-              </div>
-              <p className="text-gray-300 mt-2 text-xs">
-                ${longOutputUsd && formatNumber(Number(longOutputUsd), 2)}
-              </p>
-            </div>
-            <RangeSlider defaultValue={rangeMount} action="Long" setRangeMount={setRangeMount} />
-            <div className="mt-5">
-              <div className="flex items-center justify-between text-sm mb-4">
-                <div className="text-gray-300">Position Size</div>
-                <div className="text-right">
-                  {beautifyPrice(longOutput)} {cateSymbol}
-                  <span className="text-xs text-gray-300 ml-1.5">
-                    (${beautifyPrice(longOutputUsd)})
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between text-sm mb-4">
-                <div className="text-gray-300">Minimum received</div>
-                <div className="text-right">
-                  {beautifyPrice(Number(longOutput) * (1 - slippageTolerance / 100))} {cateSymbol}
-                </div>
-              </div>
-              <div className="flex items-center justify-between text-sm mb-4">
-                <div className="text-gray-300">Liq. Price</div>
-                <div>
-                  {estimateLoading ? (
-                    <BeatLoader size={5} color="white" />
-                  ) : (
-                    <span>${beautifyPrice(LiqPrice)}</span>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center justify-between text-sm mb-4">
-                <div className="text-gray-300">Fee</div>
-                <div className="flex items-center justify-center relative">
-                  <p
-                    className="border-b border-dashed border-dark-800 cursor-pointer"
-                    onMouseEnter={() => setShowFeeModal(true)}
-                    onMouseLeave={() => setShowFeeModal(false)}
-                  >
-                    ${beautifyPrice(Number(formatDecimal(Fee.swapFee + Fee.openPFee)))}
-                  </p>
-
-                  {showFeeModal && (
-                    <div className="absolute bg-[#14162B] text-white min-h-[50px] p-2 rounded text-xs top-[30px] left-[-60px] flex flex-col items-start justify-between z-[1] w-auto">
-                      <p>
-                        <span className="mr-1 whitespace-nowrap">Open Fee:</span>$
-                        {beautifyPrice(Fee.openPFee)}
-                      </p>
-                      <p>
-                        <span className="mr-1 whitespace-nowrap">Trade Fee:</span>$
-                        {beautifyPrice(Fee.swapFee)}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {isMaxPosition && accountId && (
-                <div className=" text-[#EA3F68] text-sm font-normal flex items-start my-1">
-                  <MaxPositionIcon />
-                  <span className="ml-1">Exceeded the maximum number of open positions.</span>
-                </div>
-              )}
-              {longTip && (
-                <span className="text-[#EA3F68] text-sm font-normal flex items-start mb-1">
-                  {longTip}
-                </span>
-              )}
-              {accountId ? (
-                <YellowSolidButton
-                  className="w-full"
-                  disabled={isDisabled || isMaxPosition || longInputTooSmall}
-                  onClick={handleConfirmButtonClick}
-                >
-                  Long {cateSymbol} {rangeMount}x
-                </YellowSolidButton>
-              ) : (
-                <ConnectWalletButton accountId={accountId} className="w-full" />
-              )}
-              {isConfirmModalOpen && (
-                <ConfirmMobile
-                  open={isConfirmModalOpen}
-                  onClose={() => {
-                    setIsConfirmModalOpen(false);
-                    if (onMobileClose) onMobileClose();
-                  }}
-                  action="Long"
-                  confirmInfo={{
-                    longInput,
-                    longInputUsd,
-                    longOutput,
-                    longOutputUsd,
-                    rangeMount,
-                    estimateData,
-                    longInputName: ReduxcategoryAssets2,
-                    longOutputName: ReduxcategoryAssets1,
-                    assets: isMainStream ? assets : assetsMEME,
-                    tokenInAmount,
-                    LiqPrice,
-                    Fee,
-                  }}
-                />
-              )}
-            </div>
-          </>
-        )}
-        {activeTab === "short" && (
-          <>
-            <div className="relative bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-30">
-              <input
-                onChange={tokenChange}
-                type="text"
-                value={shortInput}
-                placeholder="0"
-                className="lg:max-w-[60%]"
+            <p className="text-gray-300 mt-2 text-xs">${longInputUsd.toFixed(2)}</p>
+          </div>
+          <div className="relative my-2.5 flex justify-end z-0 w-1/2" style={{ zoom: "2" }}>
+            <ShrinkArrow />
+          </div>
+          <div className="relative bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-20">
+            {/* long out  */}
+            <div>{longOutput && beautifyPrice(Number(longOutput))}</div>
+            {/*  */}
+            <div className="absolute top-2 right-2">
+              <TradingToken
+                tokenList={isMainStream ? categoryAssets1 : categoryAssets1MEME}
+                type="cate1"
+                isMemeCategory={!isMainStream}
               />
-              <div className="absolute top-2 right-2">
-                <TradingToken
-                  setOwnBanlance={setOwnBanlance}
-                  tokenList={isMainStream ? categoryAssets2 : categoryAssets2MEME}
-                  type="cate2"
-                  isMemeCategory={!isMainStream}
-                  setForceUpdate={() => setForceUpdate((prev) => prev + 1)}
-                />
-              </div>
-              <p className="text-gray-300 mt-2 text-xs">${shortInputUsd.toFixed(2)}</p>
             </div>
-            <div className="relative my-2.5 flex justify-end z-0 w-1/2" style={{ zoom: "2" }}>
-              <ShrinkArrow />
-            </div>
-            <div className="relative bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-20">
-              {/* short out */}
-              <div>{shortOutput && beautifyPrice(Number(shortOutput))}</div>
-              {/*  */}
-              <div className="absolute top-2 right-2">
-                <TradingToken
-                  tokenList={isMainStream ? categoryAssets1 : categoryAssets1MEME}
-                  type="cate1"
-                  isMemeCategory={!isMainStream}
-                />
-              </div>
-              <p className="text-gray-300 mt-2 text-xs">
-                ${shortOutputUsd && formatNumber(Number(shortOutputUsd), 2)}
-              </p>
-            </div>
-            <RangeSlider defaultValue={rangeMount} action="Short" setRangeMount={setRangeMount} />
-            <div className="mt-5">
-              <div className="flex items-center justify-between text-sm mb-4">
-                <div className="text-gray-300">Position Size</div>
-                <div className="text-right">
-                  {beautifyPrice(shortOutput)} {cateSymbol}
-                  <span className="text-xs text-gray-300 ml-1.5">
-                    (${beautifyPrice(shortOutputUsd)})
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between text-sm mb-4">
-                <div className="text-gray-300">Minimum received</div>
-                <div className="text-right">
-                  {beautifyPrice(Number(shortOutput) * (1 - slippageTolerance / 100))} {cateSymbol}
-                </div>
-              </div>
-              <div className="flex items-center justify-between text-sm mb-4">
-                <div className="text-gray-300">Liq. Price</div>
-                <div>
-                  {estimateLoading ? (
-                    <BeatLoader size={5} color="white" />
-                  ) : (
-                    <span>${beautifyPrice(LiqPrice)}</span>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center justify-between text-sm mb-4">
-                <div className="text-gray-300">Fee</div>
-                <div className="flex items-center justify-center relative">
-                  <p
-                    className="border-b border-dashed border-dark-800 cursor-pointer"
-                    onMouseEnter={() => setShowFeeModal(true)}
-                    onMouseLeave={() => setShowFeeModal(false)}
-                  >
-                    ${beautifyPrice(Number(formatDecimal(Fee.swapFee + Fee.openPFee)))}
-                  </p>
-                  {showFeeModal && (
-                    <div className="absolute bg-[#14162B] text-white h-[50px] p-2 rounded text-xs top-[30px] left-[-60px] flex flex-col items-start justify-between z-[1] w-auto">
-                      <p>
-                        <span className="mr-1 whitespace-nowrap">Open Fee:</span>$
-                        {beautifyPrice(Fee.openPFee)}
-                      </p>
-                      <p>
-                        <span className="mr-1 whitespace-nowrap">Trade Fee:</span>$
-                        {beautifyPrice(Fee.swapFee)}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-              {isMaxPosition && accountId && (
-                <div className=" text-[#EA3F68] text-sm font-normal flex items-start my-1">
-                  <MaxPositionIcon />
-                  <span className="ml-1">Exceeded the maximum number of open positions.</span>
-                </div>
-              )}
-              {shortTip && (
-                <span className="text-[#EA3F68] text-sm font-normal flex items-start mb-1">
-                  {shortTip}
+            <p className="text-gray-300 mt-2 text-xs">
+              ${longOutputUsd && formatNumber(Number(longOutputUsd), 2)}
+            </p>
+          </div>
+          <RangeSlider defaultValue={rangeMount} action="Long" setRangeMount={setRangeMount} />
+          <div className="mt-5">
+            <div className="flex items-center justify-between text-sm mb-4">
+              <div className="text-gray-300">Position Size</div>
+              <div className="text-right">
+                {beautifyPrice(longOutput)} {cateSymbol}
+                <span className="text-xs text-gray-300 ml-1.5">
+                  (${beautifyPrice(longOutputUsd)})
                 </span>
-              )}
-              {accountId ? (
-                <RedSolidButton
-                  className="w-full"
-                  disabled={isDisabled || isMaxPosition}
-                  onClick={handleConfirmButtonClick}
-                >
-                  Short {cateSymbol} {rangeMount}x
-                </RedSolidButton>
-              ) : (
-                <ConnectWalletButton accountId={accountId} className="w-full" isShort />
-              )}
-              {isConfirmModalOpen && (
-                <ConfirmMobile
-                  open={isConfirmModalOpen}
-                  onClose={() => {
-                    setIsConfirmModalOpen(false);
-                    if (onMobileClose) onMobileClose();
-                  }}
-                  action="Short"
-                  confirmInfo={{
-                    longInput: shortInput,
-                    longInputUsd: shortInputUsd,
-                    longOutput: shortOutput,
-                    longOutputUsd: shortOutputUsd,
-                    rangeMount,
-                    estimateData,
-                    longInputName: ReduxcategoryAssets2,
-                    longOutputName: ReduxcategoryAssets1,
-                    assets: isMainStream ? assets : assetsMEME,
-                    tokenInAmount,
-                    LiqPrice,
-                    Fee,
-                  }}
-                />
-              )}
+              </div>
             </div>
-          </>
-        )}
+
+            <div className="flex items-center justify-between text-sm mb-4">
+              <div className="text-gray-300">Minimum received</div>
+              <div className="text-right">
+                {beautifyPrice(Number(longOutput) * (1 - slippageTolerance / 100))} {cateSymbol}
+              </div>
+            </div>
+            <div className="flex items-center justify-between text-sm mb-4">
+              <div className="text-gray-300">Liq. Price</div>
+              <div>
+                {estimateLoading ? (
+                  <BeatLoader size={5} color="white" />
+                ) : (
+                  <span>${beautifyPrice(LiqPrice)}</span>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center justify-between text-sm mb-4">
+              <div className="text-gray-300">Fee</div>
+              <div className="flex items-center justify-center relative">
+                <p
+                  className="border-b border-dashed border-dark-800 cursor-pointer"
+                  onMouseEnter={() => setShowFeeModal(true)}
+                  onMouseLeave={() => setShowFeeModal(false)}
+                >
+                  ${beautifyPrice(Number(formatDecimal(Fee.swapFee + Fee.openPFee)))}
+                </p>
+
+                {showFeeModal && (
+                  <div className="absolute bg-[#14162B] text-white min-h-[50px] p-2 rounded text-xs top-[30px] left-[-60px] flex flex-col items-start justify-between z-[1] w-auto">
+                    <p>
+                      <span className="mr-1 whitespace-nowrap">Open Fee:</span>$
+                      {beautifyPrice(Fee.openPFee)}
+                    </p>
+                    <p>
+                      <span className="mr-1 whitespace-nowrap">Trade Fee:</span>$
+                      {beautifyPrice(Fee.swapFee)}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+            {warnTip ? (
+              <div className="text-[#EA3F68] text-sm font-normal flex items-start my-2.5">
+                <MaxPositionIcon className="flex-shrink-0 mt-0.5" />
+                <span className="ml-1">{warnTip}</span>
+              </div>
+            ) : null}
+
+            {accountId ? (
+              <YellowSolidButton
+                className="w-full"
+                disabled={isDisabled || !!warnTip}
+                onClick={handleConfirmButtonClick}
+              >
+                Long {cateSymbol} {rangeMount}x
+              </YellowSolidButton>
+            ) : (
+              <ConnectWalletButton accountId={accountId} className="w-full" />
+            )}
+            {isConfirmModalOpen && (
+              <ConfirmMobile
+                open={isConfirmModalOpen}
+                onClose={() => {
+                  setIsConfirmModalOpen(false);
+                  if (onMobileClose) onMobileClose();
+                }}
+                action="Long"
+                confirmInfo={{
+                  longInput,
+                  longInputUsd,
+                  longOutput,
+                  longOutputUsd,
+                  rangeMount,
+                  estimateData,
+                  longInputName: ReduxcategoryAssets2,
+                  longOutputName: ReduxcategoryAssets1,
+                  assets: isMainStream ? assets : assetsMEME,
+                  tokenInAmount,
+                  LiqPrice,
+                  Fee,
+                }}
+              />
+            )}
+          </div>
+        </div>
+        <div className={`${activeTab === "short" ? "" : "hidden"}`}>
+          <div className="relative bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-30">
+            <input
+              onChange={tokenChange}
+              type="text"
+              value={shortInput}
+              placeholder="0"
+              className="lg:max-w-[60%]"
+            />
+            <div className="absolute top-2 right-2">
+              <TradingToken
+                setOwnBanlance={setOwnBanlance}
+                tokenList={isMainStream ? categoryAssets2 : categoryAssets2MEME}
+                type="cate2"
+                isMemeCategory={!isMainStream}
+                setForceUpdate={() => setForceUpdate((prev) => prev + 1)}
+              />
+            </div>
+            <p className="text-gray-300 mt-2 text-xs">${shortInputUsd.toFixed(2)}</p>
+          </div>
+          <div className="relative my-2.5 flex justify-end z-0 w-1/2" style={{ zoom: "2" }}>
+            <ShrinkArrow />
+          </div>
+          <div className="relative bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-20">
+            {/* short out */}
+            <div>{shortOutput && beautifyPrice(Number(shortOutput))}</div>
+            {/*  */}
+            <div className="absolute top-2 right-2">
+              <TradingToken
+                tokenList={isMainStream ? categoryAssets1 : categoryAssets1MEME}
+                type="cate1"
+                isMemeCategory={!isMainStream}
+              />
+            </div>
+            <p className="text-gray-300 mt-2 text-xs">
+              ${shortOutputUsd && formatNumber(Number(shortOutputUsd), 2)}
+            </p>
+          </div>
+          <RangeSlider defaultValue={rangeMount} action="Short" setRangeMount={setRangeMount} />
+          <div className="mt-5">
+            <div className="flex items-center justify-between text-sm mb-4">
+              <div className="text-gray-300">Position Size</div>
+              <div className="text-right">
+                {beautifyPrice(shortOutput)} {cateSymbol}
+                <span className="text-xs text-gray-300 ml-1.5">
+                  (${beautifyPrice(shortOutputUsd)})
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center justify-between text-sm mb-4">
+              <div className="text-gray-300">Minimum received</div>
+              <div className="text-right">
+                {beautifyPrice(Number(shortOutput) * (1 - slippageTolerance / 100))} {cateSymbol}
+              </div>
+            </div>
+            <div className="flex items-center justify-between text-sm mb-4">
+              <div className="text-gray-300">Liq. Price</div>
+              <div>
+                {estimateLoading ? (
+                  <BeatLoader size={5} color="white" />
+                ) : (
+                  <span>${beautifyPrice(LiqPrice)}</span>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center justify-between text-sm mb-4">
+              <div className="text-gray-300">Fee</div>
+              <div className="flex items-center justify-center relative">
+                <p
+                  className="border-b border-dashed border-dark-800 cursor-pointer"
+                  onMouseEnter={() => setShowFeeModal(true)}
+                  onMouseLeave={() => setShowFeeModal(false)}
+                >
+                  ${beautifyPrice(Number(formatDecimal(Fee.swapFee + Fee.openPFee)))}
+                </p>
+                {showFeeModal && (
+                  <div className="absolute bg-[#14162B] text-white h-[50px] p-2 rounded text-xs top-[30px] left-[-60px] flex flex-col items-start justify-between z-[1] w-auto">
+                    <p>
+                      <span className="mr-1 whitespace-nowrap">Open Fee:</span>$
+                      {beautifyPrice(Fee.openPFee)}
+                    </p>
+                    <p>
+                      <span className="mr-1 whitespace-nowrap">Trade Fee:</span>$
+                      {beautifyPrice(Fee.swapFee)}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+            {warnTip ? (
+              <div className="text-[#EA3F68] text-sm font-normal flex items-start my-2.5">
+                <MaxPositionIcon className="flex-shrink-0 mt-0.5" />
+                <span className="ml-1">{warnTip}</span>
+              </div>
+            ) : null}
+            {accountId ? (
+              <RedSolidButton
+                className="w-full"
+                disabled={isDisabled || !!warnTip}
+                onClick={handleConfirmButtonClick}
+              >
+                Short {cateSymbol} {rangeMount}x
+              </RedSolidButton>
+            ) : (
+              <ConnectWalletButton accountId={accountId} className="w-full" isShort />
+            )}
+            {isConfirmModalOpen && (
+              <ConfirmMobile
+                open={isConfirmModalOpen}
+                onClose={() => {
+                  setIsConfirmModalOpen(false);
+                  if (onMobileClose) onMobileClose();
+                }}
+                action="Short"
+                confirmInfo={{
+                  longInput: shortInput,
+                  longInputUsd: shortInputUsd,
+                  longOutput: shortOutput,
+                  longOutputUsd: shortOutputUsd,
+                  rangeMount,
+                  estimateData,
+                  longInputName: ReduxcategoryAssets2,
+                  longOutputName: ReduxcategoryAssets1,
+                  assets: isMainStream ? assets : assetsMEME,
+                  tokenInAmount,
+                  LiqPrice,
+                  Fee,
+                }}
+              />
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

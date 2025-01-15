@@ -13,6 +13,7 @@ export interface IAssetConfig {
   can_borrow: boolean;
   net_tvl_multiplier: number;
   holding_position_fee_rate: string;
+  min_borrowed_amount?: string;
 }
 
 export interface IAssetEntry {
