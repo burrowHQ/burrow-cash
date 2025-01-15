@@ -87,7 +87,18 @@ const MarginTrading = () => {
             className="text-white text-center bg-dark-100 px-5 pt-9 pb-7 rounded-md border border-dark-300"
             style={{ width: "278px" }}
           >
-            <div className="mb-4 text-gray-300 h4">Account is not whitelist.</div>
+            <div className="mb-4 text-gray-300 h4">
+              Tradoors? It's beta version,{" "}
+              <span
+                className="cursor-pointer text-primary"
+                onClick={() => {
+                  router.push("https://forms.gle/kEsoobXU8u55Fp8x7");
+                }}
+              >
+                submit whitelist
+              </span>{" "}
+              form and come back in 24h
+            </div>
             <div
               onClick={() => router.push("/")}
               className="text-primary h4 underline cursor-pointer"

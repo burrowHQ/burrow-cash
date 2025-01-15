@@ -111,6 +111,8 @@ export const MARGIN_WHITELIST = [
   "0xg1enn.near",
   "bobbypack.near",
   "itsmarcus.near",
+  "fc948c6698f446df71b438821b6b7d69df5ce8150c4ada62ebd84abcc771f468",
+  "zerobot.near",
 ];
 export const DISABLE_WITHDRAW_ADDRESS = "bc1p";
 const getConfig = (env: string = defaultNetwork) => {

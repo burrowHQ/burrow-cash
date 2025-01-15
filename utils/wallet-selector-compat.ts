@@ -153,15 +153,19 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
   } catch (error) {}
   selector = await setupWalletSelector({
     modules: [
+      setupMeteorWallet(),
       setupEthereumWallets({
         wagmiConfig,
         web3Modal,
         alwaysOnboardDuringSignIn: true,
       } as any),
-      setupOKXWallet({}),
+      setupBTCWallet({
+        autoConnect: true,
+        env: "private_mainnet",
+      }) as any,
       myNearWallet,
+      setupOKXWallet({}),
       setupSender() as any,
-      setupMeteorWallet(),
       walletConnect2,
       setupNearMobileWallet({
         dAppMetadata: {
@@ -171,10 +175,6 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
       }),
       setupHereWallet(),
       setupNightly(),
-      setupNeth({
-        bundle: false,
-        gas: "300000000000000",
-      }),
       setupKeypom({
         networkId: defaultNetwork,
         signInContractId: LOGIC_CONTRACT_NAME,
@@ -198,10 +198,6 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         deprecated: false,
       }),
       setupCoin98Wallet(),
-      setupBTCWallet({
-        autoConnect: true,
-        env: "private_mainnet",
-      }) as any,
     ],
     network: {
       networkId: defaultNetwork,

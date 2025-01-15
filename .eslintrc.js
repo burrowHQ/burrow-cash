@@ -84,6 +84,7 @@ module.exports = {
     "no-await-in-loop": "off",
     "no-lonely-if": "off",
     "react/jsx-boolean-value": "off",
+    "react/no-unescaped-entities": "off",
   },
   settings: {
     react: {
