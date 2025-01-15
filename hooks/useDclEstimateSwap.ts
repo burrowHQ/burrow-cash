@@ -76,6 +76,21 @@ export const useDclEstimateSwap = ({
     const fulfilledEstimates = estimatesResult.filter((res) => res.status == "fulfilled");
     const estimates = fulfilledEstimates.map((r) => r.value);
     const bestEstimate: IQuoteResult = _.maxBy(estimates, (e) => Number(e.amount))!;
+    if (!bestEstimate) {
+      setEstimateData({
+        expand_amount_in: "0",
+        amount_out: "0",
+        min_amount_out: "0",
+        swap_indication: {
+          dex_id: "",
+          swap_action_text: "",
+        },
+        fee: 0,
+        tag: `${tokenIn_id}@${tokenOut_id}@${tokenIn_amount}`,
+        from: "dcl",
+      });
+      return;
+    }
     const dexMap = get_registered_dexes();
     const dex = dexMap["2"];
     const min_output_amount = new Decimal(1 - slippageTolerance || 0)
