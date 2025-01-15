@@ -47,6 +47,9 @@ const getBalance = async (
           account_id: accountId,
         },
       )) as string;
+      if (tokenId == "nbtc.toalice.near") {
+        return Decimal.max(new Decimal(balanceInYocto || 0).minus(1000), "0").toFixed();
+      }
     }
     return balanceInYocto;
   } catch (err: any) {
