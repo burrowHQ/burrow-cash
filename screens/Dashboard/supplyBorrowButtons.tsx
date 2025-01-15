@@ -8,6 +8,8 @@ import CustomButton from "../../components/CustomButton/CustomButton";
 import { ArrowUpIcon } from "../../components/Icons/Icons";
 import { isMemeCategory } from "../../redux/categorySelectors";
 import { useAppSelector } from "../../redux/hooks";
+import { useAccountId } from "../../hooks/hooks";
+import { DISABLE_WITHDRAW_ADDRESS } from "../../utils/config";
 
 export const MarketButton = ({
   tokenId,
@@ -33,10 +35,14 @@ export const MarketButton = ({
 
 export const WithdrawButton = ({ tokenId }) => {
   const handleWithdrawClick = useWithdrawTrigger(tokenId);
+  const accountId = useAccountId();
+  const isWithdrawDisabled = accountId?.startsWith(DISABLE_WITHDRAW_ADDRESS);
   return (
     <CustomButton
-      className="flex-1 flex items-center justify-center border border-primary border-opacity-60 cursor-pointer rounded-md text-base md:text-sm  text-primary bg-primary hover:opacity-80 bg-opacity-5 py-1"
+      className="flex-1 flex items-center justify-center border border-primary border-opacity-60 rounded-md text-base md:text-sm  text-primary bg-primary hover:opacity-80 bg-opacity-5 py-1"
       onClick={handleWithdrawClick}
+      disabled={isWithdrawDisabled}
+      style={{ cursor: isWithdrawDisabled ? "not-allowed" : "pointer" }}
     >
       Withdraw
     </CustomButton>

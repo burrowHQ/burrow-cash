@@ -112,6 +112,7 @@ export const MARGIN_WHITELIST = [
   "bobbypack.near",
   "itsmarcus.near",
 ];
+export const DISABLE_WITHDRAW_ADDRESS = "bc1p";
 const getConfig = (env: string = defaultNetwork) => {
   const RPC_LIST = getRpcList();
   let endPoint = "defaultRpc";
