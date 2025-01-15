@@ -57,7 +57,8 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
   const [activeTab, setActiveTab] = useState<string>(ReduxActiveTab || "long");
   const [estimateLoading, setEstimateLoading] = useState<boolean>(false);
   const [selectedSetUpOption, setSelectedSetUpOption] = useState<string>("custom");
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
+  const [isLongConfirmModalOpen, setIsLongConfirmModalOpen] = useState<boolean>(false);
+  const [isShortConfirmModalOpen, setIsShortConfirmModalOpen] = useState<boolean>(false);
   const [rangeMount, setRangeMount] = useState<number>(ReduxRangeMount || 1);
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [longInput, setLongInput] = useState<string>("");
@@ -353,8 +354,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       shortInput,
     ],
   );
-  console.log("-----------ReduxcategoryAssets1", ReduxcategoryAssets1);
-
   const setOwnBanlance = (key: string) => {
     if (activeTab === "long") {
       setLongInput(key);
@@ -413,7 +412,11 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
   // open position btn click eve.
   const handleConfirmButtonClick = () => {
     if (isDisabled) return;
-    setIsConfirmModalOpen(true);
+    if (activeTab == "long") {
+      setIsLongConfirmModalOpen(true);
+    } else if (activeTab == "short") {
+      setIsShortConfirmModalOpen(true);
+    }
   };
 
   const isValidDecimalString = (str) => {
@@ -490,7 +493,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       setLiqPrice("");
       setTokenInAmount(0);
     } else if (tab === "long") {
-      console.log("......", estimateData?.amount_out);
       outputSetter(+(estimateData?.amount_out || 0));
       outputUsdSetter(inputUsdCharcate * +(estimateData?.amount_out || 0));
     } else if (tab === "short") {
@@ -764,11 +766,11 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             ) : (
               <ConnectWalletButton accountId={accountId} className="w-full" />
             )}
-            {isConfirmModalOpen && (
+            {isLongConfirmModalOpen && (
               <ConfirmMobile
-                open={isConfirmModalOpen}
+                open={isLongConfirmModalOpen}
                 onClose={() => {
-                  setIsConfirmModalOpen(false);
+                  setIsLongConfirmModalOpen(false);
                   if (onMobileClose) onMobileClose();
                 }}
                 action="Long"
@@ -896,11 +898,11 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             ) : (
               <ConnectWalletButton accountId={accountId} className="w-full" isShort />
             )}
-            {isConfirmModalOpen && (
+            {isShortConfirmModalOpen && (
               <ConfirmMobile
-                open={isConfirmModalOpen}
+                open={isShortConfirmModalOpen}
                 onClose={() => {
-                  setIsConfirmModalOpen(false);
+                  setIsShortConfirmModalOpen(false);
                   if (onMobileClose) onMobileClose();
                 }}
                 action="Short"
