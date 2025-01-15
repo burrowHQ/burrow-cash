@@ -315,7 +315,7 @@ const YourSupplied = ({
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
           <div className="absolute" style={{ left: 0, top: 0 }}>
-            {assets.svg.suppliedBg}
+            {memeCategory ? assets.svg.suppliedMemeBg : assets.svg.suppliedBg}
           </div>
           <SupplyTokenSvg className="mr-10" />
           <div className="h3">You Supplied</div>
@@ -487,7 +487,7 @@ const YourBorrowed = ({
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
           <div className="absolute" style={{ left: 0, top: 0 }}>
-            {assets.svg.borrowBg}
+            {memeCategory ? assets.svg.borrowMemeBg : assets.svg.borrowBg}
           </div>
           <BorrowTokenSvg className="mr-10" />
           <div className="h3">You Borrowed</div>
