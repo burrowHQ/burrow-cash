@@ -25,6 +25,7 @@ export const useDclEstimateSwap = ({
   forceUpdate?: number;
 }) => {
   const [estimateData, setEstimateData] = useState<IEstimateResult>();
+  const [loading, setLoading] = useState<boolean>(false);
   const combinedAssetsData = useAppSelector(getAllAssetsData);
   const allDclPools = useAppSelector(getDclPools);
   useEffect(() => {
@@ -72,6 +73,7 @@ export const useDclEstimateSwap = ({
         tag: `${pool_id}@${expandAmount}`,
       }),
     );
+    setLoading(true);
     const estimatesResult = await Promise.allSettled(quotePending);
     const fulfilledEstimates = estimatesResult.filter((res) => res.status == "fulfilled");
     const estimates = fulfilledEstimates.map((r) => r.value);
@@ -89,6 +91,7 @@ export const useDclEstimateSwap = ({
         tag: `${tokenIn_id}@${tokenOut_id}@${tokenIn_amount}`,
         from: "dcl",
       });
+      setLoading(false);
       return;
     }
     const dexMap = get_registered_dexes();
@@ -120,6 +123,10 @@ export const useDclEstimateSwap = ({
       tag: `${tokenIn_id}@${tokenOut_id}@${tokenIn_amount}`,
       from: "dcl",
     });
+    setLoading(false);
   }
-  return estimateData;
+  return {
+    estimateData,
+    loading,
+  };
 };

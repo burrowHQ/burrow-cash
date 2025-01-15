@@ -4,7 +4,6 @@ import {
   getExpectedOutputFromSwapTodos,
   instantSwap,
   Transaction,
-  init_env,
   getAvgFee,
 } from "@ref-finance/ref-sdk";
 import { isEmpty } from "lodash";
@@ -23,17 +22,18 @@ import {
   get_amount_from_msg,
   get_registered_dexes,
 } from "../utils/margin";
+import { get_pools_from_sdk } from "../api/get-pool";
 
 const SHUTDOWN_SERVER = false;
+let simplePools;
+let stablePools;
+let stablePoolsDetail;
 export const useV1EstimateSwap = ({
   tokenIn_id,
   tokenOut_id,
   tokenIn_amount,
   slippageTolerance,
   account_id,
-  simplePools,
-  stablePools,
-  stablePoolsDetail,
   forceUpdate,
 }: {
   tokenIn_id: string;
@@ -41,15 +41,13 @@ export const useV1EstimateSwap = ({
   tokenIn_amount: string;
   slippageTolerance: number;
   account_id?: string;
-  simplePools: any[];
-  stablePools: any[];
-  stablePoolsDetail: any[];
   forceUpdate?: number;
 }) => {
   const combinedAssetsData = useAppSelector(getAllAssetsData);
   const marginConfig = useAppSelector(getMarginConfig);
   const allPools = useAppSelector(getAllPools);
   const [estimateData, setEstimateData] = useState<IEstimateResult>();
+  const [loading, setLoading] = useState<boolean>(false);
   const [tokenIn_metadata, tokenOut_metadata] = useMemo(() => {
     if (tokenIn_id && tokenOut_id) {
       const [tokenIn_metadata, tokenOut_metadata] = getMetadatas([
@@ -61,27 +59,12 @@ export const useV1EstimateSwap = ({
     return [];
   }, [tokenIn_id, tokenOut_id]);
   useEffect(() => {
-    if (
-      !isEmpty(combinedAssetsData) &&
-      !isEmpty(simplePools) &&
-      !isEmpty(stablePools) &&
-      !isEmpty(stablePoolsDetail) &&
-      Number(tokenIn_amount) > 0
-    ) {
+    if (!isEmpty(combinedAssetsData) && Number(tokenIn_amount) > 0) {
       getEstimateSwapData();
     }
-  }, [
-    combinedAssetsData,
-    tokenIn_id,
-    tokenOut_id,
-    tokenIn_amount,
-    slippageTolerance,
-    simplePools?.length,
-    stablePools?.length,
-    stablePoolsDetail?.length,
-    forceUpdate,
-  ]);
+  }, [combinedAssetsData, tokenIn_id, tokenOut_id, tokenIn_amount, slippageTolerance, forceUpdate]);
   async function getEstimateSwapData() {
+    setLoading(true);
     if (SHUTDOWN_SERVER) {
       getEstimateSwapFromScript();
     } else {
@@ -95,7 +78,11 @@ export const useV1EstimateSwap = ({
       tokenIn: tokenIn_id,
       tokenOut: tokenOut_id,
       slippage: slippageTolerance,
-    }).catch(() => ({}));
+    })
+      .catch(() => ({}))
+      .finally(() => {
+        setLoading(false);
+      });
     if (!(resultFromServer?.result_code !== 0 || !resultFromServer?.result_data?.routes?.length)) {
       const result: IFindPathResult = resultFromServer.result_data;
       let min_output_amount = new Decimal(0);
@@ -138,6 +125,12 @@ export const useV1EstimateSwap = ({
     }
   }
   async function getEstimateSwapFromScript() {
+    if (!simplePools) {
+      const poolsMap = await get_pools_from_sdk();
+      simplePools = poolsMap.simplePools;
+      stablePools = poolsMap.stablePools;
+      stablePoolsDetail = poolsMap.stablePoolsDetail;
+    }
     const [tokenIn_metadata, tokenOut_metadata] = getMetadatas([
       combinedAssetsData[tokenIn_id],
       combinedAssetsData[tokenOut_id],
@@ -173,6 +166,8 @@ export const useV1EstimateSwap = ({
       slippageTolerance,
       AccountId: account_id || "test_account_id",
       referralId: "app.burrow.finance",
+    }).finally(() => {
+      setLoading(false);
     });
     const swapTransaction = transactionsRef.pop() as any;
     const [dex_id, msg] = get_swap_indication_info(swapTransaction, marginConfig.registered_dexes);
@@ -247,5 +242,8 @@ export const useV1EstimateSwap = ({
     });
     return avgFee;
   }
-  return estimateData;
+  return {
+    estimateData,
+    loading,
+  };
 };

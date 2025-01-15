@@ -11,7 +11,6 @@ import ConfirmMobile from "./ConfirmMobile";
 import { getAccountId } from "../../../redux/accountSelectors";
 import { getAssets, getAssetsMEME } from "../../../redux/assetsSelectors";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
-import { usePoolsData } from "../../../hooks/useGetPoolsData";
 import { getMarginConfigCategory } from "../../../redux/marginConfigSelectors";
 import { toDecimal } from "../../../utils/uiNumber";
 import { useEstimateSwap } from "../../../hooks/useEstimateSwap";
@@ -55,7 +54,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
   const [forceUpdateLoading, setForceUpdateLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState<string>(ReduxActiveTab || "long");
-  const [estimateLoading, setEstimateLoading] = useState<boolean>(false);
   const [selectedSetUpOption, setSelectedSetUpOption] = useState<string>("custom");
   const [isLongConfirmModalOpen, setIsLongConfirmModalOpen] = useState<boolean>(false);
   const [isShortConfirmModalOpen, setIsShortConfirmModalOpen] = useState<boolean>(false);
@@ -95,19 +93,14 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
     ? marginConfigTokens
     : marginConfigTokensMEME;
   const marginAccountList = isMainStream ? marginAccountListMain : marginAccountListMEME;
-  // fetch all pools for script estimate TODOXX
-  const { simplePools, stablePools, stablePoolsDetail } = usePoolsData();
   // estimate
-  const estimateData = useEstimateSwap({
+  const { estimateResult: estimateData, estimateLoading } = useEstimateSwap({
     tokenIn_id:
       activeTab === "long" ? ReduxcategoryAssets2?.token_id : ReduxcategoryAssets1?.token_id,
     tokenOut_id:
       activeTab === "long" ? ReduxcategoryAssets1?.token_id : ReduxcategoryAssets2?.token_id,
     tokenIn_amount: toDecimal(tokenInAmount),
     account_id: accountId,
-    simplePools,
-    stablePools,
-    stablePoolsDetail,
     slippageTolerance: slippageTolerance / 100,
     forceUpdate,
   });
@@ -173,7 +166,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             .toFixed();
           setLiqPrice(liqPriceX || "0");
         }
-        setEstimateLoading(false);
       }
     },
     200,
@@ -199,7 +191,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             .div(shortOutput);
           setLiqPrice(liqPriceX.toFixed());
         }
-        setEstimateLoading(false);
       }
       setForceUpdateLoading(!estimateData?.loadingComplete);
     },
@@ -220,7 +211,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
 
     return () => clearInterval(interval);
   }, [tokenInAmount, lastTokenInAmount]);
-  // for same input, estimateLoading or forceUpdateLoading is true
+  // for same input, forceUpdateLoading is true
   useEffect(() => {
     if (forceUpdateLoading) {
       const timer = setTimeout(() => {
@@ -230,15 +221,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       return () => clearTimeout(timer);
     }
   }, [forceUpdateLoading]);
-  useEffect(() => {
-    if (estimateLoading) {
-      const timer = setTimeout(() => {
-        setEstimateLoading(false);
-      }, 4000); // 3 seconds
-
-      return () => clearTimeout(timer); // Cleanup the timer on component unmount or when estimateLoading changes
-    }
-  }, [estimateLoading]);
   useEffect(() => {
     if (selectedSetUpOption === "custom" && customInputRef.current) {
       customInputRef.current.focus();
@@ -456,7 +438,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       setLiqPrice("");
       return;
     }
-    setEstimateLoading(true);
     if (!isValidInput(value)) return;
     if (value.includes(".") && !lastValue.includes(".")) {
       inputPriceChange.cancel();
@@ -715,13 +696,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Liq. Price</div>
-              <div>
-                {estimateLoading ? (
-                  <BeatLoader size={5} color="white" />
-                ) : (
-                  <span>${beautifyPrice(LiqPrice)}</span>
-                )}
-              </div>
+              <span>${beautifyPrice(LiqPrice)}</span>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Fee</div>
@@ -754,17 +729,26 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                 <span className="ml-1">{warnTip}</span>
               </div>
             ) : null}
-
             {accountId ? (
               <YellowSolidButton
                 className="w-full"
                 disabled={isDisabled || !!warnTip}
                 onClick={handleConfirmButtonClick}
               >
-                Long {cateSymbol} {rangeMount}x
+                {estimateLoading ? (
+                  <BeatLoader size={4} color="black" />
+                ) : (
+                  <>
+                    Long {cateSymbol} {rangeMount}x
+                  </>
+                )}
               </YellowSolidButton>
             ) : (
-              <ConnectWalletButton accountId={accountId} className="w-full" />
+              <ConnectWalletButton
+                accountId={accountId}
+                className="w-full h-[46px]"
+                loading={estimateLoading}
+              />
             )}
             {isLongConfirmModalOpen && (
               <ConfirmMobile
@@ -849,13 +833,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Liq. Price</div>
-              <div>
-                {estimateLoading ? (
-                  <BeatLoader size={5} color="white" />
-                ) : (
-                  <span>${beautifyPrice(LiqPrice)}</span>
-                )}
-              </div>
+              <span>${beautifyPrice(LiqPrice)}</span>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Fee</div>
@@ -893,10 +871,21 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                 disabled={isDisabled || !!warnTip}
                 onClick={handleConfirmButtonClick}
               >
-                Short {cateSymbol} {rangeMount}x
+                {estimateLoading ? (
+                  <BeatLoader size={4} color="black" />
+                ) : (
+                  <>
+                    Short {cateSymbol} {rangeMount}x
+                  </>
+                )}
               </RedSolidButton>
             ) : (
-              <ConnectWalletButton accountId={accountId} className="w-full" isShort />
+              <ConnectWalletButton
+                accountId={accountId}
+                className="w-full h-[46px]"
+                isShort
+                loading={estimateLoading}
+              />
             )}
             {isShortConfirmModalOpen && (
               <ConfirmMobile

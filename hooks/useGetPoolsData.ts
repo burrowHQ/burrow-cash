@@ -1,25 +1,20 @@
 import { useState, useEffect } from "react";
-import { fetchAllPools, getStablePools, init_env } from "@ref-finance/ref-sdk";
+import { get_pools_from_sdk } from "../api/get-pool";
 
 export function usePoolsData() {
   const [simplePools, setSimplePools] = useState<any[]>([]);
   const [stablePools, setStablePools] = useState<any[]>([]);
   const [stablePoolsDetail, setStablePoolsDetail] = useState<any[]>([]);
-
   useEffect(() => {
     getPoolsData();
   }, []);
 
   async function getPoolsData() {
     try {
-      //
-      const { ratedPools, unRatedPools, simplePools: simplePoolsFromSdk } = await fetchAllPools();
-      const stablePoolsFromSdk = unRatedPools.concat(ratedPools);
-      const stablePoolsDetailFromSdk = await getStablePools(stablePoolsFromSdk);
-
-      setSimplePools(simplePoolsFromSdk);
-      setStablePools(stablePoolsFromSdk);
-      setStablePoolsDetail(stablePoolsDetailFromSdk);
+      const { simplePools, stablePools, stablePoolsDetail } = await get_pools_from_sdk();
+      setSimplePools(simplePools);
+      setStablePools(stablePools);
+      setStablePoolsDetail(stablePoolsDetail);
     } catch (error) {
       console.error("Error fetching pools data:", error);
     }

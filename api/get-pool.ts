@@ -1,7 +1,9 @@
-import { ViewMethodsDcl, ChangeMethodsDcl } from "../interfaces/index";
+import { fetchAllPools, getStablePools } from "@ref-finance/ref-sdk";
+import { ViewMethodsDcl, ViewMethodsREFV1 } from "../interfaces/index";
 import { getBurrow } from "../utils";
 import { IPoolDcl, IQuoteResult, IPool } from "../interfaces/pool";
 import getConfig from "../utils/config";
+import { expandToken } from "../store/helper";
 
 export async function getDclPools() {
   const { view, dclContract } = await getBurrow();
@@ -52,4 +54,40 @@ export async function get_pool_list(poolType: "classic" | "stable" | "degen" | "
       };
     });
   return data?.data?.list || [];
+}
+async function get_stable_pool_details(pool_ids: string[]) {
+  const { view, refv1Contract } = await getBurrow();
+  const allStablePools: IPoolDcl[] = (await view(
+    refv1Contract,
+    ViewMethodsREFV1[ViewMethodsREFV1.get_pool_detail_info_by_ids],
+    {
+      pool_ids,
+    },
+  )) as IPoolDcl[];
+  const poolKindMap = {
+    RatedPoolInfo: "RATED_SWAP",
+    StablePoolInfo: "STABLE_SWAP",
+    DegenPoolInfo: "DEGEN_SWAP",
+  };
+  const stablePools = allStablePools.map((poolDetail, index) => {
+    const [key, pool_info] = Object.entries(poolDetail)[0] as any[];
+    return {
+      ...pool_info,
+      pool_kind: poolKindMap[key],
+      id: pool_ids[index],
+      rates: pool_info.rates || pool_info.c_amounts.map(() => expandToken(1, 18)),
+    };
+  });
+  return stablePools;
+}
+export async function get_pools_from_sdk() {
+  const { ratedPools, unRatedPools, simplePools } = await fetchAllPools();
+  const stablePools = unRatedPools.concat(ratedPools);
+  const pool_ids = stablePools.map((p) => p.id);
+  const stablePoolsDetail = await get_stable_pool_details(pool_ids);
+  return {
+    simplePools,
+    stablePools,
+    stablePoolsDetail,
+  };
 }
