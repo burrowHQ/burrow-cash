@@ -154,6 +154,7 @@ export const MARGIN_WHITELIST = [
   "voodooking.near",
   "lucasdeprueba.near",
   "21mbulls.near",
+  "doublerose.near",
 ];
 export const DISABLE_WITHDRAW_ADDRESS = "bc1p";
 const getConfig = (env: string = defaultNetwork) => {

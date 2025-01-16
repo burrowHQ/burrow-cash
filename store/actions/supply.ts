@@ -22,7 +22,7 @@ export async function supply({
   isMax: boolean;
   isMeme: boolean;
 }): Promise<void> {
-  const { account, logicContract, logicMEMEContract, hideModal } = await getBurrow();
+  const { account, logicContract, logicMEMEContract, hideModal, selector } = await getBurrow();
   const { decimals } = (await getMetadata(tokenId))!;
   const tokenContract = await getTokenContract(tokenId);
   const burrowContractId = isMeme ? logicMEMEContract.contractId : logicContract.contractId;
@@ -46,26 +46,29 @@ export async function supply({
       },
     ],
   };
-
-  // await prepareAndExecuteTokenTransactions(tokenContract, {
-  //   methodName: ChangeMethodsToken[ChangeMethodsToken.ft_transfer_call],
-  //   args: {
-  //     receiver_id: logicContract.contractId,
-  //     amount: expandedAmount.toFixed(0),
-  //     msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
-  //   },
-  // });
-  try {
-    await executeBTCDepositAndAction({
-      action: {
+  const wallet = await selector.wallet();
+  if (wallet.id == "btc-wallet") {
+    try {
+      await executeBTCDepositAndAction({
+        action: {
+          receiver_id: burrowContractId,
+          amount: expandedAmount.toFixed(0),
+          msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
+        },
+        env: "private_mainnet",
+        registerDeposit: "100000000000000000000000",
+      });
+    } catch (error) {
+      if (hideModal) hideModal();
+    }
+  } else {
+    await prepareAndExecuteTokenTransactions(tokenContract, {
+      methodName: ChangeMethodsToken[ChangeMethodsToken.ft_transfer_call],
+      args: {
         receiver_id: burrowContractId,
         amount: expandedAmount.toFixed(0),
         msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
       },
-      env: "private_mainnet",
-      registerDeposit: "100000000000000000000000",
     });
-  } catch (error) {
-    if (hideModal) hideModal();
   }
 }
