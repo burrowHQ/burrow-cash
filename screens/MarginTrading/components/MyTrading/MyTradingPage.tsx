@@ -81,13 +81,12 @@ const MyMarginTradingPage = () => {
         const holdingFee =
           +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi - uahpi_at_open);
         const holding = +shrinkToken(item.debt_cap, decimalsD) * (uahpi - uahpi_at_open);
-        const profitOrLoss =
+        const pnl =
           entryPrice !== null && entryPrice !== 0
             ? positionType === "Long"
-              ? (indexPrice - entryPrice) * size
-              : (entryPrice - indexPrice) * size
+              ? (indexPrice - entryPrice) * size * priceP
+              : (entryPrice - indexPrice) * size * priceD
             : 0;
-        const pnl = entryPrice !== null && entryPrice !== 0 ? profitOrLoss - holdingFee : 0;
         pnlTotal += pnl;
       }),
     );

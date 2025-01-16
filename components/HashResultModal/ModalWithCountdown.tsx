@@ -112,7 +112,13 @@ const ModalWithCountdown = ({
                   className={`text-sm ${
                     type == "Long" ? "text-toolTipBoxBorderColor" : "text-red-50"
                   } rounded-sm p-1`}
-                  style={{ backgroundColor: "rgba(210, 255, 58, 0.1)" }}
+                  style={{
+                    maxWidth: "120px",
+                    backgroundColor: "rgba(210, 255, 58, 0.1)",
+                    whiteSpace: "normal",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
                 >
                   {type} {positionSize.symbol}
                 </div>
