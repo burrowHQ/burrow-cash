@@ -85,7 +85,10 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
 
   const netValue = parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
   const collateral = parseTokenValue(item.token_c_info.balance, decimalsC);
-  const indexPrice = positionType.label === "Long" ? priceP : priceD;
+  const indexPrice =
+    positionType.label === "Long"
+      ? new Decimal(priceP || 0).div(priceD || 1).toFixed()
+      : new Decimal(priceD || 0).div(priceP || 1).toFixed();
 
   const actionShowRedColor = positionType.label === "Long";
   const marginConfig = useAppSelector(isMainStream ? getMarginConfig : getMarginConfigMEME);
@@ -306,11 +309,17 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Entry Price</div>
-              <div>{entryPrice != "-" ? beautifyPrice(entryPrice, true) : "-"}</div>
+              <div>
+                {entryPrice != "-" ? beautifyPrice(entryPrice) : "-"}
+                <span className="text-xs text-gray-300 ml-1">({symbolC})</span>
+              </div>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Index Price</div>
-              <div>{beautifyPrice(indexPrice, true)}</div>
+              <div>
+                {beautifyPrice(indexPrice)}
+                <span className="text-xs text-gray-300 ml-1">({symbolC})</span>
+              </div>
             </div>
             {/*  */}
             <div className="flex items-center justify-between text-sm mb-4">
@@ -327,9 +336,6 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Current Total PNL</div>
               <div className="flex items-center justify-center">
-                {/* <span className="text-red-50">-$0.0689</span> */}
-                {/* <span className="text-xs text-gray-300 ml-1.5">(-2.01%)</span> */}
-
                 {!pnl ? (
                   <span className="text-sm text-gray-400 ml-1.5">-</span>
                 ) : (

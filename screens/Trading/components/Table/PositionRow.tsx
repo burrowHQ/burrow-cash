@@ -112,8 +112,8 @@ const PositionRow = ({
   const pnl =
     entryPrice !== null && entryPrice !== 0
       ? positionType.label === "Long"
-        ? (indexPrice - entryPrice) * size * priceP
-        : (entryPrice - indexPrice) * size * priceD
+        ? (indexPrice - entryPrice) * size * priceD
+        : (entryPrice - indexPrice) * size * priceP
       : 0;
 
   let amplitude = 0;
@@ -184,15 +184,14 @@ const PositionRow = ({
         <p className={`${pnl > 0 ? "text-green-150" : pnl < 0 ? "text-red-150" : "text-gray-400"}`}>
           {pnl === 0 ? "" : `${pnl > 0 ? `+$` : `-$`}`}
           {beautifyPrice(Math.abs(pnl), false, 3, 3)}
-          <span className="text-gray-400 text-xs ml-0.5">
+          {/* <span className="text-gray-400 text-xs ml-0.5">
             {amplitude !== null && amplitude !== 0
               ? `(${amplitude > 0 ? `+` : `-`}${toInternationalCurrencySystem_number(
                   Math.abs(amplitude),
                 )}%)`
               : ``}
-          </span>
+          </span> */}
         </p>
-        <p className="text-gray-300 text-xs"> {assetLabel}</p>
       </td>
       <td>
         <div className="text-sm">{new Date(openTime).toLocaleDateString()}</div>
