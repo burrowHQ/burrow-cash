@@ -7,7 +7,7 @@ import { toInternationalCurrencySystem_number } from "../../../../utils/uiNumber
 const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
   const isMobile = isMobileDevice();
   return !isMobile ? (
-    <tr>
+    <tr className="align-text-top">
       <td className="py-5 pl-5">
         {`${getSymbolById(assetP.token_id, assetP.metadata?.symbol)}/${getSymbolById(
           assetD.token_id,
@@ -73,13 +73,25 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
         <span className="ml-1">{getSymbolById(assetC.token_id, assetC.metadata?.symbol)}</span>
       </td>
       <td>
-        {record.entry_price !== "0" ? (
-          <span>${beautifyPrice(Number(record.entry_price))}</span>
-        ) : (
-          "-"
-        )}
+        <div className="flex items-start flex-col">
+          {record.entry_price !== "0" ? (
+            <span>{beautifyPrice(Number(record.entry_price))}</span>
+          ) : (
+            "-"
+          )}
+          <p className="text-gray-300 text-xs">
+            {getSymbolById(assetC.token_id, assetC.metadata?.symbol)}
+          </p>
+        </div>
       </td>
-      <td>{record.price !== "0" ? <span>${beautifyPrice(Number(record.price))}</span> : "-"}</td>
+      <td>
+        <div className="flex items-start flex-col">
+          {record.price !== "0" ? <span>{beautifyPrice(Number(record.price))}</span> : "-"}
+          <p className="text-gray-300 text-xs">
+            {getSymbolById(assetC.token_id, assetC.metadata?.symbol)}
+          </p>
+        </div>
+      </td>
       <td>
         {beautifyPrice(
           Number(shrinkToken(record.fee, assetD.metadata.decimals + assetD.config.extra_decimals)),
@@ -94,13 +106,16 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
         }`}
       >
         {record.pnl > 0 ? "+" : record.pnl < 0 ? "-" : ""}
-        {record.pnl !== "0" ? beautifyPrice(Math.abs(record.pnl), true, 3, 3) : ""}
+        {record.pnl !== "0" ? beautifyPrice(Math.abs(record.pnl), false, 3, 3) : ""}
+        <p className="text-gray-300 text-xs">
+          {getSymbolById(assetC.token_id, assetC.metadata?.symbol)}
+        </p>
       </td>
       <td>
         <div className="text-sm">
           {record.open_timestamp !== 0 ? new Date(record.open_timestamp).toLocaleDateString() : "-"}
         </div>
-        <div className="text-sm">
+        <div className="text-gray-300 text-xs">
           {record.open_timestamp !== 0 ? new Date(record.open_timestamp).toLocaleTimeString() : ""}
         </div>
       </td>
@@ -110,7 +125,7 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
             ? new Date(record.close_timestamp).toLocaleDateString()
             : "-"}
         </div>
-        <div className="text-sm">
+        <div className="text-gray-300 text-xs">
           {record.close_timestamp !== 0
             ? new Date(record.close_timestamp).toLocaleTimeString()
             : ""}
