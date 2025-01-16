@@ -34,7 +34,7 @@ export function useBtcAction({ updater, inputAmount, decimals }: any) {
         setReceiveAmount("0");
       } else {
         estimateDepositAmount(expandInputAmount, { env: "private_mainnet" }).then(
-          (received: number) => {
+          (received: string) => {
             setReceiveAmount(shrinkToken(received || "0", decimals));
             // eslint-disable-next-line no-console
             console.log("---------------receivedBalance", shrinkToken(received || "0", decimals));
