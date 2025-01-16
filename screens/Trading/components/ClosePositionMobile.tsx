@@ -227,6 +227,10 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
       new Decimal(item?.token_c_info?.balance || 0).plus(item.token_p_amount || 0).toFixed(0),
       assetP.config.extra_decimals,
     ).toFixed(0, Decimal.ROUND_DOWN);
+    // no path from findPathExactOut api
+    if (new Decimal(requiredPAmount || 0).eq(0)) {
+      return balance_c_plus_p;
+    }
     const requiredPAmountOnShort = Decimal.min(
       balance_c_plus_p,
       Decimal.max(requiredPAmount, token_p_amount),

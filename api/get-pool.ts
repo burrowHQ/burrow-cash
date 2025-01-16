@@ -1,10 +1,11 @@
-import { fetchAllPools, getStablePools } from "@ref-finance/ref-sdk";
+import { fetchAllPools, init_env } from "@ref-finance/ref-sdk";
 import { ViewMethodsDcl, ViewMethodsREFV1 } from "../interfaces/index";
 import { getBurrow } from "../utils";
-import { IPoolDcl, IQuoteResult, IPool } from "../interfaces/pool";
-import getConfig from "../utils/config";
+import { IPoolDcl, IQuoteResult } from "../interfaces/pool";
+import getConfig, { isTestnet } from "../utils/config";
 import { expandToken } from "../store/helper";
 
+init_env(isTestnet ? "dev" : "mainnet");
 export async function getDclPools() {
   const { view, dclContract } = await getBurrow();
   const allDclPools: IPoolDcl[] = (await view(
