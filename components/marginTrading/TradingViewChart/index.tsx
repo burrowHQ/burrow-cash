@@ -8,7 +8,7 @@ import {
   type Timezone,
   widget,
 } from "../../../public/charting_library";
-import datafeed from "./datafeed";
+import getDataFeed from "./datafeed";
 import { storageStore } from "../../../utils/commonUtils";
 import { LoadingCircle } from "../../LoadingSpinner";
 import { getAssetsCategory } from "../../../redux/assetsSelectors";
@@ -31,8 +31,7 @@ export default function TradingViewChart({
   const marginConfig = useAppSelector(getMarginConfigCategory(isMeme));
   const assets_cached = !_.isEmpty(assets?.data);
   const margin_cached = !_.isEmpty(marginConfig?.registered_tokens);
-  // const symbol = `${baseSymbol}/${quoteSymbol}`;
-  const symbol = "NEAR/USDC"; // TODO-now this is test data
+  const symbol = `${baseSymbol}/${quoteSymbol}`;
   useDebounce(
     () => {
       try {
@@ -51,7 +50,7 @@ export default function TradingViewChart({
     const widgetOptions: ChartingLibraryWidgetOptions = {
       symbol,
       theme: "dark",
-      datafeed,
+      datafeed: getDataFeed(isMeme),
       interval: tvStorage?.get("interval") || ("30" as ResolutionString),
       container: "TVChartContainer",
       library_path: "https://assets.deltatrade.ai/assets/static/charting_library/",
