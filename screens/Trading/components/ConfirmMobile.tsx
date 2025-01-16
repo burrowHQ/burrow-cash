@@ -265,7 +265,6 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
               <div className="text-gray-300">Entry Price</div>
               {/* <div>${confirmInfo.entryPrice || "-"}</div> */}
               <div>
-                $
                 {action === "Long"
                   ? beautifyPrice(
                       confirmInfo.tokenInAmount /
@@ -284,6 +283,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
                         ),
                       ) / confirmInfo.tokenInAmount,
                     )}
+                <span className="text-xs text-gray-300 ml-1">({assetC?.metadata?.symbol})</span>
               </div>
             </div>
 
