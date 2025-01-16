@@ -578,7 +578,9 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                   </div>
                   <div className="flex items-center justify-between text-sm mb-4">
                     <div className="text-gray-300">Entry Price</div>
-                    <div>${beautifyPrice(rowData.entryPrice ?? 0)}</div>
+                    <div>
+                      {beautifyPrice(rowData.entryPrice ?? 0)} {symbolC}
+                    </div>
                   </div>
                   <div className="flex items-center justify-between text-sm mb-4">
                     <div className="text-gray-300">Liq. Price</div>
@@ -717,7 +719,9 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                   </div>
                   <div className="flex items-center justify-between text-sm mb-4">
                     <div className="text-gray-300">Entry Price</div>
-                    <div>${beautifyPrice(rowData.entryPrice ?? 0)}</div>
+                    <div>
+                      {beautifyPrice(rowData.entryPrice ?? 0)} {symbolC}
+                    </div>
                   </div>
                   <div className="flex items-center justify-between text-sm mb-4">
                     <div className="text-gray-300">Liq. Price</div>

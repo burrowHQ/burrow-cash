@@ -112,8 +112,8 @@ const PositionRow = ({
   const pnl =
     entryPrice !== null && entryPrice !== 0
       ? positionType.label === "Long"
-        ? (indexPrice - entryPrice) * size
-        : (entryPrice - indexPrice) * size
+        ? (indexPrice - entryPrice) * size * priceP
+        : (entryPrice - indexPrice) * size * priceD
       : 0;
 
   let amplitude = 0;
@@ -182,7 +182,7 @@ const PositionRow = ({
       <td>${beautifyPrice(LiqPrice)}</td>
       <td>
         <p className={`${pnl > 0 ? "text-green-150" : pnl < 0 ? "text-red-150" : "text-gray-400"}`}>
-          {pnl === 0 ? "" : `${pnl > 0 ? `+` : `-`}`}
+          {pnl === 0 ? "" : `${pnl > 0 ? `+$` : `-$`}`}
           {beautifyPrice(Math.abs(pnl), false, 3, 3)}
           <span className="text-gray-400 text-xs ml-0.5">
             {amplitude !== null && amplitude !== 0
@@ -313,7 +313,7 @@ const PositionRow = ({
               pnl > 0 ? "text-green-150" : pnl < 0 ? "text-red-150" : "text-gray-400"
             }`}
           >
-            {pnl === 0 ? "" : `${pnl > 0 ? `+` : `-`}`}
+            {pnl === 0 ? "" : `${pnl > 0 ? `+$` : `-$`}`}
             {beautifyPrice(Math.abs(pnl), false, 3, 3)} {assetLabel}
             <span className="text-gray-400 text-xs ml-0.5">
               {amplitude !== null && amplitude !== 0

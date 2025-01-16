@@ -100,7 +100,7 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
           3,
         )}
       </td>
-      <td
+      {/* <td
         className={`ml-1 ${
           record.pnl > 0 ? "text-green-150" : record.pnl < 0 ? "text-red-150" : ""
         }`}
@@ -110,7 +110,7 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
         <p className="text-gray-300 text-xs">
           {getSymbolById(assetC.token_id, assetC.metadata?.symbol)}
         </p>
-      </td>
+      </td> */}
       <td>
         <div className="text-sm">
           {record.open_timestamp !== 0 ? new Date(record.open_timestamp).toLocaleDateString() : "-"}
@@ -271,7 +271,7 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
           <p className="text-gray-300">Operation</p>
           <p>{record.close_type}</p>
         </div>
-        <div className="bg-dark-100 rounded-2xl flex items-center justify-center text-xs py-1 text-gray-300 mb-4">
+        {/* <div className="bg-dark-100 rounded-2xl flex items-center justify-center text-xs py-1 text-gray-300 mb-4">
           PNL & ROE
           <p
             className={`ml-1 ${
@@ -281,7 +281,7 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
             {record.pnl > 0 ? "+" : record.pnl < 0 ? "-" : ""}
             {record.pnl !== "0" ? beautifyPrice(Math.abs(record.pnl), false, 3, 3) : ""}
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   );
