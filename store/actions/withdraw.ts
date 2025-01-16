@@ -1,8 +1,14 @@
 import BN from "bn.js";
 import Decimal from "decimal.js";
 
+import { getWithdrawTransaction } from "btc-wallet";
 import { decimalMax, decimalMin, getBurrow, nearTokenId } from "../../utils";
-import { expandToken, expandTokenDecimal, registerAccountOnTokenWithQuery } from "../helper";
+import {
+  expandToken,
+  expandTokenDecimal,
+  registerAccountOnTokenWithQuery,
+  shrinkToken,
+} from "../helper";
 import { ChangeMethodsLogic, ChangeMethodsOracle, ChangeMethodsToken } from "../../interfaces";
 import { getTokenContract, prepareAndExecuteTransactions } from "../tokens";
 import { ChangeMethodsNearToken } from "../../interfaces/contract-methods";
@@ -28,7 +34,7 @@ interface Props {
 
 export async function withdraw({ tokenId, extraDecimals, amount, isMax, isMeme }: Props) {
   const state = store.getState();
-  const { oracleContract, logicContract, memeOracleContract, logicMEMEContract } =
+  const { oracleContract, logicContract, memeOracleContract, logicMEMEContract, selector } =
     await getBurrow();
   let assets: typeof state.assets.data;
   let account: typeof state.account;
@@ -153,6 +159,15 @@ export async function withdraw({ tokenId, extraDecimals, amount, isMax, isMeme }
         ],
       });
     }
-    await prepareAndExecuteTransactions(transactions);
+    const wallet = await selector.wallet();
+    let withdraw_to_btc;
+    if (wallet.id == "btc-wallet") {
+      const withdrawAmount = shrinkToken(expandedAmount.toFixed(0), extraDecimals);
+      withdraw_to_btc = await getWithdrawTransaction({
+        amount: withdrawAmount,
+        env: "private_mainnet",
+      });
+    }
+    await prepareAndExecuteTransactions(transactions, isMeme, withdraw_to_btc);
   }
 }

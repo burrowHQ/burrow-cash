@@ -2,6 +2,8 @@ import { Contract } from "near-api-js";
 import Decimal from "decimal.js";
 import BN from "bn.js";
 // eslint-disable-next-line import/no-cycle
+import { Transaction as SelectorTransaction } from "@near-wallet-selector/core";
+// eslint-disable-next-line import/no-cycle
 import { expandToken, expandTokenDecimal, getContract, shrinkToken } from "./helper";
 import { getBurrow } from "../utils";
 import {
@@ -134,6 +136,7 @@ export const prepareAndExecuteTokenTransactions = async (
 export const prepareAndExecuteTransactions = async (
   operations: Transaction[] = [],
   isMeme?: boolean,
+  extraTranstion?: SelectorTransaction,
 ) => {
   const { account, logicContract, view, logicMEMEContract } = await getBurrow();
   const transactions: Transaction[] = [];
@@ -179,5 +182,5 @@ export const prepareAndExecuteTransactions = async (
   }
 
   transactions.push(...operations);
-  return executeMultipleTransactions(transactions);
+  return executeMultipleTransactions(transactions, extraTranstion);
 };

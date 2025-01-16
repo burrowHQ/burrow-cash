@@ -21,7 +21,10 @@ export interface FunctionCallOptions {
   attachedDeposit?: BN;
 }
 
-export const executeMultipleTransactions = async (transactions) => {
+export const executeMultipleTransactions = async (
+  transactions,
+  extraTranstion?: SelectorTransaction,
+) => {
   const { account, selector, hideModal, signOut, fetchData } = await getBurrow();
 
   const selectorTransactions: Array<SelectorTransaction> = transactions.map((t) => ({
@@ -39,6 +42,9 @@ export const executeMultipleTransactions = async (transactions) => {
       }),
     ),
   }));
+  if (extraTranstion) {
+    selectorTransactions.push(extraTranstion);
+  }
 
   try {
     const wallet = await selector.wallet();
