@@ -51,24 +51,19 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
           : null}
       </td>
       <td>
-        {Number(
-          shrinkToken(record.amount_c, assetC.metadata.decimals + assetC.config.extra_decimals),
-        ) === 0
-          ? "-"
-          : `$${toInternationalCurrencySystem_number(
-              Number(
-                shrinkToken(
-                  record.amount_c,
-                  assetC.metadata.decimals + assetC.config.extra_decimals,
-                ),
-              ) * Number(record.c_token_price),
-            )}`}
+        {beautifyPrice(
+          Number(
+            shrinkToken(record.amount_c, assetC.metadata.decimals + assetC.config.extra_decimals),
+          ) * Number(record.c_token_price),
+          true,
+        )}
       </td>
       <td>
-        {toInternationalCurrencySystem_number(
+        {beautifyPrice(
           Number(
             shrinkToken(record.amount_c, assetC.metadata.decimals + assetC.config.extra_decimals),
           ),
+          false,
         )}
         <span className="ml-1">{getSymbolById(assetC.token_id, assetC.metadata?.symbol)}</span>
       </td>
@@ -202,30 +197,28 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Net Value</p>
           <p>
-            {Number(
-              shrinkToken(record.amount_c, assetC.metadata.decimals + assetC.config.extra_decimals),
-            ) === 0
-              ? "-"
-              : `$${toInternationalCurrencySystem_number(
-                  Number(
-                    shrinkToken(
-                      record.amount_c,
-                      assetC.metadata.decimals + assetC.config.extra_decimals,
-                    ),
-                  ) * Number(record.c_token_price),
-                )}`}
+            {beautifyPrice(
+              Number(
+                shrinkToken(
+                  record.amount_c,
+                  assetC.metadata.decimals + assetC.config.extra_decimals,
+                ),
+              ) * Number(record.c_token_price),
+              true,
+            )}
           </p>
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Collateral</p>
           <p>
-            {toInternationalCurrencySystem_number(
+            {beautifyPrice(
               Number(
                 shrinkToken(
                   record.amount_c,
                   assetC.metadata.decimals + assetC.config.extra_decimals,
                 ),
               ),
+              false,
             )}
             <span className="ml-1">{getSymbolById(assetC.token_id, assetC.metadata?.symbol)}</span>
           </p>

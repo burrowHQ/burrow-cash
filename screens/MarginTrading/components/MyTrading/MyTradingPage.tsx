@@ -87,7 +87,8 @@ const MyMarginTradingPage = () => {
               ? (indexPrice - entryPrice) * size * priceP
               : (entryPrice - indexPrice) * size * priceD
             : 0;
-        pnlTotal += pnl;
+        const safePnl = Number.isNaN(pnl) ? 0 : pnl;
+        pnlTotal += safePnl;
       }),
     );
     setTotalLongSizeValue(longTotal);
