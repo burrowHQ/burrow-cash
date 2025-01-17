@@ -313,14 +313,14 @@ const PositionRow = ({
             }`}
           >
             {pnl === 0 ? "" : `${pnl > 0 ? `+$` : `-$`}`}
-            {beautifyPrice(Math.abs(pnl), false, 3, 3)} {assetLabel}
-            <span className="text-gray-400 text-xs ml-0.5">
+            {beautifyPrice(Math.abs(pnl), false, 3, 3)}
+            {/* <span className="text-gray-400 text-xs ml-0.5">
               {amplitude !== null && amplitude !== 0
                 ? `(${amplitude > 0 ? `+` : `-`}${toInternationalCurrencySystem_number(
                     Math.abs(amplitude),
                   )}%)`
                 : ``}
-            </span>
+            </span> */}
             {/* <span className="text-gray-400 text-xs ml-0.5">(-%)</span> */}
           </p>
         </div>

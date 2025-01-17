@@ -433,7 +433,7 @@ const TradingTable = ({
                   <th>Entry price</th>
                   <th>Close price</th>
                   <th>Fee</th>
-                  {/* <th onClick={() => handleSortChange("pnl")}>
+                  <th onClick={() => handleSortChange("pnl")}>
                     <div className="flex items-center cursor-pointer">
                       PNL & ROE
                       <SortHistoryButton
@@ -442,7 +442,7 @@ const TradingTable = ({
                         sort={orderColumn === "pnl" ? orderBy : null}
                       />
                     </div>
-                  </th> */}
+                  </th>
                   <th onClick={() => handleSortChange("open_timestamp")}>
                     <div className="flex items-center cursor-pointer">
                       Opening time
