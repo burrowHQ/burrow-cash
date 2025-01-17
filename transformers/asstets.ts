@@ -19,8 +19,9 @@ export function transformAssets({
       asset.config.can_deposit = true;
       asset.config.can_withdraw = true;
     }
-    if (!assetMetadata?.icon && nearNativeTokens.includes(assetMetadata?.token_id)) {
+    if (nearNativeTokens.includes(assetMetadata?.token_id)) {
       assetMetadata.icon = nearMetadata.icon;
+      assetMetadata.symbol = nearMetadata.symbol;
     }
     map[asset.token_id] = omit(
       {

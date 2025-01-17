@@ -497,7 +497,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                     </div>
                     <div>
                       <div className="flex items-center justify-end">
-                        <img src={iconC} alt="" className="w-4 h-4" />
+                        <img src={iconC} alt="" className="w-4 h-4 rounded-full" />
                         <p className="text-base ml-1">{symbolC}</p>
                       </div>
                       <p className="text-xs text-gray-300 mt-1.5">
@@ -640,7 +640,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                     </div>
                     <div>
                       <div className="flex items-center justify-end">
-                        <img src={iconC} alt="" className="w-4 h-4" />
+                        <img src={iconC} alt="" className="w-4 h-4 rounded-full" />
                         <p className="text-base ml-1">{symbolC}</p>
                       </div>
                       <p className="text-xs text-gray-300 mt-1.5">

@@ -92,7 +92,7 @@ const Trading = () => {
     setCurrentTokenCate1(ReduxcategoryAssets1);
   }, [ReduxcategoryAssets1]);
 
-  // get selected category 2
+  // get or init selected category 2
   useEffect(() => {
     if (id) {
       if (
@@ -115,6 +115,7 @@ const Trading = () => {
   const handlePopupToggle = () => {
     setShowPopup2(!showPopupCate2);
   };
+  // click to select a token and dispatch to store (left top side)
   const handleTokenSelectCate2 = (item) => {
     dispatch(setCategoryAssets2(item));
     setShowPopup2(false);
@@ -240,12 +241,7 @@ const Trading = () => {
                         onClick={handlePopupToggle}
                         className="flex justify-center items-center"
                       >
-                        <p className="mr-1">
-                          {currentTokenCate2?.metadata?.symbol ||
-                            (isMainStream
-                              ? categoryAssets2[0]?.metadata.symbol
-                              : categoryAssets2MEME[0]?.metadata.symbol)}
-                        </p>
+                        <p className="mr-1">{currentTokenCate2?.metadata?.symbol}</p>
                         <TokenArrow />
                       </div>
                       {showPopupCate2 && (
@@ -328,12 +324,7 @@ const Trading = () => {
                             onClick={handlePopupToggle}
                             className="flex justify-center items-center"
                           >
-                            <p className="mr-1">
-                              {currentTokenCate2?.metadata?.symbol ||
-                                (isMainStream
-                                  ? categoryAssets2[0]?.metadata.symbol
-                                  : categoryAssets2MEME[0]?.metadata.symbol)}
-                            </p>
+                            <p className="mr-1">{currentTokenCate2?.metadata?.symbol}</p>
                             <TokenArrow />
                           </div>
                           {showPopupCate2 && (
@@ -393,6 +384,7 @@ const Trading = () => {
               {id && <TradingOperate id={id} />}
             </div>
           </div>
+          {/* for mobile */}
           <div className="lg:hidden fixed bottom-0 left-0 right-0 w-full h-[116px] rounded-t-[8px] px-[26px] flex flex-col justify-center items-center bg-[#383A56] z-[12]">
             <div
               className="w-full flex items-center justify-center h-[46px] bg-primary rounded-[6px] text-[#14162B] text-base font-bold"

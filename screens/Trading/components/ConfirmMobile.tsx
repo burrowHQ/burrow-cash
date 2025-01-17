@@ -21,6 +21,7 @@ import { showPositionFailure } from "../../../components/HashResultModal";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { IConfirmMobileProps } from "../comInterface";
 import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
+import { getAccountCategory } from "../../../redux/accountSelectors";
 
 export const ModalContext = createContext(null) as any;
 const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
@@ -48,7 +49,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
   const { max_slippage_rate, min_safety_buffer } = isMainStream
     ? marginConfigTokens
     : marginConfigTokensMEME;
-
+  const account = useAppSelector(getAccountCategory(!isMainStream));
   const { getAssetDetails, getAssetById, getAssetByIdMEME } = useMarginAccount();
   const assetP = isMainStream
     ? getAssetById(
@@ -109,6 +110,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
     swap_indication: confirmInfo.estimateData.swap_indication,
     assets: confirmInfo.assets.data,
     isMeme: isMemeStream,
+    account,
   };
   const confirmOpenPosition = async () => {
     setIsDisabled(true);
@@ -131,17 +133,6 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
       const tokenPPrice = confirmInfo.assets.data[openPositionParams.token_p_id].price.usd;
       const slippageRate = 1 - max_slippage_rate / 10000;
       const calculatedValue = ((+tokenDAmount * tokenDPrice) / tokenPPrice) * slippageRate;
-      console.log(
-        openPositionParams,
-        decimalsP,
-        tokenDAmount,
-        tokenDPrice,
-        tokenPPrice,
-        slippageRate,
-        calculatedValue,
-        minTokenPAmount,
-        "for nico confirmOpenPosition",
-      );
       if (minTokenPAmount < calculatedValue) {
         setIsMinTokenPAmount(true);
         hasError = true;

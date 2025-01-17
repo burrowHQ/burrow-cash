@@ -336,7 +336,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       shortInput,
     ],
   );
-  const setOwnBanlance = (key: string) => {
+  const setMaxInputBanlance = (key: string) => {
     if (activeTab === "long") {
       setLongInput(key);
     } else {
@@ -649,7 +649,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             />
             <div className="absolute top-2 right-2">
               <TradingToken
-                setOwnBanlance={setOwnBanlance}
+                setMaxInputBanlance={setMaxInputBanlance}
                 tokenList={isMainStream ? categoryAssets2 : categoryAssets2MEME}
                 type="cate2"
                 isMemeCategory={!isMainStream}
@@ -787,7 +787,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             />
             <div className="absolute top-2 right-2">
               <TradingToken
-                setOwnBanlance={setOwnBanlance}
+                setMaxInputBanlance={setMaxInputBanlance}
                 tokenList={isMainStream ? categoryAssets2 : categoryAssets2MEME}
                 type="cate2"
                 isMemeCategory={!isMainStream}
