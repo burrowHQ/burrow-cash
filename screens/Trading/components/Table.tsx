@@ -670,8 +670,6 @@ const TradingTable = ({
             <ClosePositionMobile
               open={isClosePositionModalOpen}
               onClose={() => {
-                // e.preventDefault();
-                // e.stopPropagation();
                 setIsClosePositionMobileOpen(false);
               }}
               extraProps={closePositionModalProps}

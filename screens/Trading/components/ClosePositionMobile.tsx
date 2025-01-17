@@ -49,7 +49,8 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   const [showFeeModal, setShowFeeModal] = useState<boolean>(false);
   const [selectedCollateralType, setSelectedCollateralType] = useState<string>(DEFAULT_POSITION);
   const [tokenInAmount, setTokenInAmount] = useState<string | null>(null);
-  const [isDisabled, setIsDisabled] = useState<boolean>(false);
+  const [isProcessingTx, setIsProcessingTx] = useState<boolean>(false);
+  const [isEstimating, setIsEstimating] = useState<boolean>(false);
   const [forceUpdate, setForceUpdate] = useState<number>(0);
   const [swapUnSecurity, setSwapUnSecurity] = useState<boolean>(false);
   const positionType = getPositionType(item.token_d_info.token_id);
@@ -124,9 +125,8 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     }, 20_000);
     return () => clearInterval(intervalRef.current);
   }, []);
-
   useEffect(() => {
-    setIsDisabled(!estimateData?.swap_indication || !estimateData?.min_amount_out);
+    setIsEstimating(!estimateData?.min_amount_out);
   }, [estimateData]);
 
   const Fee = useMemo(() => {
@@ -157,14 +157,12 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     ).mul(assetD.price?.usd || 0);
 
     const saft_p_value = regular_p_value.mul(1 - marginConfig.max_slippage_rate / 10000);
-
     if (regular_d_min_value.lte(saft_p_value)) {
-      setIsDisabled(false);
+      setIsProcessingTx(false);
       setSwapUnSecurity(true);
       return;
     }
-
-    setIsDisabled(true);
+    setIsProcessingTx(true);
     setSwapUnSecurity(false);
 
     try {
@@ -182,9 +180,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
         token_p_amount: expandToken(tokenInAmount || "0", assetP.config.extra_decimals, 0),
         isMeme: isMemeStream,
       });
-
       onClose();
-
       if (res) {
         const transactionHashes = res.map((item) => {
           if (!item?.transaction?.hash) {
@@ -200,7 +196,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
         errorMessage: error instanceof Error ? error.message : JSON.stringify(error),
       });
     } finally {
-      setIsDisabled(false);
+      setIsProcessingTx(false);
     }
   };
 
@@ -265,6 +261,8 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     if (!value) return "0";
     return value.toFixed(6).replace(/\.?0+$/, "");
   };
+  const isLoading = isEstimating || isProcessingTx;
+  const isDisabled = isLoading || swapUnSecurity;
   return (
     <MUIModal open={open} onClose={onClose}>
       <Wrapper
@@ -372,15 +370,6 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
                 )}
               </div>
             </div>
-
-            {/* <div
-              className={`flex items-center justify-between text-dark-200 text-base rounded-md h-12 text-center cursor-pointer ${
-                actionShowRedColor ? "bg-primary" : "bg-red-50"
-              }`}
-              onClick={handleCloseOpsitionEvt}
-            >
-              <div className="flex-grow">Close</div>
-            </div> */}
             {swapUnSecurity && (
               <div className=" text-[#EA3F68] text-sm font-normal flex items-start mb-1">
                 <MaxPositionIcon />
@@ -392,24 +381,24 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
             {actionShowRedColor ? (
               <YellowSolidButton
                 className="w-full"
-                disabled={isDisabled || swapUnSecurity}
+                disabled={isDisabled}
                 onClick={() => {
                   localStorage.setItem("marginPopType", "Long");
                   handleCloseOpsitionEvt();
                 }}
               >
-                {isDisabled ? <BeatLoader size={5} color="#14162B" /> : `Close`}
+                {isLoading ? <BeatLoader size={5} color="#14162B" /> : `Close`}
               </YellowSolidButton>
             ) : (
               <RedSolidButton
                 className="w-full"
-                disabled={isDisabled || swapUnSecurity}
+                disabled={isDisabled}
                 onClick={() => {
                   localStorage.setItem("marginPopType", "Short");
                   handleCloseOpsitionEvt();
                 }}
               >
-                {isDisabled ? <BeatLoader size={5} color="#14162B" /> : `Close`}
+                {isLoading ? <BeatLoader size={5} color="#14162B" /> : `Close`}
               </RedSolidButton>
             )}
           </Box>
