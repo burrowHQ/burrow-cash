@@ -47,7 +47,7 @@ export async function supply({
     ],
   };
   const wallet = await selector.wallet();
-  if (wallet.id == "btc-wallet") {
+  if (wallet.id == "btc-wallet" && tokenId === NBTCTokenId) {
     try {
       await executeBTCDepositAndAction({
         action: {

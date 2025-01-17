@@ -19,7 +19,7 @@ import { transformAssets } from "../../transformers/asstets";
 import getAccount from "../../api/get-account";
 import { transformAccount } from "../../transformers/account";
 import { computeWithdrawMaxAmount } from "../../redux/selectors/getWithdrawMaxAmount";
-import getConfig from "../../utils/config";
+import getConfig, { NBTCTokenId } from "../../utils/config";
 import { shadow_action_withdraw } from "./shadow";
 import { store } from "../../redux/store";
 
@@ -161,7 +161,7 @@ export async function withdraw({ tokenId, extraDecimals, amount, isMax, isMeme }
     }
     const wallet = await selector.wallet();
     let withdraw_to_btc;
-    if (wallet.id == "btc-wallet") {
+    if (wallet.id == "btc-wallet" && tokenId === NBTCTokenId) {
       const withdrawAmount = shrinkToken(expandedAmount.toFixed(0), extraDecimals);
       withdraw_to_btc = await getWithdrawTransaction({
         amount: withdrawAmount,
