@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useDebounce } from "react-use";
+import _ from "lodash";
 import Decimal from "decimal.js";
 import { NearIcon } from "../../MarginTrading/components/Icon";
 import { TokenThinArrow, TokenSelected } from "./TradingIcon";
@@ -106,10 +107,11 @@ const TradingToken: React.FC<TradingTokenInter> = ({
     }
   };
   function getTokenBalance(asset: Asset) {
+    if (_.isEmpty(account?.balances)) return "";
     if (asset.token_id == nearTokenId) {
       return shrinkToken(
-        new Decimal(account.balances[asset.metadata.token_id])
-          .plus(account.balances["near"])
+        new Decimal(account?.balances?.[asset.metadata.token_id] || 0)
+          .plus(account?.balances?.["near"] || 0)
           .toFixed(0),
         asset.metadata.decimals,
       );
