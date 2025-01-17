@@ -155,6 +155,23 @@ export const MARGIN_WHITELIST = [
   "lucasdeprueba.near",
   "21mbulls.near",
   "doublerose.near",
+  "db02f607e2c86afa8886dcd21670dcfb44322fb0d26ffc8a33e8db1c628ffb3e",
+  "demannu13.tg",
+  "jackindeeper.near",
+  "xmen02109x.near",
+  "deepuni3051.near",
+  "sleet.near",
+  "ceefoon.near",
+  "jefe_duvet.tg",
+  "48ae4ca4744d536befe02c25f58ae33a1b6d4f900eccf1d8bb58a635910dbf75",
+  "orerhime.near",
+  "ertugrulozturk.near",
+  "i6743224471.tg",
+  "Aflatoon123.near",
+  "5789cda20d329d031fb7176a5f7671cac7e35d00d32c9ea5463c0d2e7ecfaa30",
+  "ytramn.near",
+  "leon-mitte.near",
+  "meteorkent.near",
 ];
 export const DISABLE_WITHDRAW_ADDRESS = "bc1p";
 const getConfig = (env: string = defaultNetwork) => {
