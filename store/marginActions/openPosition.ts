@@ -1,4 +1,5 @@
 import BN from "bn.js";
+import Decimal from "decimal.js";
 import { getBurrow, nearTokenId } from "../../utils";
 import { expandTokenDecimal } from "../helper";
 import {
@@ -12,6 +13,7 @@ import { prepareAndExecuteTransactions } from "../tokens";
 import { Assets } from "../../redux/assetState";
 import getConfig from "../../api/get-config";
 import getMemeConfig from "../../api/get-config-meme";
+import type { AccountState } from "../../redux/accountState";
 
 export async function openPosition({
   token_c_id,
@@ -22,6 +24,7 @@ export async function openPosition({
   min_token_p_amount,
   swap_indication,
   assets,
+  account,
   isMeme,
 }: {
   token_c_id: string;
@@ -32,6 +35,7 @@ export async function openPosition({
   min_token_p_amount: string;
   swap_indication: any;
   assets: Assets;
+  account: AccountState;
   isMeme?: boolean;
 }) {
   const { logicContract, oracleContract, memeOracleContract, logicMEMEContract } =
@@ -57,15 +61,21 @@ export async function openPosition({
   const expanded_d_amount = token_d_amount;
   const transactions: Transaction[] = [];
   const logicContractId = isMeme ? logicMEMEContract.contractId : logicContract.contractId;
+  let toWrapAmount = new Decimal(0);
+  if (isNEAR) {
+    const wrap_near_balance = account.balances[nearTokenId];
+    // const near_balance = account.balances["near"];
+    toWrapAmount = expanded_token_c_amount.minus(wrap_near_balance);
+  }
   transactions.push({
     receiverId: token_c_id,
     functionCalls: [
-      ...(isNEAR
+      ...(isNEAR && toWrapAmount.gt(0)
         ? [
             {
               methodName: ChangeMethodsNearToken[ChangeMethodsNearToken.near_deposit],
               gas: new BN("100000000000000"),
-              attachedDeposit: new BN(expanded_token_c_amount.toFixed(0, 2)),
+              attachedDeposit: new BN(toWrapAmount.toFixed(0, Decimal.ROUND_CEIL)), // up
             },
           ]
         : []),

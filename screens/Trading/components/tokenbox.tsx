@@ -1,5 +1,6 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState } from "react";
 import { useDebounce } from "react-use";
+import Decimal from "decimal.js";
 import { NearIcon } from "../../MarginTrading/components/Icon";
 import { TokenThinArrow, TokenSelected } from "./TradingIcon";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
@@ -14,18 +15,19 @@ import { shrinkToken } from "../../../store";
 import { toInternationalCurrencySystem_number } from "../../../utils/uiNumber";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { nearTokenId } from "../../../utils";
+import { Asset } from "../../../redux/assetState";
 
 interface TradingTokenInter {
   tokenList: Array<any>;
   type: string;
-  setOwnBanlance?: (key: string) => void;
+  setMaxInputBanlance?: (key: string) => void;
   setForceUpdate?: () => void;
   isMemeCategory?: boolean;
 }
 const TradingToken: React.FC<TradingTokenInter> = ({
   tokenList,
   type,
-  setOwnBanlance,
+  setMaxInputBanlance,
   setForceUpdate,
   isMemeCategory,
 }) => {
@@ -33,30 +35,30 @@ const TradingToken: React.FC<TradingTokenInter> = ({
   const dispatch = useAppDispatch();
   const account = useAppSelector(getAccountCategory(isMemeCategory));
   const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
-  const [ownBalance, setOwnBalance] = useState<string>("-");
-  const [ownBalanceDetail, setOwnBalanceDetail] = useState<string>("");
+  const [selectedTokenBalance, setSelectedTokenBalance] = useState<string>("");
   const [showModal, setShowModal] = useState<boolean>(false);
   const accountId = useAppSelector(getAccountId);
   const [selectedItem, setSelectedItem] = useState<any>(
     type === "cate1" ? ReduxcategoryAssets1 : ReduxcategoryAssets2,
   );
+  const typeDispatchMap: Record<string, ((item: any) => any) | undefined> = {
+    cate1: setCategoryAssets1,
+    cate2: setCategoryAssets2,
+  };
   useDebounce(
     () => {
       const { selectedAsset, setReduxcategoryCurrentBalance } = getSelectedAssetAndBalanceSetter();
       const tokenId = selectedAsset?.metadata["token_id"];
-      const balance = account?.balances[tokenId];
       if (!tokenId) return;
-      const { decimals } = selectedAsset.metadata;
-      const waitUseKey = shrinkToken(balance, decimals);
-      const formattedBalance = toInternationalCurrencySystem_number(waitUseKey);
-      setOwnBalance(formattedBalance);
-      setOwnBalanceDetail(waitUseKey);
-      setReduxcategoryCurrentBalance && setReduxcategoryCurrentBalance(waitUseKey);
+      const selectedAssetBalance = getTokenBalance(selectedAsset);
+      setSelectedTokenBalance(selectedAssetBalance);
+      setReduxcategoryCurrentBalance && setReduxcategoryCurrentBalance(selectedAssetBalance);
       setSelectedItem(selectedAsset);
     },
     300,
     [type, accountId, account.balances, ReduxcategoryAssets1, ReduxcategoryAssets2],
   );
+  // get selected asset from store and Setter api to store balance of asset
   const getSelectedAssetAndBalanceSetter = () => {
     if (type === "cate1" && ReduxcategoryAssets1) {
       return {
@@ -73,21 +75,16 @@ const TradingToken: React.FC<TradingTokenInter> = ({
     }
     return { selectedAsset: null, setReduxcategoryCurrentBalance: null };
   };
+  // click to select a token and dispatch to store
   const handleTokenClick = (item: any) => {
     if (!item) return;
     setSelectedItem(item);
-    const typeDispatchMap: Record<string, ((item: any) => any) | undefined> = {
-      cate1: setCategoryAssets1,
-      cate2: setCategoryAssets2,
-    };
-
     const dispatchAction = typeDispatchMap[type];
     if (dispatchAction) {
       dispatch(dispatchAction(item));
     } else {
       console.warn(`Unsupported type: ${type}`);
     }
-
     setForceUpdate && setForceUpdate();
     setShowModal(false);
   };
@@ -104,15 +101,27 @@ const TradingToken: React.FC<TradingTokenInter> = ({
     }, 200);
   };
   const sendBalance = () => {
-    if (setOwnBanlance) {
-      setOwnBanlance(ownBalanceDetail);
+    if (setMaxInputBanlance) {
+      setMaxInputBanlance(selectedTokenBalance);
     }
   };
+  function getTokenBalance(asset: Asset) {
+    if (asset.token_id == nearTokenId) {
+      return shrinkToken(
+        new Decimal(account.balances[asset.metadata.token_id])
+          .plus(account.balances["near"])
+          .toFixed(0),
+        asset.metadata.decimals,
+      );
+    }
+    return shrinkToken(account.balances[asset.metadata.token_id], asset.metadata.decimals);
+  }
   return (
     <div
       className={`relative ${type === "cate2" ? "cursor-pointer" : "cursor-default"} w-fit`}
       onMouseLeave={handleMouseLeave}
     >
+      {/* selected token symbol */}
       <div
         className={`flex items-center justify-end ${
           type === "cate2" ? "hover:bg-gray-1250" : ""
@@ -136,13 +145,18 @@ const TradingToken: React.FC<TradingTokenInter> = ({
         </div>
         {type === "cate2" && <TokenThinArrow />}
       </div>
-
+      {/* selected token balance */}
       {type === "cate2" && (
         <div onClick={sendBalance} className="text-xs flex justify-end text-gray-300">
           Balance:&nbsp;
-          <span className="text-white border-b border-dark-800">{ownBalance}</span>
+          <span className="text-white border-b border-dark-800">
+            {selectedTokenBalance
+              ? toInternationalCurrencySystem_number(selectedTokenBalance)
+              : "-"}
+          </span>
         </div>
       )}
+      {/* token list */}
       {showModal && type === "cate2" && (
         <div
           className="absolute top-10 right-0 py-1.5 bg-dark-250 border border-dark-500 rounded-md z-80 w-52"
@@ -165,9 +179,7 @@ const TradingToken: React.FC<TradingTokenInter> = ({
               </p>
               {selectedItem?.metadata?.symbol === token.metadata.symbol && <TokenSelected />}
               <p className="ml-auto text-sm">
-                {toInternationalCurrencySystem_number(
-                  shrinkToken(account.balances[token.metadata.token_id], token.metadata.decimals),
-                )}
+                {toInternationalCurrencySystem_number(getTokenBalance(token))}
               </p>
             </div>
           ))}
