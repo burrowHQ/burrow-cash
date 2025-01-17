@@ -70,7 +70,10 @@ export const transformAsset = (
     .plus(new Decimal(asset.reserved))
     .plus(asset.prot_fee)
     .toFixed();
-  const totalBorrowedD = new Decimal(asset.borrowed.balance).toFixed();
+  const totalBorrowedD = new Decimal(asset.borrowed.balance)
+    .plus(new Decimal(asset?.margin_debt?.balance || 0))
+    .plus(new Decimal(asset?.margin_pending_debt || 0))
+    .toFixed();
   const totalSupply = Number(
     shrinkToken(totalSupplyD, asset.metadata.decimals + asset.config.extra_decimals),
   );
@@ -81,7 +84,9 @@ export const transformAsset = (
   const temp1 = new Decimal(asset.supplied.balance)
     .plus(new Decimal(asset.reserved))
     .plus(asset.prot_fee)
-    .minus(new Decimal(asset.borrowed.balance));
+    .minus(new Decimal(asset.borrowed.balance))
+    .minus(new Decimal(asset.margin_debt.balance || 0))
+    .minus(new Decimal(asset.margin_pending_debt || 0));
   const temp2 = temp1.minus(temp1.mul(0.001)).toFixed(0);
   const availableLiquidity = Number(
     shrinkToken(temp2, asset.metadata.decimals + asset.config.extra_decimals),
@@ -146,18 +151,22 @@ export const transformAsset = (
     collateralFactor: `${Number(asset.config.volatility_ratio / 100)}%`,
     canUseAsCollateral: asset.config.can_use_as_collateral,
     ...accountAttrs,
-    brrrBorrow: Number(
-      shrinkToken(
-        asset.farms.borrowed[brrrTokenId]?.["reward_per_day"] || "0",
-        assets[brrrTokenId]?.metadata?.decimals || 0,
-      ),
-    ),
-    brrrSupply: Number(
-      shrinkToken(
-        asset.farms.supplied[brrrTokenId]?.["reward_per_day"] || "0",
-        assets[brrrTokenId]?.metadata?.decimals || 0,
-      ),
-    ),
+    brrrBorrow: brrrTokenId
+      ? Number(
+          shrinkToken(
+            asset.farms.borrowed[brrrTokenId]?.["reward_per_day"] || "0",
+            assets[brrrTokenId]?.metadata?.decimals || 0,
+          ),
+        )
+      : 0,
+    brrrSupply: brrrTokenId
+      ? Number(
+          shrinkToken(
+            asset.farms.supplied[brrrTokenId]?.["reward_per_day"] || "0",
+            assets[brrrTokenId]?.metadata?.decimals || 0,
+          ),
+        )
+      : 0,
     depositRewards: getRewards("supplied", asset, assets),
     borrowRewards: getRewards("borrowed", asset, assets),
     can_borrow: asset.config.can_borrow,
