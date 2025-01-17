@@ -144,11 +144,11 @@ const PositionRow = ({
           <span className="text-gray-300 text-xs">({beautifyPrice(sizeValue, true, 3, 3)})</span>
         </div>
       </td>
-      <td>${toInternationalCurrencySystem_number(netValue)}</td>
+      <td>{beautifyPrice(netValue, true)}</td>
       <td>
         <div className="flex items-center">
           <p className="mr-2.5">
-            {toInternationalCurrencySystem_number(collateral)}
+            {beautifyPrice(collateral, false)}
             <span className="ml-1">{symbolC}</span>
           </p>
           <div
@@ -259,13 +259,13 @@ const PositionRow = ({
       <div className="p-4">
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Net Value</p>
-          <p>${toInternationalCurrencySystem_number(netValue)}</p>
+          <p>{beautifyPrice(netValue, true)}</p>
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Collateral</p>
           <div className="flex items-center">
             <p className="mr-2.5">
-              {toInternationalCurrencySystem_number(collateral)}
+              {beautifyPrice(collateral, false)}
               <span className="ml-1">{symbolC}</span>
             </p>
             <div

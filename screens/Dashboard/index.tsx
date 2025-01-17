@@ -257,7 +257,7 @@ const yourSuppliedColumns = (memeCategory?: boolean) => [
       return (
         <>
           <div title={originalData?.collateral ? formatTokenValue(originalData?.collateral) : "-"}>
-            {formatTokenValueWithMilify(originalData.collateral, 4)}
+            {beautifyPrice(originalData.collateral)}
           </div>
           <div className="h6 text-gray-300">
             {originalData?.collateral
@@ -274,7 +274,7 @@ const yourSuppliedColumns = (memeCategory?: boolean) => [
       return (
         <>
           <div title={formatTokenValue(originalData.supplied)}>
-            {formatTokenValueWithMilify(originalData.supplied, 4)}
+            {beautifyPrice(originalData.supplied)}
           </div>
           <div className="h6 text-gray-300">
             {beautifyPrice(originalData.supplied * originalData.price, true)}
@@ -455,7 +455,7 @@ const yourBorrowedColumns = (memeCategory?: boolean) => [
       return (
         <>
           <div title={formatTokenValue(originalData?.borrowed)}>
-            {formatTokenValueWithMilify(originalData.borrowed, 4)}
+            {beautifyPrice(originalData.borrowed)}
           </div>
           <div className="h6 text-gray-300">
             {beautifyPrice(originalData.borrowed * originalData.price, true)}
