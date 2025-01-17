@@ -174,6 +174,7 @@ export const MARGIN_WHITELIST = [
   "meteorkent.near",
   "0x6871979c76a1313949b2E928F75dC316E02bfe33",
   "trisharichie.near",
+  "pironi.near",
 ];
 export const DISABLE_WITHDRAW_ADDRESS = "bc1p";
 const getConfig = (env: string = defaultNetwork) => {
