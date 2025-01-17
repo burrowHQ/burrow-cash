@@ -53,7 +53,7 @@ export const DUST_FORMAT = {
 };
 
 export const NO_STORAGE_DEPOSIT_CONTRACTS = ["aurora"];
-export const NEAR_STORAGE_DEPOSIT = Number(process.env.NEXT_PUBLIC_NEAR_STORAGE_DEPOSIT) || 0.1;
+export const NEAR_STORAGE_DEPOSIT = 0.15;
 export const NEAR_STORAGE_DEPOSIT_MIN = 0.05;
 export const NEAR_STORAGE_EXTRA_DEPOSIT = 0.1;
 export const NEAR_STORAGE_TOKEN = 0.1;

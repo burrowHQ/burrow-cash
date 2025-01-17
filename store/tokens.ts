@@ -109,7 +109,6 @@ export const prepareAndExecuteTokenTransactions = async (
   const transactions: Transaction[] = [];
 
   const functionCalls: FunctionCallOptions[] = [];
-
   // check if account is registered in the token contract
   if (
     !(await isRegistered(account.accountId, tokenContract.contractId)) &&
