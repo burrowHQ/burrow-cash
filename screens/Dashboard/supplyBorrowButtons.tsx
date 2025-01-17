@@ -36,13 +36,13 @@ export const MarketButton = ({
 export const WithdrawButton = ({ tokenId }) => {
   const handleWithdrawClick = useWithdrawTrigger(tokenId);
   const accountId = useAccountId();
-  const isWithdrawDisabled = accountId?.startsWith(DISABLE_WITHDRAW_ADDRESS);
+  const isTaproot = accountId?.startsWith(DISABLE_WITHDRAW_ADDRESS);
   return (
     <CustomButton
       className="flex-1 flex items-center justify-center border border-primary border-opacity-60 rounded-md text-base md:text-sm  text-primary bg-primary hover:opacity-80 bg-opacity-5 py-1"
       onClick={handleWithdrawClick}
-      disabled={isWithdrawDisabled}
-      style={{ cursor: isWithdrawDisabled ? "not-allowed" : "pointer" }}
+      disabled={isTaproot}
+      style={{ cursor: isTaproot ? "not-allowed" : "pointer" }}
     >
       Withdraw
     </CustomButton>

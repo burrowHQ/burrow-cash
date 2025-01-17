@@ -83,8 +83,10 @@ const Modal = () => {
   const maxWithdrawAmount = useAppSelector(getWithdrawMaxAmount(tokenId));
   const repayPositions = useAppSelector(getRepayPositions(tokenId));
   const { availableBalance: btcAvailableBalance, receiveAmount } = useBtcAction({
+    tokenId: asset?.tokenId || "",
+    decimals: asset?.decimals || 0,
     inputAmount: amount,
-    decimals: asset.decimals,
+    action,
   });
   const activePosition =
     action === "Repay" || action === "Borrow"
@@ -145,8 +147,9 @@ const Modal = () => {
   const repay_to_lp =
     action === "Repay" && isRepayFromDeposits && selectedCollateralType !== DEFAULT_POSITION;
   const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
-  const isBtc =
-    action === "Supply" && asset.tokenId === NBTCTokenId && selectedWalletId === "btc-wallet";
+  const isBtcToken = asset.tokenId === NBTCTokenId && selectedWalletId === "btc-wallet";
+  const isBtcSupply = action === "Supply" && isBtcToken;
+  const isBtcWithdraw = action === "Withdraw" && isBtcToken;
   return (
     <MUIModal open={isOpen} onClose={handleClose}>
       <Wrapper
@@ -184,15 +187,15 @@ const Modal = () => {
             <RepayTab asset={asset} />
             <Controls
               amount={amount}
-              available={isBtc ? btcAvailableBalance : available}
+              available={isBtcSupply ? btcAvailableBalance : available}
               action={action}
               tokenId={tokenId}
               asset={asset}
-              totalAvailable={isBtc ? btcAvailableBalance : available}
+              totalAvailable={isBtcSupply ? btcAvailableBalance : available}
               available$={available$}
             />
             <div className="flex flex-col gap-4 mt-6">
-              {isBtc ? <Receive value={receiveAmount} /> : null}
+              {isBtcWithdraw ? <Receive value={receiveAmount} /> : null}
               <HealthFactor value={healthFactor} />
               {repay_to_lp ? (
                 <HealthFactor value={single_healthFactor} title="Health Factor(Single)" />

@@ -81,7 +81,9 @@ const TokenDetail = () => {
   const { account, autoConnect } = useBtcWalletSelector();
   const { id } = router.query;
   const [updaterCounter, setUpDaterCounter] = useState(1);
-  const btcChainDetail = useBtcAction({ updater: updaterCounter });
+  const tokenRow = rows.find((row: UIAsset) => {
+    return row.tokenId === id;
+  });
   const accountId = useAccountId();
   const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
   const isNBTC = NBTCTokenId === id && selectedWalletId === "btc-wallet";
@@ -105,9 +107,6 @@ const TokenDetail = () => {
     }
   }, [isNBTC, account, accountId, selectedWalletId]);
   const pageType = getPageTypeFromUrl();
-  const tokenRow = rows.find((row: UIAsset) => {
-    return row.tokenId === id;
-  });
   const match = activeCategory == pageType;
   // update search params if no pageType on url
   useEffect(() => {
@@ -143,26 +142,17 @@ const TokenDetail = () => {
     return search.get("pageType");
   }
   if (!tokenRow || !match) return null;
-  return (
-    <TokenDetailView
-      tokenRow={tokenRow}
-      assets={rows}
-      isMeme={isMeme}
-      btcChainDetail={btcChainDetail}
-    />
-  );
+  return <TokenDetailView tokenRow={tokenRow} assets={rows} isMeme={isMeme} />;
 };
 
 function TokenDetailView({
   tokenRow,
   assets,
   isMeme,
-  btcChainDetail,
 }: {
   tokenRow: UIAsset;
   assets: UIAsset[];
   isMeme: boolean;
-  btcChainDetail: any;
 }) {
   const [suppliers_number, set_suppliers_number] = useState<number>();
   const [borrowers_number, set_borrowers_number] = useState<number>();
@@ -323,7 +313,6 @@ function TokenDetailView({
         getIcons,
         getSymbols,
         isMeme,
-        btcChainDetail,
       }}
     >
       {isMobile ? (
@@ -976,15 +965,16 @@ function TokenRateModeChart({
 }
 
 function TokenUserInfo() {
-  const { tokenRow, btcChainDetail } = useContext(DetailData) as any;
+  const { tokenRow } = useContext(DetailData) as any;
+  const { availableBalance: btcAvailableBalance } = useBtcAction({
+    tokenId: tokenRow?.tokenId || "",
+    decimals: tokenRow?.decimals || 0,
+  });
   const { tokenId, tokens, isLpToken, price } = tokenRow;
   const accountId = useAccountId();
   const isMeme = useAppSelector(isMemeCategory);
   const isWrappedNear = tokenRow.symbol === "NEAR";
-  const { supplyBalance, maxBorrowAmountPositions, btcSupplyBalance } = useUserBalance(
-    tokenId,
-    isWrappedNear,
-  );
+  const { supplyBalance, maxBorrowAmountPositions } = useUserBalance(tokenId, isWrappedNear);
   const handleSupplyClick = useSupplyTrigger(tokenId);
   const handleBorrowClick = useBorrowTrigger(tokenId);
   const dispatch = useAppDispatch();
@@ -1020,7 +1010,7 @@ function TokenUserInfo() {
   );
   const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
   const isNBTC = NBTCTokenId === tokenId && selectedWalletId === "btc-wallet";
-  const isWithdrawDisabled = accountId?.startsWith(DISABLE_WITHDRAW_ADDRESS);
+  const isTaproot = accountId?.startsWith(DISABLE_WITHDRAW_ADDRESS);
   return (
     <UserBox className="mb-[29px] xsm:mb-2.5">
       <div className="flex justify-between items-center">
@@ -1059,7 +1049,7 @@ function TokenUserInfo() {
               <span
                 className="text-toolTipBoxBorderColor text-xs hover:cursor-pointer underline mr-[4px]"
                 onClick={() => {
-                  window.open("https://testnet.bridge.satos.network/", "_blank");
+                  window.open("https://ramp.satos.network/", "_blank");
                 }}
               >
                 BTC Bridge
@@ -1078,7 +1068,7 @@ function TokenUserInfo() {
             <span className="text-gray-300">BTC Chain</span>
             <span className="flex items-center">
               <span className="mr-[6px] text-sm">
-                {accountId ? digitalProcess(btcChainDetail.availableBalance || 0, 8) : "-"}
+                {accountId ? digitalProcess(btcAvailableBalance || 0, 8) : "-"}
               </span>
               <BtcChainIcon />
             </span>
@@ -1125,7 +1115,7 @@ function TokenUserInfo() {
         {accountId ? (
           <>
             <YellowSolidButton
-              disabled={isBtc || isWithdrawDisabled ? !+btcSupplyBalance : !+supplyBalance}
+              disabled={isTaproot || (isBtc ? !+btcAvailableBalance : !+supplyBalance)}
               className="w-1 flex-grow"
               onClick={handleSupplyClick}
             >
@@ -1175,8 +1165,8 @@ function YouSupplied() {
   ) || [[], 0];
   const handleWithdrawClick = useWithdrawTrigger(tokenId);
   const handleAdjustClick = useAdjustTrigger(tokenId);
-  const isWithdrawDisabled = accountId?.startsWith(DISABLE_WITHDRAW_ADDRESS);
-  const withdraw_disabled = !supplied || !supplied?.canWithdraw || isWithdrawDisabled;
+  const isTaproot = accountId?.startsWith(DISABLE_WITHDRAW_ADDRESS);
+  const withdraw_disabled = !supplied || !supplied?.canWithdraw || isTaproot;
   const adjust_disabled = !supplied?.canUseAsCollateral;
   const is_empty = !supplied;
   return (
