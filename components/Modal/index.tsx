@@ -189,7 +189,6 @@ const Modal = () => {
               amount={amount}
               available={isBtcSupply ? btcAvailableBalance : available}
               action={action}
-              tokenId={tokenId}
               asset={asset}
               totalAvailable={isBtcSupply ? btcAvailableBalance : available}
               available$={available$}
