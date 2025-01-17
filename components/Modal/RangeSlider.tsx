@@ -55,7 +55,6 @@ export default function RangeSlider(props: any) {
   function changeValue(v: string, isClickValue?: boolean) {
     let matchedValue;
     const numValue = Number(v);
-    // const toPercent = (100 / splitList.length) * numValue;
     if (isClickValue) {
       matchedValue = numValue;
       if (isMonth) {

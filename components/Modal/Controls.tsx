@@ -23,22 +23,22 @@ export default function Controls({ amount, available, action, asset, totalAvaila
       dispatch(updateAmount({ isMax: false, amount: value }));
     }
   };
-
   const handleSliderChange = (percent) => {
     const p = percent < 1 ? 0 : percent > 99 ? 100 : percent;
     const value = new Decimal(available).mul(p).div(100).toFixed();
+    const decimalLength = value?.split(".")?.[1]?.length || 0;
     if (isMeme) {
       dispatch(
         updateAmountMEME({
           isMax: p === 100,
-          amount: new Decimal(value || 0).toFixed(),
+          amount: new Decimal(value || 0).toFixed(Math.min(decimalLength, asset.decimals)),
         }),
       );
     } else {
       dispatch(
         updateAmount({
           isMax: p === 100,
-          amount: new Decimal(value || 0).toFixed(),
+          amount: new Decimal(value || 0).toFixed(Math.min(decimalLength, asset.decimals)),
         }),
       );
     }
