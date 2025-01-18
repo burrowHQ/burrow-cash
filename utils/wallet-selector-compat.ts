@@ -6,7 +6,6 @@ import { setupNightly } from "@near-wallet-selector/nightly";
 import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
 import { setupMeteorWallet } from "@near-wallet-selector/meteor-wallet";
 import { setupWalletConnect } from "@near-wallet-selector/wallet-connect";
-import { setupNeth } from "@near-wallet-selector/neth";
 import { setupNearMobileWallet } from "@near-wallet-selector/near-mobile-wallet";
 import { setupModal } from "ref-modal-ui";
 import { setupLedger } from "@near-wallet-selector/ledger";
