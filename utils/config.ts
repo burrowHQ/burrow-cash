@@ -176,6 +176,10 @@ export const MARGIN_WHITELIST = [
   "trisharichie.near",
   "pironi.near",
   "escobarindo.near",
+  "zent.near",
+  "pironi.near",
+  "scalable.near",
+  "cakmirza.tg",
 ];
 export const DISABLE_WITHDRAW_ADDRESS = "bc1p";
 const getConfig = (env: string = defaultNetwork) => {
