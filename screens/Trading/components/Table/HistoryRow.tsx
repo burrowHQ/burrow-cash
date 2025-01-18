@@ -104,9 +104,9 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
         {record.pnl !== "0"
           ? beautifyPrice(Math.abs(record.pnl * record.c_token_price), false, 3, 3)
           : ""}
-        <p className="text-gray-300 text-xs">
+        {/* <p className="text-gray-300 text-xs">
           {getSymbolById(assetC.token_id, assetC.metadata?.symbol)}
-        </p>
+        </p> */}
       </td>
       <td>
         <div className="text-sm">
