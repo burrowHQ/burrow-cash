@@ -76,7 +76,7 @@ const CommunityItem = () => {
     <div
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className="inline-block py-3 px-2 cursor-pointer hover:bg-gray-800 hover:border hover:border-dark-50 relative rounded-md"
+      className="inline-block py-3 px-2 cursor-pointer hover:bg-gray-800 border border-transparent hover:border-dark-50 relative rounded-md"
     >
       <svg
         width="13"
@@ -197,7 +197,7 @@ const Links = () => {
       gridTemplateColumns="repeat(4, 1fr)"
       alignItems="center"
       lineHeight="0"
-      sx={{ gap: "48px" }}
+      sx={{ gap: "32px" }}
     >
       <a
         href="https://twitter.com/burrow_finance"
