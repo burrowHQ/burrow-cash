@@ -57,11 +57,25 @@ const HelpMenuItem = () => {
 };
 const CommunityItem = () => {
   const [isHovered, setIsHovered] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
   const isMobile = isMobileDevice();
+
+  const handleMouseLeave = () => {
+    const id = setTimeout(() => setIsHovered(false), 300);
+    setTimeoutId(id);
+  };
+
+  const handleMouseEnter = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    setIsHovered(true);
+  };
+
   return (
     <div
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       className="inline-block py-3 px-2 cursor-pointer hover:bg-gray-800 hover:border hover:border-dark-50 relative rounded-md"
     >
       <svg
