@@ -150,6 +150,17 @@ const Modal = () => {
   const isBtcToken = asset.tokenId === NBTCTokenId && selectedWalletId === "btc-wallet";
   const isBtcSupply = action === "Supply" && isBtcToken;
   const isBtcWithdraw = action === "Withdraw" && isBtcToken;
+  if (isBtcWithdraw) {
+    const min_withdraw_amount = 0.00005;
+    if (new Decimal(amount || 0).lt(min_withdraw_amount)) {
+      alerts["btcWithdraw"] = {
+        title: `You must withdraw at least ${min_withdraw_amount} NBTC`,
+        severity: "error",
+      };
+    } else {
+      delete alerts.btcWithdraw;
+    }
+  }
   return (
     <MUIModal open={isOpen} onClose={handleClose}>
       <Wrapper
@@ -217,6 +228,7 @@ const Modal = () => {
               healthFactor={healthFactor}
               collateralType={selectedCollateralType}
               poolAsset={assets[tokenId]}
+              isDisabled={alerts["btcWithdraw"]}
             />
           </Box>
         </ModalContext.Provider>
