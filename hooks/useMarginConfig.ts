@@ -59,16 +59,18 @@ export function useMarginConfigToken() {
 
   processTokens(filteredMarginConfigTokens2, categoryAssets2);
   processTokens(filteredMarginConfigTokens2MEME, categoryAssets2MEME);
-
-  const getPositionType = (token_id) => {
-    const isMainStream = filteredTokenTypeMap.mainStream.includes(token_id);
-    const type = isMainStream
-      ? marginConfigTokens.registered_tokens[token_id]
-      : marginConfigTokensMEME.registered_tokens[token_id];
-    return {
-      label: type === 1 ? "Short" : "Long",
-      class: type === 1 ? "text-red-50" : "text-primary",
-    };
+  const getPositionType = (token_c_id: string, token_d_id: string) => {
+    if (token_c_id == token_d_id) {
+      return {
+        label: "Long",
+        class: "text-primary",
+      };
+    } else {
+      return {
+        label: "Short",
+        class: "text-red-50",
+      };
+    }
   };
 
   return {

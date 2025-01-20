@@ -49,7 +49,7 @@ const PositionRow = ({
     }, 3000);
     return () => clearTimeout(timeoutId);
   }, [itemKey, item, index]);
-  const positionType = getPositionType(item.token_d_info.token_id);
+  const positionType = getPositionType(item.token_c_info.token_id, item.token_d_info.token_id);
   const isMainStream = filteredTokenTypeMap.mainStream.includes(
     positionType.label === "Long" ? item.token_p_id : item.token_d_info.token_id,
   );
@@ -133,8 +133,12 @@ const PositionRow = ({
     <tr className="text-base hover:bg-dark-100 font-normal align-text-top">
       <td className="py-5 pl-5">
         <div className="-mb-1.5">{marketTitle}</div>
-        <span className={`text-xs ${getPositionType(item.token_d_info.token_id).class}`}>
-          {getPositionType(item.token_d_info.token_id).label}
+        <span
+          className={`text-xs ${
+            getPositionType(item.token_c_info.token_id, item.token_d_info.token_id).class
+          }`}
+        >
+          {getPositionType(item.token_c_info.token_id, item.token_d_info.token_id).label}
           <span className="ml-1.5">{toInternationalCurrencySystem_number(leverage)}x</span>
         </span>
       </td>
@@ -242,8 +246,12 @@ const PositionRow = ({
           </div>
           <div>
             <p>{marketTitle}</p>
-            <p className={`text-xs -mt-0 ${getPositionType(item.token_d_info.token_id).class}`}>
-              {getPositionType(item.token_d_info.token_id).label}
+            <p
+              className={`text-xs -mt-0 ${
+                getPositionType(item.token_c_info.token_id, item.token_d_info.token_id).class
+              }`}
+            >
+              {getPositionType(item.token_c_info.token_id, item.token_d_info.token_id).label}
               <span className="ml-1.5">{toInternationalCurrencySystem_number(leverage)}x</span>
             </p>
           </div>
