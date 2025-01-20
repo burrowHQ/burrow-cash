@@ -31,14 +31,16 @@ export default function Controls({ amount, available, action, asset, totalAvaila
       dispatch(
         updateAmountMEME({
           isMax: p === 100,
-          amount: new Decimal(value || 0).toFixed(Math.min(decimalLength, asset.decimals)),
+          // amount: new Decimal(value || 0).toFixed(Math.min(decimalLength, asset.decimals)),
+          amount: new Decimal(value || 0).toFixed(),
         }),
       );
     } else {
       dispatch(
         updateAmount({
           isMax: p === 100,
-          amount: new Decimal(value || 0).toFixed(Math.min(decimalLength, asset.decimals)),
+          // amount: new Decimal(value || 0).toFixed(Math.min(decimalLength, asset.decimals)),
+          amount: new Decimal(value || 0).toFixed(),
         }),
       );
     }
