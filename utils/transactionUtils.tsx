@@ -17,6 +17,7 @@ export enum TRANSACTION_ERROR_TYPE {
   TOKEN_FROZEN = "Token Frozen",
   POOL_BALANCE_LESS = "Pool Balance Less Than MIN_RESERVE",
   NETH_ERROR = "Smart contract panicked",
+  UNKNOWN_ERROR = "Smart contract panicked",
 }
 
 export const getErrorMessage = (receipts_outcome: any) => {
@@ -67,6 +68,9 @@ export const getErrorMessage = (receipts_outcome: any) => {
       outcome?.outcome?.status?.Failure?.ActionError?.kind?.FunctionCallError?.ExecutionError,
     );
   });
+  const isOtherError = receipts_outcome.some((outcome: any) => {
+    return outcome?.outcome?.status?.Failure;
+  });
 
   if (isSlippageError) {
     return TRANSACTION_ERROR_TYPE.SLIPPAGE_VIOLATION;
@@ -84,6 +88,8 @@ export const getErrorMessage = (receipts_outcome: any) => {
     return TRANSACTION_ERROR_TYPE.POOL_BALANCE_LESS;
   } else if (isNETHErrpr) {
     return TRANSACTION_ERROR_TYPE.NETH_ERROR;
+  } else if (isOtherError) {
+    return TRANSACTION_ERROR_TYPE.UNKNOWN_ERROR;
   } else {
     return null;
   }

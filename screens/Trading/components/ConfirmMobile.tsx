@@ -32,7 +32,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
 }) => {
   const theme = useTheme();
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
-  const { ReduxcategoryAssets1 } = useAppSelector((state) => state.category);
+  const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
   const actionShowRedColor = action === "Long";
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [isMinTokenPAmount, setIsMinTokenPAmount] = useState<boolean>(false);
@@ -78,10 +78,11 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
   const decimalsD = +assetD.config.extra_decimals + +assetD.metadata.decimals;
   const decimalsP = +assetP.config.extra_decimals + +assetP.metadata.decimals;
   const decimalsC = action === "Long" ? decimalsD : decimalsP;
-  const cateSymbol = getSymbolById(
+  const baseTokenSymbol = getSymbolById(
     ReduxcategoryAssets1?.token_id,
     ReduxcategoryAssets1?.metadata?.symbol,
   );
+  const quoteTokenSymbol = ReduxcategoryAssets2?.metadata.symbol;
   const min_amount_out_estimate = confirmInfo.estimateData.min_amount_out;
   const expand_amount_in_estimate = confirmInfo.estimateData.expand_amount_in;
   const in_extra_decimals = confirmInfo?.longInputName?.config?.extra_decimals || 0;
@@ -116,16 +117,6 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
     setIsDisabled(true);
     let hasError = false;
     try {
-      const { decimals: localDecimals } = getAssetDetails(
-        isMainStream
-          ? getAssetById(
-              action === "Long" ? openPositionParams.token_p_id : openPositionParams.token_d_id,
-            )
-          : getAssetByIdMEME(
-              action === "Long" ? openPositionParams.token_p_id : openPositionParams.token_d_id,
-            ),
-      );
-
       // Swap Out Trial Calculation Result Verification
       const minTokenPAmount = Number(shrinkToken(openPositionParams.min_token_p_amount, decimalsP));
       const tokenDAmount = shrinkToken(openPositionParams.token_d_amount, decimalsD);
@@ -158,8 +149,8 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
       localStorage.setItem(
         "cateSymbolAndDecimals",
         JSON.stringify({
-          cateSymbol,
-          decimals: localDecimals,
+          baseTokenSymbol,
+          quoteTokenSymbol,
           amount: confirmInfo.longOutput,
           totalPrice: confirmInfo.longOutputUsd,
           entryPrice:
@@ -221,7 +212,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
                     actionShowRedColor ? "bg-primary text-primary" : "bg-red-50 text-red-50"
                   }`}
                 >
-                  {action} {cateSymbol} {confirmInfo.rangeMount}X
+                  {action} {baseTokenSymbol} {confirmInfo.rangeMount}X
                 </div>
               </div>
               <div className="cursor-pointer">
@@ -325,7 +316,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
                 {isDisabled ? (
                   <BeatLoader size={5} color="#14162B" />
                 ) : (
-                  ` Confirm ${action} ${cateSymbol} ${confirmInfo.rangeMount}X`
+                  ` Confirm ${action} ${baseTokenSymbol} ${confirmInfo.rangeMount}X`
                 )}
               </YellowSolidButton>
             ) : (
@@ -337,7 +328,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
                 {isDisabled ? (
                   <BeatLoader size={5} color="#14162B" />
                 ) : (
-                  ` Confirm ${action} ${cateSymbol} ${confirmInfo.rangeMount}X`
+                  ` Confirm ${action} ${baseTokenSymbol} ${confirmInfo.rangeMount}X`
                 )}
               </RedSolidButton>
             )}

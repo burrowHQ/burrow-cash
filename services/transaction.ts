@@ -132,7 +132,8 @@ function showPositionResultWrapper(
     positionSize: {
       amount: cateSymbolAndDecimals?.amount || "",
       totalPrice: cateSymbolAndDecimals?.totalPrice || "",
-      symbol: cateSymbolAndDecimals?.cateSymbol || "NEAR",
+      baseTokenSymbol: cateSymbolAndDecimals?.baseTokenSymbol || "",
+      quoteTokenSymbol: cateSymbolAndDecimals?.quoteTokenSymbol || "",
       entryPrice: cateSymbolAndDecimals?.entryPrice || "0",
     },
   });

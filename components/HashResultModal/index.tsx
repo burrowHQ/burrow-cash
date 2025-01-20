@@ -12,9 +12,10 @@ interface ShowPositionResultParams {
   transactionHashes?: string;
   positionSize?: {
     amount: string;
-    symbol: string;
     totalPrice: string;
     entryPrice: string;
+    baseTokenSymbol: string;
+    quoteTokenSymbol: string;
   };
 }
 
@@ -57,9 +58,6 @@ export const showPositionResult = (params: ShowPositionResultParams) => {
 
   root?.render(<ModalWithCountdown show onClose={handleClose} {...params} />);
 };
-
-// ... existing code ...
-
 export const showPositionFailure = (params: {
   title?: string;
   errorMessage?: string;
