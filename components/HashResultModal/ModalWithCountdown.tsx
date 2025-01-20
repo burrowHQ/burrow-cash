@@ -10,7 +10,8 @@ interface PositionResultProps {
   type?: "Long" | "Short";
   positionSize?: {
     amount: string;
-    symbol: string;
+    baseTokenSymbol: string;
+    quoteTokenSymbol: string;
     totalPrice: string;
     entryPrice: string;
   };
@@ -32,7 +33,8 @@ const ModalWithCountdown = ({
   type = "Long",
   positionSize = {
     amount: "0",
-    symbol: "NEAR",
+    baseTokenSymbol: "",
+    quoteTokenSymbol: "",
     totalPrice: "$0.00",
     entryPrice: "0",
   },
@@ -106,7 +108,6 @@ const ModalWithCountdown = ({
             </div>
             <div className="fc">
               <div className="fc">
-                {/* <NearIconMini /> */}
                 <span className="font-normal text-base pr-2">{title}</span>
                 <div
                   className={`text-sm ${
@@ -120,7 +121,7 @@ const ModalWithCountdown = ({
                     textOverflow: "ellipsis",
                   }}
                 >
-                  {type} {positionSize.symbol}
+                  {type} {positionSize.baseTokenSymbol}
                 </div>
               </div>
               <div className="text-[#6FA300] text-sm ml-auto flex items-center">
@@ -130,12 +131,15 @@ const ModalWithCountdown = ({
             </div>
             <div className="fc justify-between text-sm font-normal">
               <span className="text-gray-300">Entry Price</span>
-              <span>${beautifyPrice(Number(positionSize.entryPrice))}</span>
+              <span className="flex items-center gap-0.5">
+                {beautifyPrice(Number(positionSize.entryPrice))}
+                <span className="text-xs text-gray-30">({positionSize.quoteTokenSymbol})</span>
+              </span>
             </div>
             <div className="fc justify-between text-sm font-normal">
               <span className="text-gray-300">Position Size</span>
               <span>
-                {beautifyPrice(Number(positionSize.amount))} {positionSize.symbol}
+                {beautifyPrice(Number(positionSize.amount))} {positionSize.baseTokenSymbol}
                 <span className="text-xs text-gray-300">
                   (${beautifyPrice(Number(positionSize.totalPrice))})
                 </span>
