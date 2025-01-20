@@ -39,7 +39,7 @@ export interface IExtraProps {
   index: number;
   item: any;
   getAssetById: (id: string, tokenInfo?: TokenInfo) => IAssetDetailedWithMetadata;
-  getPositionType: (id: string) => { label: string };
+  getPositionType: (c_id: string, d_id: string) => { label: string };
   getAssetDetails: (asset: any) => { price: number; symbol: string; decimals: number };
   parseTokenValue: (value: string, decimals: number) => number;
   calculateLeverage: (

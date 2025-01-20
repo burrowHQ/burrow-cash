@@ -53,7 +53,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   const [isEstimating, setIsEstimating] = useState<boolean>(false);
   const [forceUpdate, setForceUpdate] = useState<number>(0);
   const [swapUnSecurity, setSwapUnSecurity] = useState<boolean>(false);
-  const positionType = getPositionType(item.token_d_info.token_id);
+  const positionType = getPositionType(item.token_c_info.token_id, item.token_d_info.token_id);
   const isMainStream = filteredTokenTypeMap.mainStream.includes(
     positionType.label === "Long" ? item.token_p_id : item.token_d_info.token_id,
   );

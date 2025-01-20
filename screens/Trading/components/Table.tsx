@@ -240,7 +240,10 @@ const TradingTable = ({
           const { symbol: symbolC } = getAssetDetails(assetC);
           const { symbol: symbolP } = getAssetDetails(assetP);
           const { symbol: symbolD } = getAssetDetails(assetD);
-          const positionType = getPositionType(item.token_d_info.token_id);
+          const positionType = getPositionType(
+            item.token_c_info.token_id,
+            item.token_d_info.token_id,
+          );
           const marketTitle =
             positionType.label === "Long" ? `${symbolP}/${symbolC}` : `${symbolD}/${symbolC}`;
           return marketTitle === filterTitle;

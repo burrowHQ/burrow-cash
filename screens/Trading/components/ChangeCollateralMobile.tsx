@@ -162,7 +162,10 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
   const leverageD = parseTokenValue(rowData.data.token_d_info.balance, decimalsD);
   const leverageC = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
   const leverage = calculateLeverage(leverageD, priceD, leverageC, priceC);
-  const positionType = getPositionType(rowData.data.token_d_info.token_id);
+  const positionType = getPositionType(
+    rowData.data.token_c_info.token_id,
+    rowData.data.token_d_info.token_id,
+  );
   const sizeValueLong = parseTokenValue(rowData.data.token_p_amount, decimalsP);
   const sizeValueShort = parseTokenValue(rowData.data.token_d_info.balance, decimalsD);
   const size = positionType.label === "Long" ? sizeValueLong : sizeValueShort;

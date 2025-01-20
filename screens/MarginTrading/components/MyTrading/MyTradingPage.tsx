@@ -40,7 +40,10 @@ const MyMarginTradingPage = () => {
     const pnlArray: number[] = [];
     await Promise.all(
       Object.entries(totalMarginAccountList).map(async ([itemKey, item]) => {
-        const positionType = getPositionType(item.token_d_info.token_id).label;
+        const positionType = getPositionType(
+          item.token_c_info.token_id,
+          item.token_d_info.token_id,
+        ).label;
         const assetD = getAssetById(item.token_d_info.token_id, item);
         const assetC = getAssetById(item.token_c_info.token_id, item);
         const assetP = getAssetById(item.token_p_id, item);
