@@ -180,6 +180,10 @@ export const MARGIN_WHITELIST = [
   "pironi.near",
   "scalable.near",
   "cakmirza.tg",
+  "cwpuzzles.near",
+  "marior.near",
+  "cwpuzzles.near",
+  "eklan.near",
 ];
 export const DISABLE_WITHDRAW_ADDRESS = "bc1p";
 const getConfig = (env: string = defaultNetwork) => {
