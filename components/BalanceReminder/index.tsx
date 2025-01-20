@@ -5,11 +5,23 @@ import { RemindCloseIcon, RemindIcon } from "./icon";
 import { useAppSelector } from "../../redux/hooks";
 import { getAccountId } from "../../redux/accountSelectors";
 import { setAccountDetailsOpen, setActiveTab, setSelectedTab } from "../../redux/marginTabSlice";
+import {
+  getMarginAccountSupplied,
+  getMarginAccountSuppliedMEME,
+} from "../../redux/marginAccountSelectors";
+import { useMarginAccount } from "../../hooks/useMarginAccount";
 
 const BalanceReminder = () => {
   const router = useRouter();
+  const { getAssetById, getAssetByIdMEME } = useMarginAccount();
   const accountId = useAppSelector(getAccountId);
   const [shouldShow, setShouldShow] = useState(false);
+  const accountSupplied = useAppSelector(getMarginAccountSupplied);
+  const accountSuppliedMEME = useAppSelector(getMarginAccountSuppliedMEME);
+  const combinedAccountSupplied = [
+    ...accountSupplied.map((token) => ({ ...token, type: "main" })),
+    ...accountSuppliedMEME.map((token) => ({ ...token, type: "meme" })),
+  ];
   const Unreminded = useMemo(() => {
     const lastClosedDate = localStorage.getItem("balanceReminderLastClosed");
     const today = new Date().toDateString();
@@ -17,13 +29,22 @@ const BalanceReminder = () => {
   }, []);
   const dispatch = useDispatch();
   useEffect(() => {
-    if (accountId && Unreminded) {
+    const hasValidAccountSupplied =
+      combinedAccountSupplied.length > 0 &&
+      combinedAccountSupplied.some((token) => {
+        const assetDetails =
+          token.type === "main" ? getAssetById(token.token_id) : getAssetByIdMEME(token.token_id);
+        return (
+          assetDetails && token.balance.toString().length >= assetDetails.config.extra_decimals
+        );
+      });
+
+    if (accountId && Unreminded && hasValidAccountSupplied) {
       setShouldShow(true);
-      // setPersonalDataUpdatedSerialNumber(personalDataUpdatedSerialNumber + 1);
     } else {
       setShouldShow(false);
     }
-  }, [accountId, router.pathname, Unreminded]);
+  }, [accountId, router.pathname, Unreminded, combinedAccountSupplied]);
   const handleClaim = () => {
     dispatch(setActiveTab("my"));
     dispatch(setSelectedTab("account"));

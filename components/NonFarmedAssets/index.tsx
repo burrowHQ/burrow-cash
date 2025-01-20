@@ -10,25 +10,46 @@ function NonFarmedAssets() {
   } = useNonFarmedAssets(true);
   const main_null = !hasNonFarmedAssets || hasNegativeNetLiquidity;
   const meme_null = !hasNonFarmedAssetsMEME || hasNegativeNetLiquidityMEME;
-  if (main_null && meme_null) return null;
-  return (
-    <div className="flex xsm:hidden xsm:gap-3 items-center justify-between mb-5 border border-primary border-opacity-60 bg-primary bg-opacity-5 rounded-xl p-3 pl-5">
-      <div className="flex items-start">
-        <WarnIcon className="relative top-px flex-shrink-0 xsm:hidden" />
-        <div className="text-sm text-white mx-2.5 xsm:mx-0">
-          At least one of your farms in the {main_null ? "meme" : "Mainstream"} has started emitting
-          extra rewards. If you are seeing this warning, please click ‘Claim & Join’ to join the new
-          farm.
+
+  if (!main_null) {
+    return (
+      <div className="flex xsm:hidden xsm:gap-3 items-center justify-between mb-5 border border-primary border-opacity-60 bg-primary bg-opacity-5 rounded-xl p-3 pl-5">
+        <div className="flex items-start">
+          <WarnIcon className="relative top-px flex-shrink-0 xsm:hidden" />
+          <div className="text-sm text-white mx-2.5 xsm:mx-0">
+            At least one of your farms in the Mainstream has started emitting extra rewards. If you
+            are seeing this warning, please click ‘Claim & Join’ to join the new farm.
+          </div>
         </div>
+        <ClaimAllRewards
+          location="non-farmed-assets"
+          Button={ClaimButton}
+          disabled={hasNegativeNetLiquidity}
+          memeCategory={false}
+        />
       </div>
-      <ClaimAllRewards
-        location="non-farmed-assets"
-        Button={ClaimButton}
-        disabled={hasNegativeNetLiquidity}
-        memeCategory={main_null}
-      />
-    </div>
-  );
+    );
+  } else if (meme_null) {
+    return (
+      <div className="flex xsm:hidden xsm:gap-3 items-center justify-between mb-5 border border-primary border-opacity-60 bg-primary bg-opacity-5 rounded-xl p-3 pl-5">
+        <div className="flex items-start">
+          <WarnIcon className="relative top-px flex-shrink-0 xsm:hidden" />
+          <div className="text-sm text-white mx-2.5 xsm:mx-0">
+            At least one of your farms in the meme has started emitting extra rewards. If you are
+            seeing this warning, please click ‘Claim & Join’ to join the new farm.
+          </div>
+        </div>
+        <ClaimAllRewards
+          location="non-farmed-assets"
+          Button={ClaimButton}
+          disabled={hasNegativeNetLiquidityMEME}
+          memeCategory={true}
+        />
+      </div>
+    );
+  }
+
+  return null;
 }
 
 const ClaimButton = (props) => {

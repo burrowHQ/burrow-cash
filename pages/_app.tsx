@@ -115,26 +115,12 @@ const Init = () => {
   return null;
 };
 function Upgrade({ Component, pageProps }) {
-  const { getAssetById, getAssetByIdMEME } = useMarginAccount();
   const [upgrading, setUpgrading] = useState<boolean>(true);
-  const accountSupplied = useAppSelector(getMarginAccountSupplied);
-  const accountSuppliedMEME = useAppSelector(getMarginAccountSuppliedMEME);
-  const combinedAccountSupplied = [
-    ...accountSupplied.map((token) => ({ ...token, type: "main" })),
-    ...accountSuppliedMEME.map((token) => ({ ...token, type: "meme" })),
-  ];
   const dispatch = useAppDispatch();
   const accountId = useAppSelector(getAccountId);
   const portfolio = useAppSelector(getAccountPortfolio());
   const assets = useAppSelector(getAssets);
   const config = useAppSelector(getConfig);
-  const hasValidAccountSupplied =
-    combinedAccountSupplied?.length > 0 &&
-    combinedAccountSupplied?.some((token) => {
-      const assetDetails =
-        token.type === "main" ? getAssetById(token.token_id) : getAssetByIdMEME(token.token_id);
-      return assetDetails && token.balance.toString().length >= assetDetails.config.extra_decimals;
-    });
   useEffect(() => {
     if (
       !portfolio.positions ||
@@ -182,7 +168,7 @@ function Upgrade({ Component, pageProps }) {
           <ToastMessage />
           <Component {...pageProps} />
           {/* <Popup className="xsm:hidden" /> */}
-          {hasValidAccountSupplied && <BalanceReminder />}
+          <BalanceReminder />
           <RpcList />
           <PubTestModal />
         </Layout>
