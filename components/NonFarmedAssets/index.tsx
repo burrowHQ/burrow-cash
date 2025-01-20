@@ -29,7 +29,7 @@ function NonFarmedAssets() {
         />
       </div>
     );
-  } else if (meme_null) {
+  } else if (!meme_null) {
     return (
       <div className="flex xsm:hidden xsm:gap-3 items-center justify-between mb-5 border border-primary border-opacity-60 bg-primary bg-opacity-5 rounded-xl p-3 pl-5">
         <div className="flex items-start">
