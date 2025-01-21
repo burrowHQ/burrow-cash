@@ -1,8 +1,9 @@
 import { BeatLoader } from "react-spinners";
-import { useNonFarmedAssets } from "../../hooks/hooks";
+import { useAccountId, useNonFarmedAssets } from "../../hooks/hooks";
 import ClaimAllRewards from "../ClaimAllRewards";
 
 function NonFarmedAssets() {
+  const accountId = useAccountId();
   const { hasNonFarmedAssets, hasNegativeNetLiquidity } = useNonFarmedAssets(false);
   const {
     hasNonFarmedAssets: hasNonFarmedAssetsMEME,
@@ -10,7 +11,9 @@ function NonFarmedAssets() {
   } = useNonFarmedAssets(true);
   // const main_null = !hasNonFarmedAssets || hasNegativeNetLiquidity;
   // const meme_null = !hasNonFarmedAssetsMEME || hasNegativeNetLiquidityMEME;
-
+  if (!accountId) {
+    return null;
+  }
   if (hasNonFarmedAssets === true || hasNegativeNetLiquidity === false) {
     return (
       <div className="flex xsm:hidden xsm:gap-3 items-center justify-between mb-5 border border-primary border-opacity-60 bg-primary bg-opacity-5 rounded-xl p-3 pl-5">
