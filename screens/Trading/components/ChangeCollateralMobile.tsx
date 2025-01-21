@@ -250,7 +250,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
         positionType: positionType.label,
         icon: iconC,
         symbol: symbolC,
-        addedValue: String(addedValue),
+        addedValue: String(addedValue / priceC),
       };
       localStorage.setItem("marginTradingTab", "my");
       localStorage.setItem("marginTransactionType", "changeCollateral");
@@ -262,7 +262,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
           icon: iconC,
           type: positionType.label === "Long" ? "Long" : "Short",
           symbol: symbolC,
-          collateral: String(addedValue),
+          collateral: String(addedValue / priceC),
         });
       }
     } catch (error) {
@@ -283,7 +283,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
         positionType: positionType.label,
         icon: iconC,
         symbol: symbolC,
-        addedValue: String(addedValue),
+        addedValue: String(addedValue / priceC),
       };
       dispatch(setActiveTab("my"));
       localStorage.setItem("marginTransactionType", "changeCollateral");
@@ -295,7 +295,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
           type: positionType.label === "Long" ? "Long" : "Short",
           icon: iconC,
           symbol: symbolC,
-          collateral: String(addedValue),
+          collateral: String(addedValue / priceC),
         });
       }
     } catch (error) {

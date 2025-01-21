@@ -119,7 +119,7 @@ const ModalWithChangeCollateral = ({
             </div> */}
             <div className="fc justify-between text-sm font-normal">
               <span className="text-gray-300">collateral({symbol})</span>
-              <span>${toInternationalCurrencySystem_number(Number(collateral))}</span>
+              <span>{toInternationalCurrencySystem_number(Number(collateral))}</span>
             </div>
             <div className="absolute bottom-0 z-50 w-full left-0">{renderProgressBar()}</div>
           </div>
