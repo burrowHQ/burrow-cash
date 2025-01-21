@@ -31,9 +31,17 @@ interface Props {
   amount: string;
   isMax: boolean;
   isMeme: boolean;
+  available: number;
 }
 
-export async function withdraw({ tokenId, extraDecimals, amount, isMax, isMeme }: Props) {
+export async function withdraw({
+  tokenId,
+  extraDecimals,
+  amount,
+  isMax,
+  isMeme,
+  available,
+}: Props) {
   const state = store.getState();
   const { oracleContract, logicContract, memeOracleContract, logicMEMEContract, selector } =
     await getBurrow();
@@ -65,9 +73,8 @@ export async function withdraw({ tokenId, extraDecimals, amount, isMax, isMeme }
   const suppliedBalance = new Decimal(account.portfolio?.supplied[tokenId]?.balance || 0);
   const hasBorrow = account.portfolio?.borrows?.length > 0;
   const maxAmount = computeWithdrawMaxAmount(tokenId, assets, account.portfolio!);
-
   const expandedAmount = isMax
-    ? maxAmount
+    ? decimalMin(maxAmount, expandTokenDecimal(available, decimals + extraDecimals))
     : decimalMin(maxAmount, expandTokenDecimal(amount, decimals + extraDecimals));
 
   const transactions: Transaction[] = [];

@@ -31,6 +31,7 @@ export default function Action({
   collateralType,
   poolAsset,
   isDisabled,
+  maxWithdrawAmount,
 }) {
   const [loading, setLoading] = useState(false);
   const { amount, useAsCollateral, isMax } = useAppSelector(getSelectedValues);
@@ -45,6 +46,7 @@ export default function Action({
   const { available, canUseAsCollateral, extraDecimals, collateral, disabled, decimals } =
     getModalData({
       ...asset,
+      maxWithdrawAmount,
       maxBorrowAmount,
       healthFactor,
       amount,
@@ -117,6 +119,7 @@ export default function Action({
           amount,
           isMax,
           isMeme,
+          available,
         });
         break;
       }

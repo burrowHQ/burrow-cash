@@ -230,6 +230,7 @@ const Modal = () => {
             <Alerts data={alerts} />
             <Action
               maxBorrowAmount={maxBorrowAmount}
+              maxWithdrawAmount={maxWithdrawAmount}
               healthFactor={healthFactor}
               collateralType={selectedCollateralType}
               poolAsset={assets[tokenId]}
