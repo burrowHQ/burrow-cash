@@ -9,12 +9,12 @@ function NonFarmedAssets() {
     hasNonFarmedAssets: hasNonFarmedAssetsMEME,
     hasNegativeNetLiquidity: hasNegativeNetLiquidityMEME,
   } = useNonFarmedAssets(true);
-  // const main_null = !hasNonFarmedAssets || hasNegativeNetLiquidity;
-  // const meme_null = !hasNonFarmedAssetsMEME || hasNegativeNetLiquidityMEME;
+  const main_null = !hasNonFarmedAssets || hasNegativeNetLiquidity;
+  const meme_null = !hasNonFarmedAssetsMEME || hasNegativeNetLiquidityMEME;
   if (!accountId) {
     return null;
   }
-  if (hasNonFarmedAssets === true || hasNegativeNetLiquidity === false) {
+  if (!main_null) {
     return (
       <div className="flex xsm:hidden xsm:gap-3 items-center justify-between mb-5 border border-primary border-opacity-60 bg-primary bg-opacity-5 rounded-xl p-3 pl-5">
         <div className="flex items-start">
@@ -32,7 +32,7 @@ function NonFarmedAssets() {
         />
       </div>
     );
-  } else if (hasNonFarmedAssetsMEME === true || hasNegativeNetLiquidityMEME === false) {
+  } else if (!meme_null) {
     return (
       <div className="flex xsm:hidden xsm:gap-3 items-center justify-between mb-5 border border-primary border-opacity-60 bg-primary bg-opacity-5 rounded-xl p-3 pl-5">
         <div className="flex items-start">
