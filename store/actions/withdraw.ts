@@ -8,6 +8,7 @@ import {
   expandTokenDecimal,
   registerAccountOnTokenWithQuery,
   shrinkToken,
+  shrinkTokenDecimal,
 } from "../helper";
 import { ChangeMethodsLogic, ChangeMethodsOracle, ChangeMethodsToken } from "../../interfaces";
 import { getTokenContract, prepareAndExecuteTransactions } from "../tokens";
@@ -162,7 +163,9 @@ export async function withdraw({ tokenId, extraDecimals, amount, isMax, isMeme }
     const wallet = await selector.wallet();
     let withdraw_to_btc;
     if (wallet.id == "btc-wallet" && tokenId === NBTCTokenId) {
-      const withdrawAmount = shrinkToken(expandedAmount.toFixed(0), extraDecimals);
+      const withdrawAmount = shrinkTokenDecimal(expandedAmount.toFixed(0), extraDecimals).toFixed(
+        0,
+      );
       withdraw_to_btc = await getWithdrawTransaction({
         amount: withdrawAmount,
         env: "private_mainnet",
