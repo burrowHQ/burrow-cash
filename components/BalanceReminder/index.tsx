@@ -22,11 +22,14 @@ const BalanceReminder = () => {
     ...accountSupplied.map((token) => ({ ...token, type: "main" })),
     ...accountSuppliedMEME.map((token) => ({ ...token, type: "meme" })),
   ];
+  const [lastClosedDate, setLastClosedDate] = useState(() =>
+    localStorage.getItem("balanceReminderLastClosed"),
+  );
+
   const Unreminded = useMemo(() => {
-    const lastClosedDate = localStorage.getItem("balanceReminderLastClosed");
     const today = new Date().toDateString();
     return !lastClosedDate || lastClosedDate !== today;
-  }, []);
+  }, [lastClosedDate]);
   const dispatch = useDispatch();
   useEffect(() => {
     const hasValidAccountSupplied =
@@ -54,6 +57,7 @@ const BalanceReminder = () => {
   function closeTip() {
     const today = new Date().toDateString();
     localStorage.setItem("balanceReminderLastClosed", today);
+    setLastClosedDate(today);
     setShouldShow(false);
   }
   if (!shouldShow) {
