@@ -1,4 +1,4 @@
-import { useEffect, useState, createContext } from "react";
+import { useEffect, useState, createContext, useMemo } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 
 import Decimal from "decimal.js";
@@ -49,6 +49,7 @@ import {
   CollateralTypeSelectorRepay,
 } from "./CollateralTypeSelector";
 import { useBtcAction } from "../../hooks/useBtcBalance";
+import { beautifyPrice } from "../../utils/beautyNumber";
 
 export const ModalContext = createContext(null) as any;
 const Modal = () => {
@@ -82,12 +83,16 @@ const Modal = () => {
   const maxBorrowAmountPositions = useAppSelector(getBorrowMaxAmount(tokenId));
   const maxWithdrawAmount = useAppSelector(getWithdrawMaxAmount(tokenId));
   const repayPositions = useAppSelector(getRepayPositions(tokenId));
-  const { availableBalance: btcAvailableBalance, receiveAmount } = useBtcAction({
+  const { availableBalance: btcAvailableBalance, totalFeeAmount } = useBtcAction({
     tokenId: asset?.tokenId || "",
     decimals: asset?.decimals || 0,
-    inputAmount: amount,
-    action,
   });
+  const receiveAmount = useMemo(() => {
+    return Decimal.max(new Decimal(amount || 0).minus(totalFeeAmount || 0), 0).toFixed(
+      asset?.decimals || 0,
+      Decimal.ROUND_DOWN,
+    );
+  }, [totalFeeAmount, amount]);
   const activePosition =
     action === "Repay" || action === "Borrow"
       ? selectedCollateralType
@@ -205,7 +210,7 @@ const Modal = () => {
               available$={available$}
             />
             <div className="flex flex-col gap-4 mt-6">
-              {isBtcWithdraw ? <Receive value={receiveAmount} /> : null}
+              {isBtcWithdraw ? <Receive value={beautifyPrice(receiveAmount) as string} /> : null}
               <HealthFactor value={healthFactor} />
               {repay_to_lp ? (
                 <HealthFactor value={single_healthFactor} title="Health Factor(Single)" />
