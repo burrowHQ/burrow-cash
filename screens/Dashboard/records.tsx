@@ -115,7 +115,6 @@ const getColumns = ({ showToast, handleTxClick, txLoadingStates }) => [
     header: "Assets",
     minSize: 220,
     cell: ({ originalData }) => {
-      console.log(originalData, "CustomTable");
       const { data } = originalData || {};
       const { metadata } = data || {};
       const { icon, tokens, symbol } = metadata || {};
