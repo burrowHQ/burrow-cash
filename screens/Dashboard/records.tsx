@@ -20,8 +20,8 @@ const Records = ({ isShow }) => {
   const accountId = useAccountId();
   const { activeCategory } = useAppSelector((state) => state.category);
   const { toastMessage, showToast } = useToastMessage();
-  const assets = useAppSelector(getAssetsCategory(false));
   const isMeme = useAppSelector(isMemeCategory);
+  const assets = useAppSelector(getAssetsCategory(isMeme));
   const [isLoading, setIsLoading] = useState(false);
   const [docs, setDocs] = useState<any>([]);
   const [pagination, setPagination] = useState<{
@@ -115,6 +115,7 @@ const getColumns = ({ showToast, handleTxClick, txLoadingStates }) => [
     header: "Assets",
     minSize: 220,
     cell: ({ originalData }) => {
+      console.log(originalData, "CustomTable");
       const { data } = originalData || {};
       const { metadata } = data || {};
       const { icon, tokens, symbol } = metadata || {};
