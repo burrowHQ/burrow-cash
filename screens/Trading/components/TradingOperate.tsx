@@ -156,15 +156,22 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
         if (activeTab == "long" && +(longInput || 0) > 0 && (longOutput || 0) > 0) {
           const safetyBufferFactor = 1 - min_safety_buffer / 10000;
-          const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
-          const token_c_value = new Decimal(longInput).mul(assetPrice || 0);
-          const token_d_value = token_c_value.mul(rangeMount || 0);
-          const liqPriceX = token_d_value
-            .div(safetyBufferFactor)
-            .minus(token_c_value)
-            .div(longOutput)
+          // const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
+          // const token_c_value = new Decimal(longInput).mul(assetPrice || 0);
+          // const token_d_value = token_c_value.mul(rangeMount || 0);
+          const token_c_amount = longInput;
+          const token_d_amount = new Decimal(token_c_amount || 0).mul(rangeMount || 0);
+          const token_p_amount = longOutput;
+          const liq_price = new Decimal(token_d_amount || 0)
+            .minus(new Decimal(token_c_amount || 0).mul(safetyBufferFactor))
+            .div(new Decimal(token_p_amount || 0).mul(safetyBufferFactor))
             .toFixed();
-          setLiqPrice(liqPriceX || "0");
+          // const liqPriceX = token_d_value
+          //   .div(safetyBufferFactor)
+          //   .minus(token_c_value)
+          //   .div(longOutput)
+          //   .toFixed();
+          setLiqPrice(liq_price || "0");
         }
       }
     },
@@ -182,20 +189,34 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
           +(shortOutput || 0) > 0
         ) {
           const safetyBufferFactor = 1 - min_safety_buffer / 10000;
-          const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
-          const token_c_value = new Decimal(shortInput).mul(assetPrice || 0);
-          const token_p_value = new Decimal(estimateData.amount_out).mul(assetPrice || 0);
-          const liqPriceX = new Decimal(token_c_value)
-            .plus(token_p_value)
+          // const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
+          // const token_c_value = new Decimal(shortInput).mul(assetPrice || 0);
+          // const token_p_value = new Decimal(estimateData.amount_out).mul(assetPrice || 0);
+          const token_c_amount = shortInput;
+          const token_p_amount = estimateData.amount_out;
+          const token_d_amount = shortOutput;
+
+          // const liq_price = new Decimal(token_c_amount || 0)
+          // .plus(token_p_amount || 0)
+          // .mul(safety_buffer)
+          // .div(new Decimal(token_d_amount || 0).plus(hp_fee))
+          // .toFixed();
+          const liq_price = new Decimal(token_c_amount || 0)
+            .plus(token_p_amount || 0)
             .mul(safetyBufferFactor)
-            .div(shortOutput);
-          setLiqPrice(liqPriceX.toFixed());
+            .div(token_d_amount)
+            .toFixed();
+          // const liqPriceX = new Decimal(token_c_value)
+          //   .plus(token_p_value)
+          //   .mul(safetyBufferFactor)
+          //   .div(shortOutput);
+          setLiqPrice(liq_price || "0");
         }
       }
       setForceUpdateLoading(!estimateData?.loadingComplete);
     },
     200,
-    [estimateData, activeTab, shortOutput, shortInput],
+    [estimateData, activeTab],
   );
   // update price and make refresh icon spin
   useEffect(() => {
@@ -696,7 +717,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Liq. Price</div>
-              <span>${beautifyPrice(LiqPrice)}</span>
+              <span>{beautifyPrice(LiqPrice)}</span>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Fee</div>
@@ -833,7 +854,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Liq. Price</div>
-              <span>${beautifyPrice(LiqPrice)}</span>
+              <span>{beautifyPrice(LiqPrice)}</span>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Fee</div>
