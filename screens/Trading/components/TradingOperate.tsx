@@ -71,7 +71,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
   const [warnTip, setWarnTip] = useState<React.ReactElement | string>("");
   const [LiqPrice, setLiqPrice] = useState<string>("");
   const [forceUpdate, setForceUpdate] = useState<number>(0);
-  const [lastTokenInAmount, setLastTokenInAmount] = useState(0);
   const customInputRef = useRef<HTMLInputElement>(null);
   const accountId = useAppSelector(getAccountId);
   const { filteredTokenTypeMap } = useRegisterTokenType();
@@ -129,14 +128,17 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
   /**
    * longInput shortInput deal start
    *  */
+  // TODOXX
   useEffect(() => {
     const inputUsdCharcate1 = getAssetPrice(ReduxcategoryAssets1);
     const inputUsdCharcate2 = getAssetPrice(ReduxcategoryAssets2);
     if (inputUsdCharcate1 && estimateData) {
+      // out put input
       updateOutput(activeTab, inputUsdCharcate1);
     }
 
     if (inputUsdCharcate2) {
+      // swap token in amount
       updateInputAmounts(activeTab, inputUsdCharcate2, inputUsdCharcate1);
     }
   }, [
@@ -145,10 +147,9 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
     rangeMount,
     estimateData,
     slippageTolerance,
-    forceUpdate,
     tokenInAmount,
-    activeTab, // Add activeTab to dependencies if needed
     ReduxcategoryAssets1,
+    ReduxcategoryAssets2,
   ]);
   // update liq price for long
   useDebounce(
@@ -156,20 +157,27 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
         if (activeTab == "long" && +(longInput || 0) > 0 && (longOutput || 0) > 0) {
           const safetyBufferFactor = 1 - min_safety_buffer / 10000;
-          const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
-          const token_c_value = new Decimal(longInput).mul(assetPrice || 0);
-          const token_d_value = token_c_value.mul(rangeMount || 0);
-          const liqPriceX = token_d_value
-            .div(safetyBufferFactor)
-            .minus(token_c_value)
-            .div(longOutput)
+          // const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
+          // const token_c_value = new Decimal(longInput).mul(assetPrice || 0);
+          // const token_d_value = token_c_value.mul(rangeMount || 0);
+          const token_c_amount = longInput;
+          const token_d_amount = new Decimal(token_c_amount || 0).mul(rangeMount || 0);
+          const token_p_amount = longOutput;
+          const liq_price = new Decimal(token_d_amount || 0)
+            .minus(new Decimal(token_c_amount || 0).mul(safetyBufferFactor))
+            .div(new Decimal(token_p_amount || 0).mul(safetyBufferFactor))
             .toFixed();
-          setLiqPrice(liqPriceX || "0");
+          // const liqPriceX = token_d_value
+          //   .div(safetyBufferFactor)
+          //   .minus(token_c_value)
+          //   .div(longOutput)
+          //   .toFixed();
+          setLiqPrice(liq_price || "0");
         }
       }
     },
     200,
-    [activeTab, longOutput, longInput],
+    [activeTab, estimateData],
   );
   // update liq price for short
   useDebounce(
@@ -182,41 +190,53 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
           +(shortOutput || 0) > 0
         ) {
           const safetyBufferFactor = 1 - min_safety_buffer / 10000;
-          const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
-          const token_c_value = new Decimal(shortInput).mul(assetPrice || 0);
-          const token_p_value = new Decimal(estimateData.amount_out).mul(assetPrice || 0);
-          const liqPriceX = new Decimal(token_c_value)
-            .plus(token_p_value)
+          // const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
+          // const token_c_value = new Decimal(shortInput).mul(assetPrice || 0);
+          // const token_p_value = new Decimal(estimateData.amount_out).mul(assetPrice || 0);
+          const token_c_amount = shortInput;
+          const token_p_amount = estimateData.amount_out;
+          const token_d_amount = shortOutput;
+
+          // const liq_price = new Decimal(token_c_amount || 0)
+          // .plus(token_p_amount || 0)
+          // .mul(safety_buffer)
+          // .div(new Decimal(token_d_amount || 0).plus(hp_fee))
+          // .toFixed();
+          const liq_price = new Decimal(token_c_amount || 0)
+            .plus(token_p_amount || 0)
             .mul(safetyBufferFactor)
-            .div(shortOutput);
-          setLiqPrice(liqPriceX.toFixed());
+            .div(token_d_amount)
+            .toFixed();
+          // const liqPriceX = new Decimal(token_c_value)
+          //   .plus(token_p_value)
+          //   .mul(safetyBufferFactor)
+          //   .div(shortOutput);
+          setLiqPrice(liq_price || "0");
         }
       }
-      setForceUpdateLoading(!estimateData?.loadingComplete);
     },
     200,
-    [estimateData, activeTab, shortOutput, shortInput],
+    [estimateData, activeTab],
   );
-  // update price and make refresh icon spin
+  // force estimating
   useEffect(() => {
     const interval = setInterval(() => {
-      if (tokenInAmount === lastTokenInAmount && longInput) {
-        setTokenInAmount((prev) => prev);
+      // TODOXX
+      if (tokenInAmount) {
         setForceUpdate((prev) => prev + 1);
         setForceUpdateLoading(true);
-      } else {
-        setLastTokenInAmount(tokenInAmount);
       }
     }, 20_000);
 
     return () => clearInterval(interval);
-  }, [tokenInAmount, lastTokenInAmount]);
+  }, [tokenInAmount]);
+  // TODOXX
   // for same input, forceUpdateLoading is true
   useEffect(() => {
     if (forceUpdateLoading) {
       const timer = setTimeout(() => {
         setForceUpdateLoading(false);
-      }, 4000);
+      }, 1000);
 
       return () => clearTimeout(timer);
     }
@@ -363,7 +383,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
     dispatch(setReduxActiveTab(tabString));
     setActiveTab(tabString);
     initCateState(tabString);
-    setForceUpdate((prev) => prev + 1);
   };
   const getTabClassName = (tabName: string) => {
     return activeTab === tabName
@@ -458,6 +477,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
   function getAssetPrice(categoryId) {
     return categoryId ? combinedAssetsData[categoryId["token_id"]]?.price?.usd : 0;
   }
+  // TODOXX
   function updateOutput(tab: string, inputUsdCharcate: number) {
     /**
      * @param inputUsdCharcate  category1 current price
@@ -481,6 +501,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       outputUsdSetter(inputUsdCharcate * tokenInAmount);
     }
   }
+  // TODOXX
   function updateInputAmounts(tab, inputUsdCharcate2, inputUsdCharcate1) {
     /**
      * @param inputUsdCharcate2  category2 current price
@@ -575,6 +596,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             if (!tokenInAmount || forceUpdateLoading) {
               return;
             }
+            // TODOXX
             setForceUpdate((prev) => prev + 1);
             setForceUpdateLoading(true);
           }}
@@ -653,7 +675,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                 tokenList={isMainStream ? categoryAssets2 : categoryAssets2MEME}
                 type="cate2"
                 isMemeCategory={!isMainStream}
-                setForceUpdate={() => setForceUpdate((prev) => prev + 1)}
               />
             </div>
             <p className="text-gray-300 mt-2 text-xs">${longInputUsd.toFixed(2)}</p>
@@ -696,7 +717,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Liq. Price</div>
-              <span>${beautifyPrice(LiqPrice)}</span>
+              <span>{beautifyPrice(LiqPrice)}</span>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Fee</div>
@@ -791,7 +812,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                 tokenList={isMainStream ? categoryAssets2 : categoryAssets2MEME}
                 type="cate2"
                 isMemeCategory={!isMainStream}
-                setForceUpdate={() => setForceUpdate((prev) => prev + 1)}
               />
             </div>
             <p className="text-gray-300 mt-2 text-xs">${shortInputUsd.toFixed(2)}</p>
@@ -833,7 +853,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Liq. Price</div>
-              <span>${beautifyPrice(LiqPrice)}</span>
+              <span>{beautifyPrice(LiqPrice)}</span>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Fee</div>

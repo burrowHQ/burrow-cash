@@ -287,7 +287,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Liq. Price</div>
-              <div>${beautifyPrice(confirmInfo.LiqPrice)}</div>
+              <div>{beautifyPrice(confirmInfo.LiqPrice)}</div>
             </div>
 
             {isMinTokenPAmount && (

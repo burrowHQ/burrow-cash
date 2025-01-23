@@ -37,17 +37,18 @@ export const useEstimateSwap = ({
     forceUpdate,
   });
   useEffect(() => {
-    if (dclEstimateResult?.tag && v1EstimateResult?.tag && validator()) {
+    if (
+      dclEstimateResult?.tag &&
+      v1EstimateResult?.tag &&
+      validator() &&
+      !v1Loading &&
+      !dclLoading
+    ) {
       getBestEstimateResult();
       setEstimateLoading(false);
     }
-    if (tokenIn_amount == "0" || !tokenIn_amount) {
-      setEstimateResult((prev: any) => {
-        if (prev?.amount_out !== "0" || !prev?.loadingComplete) {
-          return { ...prev, amount_out: "0", loadingComplete: true };
-        }
-        return prev;
-      });
+    if (!Number(tokenIn_amount || 0)) {
+      setEstimateLoading(false);
     }
   }, [
     dclEstimateResult?.tag,
@@ -55,9 +56,13 @@ export const useEstimateSwap = ({
     dclEstimateResult?.amount_out,
     v1EstimateResult?.amount_out,
     tokenIn_amount,
+    v1Loading,
+    dclLoading,
   ]);
   useEffect(() => {
-    setEstimateLoading(v1Loading || dclLoading);
+    if (v1Loading || dclLoading) {
+      setEstimateLoading(true);
+    }
   }, [v1Loading, dclLoading]);
   function getBestEstimateResult() {
     const { amount_out: dcl_amount_out } = dclEstimateResult!;
@@ -65,10 +70,10 @@ export const useEstimateSwap = ({
     console.log(dcl_amount_out, v1_amount_out, "dcl_amount_out, v1_amount_out");
     // best is v1
     if (new Decimal(v1_amount_out || 0).gt(dcl_amount_out || 0)) {
-      setEstimateResult({ ...v1EstimateResult, loadingComplete: true });
+      setEstimateResult(v1EstimateResult);
     } else if (new Decimal(dcl_amount_out || 0).gt(v1_amount_out || 0)) {
       // best is dcl
-      setEstimateResult({ ...dclEstimateResult, loadingComplete: true });
+      setEstimateResult(dclEstimateResult);
     }
   }
   function validator() {

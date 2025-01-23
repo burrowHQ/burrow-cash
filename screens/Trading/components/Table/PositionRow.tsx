@@ -98,7 +98,7 @@ const PositionRow = ({
 
   const netValue = parseTokenValue(item.token_c_info.balance, decimalsC) * (priceC || 0);
   const collateral = parseTokenValue(item.token_c_info.balance, decimalsC);
-  const assetLabel = positionType.label === "Long" ? symbolD : symbolP;
+  const assetLabel = positionType.label === "Long" ? symbolP : symbolD;
   const indexPrice = positionType.label === "Long" ? priceP / priceD : priceD / priceP;
   const openTime = new Date(Number(item.open_ts) / 1e6);
   const uahpi: any = isMainStream
@@ -144,7 +144,10 @@ const PositionRow = ({
       </td>
       <td>
         <div className="flex mr-4 items-start flex-col">
-          <p className=""> {beautifyPrice(size)}</p>
+          <p className="">
+            {" "}
+            {beautifyPrice(size)} {assetLabel}
+          </p>
           <span className="text-gray-300 text-xs">({beautifyPrice(sizeValue, true, 3, 3)})</span>
         </div>
       </td>
@@ -174,16 +177,12 @@ const PositionRow = ({
           ) : (
             <span className="text-gray-500">-</span>
           )}
-          <span className="text-gray-300 text-xs">{assetLabel}</span>
         </div>
       </td>
       <td>
-        <div className="flex items-start flex-col">
-          {beautifyPrice(indexPrice)}
-          <span className="text-gray-300 text-xs">{assetLabel}</span>
-        </div>
+        <div className="flex items-start flex-col">{beautifyPrice(indexPrice)}</div>
       </td>
-      <td>${beautifyPrice(LiqPrice)}</td>
+      <td>{beautifyPrice(LiqPrice)}</td>
       <td>
         <p className={`${pnl > 0 ? "text-green-150" : pnl < 0 ? "text-red-150" : "text-gray-400"}`}>
           {pnl === 0 ? "" : `${pnl > 0 ? `+$` : `-$`}`}
@@ -258,7 +257,10 @@ const PositionRow = ({
         </div>
         <div className="text-right">
           <div className="flex items-center">
-            <p className="mr-2"> {beautifyPrice(size)}</p>
+            <p className="mr-2">
+              {" "}
+              {beautifyPrice(size)} {assetLabel}
+            </p>
             <span className="text-gray-300 text-sm">({beautifyPrice(sizeValue, true, 3, 3)})</span>
           </div>
           <p className="text-xs text-gray-300">Size</p>
@@ -291,9 +293,7 @@ const PositionRow = ({
           <p className="text-gray-300">Entry Price</p>
           <p>
             {entryPrice !== null ? (
-              <span>
-                {beautifyPrice(entryPrice)} {assetLabel}
-              </span>
+              <span>{beautifyPrice(entryPrice)}</span>
             ) : (
               <span className="text-gray-500">-</span>
             )}
@@ -301,20 +301,18 @@ const PositionRow = ({
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Index Price</p>
-          <p>
-            {beautifyPrice(indexPrice)} {assetLabel}
-          </p>
+          <p>{beautifyPrice(indexPrice)}</p>
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Liq. Price</p>
-          <p>${beautifyPrice(LiqPrice)}</p>
+          <p>{beautifyPrice(LiqPrice)}</p>
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Opening time</p>
           <p>{new Date(openTime).toLocaleString()}</p>
         </div>
         <div className="bg-dark-100 rounded-2xl flex items-center justify-center text-xs py-1 text-gray-300 mb-4">
-          PNL & ROE{" "}
+          PNL{" "}
           <p
             className={`ml-1 ${
               pnl > 0 ? "text-green-150" : pnl < 0 ? "text-red-150" : "text-gray-400"

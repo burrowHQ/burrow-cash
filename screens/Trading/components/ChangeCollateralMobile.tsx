@@ -591,13 +591,13 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                       {+(inputValue || 0) > 0 ? (
                         <>
                           <span className="text-gray-300 mr-2 line-through">
-                            ${beautifyPrice(LiqPrice)}
+                            {beautifyPrice(LiqPrice)}
                           </span>
                           <RightArrow />
-                          <p className="ml-2">${beautifyPrice(LiqPriceNew)}</p>
+                          <p className="ml-2">{beautifyPrice(LiqPriceNew)}</p>
                         </>
                       ) : (
-                        <p>${beautifyPrice(LiqPrice)}</p>
+                        <p>{beautifyPrice(LiqPrice)}</p>
                       )}
                     </div>
                   </div>
@@ -732,13 +732,13 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                       {+(inputValue || 0) > 0 ? (
                         <>
                           <span className="text-gray-300 mr-2 line-through">
-                            ${beautifyPrice(LiqPrice)}
+                            {beautifyPrice(LiqPrice)}
                           </span>
                           <RightArrow />
-                          <p className="ml-2">${beautifyPrice(LiqPriceNew)}</p>
+                          <p className="ml-2">{beautifyPrice(LiqPriceNew)}</p>
                         </>
                       ) : (
-                        <p>${beautifyPrice(LiqPrice)}</p>
+                        <p>{beautifyPrice(LiqPrice)}</p>
                       )}
                     </div>
                   </div>

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
+import Decimal from "decimal.js";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 import { ComeBackIcon, MemeTagIcon, TokenArrow } from "./components/TradingIcon";
@@ -29,6 +30,7 @@ import { getSymbolById } from "../../transformers/nearSymbolTrans";
 import { useRegisterTokenType } from "../../hooks/useRegisterTokenType";
 
 const Trading = () => {
+  const [open, setOpen] = useState(false);
   const isMobile = isMobileDevice();
   const { query } = useRouterQuery();
   const accountId = useAccountId();
@@ -176,9 +178,15 @@ const Trading = () => {
 
     return () => clearInterval(intervalId); // Cleanup on unmount
   }, [id]);
-
-  const [open, setOpen] = useState(false);
-  //
+  const indexPrice = useMemo(() => {
+    if (currentTokenCate1?.token_id && currentTokenCate2?.token_id) {
+      const currentTokenCate1Price = currentTokenCate1?.price?.usd || 0;
+      const currentTokenCate2Price = currentTokenCate2?.price?.usd || 0;
+      if (new Decimal(currentTokenCate2Price).gt(0)) {
+        return new Decimal(currentTokenCate1Price).div(currentTokenCate2Price).toFixed();
+      }
+    }
+  }, [currentTokenCate1, currentTokenCate2]);
   return (
     <LayoutBox>
       {isLoading ? (
@@ -265,7 +273,7 @@ const Trading = () => {
                       )}
                     </div>
                   </div>
-                  <span>${beautifyPrice(combinedAssetsData[id]?.price?.usd || 0)}</span>
+                  <span>{beautifyPrice(indexPrice)}</span>
                 </div>
                 {/* total v */}
                 <div className="text-sm">
@@ -307,9 +315,7 @@ const Trading = () => {
                           currentTokenCate1?.metadata?.symbol,
                         )}
                       </p>
-                      <p className="text-[#C0C4E9] text-xs">
-                        ${beautifyPrice(combinedAssetsData[id]?.price?.usd || 0)}
-                      </p>
+                      <p className="text-[#C0C4E9] text-xs">{beautifyPrice(indexPrice)}</p>
                     </div>
 
                     {/* cate2 */}
