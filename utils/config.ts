@@ -184,6 +184,9 @@ export const MARGIN_WHITELIST = [
   "marior.near",
   "cwpuzzles.near",
   "eklan.near",
+  "zkjandro.near",
+  "hsyang.near",
+  "aiml.near",
 ];
 export const DISABLE_WITHDRAW_ADDRESS = "bc1p";
 const getConfig = (env: string = defaultNetwork) => {
