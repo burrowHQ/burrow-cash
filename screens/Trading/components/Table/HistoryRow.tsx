@@ -9,10 +9,15 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
   return !isMobile ? (
     <tr className="align-text-top">
       <td className="py-5 pl-5">
-        {`${getSymbolById(assetP.token_id, assetP.metadata?.symbol)}/${getSymbolById(
-          assetD.token_id,
-          assetD.metadata?.symbol,
-        )}`}
+        {record.trend === "long"
+          ? `${getSymbolById(assetP.token_id, assetP.metadata?.symbol)}/${getSymbolById(
+              assetD.token_id,
+              assetD.metadata?.symbol,
+            )}`
+          : `${getSymbolById(assetD.token_id, assetD.metadata?.symbol)}/${getSymbolById(
+              assetP.token_id,
+              assetP.metadata?.symbol,
+            )}`}
         <div
           className={
             record.trend === "long"
@@ -49,6 +54,11 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
                 ),
               )
           : null}
+        <span className="ml-0.5">
+          {record.trend === "long"
+            ? `${getSymbolById(assetP.token_id, assetP.metadata?.symbol)}`
+            : `${getSymbolById(assetD.token_id, assetD.metadata?.symbol)}`}
+        </span>
       </td>
       <td>
         {beautifyPrice(
@@ -74,17 +84,11 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
           ) : (
             "-"
           )}
-          <p className="text-gray-300 text-xs">
-            {getSymbolById(assetC.token_id, assetC.metadata?.symbol)}
-          </p>
         </div>
       </td>
       <td>
         <div className="flex items-start flex-col">
           {record.price !== "0" ? <span>{beautifyPrice(Number(record.price))}</span> : "-"}
-          <p className="text-gray-300 text-xs">
-            {getSymbolById(assetC.token_id, assetC.metadata?.symbol)}
-          </p>
         </div>
       </td>
       <td>
@@ -104,9 +108,6 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
         {record.pnl !== "0"
           ? beautifyPrice(Math.abs(record.pnl * record.c_token_price), false, 3, 3)
           : ""}
-        {/* <p className="text-gray-300 text-xs">
-          {getSymbolById(assetC.token_id, assetC.metadata?.symbol)}
-        </p> */}
       </td>
       <td>
         <div className="text-sm">
@@ -194,6 +195,11 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
                     ),
                   )
               : null}
+            <span className="ml-0.5">
+              {record.trend === "long"
+                ? `${getSymbolById(assetP.token_id, assetP.metadata?.symbol)}`
+                : `${getSymbolById(assetD.token_id, assetD.metadata?.symbol)}`}
+            </span>
           </p>
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
@@ -267,7 +273,7 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
           <p>{record.close_type}</p>
         </div>
         <div className="bg-dark-100 rounded-2xl flex items-center justify-center text-xs py-1 text-gray-300 mb-4">
-          PNL & ROE
+          PNL
           <p
             className={`ml-1 ${
               record.pnl > 0 ? "text-green-150" : record.pnl < 0 ? "text-red-150" : ""
