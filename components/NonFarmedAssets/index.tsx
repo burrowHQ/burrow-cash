@@ -1,8 +1,9 @@
 import { BeatLoader } from "react-spinners";
-import { useNonFarmedAssets } from "../../hooks/hooks";
+import { useAccountId, useNonFarmedAssets } from "../../hooks/hooks";
 import ClaimAllRewards from "../ClaimAllRewards";
 
 function NonFarmedAssets() {
+  const accountId = useAccountId();
   const { hasNonFarmedAssets, hasNegativeNetLiquidity } = useNonFarmedAssets(false);
   const {
     hasNonFarmedAssets: hasNonFarmedAssetsMEME,
@@ -10,7 +11,9 @@ function NonFarmedAssets() {
   } = useNonFarmedAssets(true);
   const main_null = !hasNonFarmedAssets || hasNegativeNetLiquidity;
   const meme_null = !hasNonFarmedAssetsMEME || hasNegativeNetLiquidityMEME;
-
+  if (!accountId) {
+    return null;
+  }
   if (!main_null) {
     return (
       <div className="flex xsm:hidden xsm:gap-3 items-center justify-between mb-5 border border-primary border-opacity-60 bg-primary bg-opacity-5 rounded-xl p-3 pl-5">
@@ -18,7 +21,7 @@ function NonFarmedAssets() {
           <WarnIcon className="relative top-px flex-shrink-0 xsm:hidden" />
           <div className="text-sm text-white mx-2.5 xsm:mx-0">
             At least one of your farms in the Mainstream has started emitting extra rewards. If you
-            are seeing this warning, please click ‘Claim & Join’ to join the new farm.
+            are seeing this warning, please click &apos;Claim & Join&apos; to join the new farm.
           </div>
         </div>
         <ClaimAllRewards
@@ -36,7 +39,7 @@ function NonFarmedAssets() {
           <WarnIcon className="relative top-px flex-shrink-0 xsm:hidden" />
           <div className="text-sm text-white mx-2.5 xsm:mx-0">
             At least one of your farms in the meme has started emitting extra rewards. If you are
-            seeing this warning, please click ‘Claim & Join’ to join the new farm.
+            seeing this warning, please click &apos;Claim & Join&apos; to join the new farm.
           </div>
         </div>
         <ClaimAllRewards

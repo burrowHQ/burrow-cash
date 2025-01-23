@@ -190,7 +190,7 @@ const MyMarginTradingPage = () => {
 
                       return Object.entries(mergedCollateral).map(([tokenId, data], index) => (
                         <div key={tokenId} className="flex items-center justify-center mb-3">
-                          <img src={data.icon} alt="" className="w-4 h-4" />
+                          <img src={data.icon} alt="" className="w-4 h-4 rounded-3xl" />
                           <p className="ml-2 mr-8 text-xs text-gray-300">{data.symbol}</p>
                           <div className="text-xs ml-auto">
                             {beautifyPrice(data.totalValue, true)}
@@ -280,7 +280,7 @@ const MyMarginTradingPage = () => {
 
                       return Object.entries(mergedCollateral).map(([tokenId, data], index) => (
                         <div key={tokenId} className="flex items-center justify-center mb-3">
-                          <img src={data.icon} alt="" className="w-4 h-4" />
+                          <img src={data.icon} alt="" className="w-4 h-4 rounded-3xl" />
                           <p className="ml-2 mr-8 text-xs text-gray-300">{data.symbol}</p>
                           <div className="text-xs ml-auto">
                             {beautifyPrice(data.totalValue, true)}
