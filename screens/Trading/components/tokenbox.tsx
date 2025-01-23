@@ -22,14 +22,12 @@ interface TradingTokenInter {
   tokenList: Array<any>;
   type: string;
   setMaxInputBanlance?: (key: string) => void;
-  setForceUpdate?: () => void;
   isMemeCategory?: boolean;
 }
 const TradingToken: React.FC<TradingTokenInter> = ({
   tokenList,
   type,
   setMaxInputBanlance,
-  setForceUpdate,
   isMemeCategory,
 }) => {
   let timer: NodeJS.Timeout;
@@ -86,7 +84,6 @@ const TradingToken: React.FC<TradingTokenInter> = ({
     } else {
       console.warn(`Unsupported type: ${type}`);
     }
-    setForceUpdate && setForceUpdate();
     setShowModal(false);
   };
 
