@@ -50,11 +50,9 @@ export function useLiqPrice({
     uahpi: token_d_asset.uahpi,
     uahpi_at_open,
   });
-  const hp_fee = new Decimal(token_d_price).mul(
-    shrinkToken(
-      hp_fee_amount,
-      token_d_asset.metadata.decimals + token_d_asset.config.extra_decimals,
-    ),
+  const hp_fee = shrinkToken(
+    hp_fee_amount,
+    token_d_asset.metadata.decimals + token_d_asset.config.extra_decimals,
   );
   // (token_c_value + token_p_value) * percent > total_debt + total_hp_fee
   if (position_type == "Long") {
