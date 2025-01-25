@@ -160,7 +160,7 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
       } as any),
       setupBTCWallet({
         autoConnect: true,
-        env: "private_mainnet",
+        env: "mainnet",
       }) as any,
       myNearWallet,
       setupOKXWallet({}),

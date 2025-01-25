@@ -175,7 +175,7 @@ export async function withdraw({
       );
       withdraw_to_btc = await getWithdrawTransaction({
         amount: withdrawAmount,
-        env: "private_mainnet",
+        env: "mainnet",
       });
     }
     await prepareAndExecuteTransactions(transactions, isMeme, withdraw_to_btc);

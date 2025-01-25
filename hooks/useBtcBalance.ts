@@ -19,7 +19,7 @@ export function useBtcAction({
   const [availableBalance, setAvailableBalance] = useState<number>(0);
   const btcSelector = useBtcWalletSelector();
   const isBtcTokenId = tokenId == NBTCTokenId;
-  const env = "private_mainnet";
+  const env = "mainnet";
   useDebounce(
     () => {
       if (btcSelector?.account && isBtcTokenId) {
