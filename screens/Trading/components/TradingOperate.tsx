@@ -128,7 +128,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
   /**
    * longInput shortInput deal start
    *  */
-  // TODOXX
   useEffect(() => {
     const inputUsdCharcate1 = getAssetPrice(ReduxcategoryAssets1);
     const inputUsdCharcate2 = getAssetPrice(ReduxcategoryAssets2);
@@ -221,7 +220,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
   // force estimating
   useEffect(() => {
     const interval = setInterval(() => {
-      // TODOXX
       if (tokenInAmount) {
         setForceUpdate((prev) => prev + 1);
         setForceUpdateLoading(true);
@@ -230,7 +228,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
 
     return () => clearInterval(interval);
   }, [tokenInAmount]);
-  // TODOXX
   // for same input, forceUpdateLoading is true
   useEffect(() => {
     if (forceUpdateLoading) {
@@ -477,7 +474,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
   function getAssetPrice(categoryId) {
     return categoryId ? combinedAssetsData[categoryId["token_id"]]?.price?.usd : 0;
   }
-  // TODOXX
   function updateOutput(tab: string, inputUsdCharcate: number) {
     /**
      * @param inputUsdCharcate  category1 current price
@@ -501,7 +497,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       outputUsdSetter(inputUsdCharcate * tokenInAmount);
     }
   }
-  // TODOXX
   function updateInputAmounts(tab, inputUsdCharcate2, inputUsdCharcate1) {
     /**
      * @param inputUsdCharcate2  category2 current price
@@ -566,6 +561,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       }
     }
   }
+  const buttonLoading = estimateLoading || forceUpdateLoading;
   return (
     <div className="lg:w-full pt-4 lg:px-4 pb-9">
       <div className="flex justify-between items-center">
@@ -596,7 +592,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             if (!tokenInAmount || forceUpdateLoading) {
               return;
             }
-            // TODOXX
             setForceUpdate((prev) => prev + 1);
             setForceUpdateLoading(true);
           }}
@@ -756,7 +751,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                 disabled={isDisabled || !!warnTip}
                 onClick={handleConfirmButtonClick}
               >
-                {estimateLoading ? (
+                {buttonLoading ? (
                   <BeatLoader size={4} color="black" />
                 ) : (
                   <>
@@ -768,7 +763,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
               <ConnectWalletButton
                 accountId={accountId}
                 className="w-full h-[46px]"
-                loading={estimateLoading}
+                loading={buttonLoading}
               />
             )}
             {isLongConfirmModalOpen && (
@@ -891,7 +886,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                 disabled={isDisabled || !!warnTip}
                 onClick={handleConfirmButtonClick}
               >
-                {estimateLoading ? (
+                {buttonLoading ? (
                   <BeatLoader size={4} color="black" />
                 ) : (
                   <>
@@ -904,7 +899,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                 accountId={accountId}
                 className="w-full h-[46px]"
                 isShort
-                loading={estimateLoading}
+                loading={buttonLoading}
               />
             )}
             {isShortConfirmModalOpen && (
