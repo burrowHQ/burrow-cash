@@ -6,8 +6,8 @@ import { MenuButton, CloseIcon, ArrowRightIcon, ArrowTopRightIcon, ArrowDownIcon
 import { WrapperMenuMobile } from "./style";
 import { bridgeList } from "./Bridge";
 import { mainMenuList, helpMenu, Imenu } from "./menuData";
-import { toggleShowDust } from "../../redux/appSlice";
-import { getShowDust } from "../../redux/appSelectors";
+import { toggleShowDust } from "../../redux/marginTrading";
+import { getShowDust } from "../../redux/categorySelectors";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { DiscordIcon, MediumIcon, TwitterIcon } from "../Footer/svg";
 

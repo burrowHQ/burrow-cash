@@ -14,3 +14,7 @@ export const getActiveCategory = createSelector(
     return category.activeCategory;
   },
 );
+export const getShowDust = createSelector(
+  (state: RootState) => state.category,
+  (app) => app.showDust,
+);

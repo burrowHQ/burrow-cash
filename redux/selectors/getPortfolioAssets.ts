@@ -140,7 +140,7 @@ export const getPortfolioAssets = (memeCategory?: boolean) => {
             totalSupplyMoney: toUsd(totalSupplyD, asset),
           });
         })
-        .filter(app.showDust ? Boolean : emptySuppliedAsset);
+        .filter(category.showDust ? Boolean : emptySuppliedAsset);
       // borrow from regular position
       const borrowed = Object.keys(account.portfolio.borrowed || {})
         .map((tokenId) => {
@@ -180,7 +180,7 @@ export const getPortfolioAssets = (memeCategory?: boolean) => {
             totalSupplyMoney: toUsd(totalSupplyD, asset),
           });
         })
-        .filter(app.showDust ? Boolean : emptyBorrowedAsset);
+        .filter(category.showDust ? Boolean : emptyBorrowedAsset);
       // borrow from lp position
       const borrowed_LP = Object.keys(lpPositions).reduce((acc, shadow_id: string) => {
         const b = Object.keys(lpPositions[shadow_id].borrowed)
@@ -223,7 +223,7 @@ export const getPortfolioAssets = (memeCategory?: boolean) => {
               totalSupplyMoney: toUsd(totalSupplyD, asset),
             });
           })
-          .filter(app.showDust ? Boolean : emptyBorrowedAsset);
+          .filter(category.showDust ? Boolean : emptyBorrowedAsset);
         return { ...acc, [shadow_id]: b };
       }, {});
       const borrowedAll = Array.from(borrowed);
