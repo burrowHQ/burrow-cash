@@ -5,7 +5,8 @@ import { Box, Tooltip, Skeleton } from "@mui/material";
 import { USD_FORMAT, TOKEN_FORMAT, APY_FORMAT, DUST_FORMAT, NUMBER_FORMAT } from "../../../store";
 import type { IReward, UIAsset } from "../../../interfaces";
 import { useAppSelector } from "../../../redux/hooks";
-import { getDisplayAsTokenValue, getShowDust } from "../../../redux/appSelectors";
+import { getDisplayAsTokenValue } from "../../../redux/appSelectors";
+import { getShowDust } from "../../../redux/categorySelectors";
 import { Rewards } from "../../index";
 import { useFullDigits } from "../../../hooks/useFullDigits";
 

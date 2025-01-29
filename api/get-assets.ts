@@ -1,5 +1,5 @@
 import Decimal from "decimal.js";
-import { getAllMetadata, getAssetsDetailed, getPrices, getUnitLptAssets } from "../store";
+import { getAllMetadata, getAssetsDetail, getPrices, getUnitLptAssets } from "../store";
 import { shrinkToken } from "../store/helper";
 import { lpTokenPrefix, blackAssets } from "../utils/config";
 import { IToken, IUnitLptAssetDetail, IMetadata } from "../interfaces/asset";
@@ -40,9 +40,8 @@ const getLptMetadata = (lp_token_details: IUnitLptAssetDetail, priceMap, metadat
 };
 
 const getAssets = async () => {
-  const assetsPendng = await getAssetsDetailed();
-  // TODO for satoshi
-  const assets = assetsPendng.filter((asset) => asset.token_id.indexOf(lpTokenPrefix) === -1);
+  const assets_pending = await getAssetsDetail();
+  const assets = assets_pending.filter((asset) => !blackAssets.includes(asset.token_id));
   const token_ids_from_regular = assets
     .filter((asset) => asset.token_id.indexOf(lpTokenPrefix) === -1)
     .map((asset) => asset.token_id);

@@ -27,6 +27,7 @@ import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
 import { MARGIN_MIN_COLLATERAL_USD } from "../../../utils/config";
 import type { Asset } from "../../../redux/assetState";
 import { expandToken, shrinkToken } from "../../../store";
+import type { IMarginConfigState } from "../../../redux/marginConfigState";
 
 interface TradingOperateProps {
   onMobileClose?: () => void;
@@ -272,7 +273,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
         } else if (new Decimal(longInput || 0).gt(ReduxcategoryCurrentBalance2 || 0)) {
           setWarnTip(insufficient_balance);
         } else {
-          const borrowLimit = getBorrowLimit(ReduxcategoryAssets2, tokenInAmount);
+          const borrowLimit = getBorrowLimit(ReduxcategoryAssets2, tokenInAmount, config);
           const price_1 = getAssetPrice(ReduxcategoryAssets1);
           const price_2 = getAssetPrice(ReduxcategoryAssets2);
           if (borrowLimit?.isExceed) {
@@ -311,7 +312,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
         } else if (new Decimal(shortInput || 0).gt(ReduxcategoryCurrentBalance2 || 0)) {
           setWarnTip(insufficient_balance);
         } else {
-          const borrowLimit = getBorrowLimit(ReduxcategoryAssets1, tokenInAmount);
+          const borrowLimit = getBorrowLimit(ReduxcategoryAssets1, tokenInAmount, config);
           if (borrowLimit?.isExceed) {
             setWarnTip(
               <>
@@ -351,6 +352,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       ReduxcategoryCurrentBalance2,
       longInput,
       shortInput,
+      config,
     ],
   );
   const setMaxInputBanlance = (key: string) => {
@@ -530,7 +532,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
     if (!value) return "0";
     return value.toFixed(6).replace(/\.?0+$/, "");
   };
-  function getBorrowLimit(assetDebt: Asset, debt_amount: number) {
+  function getBorrowLimit(assetDebt: Asset, debt_amount: number, marginConfig: IMarginConfigState) {
     const assetsMap = isMainStream ? assets.data : assetsMEME.data;
     const asset = assetsMap[assetDebt.token_id];
     const temp1 = new Decimal(asset.supplied.balance)
@@ -543,8 +545,10 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
     const availableLiquidity = Number(
       shrinkToken(temp2, asset.metadata.decimals + asset.config.extra_decimals),
     );
+    const scale = marginConfig.pending_debt_scale / 10000;
+    const availableLiquidityForMargin = availableLiquidity * scale;
     // asset.config.min_borrowed_amount;
-    if (new Decimal(debt_amount || 0).gte(availableLiquidity || 0)) {
+    if (new Decimal(debt_amount || 0).gte(availableLiquidityForMargin || 0)) {
       return {
         isExceed: true,
         availableLiquidity,

@@ -813,7 +813,7 @@ export const getAccountDailyRewards = (memeCategory?: boolean) => {
       const accountDustProcess = dustProcess({
         accountSource: account,
         assets,
-        app,
+        showDust: category.showDust,
       });
       const baseCollateralUsdDaily =
         getGainsArr(accountDustProcess.portfolio.collaterals, assets)[0] / 365;
@@ -959,11 +959,11 @@ export function filterAccountEndedFarms(userFarms, allFarms): IAccountFarms {
 function dustProcess({
   accountSource,
   assets,
-  app,
+  showDust,
 }: {
   accountSource: AccountState;
   assets: AssetsState;
-  app: AppState;
+  showDust: boolean;
 }) {
   const account = Copy(accountSource);
   const portfolioAssets = {
@@ -987,7 +987,7 @@ function dustProcess({
         supplied: suppliedToken,
       };
     })
-    .filter(app.showDust ? Boolean : emptySuppliedAsset)
+    .filter(showDust ? Boolean : emptySuppliedAsset)
     .reduce((acc, cur) => [...acc, cur.tokenId], [] as any);
 
   const borrowed = Object.keys(account.portfolio.borrowed)
@@ -1002,7 +1002,7 @@ function dustProcess({
         borrowed: borrowedToken,
       };
     })
-    .filter(app.showDust ? Boolean : emptyBorrowedAsset)
+    .filter(showDust ? Boolean : emptyBorrowedAsset)
     .reduce((acc, cur) => [...acc, cur.tokenId], [] as any);
   const newSupplied = {};
   const newCollateral = {};

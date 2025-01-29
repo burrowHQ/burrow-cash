@@ -1,4 +1,4 @@
-import { getAssetsDetailed } from "../store";
+import { getAssetsDetail } from "../store";
 
 import getBalance from "./get-balance";
 import getPortfolio from "./get-portfolio";
@@ -9,7 +9,7 @@ const getAccount = async () => {
   const account = await getAccountWallet();
   const { accountId } = account;
   if (accountId) {
-    const assets = await getAssetsDetailed();
+    const assets = await getAssetsDetail();
     const tokenIds = assets.map((asset) => asset.token_id);
     const shadowRecords = await getShadowRecords();
     let accountBalance = "0";

@@ -114,11 +114,6 @@ export const getAppState = (memeCategory?) => {
   );
 };
 
-export const getShowDust = createSelector(
-  (state: RootState) => state.app,
-  (app) => app.showDust,
-);
-
 export const getShowTicker = createSelector(
   (state: RootState) => state.app,
   (app) => app.showTicker,
