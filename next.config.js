@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
-  reactStrictMode: true,
-  trailingSlash: true,
+  reactStrictMode: false,
+  trailingSlash: false,
   eslint: {
     ignoreDuringBuilds: true,
   },

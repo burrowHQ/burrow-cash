@@ -52,7 +52,8 @@ export type IViewReturnType =
   | IMarginConfig
   | IMarginAccountDetailedView
   | IPoolDcl[]
-  | IQuoteResult;
+  | IQuoteResult
+  | IAssetDetailed[];
 
 export interface IBurrow {
   selector: WalletSelector;

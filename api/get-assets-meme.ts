@@ -1,5 +1,5 @@
 import Decimal from "decimal.js";
-import { getAllMetadata, getAssetsMEMEDetailed, getPrices, getUnitLptAssets } from "../store";
+import { getAllMetadata, getAssetsMEMEDetail, getPrices, getUnitLptAssets } from "../store";
 import { shrinkToken } from "../store/helper";
 import { lpTokenPrefix } from "../utils/config";
 import { IToken, IUnitLptAssetDetail, IMetadata } from "../interfaces/asset";
@@ -40,7 +40,7 @@ const getLptMetadata = (lp_token_details: IUnitLptAssetDetail, priceMap, metadat
 };
 
 const getAssetsMEME = async () => {
-  const assets = await getAssetsMEMEDetailed();
+  const assets = await getAssetsMEMEDetail();
   const token_ids_from_regular = assets
     .filter((asset) => asset.token_id.indexOf(lpTokenPrefix) === -1)
     .map((asset) => asset.token_id);

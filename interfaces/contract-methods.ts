@@ -8,6 +8,7 @@ export enum ViewMethodsLogic {
   get_asset,
   get_assets,
   get_assets_paged,
+  get_assets_paged_detailed,
   // config
   get_config,
   get_margin_config,

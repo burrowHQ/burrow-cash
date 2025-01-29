@@ -1,4 +1,4 @@
-import { getAssetsMEMEDetailed } from "../store";
+import { getAssetsMEMEDetail } from "../store";
 
 import getBalance from "./get-balance";
 import getPortfolioMEME from "./get-portfolio-meme";
@@ -9,7 +9,7 @@ const getAccountMEME = async () => {
   const account = await getAccountWallet();
   const { accountId } = account;
   if (accountId) {
-    const assets = await getAssetsMEMEDetailed();
+    const assets = await getAssetsMEMEDetail();
     const tokenIds = assets.map((asset) => asset.token_id);
     const shadowRecords = await getShadowRecords();
     const accountBalance = (await account.getAccountBalance()).available;
