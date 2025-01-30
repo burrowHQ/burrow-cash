@@ -11,12 +11,8 @@ import { setUnreadLiquidation } from "../../redux/appSlice";
 import { getAccountId } from "../../redux/accountSelectors";
 
 const Liquidations = ({ isShow, setLiquidationPage }) => {
-  const dispatch = useAppDispatch();
-  const assets = useAppSelector(getAssetsCategory());
-  const accountId = useAppSelector(getAccountId);
-  const [isLoading, setIsLoading] = useState(false);
   const [docs, setDocs] = useState([]);
-  const isMeme = useAppSelector(isMemeCategory);
+  const [isLoading, setIsLoading] = useState(false);
   const [pagination, setPagination] = useState<{
     page?: number;
     totalPages?: number;
@@ -24,6 +20,10 @@ const Liquidations = ({ isShow, setLiquidationPage }) => {
   }>({
     page: 1,
   });
+  const dispatch = useAppDispatch();
+  const isMeme = useAppSelector(isMemeCategory);
+  const assets = useAppSelector(getAssetsCategory(isMeme));
+  const accountId = useAppSelector(getAccountId);
   useEffect(() => {
     if (isShow) {
       fetchData({

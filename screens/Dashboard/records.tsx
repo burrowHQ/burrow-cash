@@ -17,12 +17,6 @@ import {
 } from "../../components/Icons/Icons";
 
 const Records = ({ isShow }) => {
-  const accountId = useAccountId();
-  const { activeCategory } = useAppSelector((state) => state.category);
-  const { toastMessage, showToast } = useToastMessage();
-  const isMeme = useAppSelector(isMemeCategory);
-  const assets = useAppSelector(getAssetsCategory(isMeme));
-  const [isLoading, setIsLoading] = useState(false);
   const [docs, setDocs] = useState<any>([]);
   const [pagination, setPagination] = useState<{
     page?: number;
@@ -32,6 +26,11 @@ const Records = ({ isShow }) => {
     page: 1,
   });
   const [txLoadingStates, setTxLoadingStates] = useState({});
+  const accountId = useAccountId();
+  const { toastMessage, showToast } = useToastMessage();
+  const isMeme = useAppSelector(isMemeCategory);
+  const assets = useAppSelector(getAssetsCategory(isMeme));
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (isShow) {
