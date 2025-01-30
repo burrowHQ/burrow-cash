@@ -877,3 +877,12 @@ options-list::-webkit-scrollbar {
 .need-small {
   font-size: 8px !important;
 }
+.slip-fater:hover .slip-child {
+  display: block;
+}
+.slip-child {
+  display: none;
+}
+.slip-child:hover {
+  display: block;
+}

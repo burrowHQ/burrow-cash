@@ -4398,17 +4398,7 @@
     hoist-non-react-statics "^3.3.2"
     tslib "^1.9.3"
 
-"@sentry/tracing@^7.13.0":
-  version "7.13.0"
-  resolved "https://registry.npmjs.org/@sentry/tracing/-/tracing-7.13.0.tgz"
-  integrity sha512-/MKSd25rGv6Pc0FPBLXJifkfvSaYVPA8XUOLzVeDN0gl07h8AXli4qG9amTh/4Wb5h4dFpbcscOvW2VC+pxkIA==
-  dependencies:
-    "@sentry/hub" "7.13.0"
-    "@sentry/types" "7.13.0"
-    "@sentry/utils" "7.13.0"
-    tslib "^1.9.3"
-
-"@sentry/types@7.13.0", "@sentry/types@^7.2.0":
+"@sentry/types@7.13.0":
   version "7.13.0"
   resolved "https://registry.npmjs.org/@sentry/types/-/types-7.13.0.tgz"
   integrity sha512-ttckM1XaeyHRLMdr79wmGA5PFbTGx2jio9DCD/mkEpSfk6OGfqfC7gpwy7BNstDH/VKyQj/lDCJPnwvWqARMoQ==
@@ -9036,11 +9026,6 @@ fetch-blob@^3.1.2, fetch-blob@^3.1.4:
     node-domexception "^1.0.0"
     web-streams-polyfill "^3.0.3"
 
-fflate@^0.4.1:
-  version "0.4.8"
-  resolved "https://registry.npmjs.org/fflate/-/fflate-0.4.8.tgz"
-  integrity sha512-FJqqoDBR00Mdj9ppamLa/Y7vxm+PRmNWA67N846RvsoYVMKB4q3y/de5PA7gUmRMYK/8CMz2GDZQmCRN1wBcWA==
-
 figures@^4.0.1:
   version "4.0.1"
   resolved "https://registry.npmjs.org/figures/-/figures-4.0.1.tgz"
@@ -13178,15 +13163,6 @@ postcss@^8.4.23, postcss@^8.4.28:
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
-posthog-js@^1.20.2:
-  version "1.31.0"
-  resolved "https://registry.npmjs.org/posthog-js/-/posthog-js-1.31.0.tgz"
-  integrity sha512-d6vBb/ChS+t33voi37HA76etwWIukEcvJLZLZvkhJZcIrR29shwkAFUzd8lL7VdAelLlaAtmoPMwr820Yq5GUg==
-  dependencies:
-    "@sentry/types" "^7.2.0"
-    fflate "^0.4.1"
-    rrweb-snapshot "^1.1.14"
-
 posthtml-parser@^0.10.1:
   version "0.10.2"
   resolved "https://registry.npmjs.org/posthtml-parser/-/posthtml-parser-0.10.2.tgz#df364d7b179f2a6bf0466b56be7b98fd4e97c573"
@@ -14111,11 +14087,6 @@ rpc-websockets@^9.0.2:
   optionalDependencies:
     bufferutil "^4.0.1"
     utf-8-validate "^5.0.2"
-
-rrweb-snapshot@^1.1.14:
-  version "1.1.14"
-  resolved "https://registry.npmjs.org/rrweb-snapshot/-/rrweb-snapshot-1.1.14.tgz"
-  integrity sha512-eP5pirNjP5+GewQfcOQY4uBiDnpqxNRc65yKPW0eSoU1XamDfc4M8oqpXGMyUyvLyxFDB0q0+DChuxxiU2FXBQ==
 
 rtl-css-js@^1.14.0:
   version "1.16.0"

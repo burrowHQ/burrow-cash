@@ -1,32 +1,19 @@
-import posthogJs from "posthog-js";
-
-const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY as string;
-const POSTHOG_HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST as string;
-
 // export const isPostHogEnabled = POSTHOG_KEY && POSTHOG_HOST;
 export const isPostHogEnabled = false;
 
-const initPostHog = () => {
-  if (typeof window !== "undefined" && isPostHogEnabled) {
-    posthogJs.init(POSTHOG_KEY, {
-      api_host: POSTHOG_HOST,
-      autocapture: false,
-    });
-  }
-
-  return posthogJs;
-};
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+const initPostHog = () => {};
 
 export const posthog = initPostHog();
 
 export const track = (name, props = {}) => {
-  if (!isPostHogEnabled) return;
-  posthog.capture(name, props);
+  // if (!isPostHogEnabled) return;
+  // posthog.capture(name, props);
 };
 
 export const identifyUser = (id, traits = {}) => {
-  if (!isPostHogEnabled) return;
-  posthog.identify(id, traits);
+  // if (!isPostHogEnabled) return;
+  // posthog.identify(id, traits);
 };
 
 export const trackConnectWallet = () => {
