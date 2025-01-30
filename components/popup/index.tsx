@@ -83,7 +83,7 @@ const Popup = ({ className }) => {
                 <SupplyCarousel />
               </>
             </SwiperSlide>
-            <SwiperSlide>
+            {/* <SwiperSlide>
               <CloseButton
                 className="absolute cursor-pointer top-8 right-8 xsm:top-3.5 xsm:right-7 z-50"
                 onClick={closePopup}
@@ -91,7 +91,7 @@ const Popup = ({ className }) => {
               <div className={`${isMobileDevice() ? "mt-0" : "mt-8"} relative`}>
                 <StakeCarousel />
               </div>
-            </SwiperSlide>
+            </SwiperSlide> */}
           </Swiper>
         </div>
       </div>

@@ -13,7 +13,7 @@ export const fetchAssetsMEME = createAsyncThunk("assetsMEME/fetchAssets", async 
   return { assets, netTvlFarm, allFarms };
 });
 
-export const fetchRefPrices = createAsyncThunk("assetsMEME/fetchRefPrices", async () => {
+export const fetchRefPricesMEME = createAsyncThunk("assetsMEME/fetchRefPrices", async () => {
   const prices = await fetch(
     "https://raw.githubusercontent.com/NearDeFi/token-prices/main/ref-prices.json",
   ).then((r) => r.json());
@@ -40,7 +40,7 @@ export const assetSliceMEME = createSlice({
       console.error(action.payload);
       throw new Error("Failed to fetch assets and metadata");
     });
-    builder.addCase(fetchRefPrices.fulfilled, (state, action) => {
+    builder.addCase(fetchRefPricesMEME.fulfilled, (state, action) => {
       missingPriceTokens.forEach((missingToken) => {
         const missingTokenId = missingToken[defaultNetwork];
         if (missingTokenId && state.data[missingTokenId] && !state.data[missingTokenId]["price"]) {
@@ -61,10 +61,10 @@ export const assetSliceMEME = createSlice({
         }
       });
     });
-    builder.addCase(fetchRefPrices.pending, (state) => {
+    builder.addCase(fetchRefPricesMEME.pending, (state) => {
       state.status = "fetching";
     });
-    builder.addCase(fetchRefPrices.rejected, (state, action) => {
+    builder.addCase(fetchRefPricesMEME.rejected, (state, action) => {
       state.status = action.meta.requestStatus;
       console.error(action.payload);
       throw new Error("Failed to fetch REF prices");
