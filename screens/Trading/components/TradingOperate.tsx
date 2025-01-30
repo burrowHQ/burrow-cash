@@ -137,7 +137,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       updateOutput(activeTab, inputUsdCharcate1);
     }
 
-    if (inputUsdCharcate2) {
+    if (inputUsdCharcate2 && inputUsdCharcate1) {
       // swap token in amount
       updateInputAmounts(activeTab, inputUsdCharcate2, inputUsdCharcate1);
     }
