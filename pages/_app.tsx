@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import Head from "next/head";
 import { Provider } from "react-redux";
-import Decimal from "decimal.js";
 import type { AppProps } from "next/app";
 import { PersistGate } from "redux-persist/integration/react";
 import { init, ErrorBoundary } from "@sentry/react";
@@ -37,12 +36,7 @@ import { fetchAllPools } from "../redux/poolSlice";
 import "./slip.css";
 import { get_blocked } from "../api/get-blocked";
 import Popup from "../components/popup";
-import {
-  getMarginAccountSupplied,
-  getMarginAccountSuppliedMEME,
-} from "../redux/marginAccountSelectors";
 import BalanceReminder from "../components/BalanceReminder";
-import { useMarginAccount } from "../hooks/useMarginAccount";
 
 ModalReact.defaultStyles = {
   overlay: {
@@ -161,12 +155,12 @@ function Upgrade({ Component, pageProps }) {
         </div>
       ) : (
         <Layout>
-          {/* <Popup className="lg:hidden" /> */}
+          <Popup className="lg:hidden" />
           <Init />
           <Modal />
           <ToastMessage />
           <Component {...pageProps} />
-          {/* <Popup className="xsm:hidden" /> */}
+          <Popup className="xsm:hidden" />
           <BalanceReminder />
           <RpcList />
           <PubTestModal />
