@@ -8,6 +8,7 @@ export const Wrapper = styled(Box)(({ theme }) => ({
   border: "1px solid #4F5178",
   boxShadow: "0px 0px 10px 4px #00000026",
   flexDirection: "column",
+  overflow: "auto",
   [theme.breakpoints.down("sm")]: {
     position: "absolute",
     width: "100%",
