@@ -24,6 +24,8 @@ import { useDegenMode } from "../../hooks/hooks";
 import { SubmitButton } from "./components";
 import getShadowRecords from "../../api/get-shadows";
 import { expandToken, shrinkToken } from "../../store";
+import { getAssets as getAssetSelector } from "../../redux/assetsSelectors";
+import { getAccountPortfolio, getAccountId } from "../../redux/accountSelectors";
 
 export default function Action({
   maxBorrowAmount,
