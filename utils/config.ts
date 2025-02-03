@@ -189,6 +189,7 @@ export const MARGIN_WHITELIST = [
   "aiml.near",
   "refinternn.near",
   "willagao.near",
+  "web3hedge.near",
 ];
 export const DISABLE_WITHDRAW_ADDRESS = "bc1p";
 const getConfig = (env: string = defaultNetwork) => {
