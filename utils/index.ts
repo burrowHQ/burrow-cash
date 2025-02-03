@@ -65,20 +65,6 @@ export const getBurrow = async ({
   hideModal,
   signOut,
 }: GetBurrowArgs = {}): Promise<IBurrow> => {
-  /// because it's being called by multiple components on startup
-  /// all calls wait until setup is complete and then return burrow instance promise
-  const getBurrowInternal = async () => {
-    if (burrow) return burrow;
-    await new Promise((res) => {
-      setTimeout(() => {
-        res({});
-      }, 250);
-    });
-    return getBurrowInternal();
-  };
-  // if (!resetBurrow) return getBurrowInternal();
-  // resetBurrow = false;
-
   const changeAccount = async (accountId) => {
     if (fetchData) fetchData(accountId);
   };

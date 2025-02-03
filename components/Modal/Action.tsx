@@ -23,6 +23,8 @@ import { useDegenMode } from "../../hooks/hooks";
 import { SubmitButton } from "./components";
 import getShadowRecords from "../../api/get-shadows";
 import { expandToken, shrinkToken } from "../../store";
+import { getAssets as getAssetSelector } from "../../redux/assetsSelectors";
+import { getAccountPortfolio, getAccountId } from "../../redux/accountSelectors";
 
 export default function Action({ maxBorrowAmount, healthFactor, collateralType, poolAsset }) {
   const [loading, setLoading] = useState(false);
@@ -30,6 +32,8 @@ export default function Action({ maxBorrowAmount, healthFactor, collateralType, 
   const { enable_pyth_oracle } = useAppSelector(getConfig); // TODO33 need query from api？
   const dispatch = useAppDispatch();
   const asset = useAppSelector(getAssetData);
+  const assets = useAppSelector(getAssetSelector);
+  const accountId = useAppSelector(getAccountId);
   const { action = "Deposit", tokenId, borrowApy, price, portfolio, isLpToken, position } = asset;
   const { isRepayFromDeposits } = useDegenMode();
   const isMeme = useAppSelector(isMemeCategory);
