@@ -551,7 +551,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
     if (new Decimal(debt_amount || 0).gte(availableLiquidityForMargin || 0)) {
       return {
         isExceed: true,
-        availableLiquidity,
+        availableLiquidity: availableLiquidityForMargin,
       };
     }
     if (new Decimal(asset.config.min_borrowed_amount || 0).gt(0)) {
