@@ -11,11 +11,7 @@ import { getAssets as getAssetsSelector, getAssetsMEME } from "../../redux/asset
 import { shrinkToken } from "../../store";
 import { toInternationalCurrencySystem_number } from "../../utils/uiNumber";
 import { useMarginConfigToken } from "../../hooks/useMarginConfig";
-import {
-  setCategoryAssets1,
-  setCategoryAssets2,
-  setReduxRangeMount,
-} from "../../redux/marginTrading";
+import { setCategoryAssets1, setCategoryAssets2 } from "../../redux/marginTrading";
 import { useMarginAccount } from "../../hooks/useMarginAccount";
 import { useAccountId } from "../../hooks/hooks";
 import { useRouterQuery } from "../../utils/txhashContract";
@@ -35,16 +31,8 @@ const Trading = () => {
   const { query } = useRouterQuery();
   const accountId = useAccountId();
   const { marginAccountList, marginAccountListMEME } = useMarginAccount();
-  const {
-    categoryAssets2,
-    categoryAssets2MEME,
-    filterMarginConfigList,
-    categoryAssets1,
-    categoryAssets1MEME,
-  } = useMarginConfigToken();
-  const { ReduxcategoryAssets1, ReduxcategoryAssets2, ReduxActiveTab } = useAppSelector(
-    (state) => state.category,
-  );
+  const { categoryAssets2, categoryAssets2MEME } = useMarginConfigToken();
+  const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
   const router = useRouter();
   const { id }: any = router.query;
   const { filteredTokenTypeMap } = useRegisterTokenType();
@@ -75,7 +63,7 @@ const Trading = () => {
       setCurrentTokenCate1(combinedAssetsData[id]);
       dispatch(setCategoryAssets1(combinedAssetsData[id]));
     }
-  }, [id, currentTokenCate1, isLoading]);
+  }, [id, isLoading]);
 
   useMemo(() => {
     setLongAndShortPosition([
@@ -179,14 +167,17 @@ const Trading = () => {
     return () => clearInterval(intervalId); // Cleanup on unmount
   }, [id]);
   const indexPrice = useMemo(() => {
+    // use combinedAssetsData to obtain the latest data updated regularly
     if (currentTokenCate1?.token_id && currentTokenCate2?.token_id) {
-      const currentTokenCate1Price = currentTokenCate1?.price?.usd || 0;
-      const currentTokenCate2Price = currentTokenCate2?.price?.usd || 0;
+      const currentTokenCate1Price =
+        combinedAssetsData?.[currentTokenCate1?.token_id]?.price?.usd || 0;
+      const currentTokenCate2Price =
+        combinedAssetsData?.[currentTokenCate2?.token_id]?.price?.usd || 0;
       if (new Decimal(currentTokenCate2Price).gt(0)) {
         return new Decimal(currentTokenCate1Price).div(currentTokenCate2Price).toFixed();
       }
     }
-  }, [currentTokenCate1, currentTokenCate2]);
+  }, [currentTokenCate1, currentTokenCate2, combinedAssetsData]);
   return (
     <LayoutBox>
       {isLoading ? (
