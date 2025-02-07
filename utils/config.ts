@@ -190,6 +190,7 @@ export const MARGIN_WHITELIST = [
   "refinternn.near",
   "willagao.near",
   "web3hedge.near",
+  "71b85bee14a52c42ce331d2b7ee789da4c542d72678cedcab0c762b43e28f244",
 ];
 export const DISABLE_WITHDRAW_ADDRESS = "bc1p";
 const getConfig = (env: string = defaultNetwork) => {
