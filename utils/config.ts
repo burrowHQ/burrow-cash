@@ -63,6 +63,7 @@ export const NBTCTokenId = {
   testnet: "nbtc-dev.testnet",
   mainnet: "nbtc.bridge.near",
 }[defaultNetwork];
+export const NBTC_ENV = "mainnet";
 export const MARGIN_WHITELIST = [
   "lini.near",
   "juaner.near",

@@ -3,7 +3,7 @@ import { useDebounce } from "react-use";
 import Decimal from "decimal.js";
 import { useBtcWalletSelector, getBtcBalance, getDepositAmount } from "btc-wallet";
 import { expandToken, shrinkToken } from "../store/helper";
-import { NBTCTokenId } from "../utils/config";
+import { NBTCTokenId, NBTC_ENV } from "../utils/config";
 
 export function useBtcAction({
   tokenId,
@@ -19,7 +19,7 @@ export function useBtcAction({
   const [availableBalance, setAvailableBalance] = useState<number>(0);
   const btcSelector = useBtcWalletSelector();
   const isBtcTokenId = tokenId == NBTCTokenId;
-  const env = "mainnet";
+  const env = NBTC_ENV;
   useDebounce(
     () => {
       if (btcSelector?.account && isBtcTokenId) {

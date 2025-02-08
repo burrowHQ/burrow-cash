@@ -40,6 +40,7 @@ import getConfig, {
   LOGIC_MEMECONTRACT_NAME,
   WALLET_CONNECT_ID,
   isTestnet,
+  NBTC_ENV,
 } from "./config";
 
 declare global {
@@ -160,7 +161,7 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
       } as any),
       setupBTCWallet({
         autoConnect: true,
-        env: "mainnet",
+        env: NBTC_ENV,
       }) as any,
       myNearWallet,
       setupOKXWallet({}),

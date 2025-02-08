@@ -20,7 +20,7 @@ import { transformAssets } from "../../transformers/asstets";
 import getAccount from "../../api/get-account";
 import { transformAccount } from "../../transformers/account";
 import { computeWithdrawMaxAmount } from "../../redux/selectors/getWithdrawMaxAmount";
-import getConfig, { NBTCTokenId } from "../../utils/config";
+import getConfig, { NBTCTokenId, NBTC_ENV } from "../../utils/config";
 import { shadow_action_withdraw } from "./shadow";
 import { store } from "../../redux/store";
 
@@ -175,7 +175,7 @@ export async function withdraw({
       );
       withdraw_to_btc = await getWithdrawTransaction({
         amount: withdrawAmount,
-        env: "mainnet",
+        env: NBTC_ENV,
       });
     }
     await prepareAndExecuteTransactions(transactions, isMeme, withdraw_to_btc);

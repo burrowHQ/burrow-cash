@@ -2,7 +2,7 @@ import Decimal from "decimal.js";
 import { executeBTCDepositAndAction } from "btc-wallet";
 import { decimalMin, getBurrow } from "../../utils";
 import { expandTokenDecimal } from "../helper";
-import { NBTCTokenId } from "../../utils/config";
+import { NBTCTokenId, NBTC_ENV } from "../../utils/config";
 import { ChangeMethodsToken } from "../../interfaces";
 import { getTokenContract, getMetadata, prepareAndExecuteTokenTransactions } from "../tokens";
 import getBalance from "../../api/get-balance";
@@ -55,7 +55,7 @@ export async function supply({
           amount: expandedAmount.toFixed(0),
           msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
         },
-        env: "mainnet",
+        env: NBTC_ENV,
         registerDeposit: "100000000000000000000000",
       });
     } catch (error) {
