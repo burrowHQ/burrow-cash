@@ -104,6 +104,21 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
     slippageTolerance: slippageTolerance / 100,
     forceUpdate,
   });
+  // Long for tip to get max borrow amount TODO According to market conditions, if there is a real need, add
+  // const { estimateResult: estimateDataBurrowLimit, estimateLoading: estimateLoadingBurrowLimt } =
+  //   useEstimateSwap({
+  //     tokenIn_id: ReduxcategoryAssets2?.token_id,
+  //     tokenOut_id: ReduxcategoryAssets1?.token_id,
+  //     tokenIn_amount: toDecimal(
+  //       getAvailableLiquidityForMargin({
+  //         assetDebt: ReduxcategoryAssets2,
+  //         marginConfig: config,
+  //       }),
+  //     ),
+  //     account_id: accountId,
+  //     slippageTolerance: slippageTolerance / 100,
+  //     forceUpdate,
+  //   });
   // slippageTolerance change ecent
   useEffect(() => {
     dispatch(setSlippageToleranceFromRedux(0.5));
@@ -287,6 +302,18 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                   {ReduxcategoryAssets1?.metadata?.symbol}
                 </>,
               );
+              // const max_position = estimateDataBurrowLimit?.amount_out || 0;
+              // setWarnTip(
+              //   <span className={`${estimateLoadingBurrowLimt ? "flex items-center" : ""}`}>
+              //     {tip_max_available_debt}{" "}
+              //     {estimateLoadingBurrowLimt ? (
+              //       <BeatLoader size={4} color="red" className="mx-1" />
+              //     ) : (
+              //       beautifyPrice(Number(max_position || 0))
+              //     )}{" "}
+              //     {ReduxcategoryAssets1?.metadata?.symbol}
+              //   </span>,
+              // );
             }
           } else if (borrowLimit?.lowLoanLimit) {
             if (Number(price_1 || 0) > 0) {
@@ -535,18 +562,10 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
   function getBorrowLimit(assetDebt: Asset, debt_amount: number, marginConfig: IMarginConfigState) {
     const assetsMap = isMainStream ? assets.data : assetsMEME.data;
     const asset = assetsMap[assetDebt.token_id];
-    const temp1 = new Decimal(asset.supplied.balance)
-      .plus(new Decimal(asset.reserved))
-      .plus(asset.prot_fee)
-      .minus(new Decimal(asset.borrowed.balance || 0))
-      .minus(new Decimal(asset.margin_debt.balance || 0))
-      .minus(new Decimal(asset.margin_pending_debt || 0));
-    const temp2 = temp1.minus(temp1.mul(0.001)).toFixed(0);
-    const availableLiquidity = Number(
-      shrinkToken(temp2, asset.metadata.decimals + asset.config.extra_decimals),
-    );
-    const scale = marginConfig.pending_debt_scale / 10000;
-    const availableLiquidityForMargin = availableLiquidity * scale;
+    const availableLiquidityForMargin = getAvailableLiquidityForMargin({
+      assetDebt,
+      marginConfig,
+    });
     // asset.config.min_borrowed_amount;
     if (new Decimal(debt_amount || 0).gte(availableLiquidityForMargin || 0)) {
       return {
@@ -564,6 +583,29 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
         };
       }
     }
+  }
+  function getAvailableLiquidityForMargin({
+    assetDebt,
+    marginConfig,
+  }: {
+    assetDebt: Asset;
+    marginConfig: IMarginConfigState;
+  }) {
+    const assetsMap = isMainStream ? assets.data : assetsMEME.data;
+    const asset = assetsMap[assetDebt.token_id];
+    const temp1 = new Decimal(asset.supplied.balance)
+      .plus(new Decimal(asset.reserved))
+      .plus(asset.prot_fee)
+      .minus(new Decimal(asset.borrowed.balance || 0))
+      .minus(new Decimal(asset.margin_debt.balance || 0))
+      .minus(new Decimal(asset.margin_pending_debt || 0));
+    const temp2 = temp1.minus(temp1.mul(0.001)).toFixed(0);
+    const availableLiquidity = Number(
+      shrinkToken(temp2, asset.metadata.decimals + asset.config.extra_decimals),
+    );
+    const scale = marginConfig.pending_debt_scale / 10000;
+    const availableLiquidityForMargin = availableLiquidity * scale;
+    return availableLiquidityForMargin;
   }
   const buttonLoading = estimateLoading || forceUpdateLoading;
   return (
