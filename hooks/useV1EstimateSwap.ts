@@ -59,7 +59,7 @@ export const useV1EstimateSwap = ({
     return [];
   }, [tokenIn_id, tokenOut_id]);
   useEffect(() => {
-    if (!isEmpty(combinedAssetsData) && Number(tokenIn_amount) > 0) {
+    if (!isEmpty(combinedAssetsData) && Number(tokenIn_amount) > 0 && tokenIn_id && tokenOut_id) {
       getEstimateSwapData();
     }
   }, [combinedAssetsData, tokenIn_id, tokenOut_id, tokenIn_amount, slippageTolerance, forceUpdate]);
