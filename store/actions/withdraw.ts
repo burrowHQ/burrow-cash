@@ -47,13 +47,13 @@ export async function withdraw({
   // console.log('0000000000000-accountId', accountId)
   // console.log('0000000000000-account', account)
   if (!accountId) return;
-
   const asset = assets[tokenId];
   const { decimals } = asset.metadata;
   const { logicContract, oracleContract } = await getBurrow();
   const isNEAR = tokenId === nearTokenId;
   const { isLpToken } = asset;
   const suppliedBalance = new Decimal(accountPortfolio?.supplied[tokenId]?.balance || 0);
+  const hasBorrow = accountPortfolio?.borrows?.length > 0;
   const maxAmount = computeWithdrawMaxAmount(tokenId, assets, accountPortfolio!);
 
   const expandedAmount = isMax
@@ -137,7 +137,8 @@ export async function withdraw({
                     {
                       DecreaseCollateral: {
                         token_id: tokenId,
-                        amount: decreaseCollateralAmount.toFixed(0),
+                        amount:
+                          !hasBorrow && isMax ? undefined : decreaseCollateralAmount.toFixed(0),
                       },
                     },
                     withdrawAction,
@@ -151,7 +152,8 @@ export async function withdraw({
                         {
                           DecreaseCollateral: {
                             token_id: tokenId,
-                            amount: decreaseCollateralAmount.toFixed(0),
+                            amount:
+                              !hasBorrow && isMax ? undefined : decreaseCollateralAmount.toFixed(0),
                           },
                         },
                         withdrawAction,
