@@ -8,7 +8,7 @@ import { Integrations } from "@sentry/tracing";
 import posthogJs from "posthog-js";
 import { useIdle, useInterval } from "react-use";
 import ModalReact from "react-modal";
-
+import { BtcWalletSelectorContextProvider } from "btc-wallet";
 import "../styles/global.css";
 import LoadingBar from "react-top-loading-bar";
 import { useRouter } from "next/router";
@@ -198,15 +198,17 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         progress={progress}
         onLoaderFinished={() => setProgress(0)}
       />
-      <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <Head>
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <title>Burrow Finance</title>
-          </Head>
-          <Upgrade Component={Component} pageProps={pageProps} />
-        </PersistGate>
-      </Provider>
+      <BtcWalletSelectorContextProvider>
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
+            <Head>
+              <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <title>Burrow Finance</title>
+            </Head>
+            <Upgrade Component={Component} pageProps={pageProps} />
+          </PersistGate>
+        </Provider>
+      </BtcWalletSelectorContextProvider>
       {isBlocked && blockFeatureEnabled && (
         <div
           className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center"
