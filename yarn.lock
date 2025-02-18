@@ -6885,10 +6885,10 @@ bser@2.1.1:
   dependencies:
     node-int64 "^0.4.0"
 
-btc-wallet@^0.5.20-beta:
-  version "0.5.20-beta"
-  resolved "https://registry.yarnpkg.com/btc-wallet/-/btc-wallet-0.5.20-beta.tgz#21d74b9c3d31a454c290d04de743526f79c868ab"
-  integrity sha512-9w4rONWQJ3yBBenDYiy7825jdyuFu3MLxTyu9FTOpk+tgLHFXjThh2OTIRHUtUlw973AjeA/azRZUUKiGVVXxQ==
+btc-wallet@^0.5.21-beta:
+  version "0.5.21-beta"
+  resolved "https://registry.yarnpkg.com/btc-wallet/-/btc-wallet-0.5.21-beta.tgz#c141c073fc28f7e01cf31784e871042e54eb4b37"
+  integrity sha512-xiaRLOqBxXjilzHEt1o6C4EtxeBKnJ+00cqF6T308qMEBu6ZU3PKHa97SfK0HPktLxraYqrED4cgmOGPNlO/fQ==
   dependencies:
     "@bitcoinerlab/secp256k1" "^1.2.0"
     "@ethereumjs/util" "^9.0.1"
