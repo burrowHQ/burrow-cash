@@ -9,7 +9,7 @@ import {
   ViewMethodsREFV1,
   IShadowRecordInfo,
 } from "../interfaces";
-import { lpTokenPrefix } from "../utils/config";
+import { lpTokenPrefix, NBTCTokenId } from "../utils/config";
 
 export const getTokenContract = async (tokenContractAddress: string): Promise<Contract> => {
   const { account } = await getBurrow();
@@ -47,6 +47,12 @@ const getBalance = async (
           account_id: accountId,
         },
       )) as string;
+      if (
+        tokenId === NBTCTokenId &&
+        window.selector?.store?.getState()?.selectedWalletId === "btc-wallet"
+      ) {
+        return Decimal.max(new Decimal(balanceInYocto || 0).minus(1000), "0").toFixed();
+      }
     }
     return balanceInYocto;
   } catch (err: any) {
