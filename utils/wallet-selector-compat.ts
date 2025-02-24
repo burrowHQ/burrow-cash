@@ -21,6 +21,8 @@ import BN from "bn.js";
 import { map, distinctUntilChanged } from "rxjs";
 import { setupKeypom } from "@keypom/selector";
 import { setupOKXWallet } from "@near-wallet-selector/okx-wallet";
+import { setupHotWallet } from "@near-wallet-selector/hot-wallet";
+import { setupMeteorWalletApp } from "@near-wallet-selector/meteor-wallet-app";
 import { setupBTCWallet } from "btc-wallet";
 // @ts-nocheck
 import type { Config } from "@wagmi/core";
@@ -201,6 +203,10 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         deprecated: false,
       }),
       setupCoin98Wallet(),
+      setupHotWallet(),
+      setupMeteorWalletApp({
+        contractId: LOGIC_CONTRACT_NAME,
+      }),
     ],
     network: {
       networkId: defaultNetwork,
