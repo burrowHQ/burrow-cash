@@ -28,8 +28,8 @@ const StyledTipBox = styled.div<{ padding?: string }>`
   gap: 4px;
   position: relative;
   border-radius: 6px;
-  border: 1px solid #4f5178;
-  background: #2e304b;
+  border: 1px solid #303037;
+  background: #202026;
   font-size: 12px;
   padding: ${(p) => p.padding ?? "20px 30px"};
 `;
@@ -37,8 +37,8 @@ const StyledTipBox = styled.div<{ padding?: string }>`
 const StyledBox = styled.div<{ padding?: string }>`
   position: relative;
   border-radius: 12px;
-  border: 1px solid #31344d;
-  background: #23253a;
+  border: 1px solid #303037;
+  background: #202026;
   padding: ${(p) => p.padding ?? "20px 30px"};
 
   @media (max-width: 767px) {

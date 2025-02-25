@@ -35,7 +35,7 @@ ModalReact.defaultStyles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(20, 22, 43, 0.8)",
+    backgroundColor: "rgba(22, 22, 27, 0.8)",
     zIndex: 100,
     outline: "none",
   },
@@ -193,7 +193,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ErrorBoundary fallback={FallbackError}>
       <LoadingBar
-        color="#D2FF3A"
+        color="#00F7A5"
         height={3}
         progress={progress}
         onLoaderFinished={() => setProgress(0)}

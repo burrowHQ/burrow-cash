@@ -114,8 +114,8 @@ const TokenBorrowSuppliesChart = ({
 
             <defs>
               <linearGradient id="colorYellow" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#d2ff3a" stopOpacity={0.4} />
-                <stop offset="75%" stopColor="#d2ff3a" stopOpacity={0.05} />
+                <stop offset="0%" stopColor="#00F7A5" stopOpacity={0.4} />
+                <stop offset="75%" stopColor="#00F7A5" stopOpacity={0.05} />
               </linearGradient>
             </defs>
 
@@ -130,7 +130,7 @@ const TokenBorrowSuppliesChart = ({
               activeDot={<ActiveDot />}
               type="monotone"
               dataKey={yKey}
-              stroke={isBorrow ? "#FF6BA9" : "#d2ff3a"}
+              stroke={isBorrow ? "#FF6BA9" : "#00F7A5"}
               fill={isBorrow ? "url(#colorPink)" : "url(#colorYellow)"}
             />
           </AreaChart>
@@ -171,7 +171,7 @@ const RenderTickY = (tickProps: any) => {
   const { value, offset } = payload;
 
   return (
-    <text fontSize="13px" fill="#7E8A93" x={x - 20} y={y} textAnchor="middle">
+    <text fontSize="13px" fill="#303037" x={x - 20} y={y} textAnchor="middle">
       {value}%
     </text>
   );
@@ -183,7 +183,7 @@ const RenderTick = (tickProps: any) => {
 
   if (index % 2 === 0) {
     return (
-      <text fontSize="13px" fill="#7E8A93" x={x} y={y + 20} textAnchor="middle">
+      <text fontSize="13px" fill="#303037" x={x} y={y + 20} textAnchor="middle">
         {value}
       </text>
     );

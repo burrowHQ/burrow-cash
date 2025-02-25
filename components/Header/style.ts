@@ -76,7 +76,7 @@ export const WalletMobile = styled("div")(() => ({
   display: "flex",
 }));
 export const WrapperMenuMobile = styled("div")(() => ({
-  backgroundColor: "#2E304B",
+  backgroundColor: "#202026",
   borderBottomLeftRadius: "12px",
   borderBottomRightRadius: "12px",
   outline: "none",

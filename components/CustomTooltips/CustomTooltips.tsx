@@ -25,9 +25,9 @@ const StyledWrapper = styled.div`
     margin-bottom: 8px;
     display: none;
     border-radius: 5px;
-    border: 1px solid #4f5178;
+    border: 1px solid #303037;
     padding: 7px 7px 6px;
-    background: #2e304b;
+    background: #202026;
     line-height: 1.1;
     box-shadow: 0px 0px 10px 4px rgba(0, 0, 0, 0.15);
     width: 351px;

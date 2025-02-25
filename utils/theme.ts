@@ -8,7 +8,7 @@ const palette = {
   light: {
     mode: "light",
     primary: {
-      main: "#D2FF3A",
+      main: "#00F7A5",
       light: "#D5EFE6",
     },
     secondary: {
@@ -20,13 +20,13 @@ const palette = {
     },
     background: {
       default: "#F8F9FF",
-      paper: "#2E304B",
+      paper: "#202026",
     },
   },
   dark: {
     mode: "light",
     primary: {
-      main: "#D2FF3A",
+      main: "#00F7A5",
       light: "#000",
     },
     secondary: {
@@ -38,7 +38,7 @@ const palette = {
     },
     background: {
       default: "#1A3632",
-      paper: "#2E304B",
+      paper: "#202026",
     },
   },
 };
@@ -66,8 +66,8 @@ declare module "@mui/material/styles" {
 
 const custom = {
   light: {
-    headerBackground: "#14162B",
-    pageBackground: "#14162B",
+    headerBackground: "#16161B",
+    pageBackground: "#16161B",
     footerText: "#C0C4E9",
     footerIcon: "#000",
     text: "#000",
@@ -82,13 +82,13 @@ const custom = {
     stakingCardBg: "#fff",
   },
   dark: {
-    headerBackground: "#14162B",
-    pageBackground: "#14162B",
+    headerBackground: "#16161B",
+    pageBackground: "#16161B",
     footerText: "#C0C4E9",
     footerIcon: "#7f83a0",
     text: "#fff",
     textStaking: "#fff",
-    background: "#14162B",
+    background: "#16161B",
     backgroundStaking: "#31344E",
     notConnectedBg: "rgba(0,0,0,0.85)",
     scrollbarBg: "rgba(0,0,0,0.5)",
