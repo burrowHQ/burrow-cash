@@ -135,12 +135,12 @@ function Upgrade({ Component, pageProps }) {
         </div>
       ) : (
         <Layout>
-          <Popup className="lg:hidden" />
+          {/* <Popup className="lg:hidden" /> */}
           <Init />
           <Modal />
           <ToastMessage />
           <Component {...pageProps} />
-          <Popup className="xsm:hidden" />
+          {/* <Popup className="xsm:hidden" /> */}
           <RpcList />
           <PubTestModal />
         </Layout>

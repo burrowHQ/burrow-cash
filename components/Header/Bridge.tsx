@@ -59,7 +59,7 @@ export const bridgeList: IBridge[] = [
   {
     title: "Aggregate Bridge",
     subTitle: "Arbitrum | Ethereum | Base Optimism | Scroll",
-    link: "https://app.ref.finance/bridge",
+    link: "https://dex.rhea.finance/bridge",
   },
   {
     title: "Token Bridge",
