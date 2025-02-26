@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTheme, Box, Snackbar, Typography } from "@mui/material";
 import { useRouter } from "next/router";
-import Image from "next/image";
 import Link from "next/link";
 import LogoIcon from "../../public/logo.svg";
 import BrrrIcon from "../../public/brrr.svg";
@@ -128,8 +127,8 @@ const Header = () => {
           >
             {/* <span className=" transform"><LogoIcon /></span> */}
             {/* <img src="/public/logo.svg" width={30} height={30} /> */}
-            <Image
-              src="/Rhea-logo.png"
+            <img
+              src="/rheaLogo.png"
               width={80}
               height={30}
               alt=""

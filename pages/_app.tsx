@@ -127,7 +127,7 @@ function Upgrade({ Component, pageProps }) {
     <div>
       {upgrading ? (
         <div className="flex flex-col items-center justify-center  h-screen">
-          <img src="/loading-brrr.gif" alt="" width="75px" />
+          <img src="/favicon.png" alt="" width="75px" />
           <span className="flex items-center text-sm text-gray-300 mt-2">
             Refreshing assets data...
           </span>
