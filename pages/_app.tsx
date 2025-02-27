@@ -155,7 +155,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   // const blockFeatureEnabled = false;
   const router = useRouter();
   useEffect(() => {
-    window.location.href = "http://lending.rhea.finance/";
+    window.location.href = "https://lending.rhea.finance/";
   }, []);
   useEffect(() => {
     if (blockFeatureEnabled) {
