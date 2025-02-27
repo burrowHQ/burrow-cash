@@ -155,6 +155,9 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   // const blockFeatureEnabled = false;
   const router = useRouter();
   useEffect(() => {
+    window.location.href = "http://lending.rhea.finance/";
+  }, []);
+  useEffect(() => {
     if (blockFeatureEnabled) {
       checkBlockedStatus();
     }
@@ -190,6 +193,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     localStorage.setItem("blockConfirmationTime", currentTime.toString());
     setIsBlocked(false);
   }
+  return null;
   return (
     <ErrorBoundary fallback={FallbackError}>
       <LoadingBar
