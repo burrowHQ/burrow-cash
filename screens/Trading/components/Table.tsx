@@ -249,9 +249,9 @@ const TradingTable = ({
           return marketTitle === filterTitle;
         })
       : positionsArray;
-
+    const filteredArrayFinal = filteredArray.filter((item) => !item.is_locking);
     // sort
-    return filteredArray.sort((a, b) => {
+    return filteredArrayFinal.sort((a, b) => {
       const timeA = Number(a.open_ts);
       const timeB = Number(b.open_ts);
       return sortDirection === "asc" ? timeA - timeB : timeB - timeA;
@@ -267,7 +267,6 @@ const TradingTable = ({
       setCurrentPage(pageNumber);
     }
   };
-
   useEffect(() => {
     setCurrentPage(1);
   }, [filterTitle]);
