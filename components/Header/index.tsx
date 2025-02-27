@@ -134,7 +134,7 @@ const Header = () => {
               alt=""
               className="cursor-pointer"
               onClick={() => {
-                window.open("https://www.ref.finance");
+                window.open("https://www.rhea.finance");
               }}
             />
           </Logo>

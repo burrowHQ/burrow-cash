@@ -224,7 +224,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             style={{ width: "278px" }}
           >
             <p className="text-sm">
-              You are prohibited from accessing app.burrow.finance due to your location or other
+              You are prohibited from accessing lending.rhea.finance due to your location or other
               infringement of the Terms of Services.
             </p>
             <div
