@@ -171,7 +171,7 @@ const RenderTickY = (tickProps: any) => {
   const { value, offset } = payload;
 
   return (
-    <text fontSize="13px" fill="#303037" x={x - 20} y={y} textAnchor="middle">
+    <text fontSize="13px" fill="#7E8A93" x={x - 20} y={y} textAnchor="middle">
       {value}%
     </text>
   );
@@ -183,7 +183,7 @@ const RenderTick = (tickProps: any) => {
 
   if (index % 2 === 0) {
     return (
-      <text fontSize="13px" fill="#303037" x={x} y={y + 20} textAnchor="middle">
+      <text fontSize="13px" fill="#7E8A93" x={x} y={y + 20} textAnchor="middle">
         {value}
       </text>
     );
