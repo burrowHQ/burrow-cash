@@ -30,7 +30,7 @@ const ClaimButton = (props) => {
       {...props}
       className="flex flex-shrink-0 items-center justify-center bg-primary rounded-md cursor-pointer text-sm font-bold text-dark-200 hover:opacity-80 w-[136px] xsm:w-full h-8"
     >
-      {loading ? <BeatLoader size={5} color="#14162B" /> : <>Claim & Join</>}
+      {loading ? <BeatLoader size={5} color="#16161B" /> : <>Claim & Join</>}
     </div>
   );
 };

@@ -90,7 +90,7 @@ function TableHead({ sorting }) {
         </div>
       </div>
       <div
-        className="col-span-1 bg-gray-300 rounded-t-2xl flex items-center text-sm text-black cursor-pointer pl-4 xl:pl-8 whitespace-nowrap"
+        className="col-span-1 bg-white rounded-t-2xl flex items-center text-sm text-black cursor-pointer pl-4 xl:pl-8 whitespace-nowrap"
         onClick={() => {
           dispatch_sort_action("availableLiquidityMoney");
         }}

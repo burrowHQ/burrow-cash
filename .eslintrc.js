@@ -69,6 +69,7 @@ module.exports = {
     "@typescript-eslint/no-inferrable-types": ["off"],
     "no-underscore-dangle": "off",
     "react/no-unused-prop-types": "off",
+    "jsx-a11y/no-noninteractive-element-interactions": "off",
   },
   settings: {
     react: {

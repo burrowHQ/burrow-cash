@@ -151,7 +151,7 @@ const WalletButton = () => {
               padding: "0 20px",
               borderRadius: "6px",
               ":hover": {
-                backgroundColor: "#D2FF3A",
+                backgroundColor: "#00F7A5",
                 opacity: "0.8",
               },
               [theme.breakpoints.down("lg")]: {
@@ -379,7 +379,7 @@ const ClaimButtonInAccount = (props) => {
       {...props}
       className="flex items-center justify-center bg-primary rounded-md cursor-pointer text-sm font-bold text-dark-200 hover:opacity-80 w-20 h-8"
     >
-      {loading ? <BeatLoader size={5} color="#14162B" /> : <>Claim</>}
+      {loading ? <BeatLoader size={5} color="#16161B" /> : <>Claim</>}
     </div>
   );
 };
@@ -420,7 +420,7 @@ export const ConnectWalletButton = ({
           height: "42px",
           borderRadius: "6px",
           ":hover": {
-            backgroundColor: "#D2FF3A",
+            backgroundColor: "#00F7A5",
             opacity: "0.8",
           },
         }}

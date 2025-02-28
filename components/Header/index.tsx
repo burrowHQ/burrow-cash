@@ -3,7 +3,6 @@ import { useTheme, Box, Snackbar, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import LogoIcon from "../../public/logo.svg";
-import BurrowIcon from "../../public/burrow.svg";
 import BrrrIcon from "../../public/brrr.svg";
 import WalletButton from "./WalletButton";
 import Bridge from "./Bridge";
@@ -22,7 +21,7 @@ const MenuItem = ({ item }: { item: Imenu }) => {
   const { title, link, allLinks } = item;
   const router = useRouter();
   const isSelected = allLinks?.includes(router.route);
-  const style = isSelected ? { color: "#D2FF3A" } : {};
+  const style = isSelected ? { color: "#00F7A5" } : {};
 
   return (
     <Link href={link}>
@@ -126,8 +125,18 @@ const Header = () => {
               window.open("https://burrow.finance/");
             }}
           >
-            <LogoIcon style={{ fill: "white" }} />
-            <BurrowIcon />
+            {/* <span className=" transform"><LogoIcon /></span> */}
+            {/* <img src="/public/logo.svg" width={30} height={30} /> */}
+            <img
+              src="/rheaLogo.png"
+              width={80}
+              height={30}
+              alt=""
+              className="cursor-pointer"
+              onClick={() => {
+                window.open("https://www.rhea.finance");
+              }}
+            />
           </Logo>
           <Menu>
             {mainMenuList.map((item) => {

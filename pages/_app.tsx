@@ -35,7 +35,7 @@ ModalReact.defaultStyles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(20, 22, 43, 0.8)",
+    backgroundColor: "rgba(22, 22, 27, 0.8)",
     zIndex: 100,
     outline: "none",
   },
@@ -127,7 +127,7 @@ function Upgrade({ Component, pageProps }) {
     <div>
       {upgrading ? (
         <div className="flex flex-col items-center justify-center  h-screen">
-          <img src="/loading-brrr.gif" alt="" width="75px" />
+          <img src="/favicon.png" alt="" width="75px" />
           <span className="flex items-center text-sm text-gray-300 mt-2">
             Refreshing assets data...
           </span>
@@ -135,12 +135,12 @@ function Upgrade({ Component, pageProps }) {
         </div>
       ) : (
         <Layout>
-          <Popup className="lg:hidden" />
+          {/* <Popup className="lg:hidden" /> */}
           <Init />
           <Modal />
           <ToastMessage />
           <Component {...pageProps} />
-          <Popup className="xsm:hidden" />
+          {/* <Popup className="xsm:hidden" /> */}
           <RpcList />
           <PubTestModal />
         </Layout>
@@ -197,7 +197,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ErrorBoundary fallback={FallbackError}>
       <LoadingBar
-        color="#D2FF3A"
+        color="#00F7A5"
         height={3}
         progress={progress}
         onLoaderFinished={() => setProgress(0)}
@@ -207,7 +207,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           <PersistGate loading={null} persistor={persistor}>
             <Head>
               <meta name="viewport" content="width=device-width, initial-scale=1" />
-              <title>Burrow Finance</title>
+              <title>REHA Finance</title>
             </Head>
             <Upgrade Component={Component} pageProps={pageProps} />
           </PersistGate>
@@ -228,7 +228,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             style={{ width: "278px" }}
           >
             <p className="text-sm">
-              You are prohibited from accessing app.burrow.finance due to your location or other
+              You are prohibited from accessing lending.rhea.finance due to your location or other
               infringement of the Terms of Services.
             </p>
             <div

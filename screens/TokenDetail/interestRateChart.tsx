@@ -91,7 +91,7 @@ const InterestRateChart = ({ data }) => {
         <Line
           type="monotone"
           dataKey="supplyRate"
-          stroke="#D2FF3A"
+          stroke="#00F7A5"
           dot={<CustomizedDot />}
           activeDot={<ActiveDot />}
         />
@@ -149,7 +149,7 @@ const CustomTooltip = ({ active, payload, defaultPayload }: any) => {
       <LabelText
         left="Supply Rate"
         right={`${supplyRate?.toFixed(2)}%`}
-        style={{ color: "#D2FF3A" }}
+        style={{ color: "#00F7A5" }}
         className="mb-0"
       />
     </div>
