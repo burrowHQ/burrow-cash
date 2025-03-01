@@ -203,7 +203,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
           <PersistGate loading={null} persistor={persistor}>
             <Head>
               <meta name="viewport" content="width=device-width, initial-scale=1" />
-              <title>REHA Finance</title>
+              <title>RHEA Finance</title>
             </Head>
             <Upgrade Component={Component} pageProps={pageProps} />
           </PersistGate>
