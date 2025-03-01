@@ -256,7 +256,7 @@ const StyledTable = styled.div`
   }
 
   .custom-table-thead {
-    border-bottom: 1px solid #31344d;
+    border-bottom: 1px solid #303037;
 
     .custom-table-th {
       text-align: left;
@@ -285,7 +285,7 @@ const StyledTable = styled.div`
 
   .custom-table-row {
     &.table-row-hover:hover {
-      background: #33344c;
+      background: #25252c;
     }
     &:hover {
       .custom-table-action {

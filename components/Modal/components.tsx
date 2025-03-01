@@ -295,13 +295,13 @@ export const SubmitButton = ({ action, disabled, onClick, loading }) => {
   if (action === "Borrow" || action === "Repay")
     return (
       <RedSolidSubmitButton disabled={disabled || loading} onClick={onClick}>
-        {loading ? <BeatLoader size={5} color="#14162B" /> : action}
+        {loading ? <BeatLoader size={5} color="#16161B" /> : action}
       </RedSolidSubmitButton>
     );
 
   return (
     <YellowSolidSubmitButton disabled={disabled || loading} onClick={onClick}>
-      {loading ? <BeatLoader size={5} color="#14162B" /> : action === "Adjust" ? "Confirm" : action}
+      {loading ? <BeatLoader size={5} color="#16161B" /> : action === "Adjust" ? "Confirm" : action}
     </YellowSolidSubmitButton>
   );
 };

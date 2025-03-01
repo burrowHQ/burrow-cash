@@ -314,9 +314,7 @@ export const ModalAddCustomNetWork = (props: any) => {
                         } ${index !== Object.entries(rpclist).length - 1 ? "mb-3" : ""} ${
                           isInEditStatus ? "" : "cursor-pointer"
                         } ${
-                          isInEditStatus && !data.custom
-                            ? ""
-                            : "bg-black bg-gray-500 bg-opacity-30 hover:bg-opacity-50"
+                          isInEditStatus && !data.custom ? "" : "bg-gray-500 hover:bg-opacity-50"
                         } justify-between text-white`}
                         onClick={() => {
                           if (!isInEditStatus) {

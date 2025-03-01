@@ -20,6 +20,8 @@ import BN from "bn.js";
 import { map, distinctUntilChanged } from "rxjs";
 import { setupKeypom } from "@keypom/selector";
 import { setupOKXWallet } from "@near-wallet-selector/okx-wallet";
+import { setupHotWallet } from "@near-wallet-selector/hot-wallet";
+import { setupMeteorWalletApp } from "@near-wallet-selector/meteor-wallet-app";
 import { setupBTCWallet } from "btc-wallet";
 // @ts-nocheck
 import type { Config } from "@wagmi/core";
@@ -112,7 +114,7 @@ const web3Modal = createWeb3Modal({
 const walletConnect2 = setupWalletConnect({
   projectId: WALLET_CONNECT_ID,
   metadata: {
-    name: "Burrow Finance",
+    name: "REHA Finance",
     description: "Burrow with NEAR Wallet Selector",
     url: "https://github.com/near/wallet-selector",
     icons: ["https://avatars.githubusercontent.com/u/37784886"],
@@ -198,6 +200,10 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         deprecated: false,
       }),
       setupCoin98Wallet(),
+      setupHotWallet(),
+      setupMeteorWalletApp({
+        contractId: LOGIC_CONTRACT_NAME,
+      }),
     ],
     network: {
       networkId: defaultNetwork,

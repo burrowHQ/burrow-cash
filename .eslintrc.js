@@ -85,6 +85,7 @@ module.exports = {
     "no-lonely-if": "off",
     "react/jsx-boolean-value": "off",
     "react/no-unescaped-entities": "off",
+    "jsx-a11y/no-noninteractive-element-interactions": "off",
   },
   settings: {
     react: {

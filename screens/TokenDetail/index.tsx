@@ -1385,7 +1385,7 @@ function OuterLink() {
                 key="1"
                 className="lg:opacity-60 lg:hover:opacity-100"
                 onClick={() => {
-                  window.open("https://app.ref.finance/");
+                  window.open("https://dex.rhea.finance/");
                 }}
               />
             </LabelOuterLinkIcon>
@@ -1404,9 +1404,9 @@ function OuterLink() {
                   const pool_id = tokenId.split("-")[1];
                   const is_stable_pool = STABLE_POOL_IDS.includes(pool_id);
                   if (is_stable_pool) {
-                    window.open(`https://app.ref.finance/sauce/${pool_id}`);
+                    window.open(`https://dex.rhea.finance/sauce/${pool_id}`);
                   } else {
-                    window.open(`https://app.ref.finance/pool/${pool_id}`);
+                    window.open(`https://dex.rhea.finance/pool/${pool_id}`);
                   }
                 }}
               />

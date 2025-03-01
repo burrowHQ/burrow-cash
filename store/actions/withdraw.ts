@@ -114,7 +114,8 @@ export async function withdraw({
                     {
                       DecreaseCollateral: {
                         token_id: tokenId,
-                        amount: hasBorrow ? decreaseCollateralAmount.toFixed(0) : undefined,
+                        amount:
+                          !hasBorrow && isMax ? undefined : decreaseCollateralAmount.toFixed(0),
                       },
                     },
                     withdrawAction,
@@ -128,7 +129,8 @@ export async function withdraw({
                         {
                           DecreaseCollateral: {
                             token_id: tokenId,
-                            amount: decreaseCollateralAmount.toFixed(0),
+                            amount:
+                              !hasBorrow && isMax ? undefined : decreaseCollateralAmount.toFixed(0),
                           },
                         },
                         withdrawAction,
