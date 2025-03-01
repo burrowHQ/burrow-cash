@@ -50,7 +50,7 @@ const Links = () => {
       sx={{ gap: "26px" }}
     >
       <Link
-        href="https://twitter.com/burrow_finance"
+        href="https://twitter.com/rhea_finance"
         title="Twitter"
         target="_blank"
         color={theme.custom.footerIcon}
@@ -66,7 +66,7 @@ const Links = () => {
         <DiscordIcon />
       </Link>
       <Link
-        href="https://burrowfinance.medium.com/"
+        href="https://rhea-finance.medium.com/"
         title="Medium"
         target="_blank"
         color={theme.custom.footerIcon}
