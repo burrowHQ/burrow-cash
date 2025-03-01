@@ -248,7 +248,7 @@ const Links = () => {
       sx={{ gap: "26px" }}
     >
       <a
-        href="https://twitter.com/burrow_finance"
+        href="https://twitter.com/rhea_finance"
         title="Twitter"
         target="_blank"
         rel="noopener noreferrer"
@@ -266,7 +266,7 @@ const Links = () => {
         <DiscordIcon fill="#979ABE" />
       </a>
       <a
-        href="https://burrowfinance.medium.com/"
+        href="https://rhea-finance.medium.com/"
         title="Medium"
         target="_blank"
         rel="noopener noreferrer"

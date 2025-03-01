@@ -168,10 +168,10 @@ const Header = () => {
         <WrapperMobile>
           <Logo
             onClick={() => {
-              window.open("https://burrow.finance/");
+              window.open("https://www.rhea.finance");
             }}
           >
-            <BrrrIcon />
+            <img src="/rheaLogo.png" width={80} height={30} alt="" className="cursor-pointer" />
           </Logo>
           <Box className="flex items-center">
             <WalletButton />
@@ -195,7 +195,7 @@ const Links = () => {
       sx={{ gap: "48px" }}
     >
       <a
-        href="https://twitter.com/burrow_finance"
+        href="https://twitter.com/rhea_finance"
         title="Twitter"
         target="_blank"
         rel="noopener noreferrer"
@@ -213,7 +213,7 @@ const Links = () => {
         <DiscordIcon />
       </a>
       <a
-        href="https://burrowfinance.medium.com/"
+        href="https://rhea-finance.medium.com/"
         title="Medium"
         target="_blank"
         rel="noopener noreferrer"
