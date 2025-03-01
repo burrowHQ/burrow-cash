@@ -2,7 +2,7 @@
 
 Update for deployment.
 
-# Quick Start
+# Quick Start 2
 
 To run this project locally:
 
