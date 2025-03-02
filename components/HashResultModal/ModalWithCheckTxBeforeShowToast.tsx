@@ -61,7 +61,7 @@ const ModalWithCheckTxBeforeShowToast = ({ show, onClose, txHash }: ShowChangeCo
       className="rounded-sm"
       style={{
         width: `${progress}%`,
-        backgroundColor: "#D2FF3A",
+        backgroundColor: "#00F7A5",
         height: "3px",
       }}
     />

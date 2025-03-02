@@ -88,7 +88,7 @@ const ModalWithCountdown = ({
       className="rounded-sm"
       style={{
         width: `${progress}%`,
-        backgroundColor: type == "Long" ? "#D2FF3A" : "#ff6ba9",
+        backgroundColor: type == "Long" ? "#00F7A5" : "#ff6ba9",
         height: "3px",
       }}
     />

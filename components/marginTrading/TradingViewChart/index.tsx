@@ -75,18 +75,19 @@ export default function TradingViewChart({
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone as Timezone,
       studies_overrides: {},
       loading_screen: {
-        backgroundColor: "#23253a",
-        foregroundColor: "#23253a",
+        backgroundColor: "#202026",
+        foregroundColor: "#202026",
       },
       overrides: {
-        "paneProperties.background": "#23253a",
+        "paneProperties.background": "#202026",
         "paneProperties.backgroundType": "solid",
         "paneProperties.vertGridProperties.color": "rgba(255,255,255, 0.03)",
         "paneProperties.horzGridProperties.color": "rgba(255,255,255, 0.03)",
         "paneProperties.separatorColor": "transparent",
         "scalesProperties.textColor": "#C0C4E9",
       },
-      custom_css_url: "https://img.ref.finance/images/static/charting_library/custom-theme.css",
+      custom_css_url:
+        "https://img.ref.finance/images/static/charting_library/custom-rhea-theme.css",
     };
     tvWidgetRef.current = new widget(widgetOptions);
     tvWidgetRef.current.applyOverrides({

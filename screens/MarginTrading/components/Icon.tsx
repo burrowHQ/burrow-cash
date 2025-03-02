@@ -51,12 +51,12 @@ export function AddCollateral({ ...props }) {
         width="16"
         height="16"
         rx="4"
-        stroke="#D2FF3A"
+        stroke="#00F7A5"
         strokeWidth="1.2"
       />
       <path
         d="M8.22533 12.8756V9.68961H5.11133V8.28561H8.22533V5.09961H9.77333V8.28561H12.8873V9.68961H9.77333V12.8756H8.22533Z"
-        fill="#D2FF3A"
+        fill="#00F7A5"
       />
     </svg>
   );
