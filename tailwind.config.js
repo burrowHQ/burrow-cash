@@ -81,7 +81,7 @@ module.exports = {
         primary: "#00F7A5",
         claim: "#7C89FF",
         warning: "#FFC34F",
-        danger: "#FF68A7",
+        danger: "#FF5500",
         blue: {
           50: "#45AFFF",
           100: "#398FED",
@@ -115,10 +115,8 @@ module.exports = {
           1250: "#727591",
         },
         red: {
-          // 50: "#ff7a00",
           50: "#FF5500",
-          100: "#FF68A7",
-          150: "#EA3F68",
+          100: "#FF5500",
         },
         yellow: {
           50: "#F3BA2F",
@@ -141,9 +139,9 @@ module.exports = {
           1100: "#2F324B",
           1200: "#D8DCFF",
           1250: "#454869",
-          1300: "#383A56",
           1350: "#565A7B",
           1400: "#5A5C7A",
+          1300: "#565874",
         },
         toolTipBoxBorderColor: "#00F7A5",
         toolTipBoxBgColor: "rgba(35,37,58,0.8)",
