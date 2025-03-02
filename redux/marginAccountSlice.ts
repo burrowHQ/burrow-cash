@@ -23,7 +23,7 @@ export const marginAccountSlice = createSlice({
     builder.addCase(fetchMarginAccount.fulfilled, (state, action) => {
       state.status = action.meta.requestStatus;
       state.fetchedAt = new Date().toString();
-      // if (!action.payload?.account_id) return;
+      // @ts-ignore
       const { account_id, margin_positions, supplied } = action.payload || {};
       state.account_id = account_id || "";
       state.margin_positions = margin_positions || {};
