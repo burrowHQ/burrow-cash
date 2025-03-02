@@ -74,7 +74,7 @@ const Staking = () => {
             <Mascot width={isMobile ? 122 : 158} height={isMobile ? 114 : 147} />
           </div>
           <div className="h2 flex items-center gap-3 mb-4 md:mb-0">
-            <BrrrLogo color="#D2FF3A" className="brrr-logo" />
+            <BrrrLogo color="#00F7A5" className="brrr-logo" />
             <div className="brrr-amount flex flex-col md:flex-row md:gap-4 md:items-center">
               {totalAmount > 0 ? totalAmount.toLocaleString() : 0}
               <div className="text-gray-300 brrr-token">BRRR</div>
@@ -194,7 +194,7 @@ const StakingBox = ({
       <div className="flex justify-between flex-col h-full">
         <div className="flex justify-end lg:justify-between mb-3">
           <div className={twMerge("hidden md:block relative", disabled && "opacity-60")}>
-            <BrrrLogo color="#D2FF3A" />
+            <BrrrLogo color="#00F7A5" />
             {logoIcon && (
               <div className="absolute" style={{ bottom: 8, right: -8 }}>
                 {logoIcon}

@@ -24,9 +24,9 @@ export function SuppliedEmptyIcon() {
     >
       <path
         d="M35 0C34.4477 0 34 0.447715 34 1C34 1.55228 34.4477 2 35 2V0ZM52.5334 18.8845C53.0219 19.1422 53.6268 18.9551 53.8845 18.4666L58.0838 10.5063C58.3414 10.0178 58.1544 9.41294 57.6659 9.15525C57.1774 8.89756 56.5725 9.08465 56.3148 9.57314L52.5821 16.6489L45.5063 12.9162C45.0178 12.6586 44.4129 12.8456 44.1552 13.3341C43.8976 13.8226 44.0847 14.4275 44.5731 14.6852L52.5334 18.8845ZM35 2C41.7351 2 45.4387 4.52454 47.7378 7.71281C50.1095 11.0017 51.0347 15.0304 52.0447 18.2955L53.9553 17.7045C53.0087 14.6441 51.9775 10.1727 49.36 6.54301C46.67 2.81267 42.3518 0 35 0V2Z"
-        fill="#D2FF3A"
+        fill="#00F7A5"
       />
-      <ellipse cx="56" cy="52.5" rx="56" ry="9.5" fill="#14162B" />
+      <ellipse cx="56" cy="52.5" rx="56" ry="9.5" fill="#16161B" />
       <mask
         id="mask0_445_13550"
         style={{ maskType: "alpha" }}
@@ -38,17 +38,17 @@ export function SuppliedEmptyIcon() {
       >
         <path
           d="M112 52.5C112 57.7467 86.9279 62 56 62C25.0721 62 0 57.7467 0 52.5C0 47.2533 25.0721 18 56 18C86.9279 18 112 47.2533 112 52.5Z"
-          fill="#14162B"
+          fill="#16161B"
         />
       </mask>
       <g mask="url(#mask0_445_13550)">
         <path
           d="M82 51C82 66.464 69.464 79 54 79C38.536 79 26 66.464 26 51C26 35.536 38.536 24 54 24C67.5 24 73 30.5 73 30.5C77.9487 35.5501 82 43.3708 82 51Z"
-          fill="#D2FF3A"
+          fill="#00F7A5"
           stroke="#23253A"
           strokeWidth="2"
         />
-        <circle cx="59" cy="55" r="28" fill="#D2FF3A" stroke="#23253A" strokeWidth="2" />
+        <circle cx="59" cy="55" r="28" fill="#00F7A5" stroke="#23253A" strokeWidth="2" />
       </g>
     </svg>
   );
@@ -65,9 +65,9 @@ export function BorrowedEmptyIcon() {
     >
       <path
         d="M76.0898 21.3842C75.7869 21.846 75.9158 22.4659 76.3776 22.7688C76.8394 23.0717 77.4593 22.9429 77.7622 22.4811L76.0898 21.3842ZM82.2495 0.292806C81.859 -0.0977198 81.2259 -0.0977195 80.8353 0.292803L74.4714 6.65676C74.0808 7.04728 74.0808 7.68045 74.4714 8.07097C74.8619 8.46149 75.4951 8.4615 75.8856 8.07097L81.5424 2.41412L87.1993 8.07099C87.5898 8.46151 88.223 8.46151 88.6135 8.07099C89.004 7.68046 89.004 7.0473 88.6135 6.65677L82.2495 0.292806ZM77.7622 22.4811C83.456 13.8003 82.5424 7.36073 82.5424 0.999913L80.5424 0.99991C80.5424 7.5045 81.3968 13.2931 76.0898 21.3842L77.7622 22.4811Z"
-        fill="#FF6BA9"
+        fill="#FF5500"
       />
-      <ellipse cx="56" cy="52.501" rx="56" ry="9.5" fill="#14162B" />
+      <ellipse cx="56" cy="52.501" rx="56" ry="9.5" fill="#16161B" />
       <mask
         id="mask0_398_489"
         style={{ maskType: "alpha" }}
@@ -79,17 +79,17 @@ export function BorrowedEmptyIcon() {
       >
         <path
           d="M112 52.5015C112 57.7482 86.9279 62.0015 56 62.0015C25.0721 62.0015 0 57.7482 0 52.5015C0 47.2548 25.0721 18.0015 56 18.0015C86.9279 18.0015 112 47.2548 112 52.5015Z"
-          fill="#14162B"
+          fill="#16161B"
         />
       </mask>
       <g mask="url(#mask0_398_489)">
         <path
           d="M82 51.0015C82 66.4654 69.464 79.0015 54 79.0015C38.536 79.0015 26 66.4654 26 51.0015C26 35.5375 38.536 24.0015 54 24.0015C67.5 24.0015 73 30.5015 73 30.5015C77.9487 35.5516 82 43.3722 82 51.0015Z"
-          fill="#FF6BA9"
+          fill="#FF5500"
           stroke="#23253A"
           strokeWidth="2"
         />
-        <circle cx="59" cy="55.0015" r="28" fill="#FF6BA9" stroke="#23253A" strokeWidth="2" />
+        <circle cx="59" cy="55.0015" r="28" fill="#FF5500" stroke="#23253A" strokeWidth="2" />
       </g>
     </svg>
   );
@@ -309,8 +309,8 @@ export function RedLinearGradient(props) {
           y2="124.871"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#FF6BA9" />
-          <stop offset="1" stopColor="#FF6BA9" stopOpacity="0" />
+          <stop stopColor="#FF5500" />
+          <stop offset="1" stopColor="#FF5500" stopOpacity="0" />
         </linearGradient>
       </defs>
     </svg>
@@ -374,8 +374,8 @@ export function YellowLinearGradient(props) {
           y2="124.871"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#D2FF3A" />
-          <stop offset="1" stopColor="#D2FF3A" stopOpacity="0" />
+          <stop stopColor="#00F7A5" />
+          <stop offset="1" stopColor="#00F7A5" stopOpacity="0" />
         </linearGradient>
       </defs>
     </svg>
@@ -409,7 +409,7 @@ export function YellowBallIcon(props) {
       xmlns="http://www.w3.org/2000/svg"
     >
       <g filter="url(#filter0_d_1115_1018)">
-        <circle cx="7.5" cy="7.5" r="3.5" fill="#D2FF3A" />
+        <circle cx="7.5" cy="7.5" r="3.5" fill="#00F7A5" />
       </g>
       <defs>
         <filter

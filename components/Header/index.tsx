@@ -3,7 +3,6 @@ import { useTheme, Box, Snackbar, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import LogoIcon from "../../public/logo.svg";
-import BurrowIcon from "../../public/burrow.svg";
 import BrrrIcon from "../../public/brrr.svg";
 import WalletButton from "./WalletButton";
 import Bridge from "./Bridge";
@@ -22,7 +21,7 @@ const MenuItem = ({ item }: { item: Imenu }) => {
   const { title, link, allLinks } = item;
   const router = useRouter();
   const isSelected = allLinks?.includes(router.route);
-  const style = isSelected ? { color: "#D2FF3A" } : {};
+  const style = isSelected ? { color: "#00F7A5" } : {};
 
   return (
     <Link href={link}>
@@ -93,15 +92,17 @@ const CommunityItem = () => {
         />
       </svg>
       {isHovered && (
-        <div className="absolute z-50 top-full mt-1 left-0 w-48 p-2 bg-dark-100 shadow-lg border border-dark-300 rounded-md pt-4 pb-6 px-6">
-          <h1 className="text-sm text-gray-300 mb-4">Community</h1>
-          <LinksWrapper>
-            <Links />
-          </LinksWrapper>
-          <h1 className="text-sm text-gray-300 mt-4">Developer</h1>
-          <div>
-            <Github />
-            <BugBounty />
+        <div className="absolute z-50 top-full left-0 pt-2">
+          <div className="w-48 p-2 bg-dark-100 shadow-lg border border-dark-300 rounded-md pt-4 pb-6 px-6">
+            <h1 className="text-sm text-gray-300 mb-4">Community</h1>
+            <LinksWrapper>
+              <Links />
+            </LinksWrapper>
+            <h1 className="text-sm text-gray-300 mt-4">Developer</h1>
+            <div>
+              <Github />
+              <BugBounty />
+            </div>
           </div>
         </div>
       )}
@@ -140,8 +141,18 @@ const Header = () => {
               window.open("https://burrow.finance/");
             }}
           >
-            <LogoIcon style={{ fill: "white" }} />
-            <BurrowIcon />
+            {/* <span className=" transform"><LogoIcon /></span> */}
+            {/* <img src="/public/logo.svg" width={30} height={30} /> */}
+            <img
+              src="/rheaLogo.png"
+              width={80}
+              height={30}
+              alt=""
+              className="cursor-pointer"
+              onClick={() => {
+                window.open("https://www.rhea.finance");
+              }}
+            />
           </Logo>
           <Menu>
             {mainMenuList.map((item) => {
@@ -173,10 +184,10 @@ const Header = () => {
         <WrapperMobile>
           <Logo
             onClick={() => {
-              window.open("https://burrow.finance/");
+              window.open("https://www.rhea.finance");
             }}
           >
-            <BrrrIcon />
+            <img src="/rheaLogo.png" width={80} height={30} alt="" className="cursor-pointer" />
           </Logo>
           <Box className="flex items-center">
             <WalletButton />
@@ -194,13 +205,13 @@ const Links = () => {
   return (
     <Box
       display="grid"
-      gridTemplateColumns="repeat(4, 1fr)"
+      gridTemplateColumns="repeat(3, 1fr)"
       alignItems="center"
       lineHeight="0"
       sx={{ gap: "32px" }}
     >
       <a
-        href="https://twitter.com/burrow_finance"
+        href="https://twitter.com/rhea_finance"
         title="Twitter"
         target="_blank"
         rel="noopener noreferrer"
@@ -209,7 +220,7 @@ const Links = () => {
         <TwitterIcon />
       </a>
       <a
-        href="https://discord.gg/rsMyJfHQx9"
+        href="https://discord.gg/rheafinance"
         title="Discord"
         target="_blank"
         rel="noopener noreferrer"
@@ -218,7 +229,7 @@ const Links = () => {
         <DiscordIcon />
       </a>
       <a
-        href="https://burrowfinance.medium.com/"
+        href="https://rhea-finance.medium.com/"
         title="Medium"
         target="_blank"
         rel="noopener noreferrer"

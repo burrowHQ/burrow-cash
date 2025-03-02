@@ -54,10 +54,10 @@ export default function ToolTip({
 }
 const TipWrap = styled.div`
   #my-tooltip.react-tooltip {
-    border: 1px solid #4f5178;
+    border: 1px solid #303037;
     border-radius: 6px;
     padding: 6px 12px;
-    background-color: #2e304b !important;
+    background-color: #202026 !important;
     max-width: 300px;
     z-index: 50;
     font-size: 12px;

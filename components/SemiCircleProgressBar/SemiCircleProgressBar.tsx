@@ -104,9 +104,9 @@ const StyledWrapper = styled.div`
       height: 240px;
       border-radius: 50%;
       box-sizing: border-box;
-      border: 10px solid #2e304b; /* half gray, */
-      border-bottom-color: #d2ff3a; /* half azure */
-      border-right-color: #d2ff3a;
+      border: 10px solid #00f7a5; /* half gray, */
+      border-bottom-color: #00f7a5; /* half azure */
+      border-right-color: #00f7a5;
       opacity: 1;
 
       &.bar-warning {
@@ -115,8 +115,8 @@ const StyledWrapper = styled.div`
       }
 
       &.bar-danger {
-        border-bottom-color: #ff68a7;
-        border-right-color: #ff68a7;
+        border-bottom-color: #ff5500;
+        border-right-color: #ff5500;
       }
     }
 

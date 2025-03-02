@@ -49,7 +49,7 @@ export default function Disclaimer({ isOpen = false, onClose }) {
           "&::-webkit-scrollbar, & *::-webkit-scrollbar": {
             display: "none",
           },
-          border: "1px solid #4F5178",
+          border: "1px solid #303037",
           [theme.breakpoints.down("sm")]: {
             position: "absolute",
             bottom: "0px",
@@ -175,7 +175,7 @@ export default function Disclaimer({ isOpen = false, onClose }) {
               color: "#000",
               fontSize: "16px",
               textTransform: "none",
-              ":hover": { backgroundColor: "#D2FF3A" },
+              ":hover": { backgroundColor: "#00F7A5" },
               ":disabled": { color: "#6D708D", backgroundColor: "#565874" },
             }}
             disabled={!checked1 || !checked2}

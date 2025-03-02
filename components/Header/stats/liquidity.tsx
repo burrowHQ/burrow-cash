@@ -65,7 +65,7 @@ export const UserLiquidity = ({ memeCategory }: { memeCategory?: boolean }) => {
         value: userDepositedValue,
         text: "Supplied",
         valueStyle: {
-          color: "#D2FF3A",
+          color: "#00F7A5",
         },
       },
     ],
@@ -74,7 +74,7 @@ export const UserLiquidity = ({ memeCategory }: { memeCategory?: boolean }) => {
         value: userBorrowedValue,
         text: "Borrowed",
         valueStyle: {
-          color: "#FF68A7",
+          color: "#FF5500",
         },
       },
     ],

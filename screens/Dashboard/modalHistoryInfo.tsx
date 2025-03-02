@@ -65,7 +65,7 @@ const ModalHistoryInfo = ({ isOpen, onClose, tab }) => {
     >
       <div
         className="flex justify-between"
-        style={{ background: "#3A3D56", margin: "-1rem -1rem 0", padding: "0 1rem" }}
+        style={{ background: "rgba(22, 22, 27, 0.8)", margin: "-1rem -1rem 0", padding: "0 1rem" }}
       >
         <div className="flex gap-4">
           <TabItem text="Records" onClick={() => handleTabChange(0)} active={tabIndex === 0} />

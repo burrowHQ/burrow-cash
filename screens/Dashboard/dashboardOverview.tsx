@@ -250,7 +250,7 @@ const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
                           title={{ text: tokensName }}
                           wrapStyle={{
                             background: "none",
-                            border: "1px solid #2E304B",
+                            border: "1px solid #202026",
                             padding: "7px 8px",
                           }}
                           titleWrapClass="w-[158px] rounded-[4px] md:rounded-[4px]"
@@ -353,7 +353,7 @@ const ClaimButton = (props) => {
       {...props}
       className="flex items-center justify-center bg-primary rounded-md cursor-pointer text-sm font-bold text-dark-200 hover:opacity-80 w-full h-8 mt-1.5 "
     >
-      {loading ? <BeatLoader size={5} color="#14162B" /> : <>Claim</>}
+      {loading ? <BeatLoader size={5} color="#16161B" /> : <>Claim</>}
     </div>
   );
 };

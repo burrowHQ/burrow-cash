@@ -84,14 +84,14 @@ const InterestRateChart = ({ data }) => {
         <Line
           type="monotone"
           dataKey="borrowRate"
-          stroke="#FF6BA9"
+          stroke="#FF5500"
           dot={<CustomizedDot />}
           activeDot={<ActiveDot />}
         />
         <Line
           type="monotone"
           dataKey="supplyRate"
-          stroke="#D2FF3A"
+          stroke="#00F7A5"
           dot={<CustomizedDot />}
           activeDot={<ActiveDot />}
         />
@@ -144,12 +144,12 @@ const CustomTooltip = ({ active, payload, defaultPayload }: any) => {
       <LabelText
         left="Borrow Rate"
         right={`${borrowRate?.toFixed(2)}%`}
-        style={{ color: "#FF6BA9" }}
+        style={{ color: "#FF5500" }}
       />
       <LabelText
         left="Supply Rate"
         right={`${supplyRate?.toFixed(2)}%`}
-        style={{ color: "#D2FF3A" }}
+        style={{ color: "#00F7A5" }}
         className="mb-0"
       />
     </div>

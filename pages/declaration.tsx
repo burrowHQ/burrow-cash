@@ -26,12 +26,12 @@ const StyledDocument = styled.div`
   color: "#C0C4E9";
   h1 {
     font-size: 26px;
-    color: #d2ff3a;
+    color: #00f7a5;
     font-family: "work-sans-bold";
   }
   h2 {
     font-size: 22px;
-    color: #d2ff3a;
+    color: #00f7a5;
     font-family: "work-sans-bold";
   }
   h3 {
