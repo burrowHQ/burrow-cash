@@ -93,7 +93,7 @@ export const beautifyPrice = (
       <span key={num} className="animate-flipIn">
         {isDollar ? "$" : ""}
         {+integerPart === 0 ? "0.0" : integerPart + ".0"}
-        <span className={twMerge("px-px need-small", "")} style={{ color: "#d2ff3a" }}>
+        <span className={twMerge("px-px need-small", "")} style={{ color: "#00F7A5" }}>
           {nonZeroIndex}
         </span>
         {digits}

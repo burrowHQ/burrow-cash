@@ -57,7 +57,6 @@ import getConfig, {
   lpTokenPrefix,
   STABLE_POOL_IDS,
   NBTCTokenId,
-  DISABLE_WITHDRAW_ADDRESS,
 } from "../../utils/config";
 import InterestRateChart, { LabelText } from "./interestRateChart";
 import TokenBorrowSuppliesChart from "./tokenBorrowSuppliesChart";
@@ -1010,7 +1009,6 @@ function TokenUserInfo() {
   );
   const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
   const isNBTC = NBTCTokenId === tokenId && selectedWalletId === "btc-wallet";
-  const isTaproot = accountId?.startsWith(DISABLE_WITHDRAW_ADDRESS);
   return (
     <UserBox className="mb-[29px] xsm:mb-2.5">
       <div className="flex justify-between items-center">
@@ -1115,7 +1113,7 @@ function TokenUserInfo() {
         {accountId ? (
           <>
             <YellowSolidButton
-              disabled={isTaproot || (isBtc ? !+btcAvailableBalance : !+supplyBalance)}
+              disabled={isBtc ? !+btcAvailableBalance : !+supplyBalance}
               className="w-1 flex-grow"
               onClick={handleSupplyClick}
             >
@@ -1165,8 +1163,7 @@ function YouSupplied() {
   ) || [[], 0];
   const handleWithdrawClick = useWithdrawTrigger(tokenId);
   const handleAdjustClick = useAdjustTrigger(tokenId);
-  const isTaproot = accountId?.startsWith(DISABLE_WITHDRAW_ADDRESS);
-  const withdraw_disabled = !supplied || !supplied?.canWithdraw || isTaproot;
+  const withdraw_disabled = !supplied || !supplied?.canWithdraw;
   const adjust_disabled = !supplied?.canUseAsCollateral;
   const is_empty = !supplied;
   return (
