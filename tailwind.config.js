@@ -51,7 +51,7 @@ module.exports = {
         primary: "#00F7A5",
         claim: "#7C89FF",
         warning: "#FFC34F",
-        danger: "#FF68A7",
+        danger: "#FF5500",
         blue: {
           50: "#45AFFF",
           100: "#398FED",
@@ -82,9 +82,8 @@ module.exports = {
           1150: "#2F324B",
         },
         red: {
-          // 50: "#ff7a00",
           50: "#FF5500",
-          100: "#FF68A7",
+          100: "#FF5500",
         },
         yellow: {
           50: "#F3BA2F",

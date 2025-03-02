@@ -257,7 +257,7 @@ const Links = () => {
         <TwitterIcon fill="#979ABE" />
       </a>
       <a
-        href="https://discord.gg/rsMyJfHQx9"
+        href="https://discord.gg/rheafinance"
         title="Discord"
         target="_blank"
         rel="noopener noreferrer"
