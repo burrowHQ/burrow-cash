@@ -1,6 +1,12 @@
-:root:not(.theme-dark) {
-  --tv-color-platform-background: #e6e6e6;
-  --tv-color-pane-background: #e6e6e6;
-  --tv-color-toolbar-toggle-button-background-active: #4b85f5;
-  --tv-color-toolbar-toggle-button-background-active-hover: #1d64f2;
+.theme-dark:root {
+  --tv-color-platform-background: #202026;
+  --tv-color-pane-background: #202026;
+  --tv-color-toolbar-divider-background: #202026;
+  --tv-color-toolbar-button-text: #C0C4E9;
+  --tv-color-toolbar-toggle-button-background-active: #00F7A5;
+  --tv-color-toolbar-toggle-button-background-active-hover: #00F7A5;
+  --tv-color-toolbar-button-background-hover: rgba(255,255,255,0.1);
+  --tv-color-toolbar-button-text-hover:white;
+  --tv-color-popup-background: #31344D;
+  --tv-color-toolbar-button-text-active: white;
 }
