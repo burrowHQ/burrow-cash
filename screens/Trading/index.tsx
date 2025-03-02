@@ -24,6 +24,7 @@ import TradingOperateMobile from "./components/TradingOperateMobile";
 import { beautifyPrice } from "../../utils/beautyNumber";
 import { getSymbolById } from "../../transformers/nearSymbolTrans";
 import { useRegisterTokenType } from "../../hooks/useRegisterTokenType";
+import { RefreshIcon } from "../../components/Header/svg";
 
 const Trading = () => {
   const [open, setOpen] = useState(false);
@@ -182,7 +183,7 @@ const Trading = () => {
     <LayoutBox>
       {isLoading ? (
         <div className="flex flex-col items-center justify-center h-screen">
-          <img src="/loading-brrr.gif" alt="" width="75px" />
+          <RefreshIcon className="flex-shrink-0 animate-spin h-6 w-6" />
           <span className="flex items-center text-sm text-gray-300 mt-2">Loading Meme data...</span>
         </div>
       ) : (

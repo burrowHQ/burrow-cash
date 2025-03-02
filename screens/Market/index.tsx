@@ -7,6 +7,7 @@ import { showModal } from "../../redux/appSlice";
 import { useAvailableAssets } from "../../hooks/hooks";
 import { useTableSorting } from "../../hooks/useTableSorting";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
+import { RefreshIcon } from "../../components/Header/svg";
 import { setActiveCategory } from "../../redux/marginTrading";
 
 const Market = () => {
@@ -53,7 +54,7 @@ const Market = () => {
       />
       {loading ? (
         <div className="flex flex-col items-center mt-24">
-          <img src="/favicon.png" alt="" width="75px" />
+          <RefreshIcon className="flex-shrink-0 animate-spin h-6 w-6" />
           <span className="flex items-center text-sm text-gray-300 mt-2">Loading data...</span>
         </div>
       ) : null}

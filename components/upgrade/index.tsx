@@ -14,6 +14,7 @@ import { ToastMessage } from "../ToastMessage";
 import BalanceReminder from "../BalanceReminder";
 import PubTestModal from "../PubTestModal";
 import Init from "../appInit";
+import { RefreshIcon } from "../Header/svg";
 
 export default function Upgrade({ Component, pageProps }) {
   const [upgrading, setUpgrading] = useState<boolean>(true);
@@ -55,7 +56,7 @@ export default function Upgrade({ Component, pageProps }) {
     <div>
       {upgrading ? (
         <div className="flex flex-col items-center justify-center  h-screen">
-          <img src="/loading-brrr.gif" alt="" width="75px" />
+          <RefreshIcon className="flex-shrink-0 animate-spin h-6 w-6" />
           <span className="flex items-center text-sm text-gray-300 mt-2">
             Refreshing assets data...
           </span>

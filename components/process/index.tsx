@@ -15,7 +15,7 @@ export default function Process() {
   }, []);
   return (
     <LoadingBar
-      color="#D2FF3A"
+      color="#00F7A5"
       height={3}
       progress={progress}
       onLoaderFinished={() => setProgress(0)}
