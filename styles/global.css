@@ -3,17 +3,17 @@
 @tailwind utilities;
 @import "../node_modules/ref-modal-ui/styles.css";
 @font-face {
-  font-family: "work-sans";
-  src: url("./work-sans/WorkSans-Regular.otf");
+  font-family: "jost";
+  src: url("./jost/Jost-400-Book.otf");
 }
 
 @font-face {
-  font-family: "work-sans-bold";
-  src: url("./work-sans/WorkSans-Bold.otf");
+  font-family: "jost-bold";
+  src: url("./jost/Jost-800-Hevy.otf");
 }
 
 body {
-  font-family: "work-sans";
+  font-family: "jost";
   margin: 0;
   padding: 0;
   height: 100%;
@@ -27,8 +27,8 @@ body {
   height: 100%;
 }
 
-.sans-bold {
-  font-family: "work-sans-bold";
+.jost-bold {
+  font-family: "jost-bold";
 }
 
 html {

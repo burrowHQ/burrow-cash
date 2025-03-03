@@ -1,3 +1,5 @@
+import { AWS_MEDIA_DOMAIN } from "../../utils/config";
+
 export function ArrowDownIcon(props) {
   return (
     <svg
@@ -264,4 +266,8 @@ export function BoosterIcon(props) {
       />
     </svg>
   );
+}
+
+export function MarketBg(props: any) {
+  return <img {...props} src={AWS_MEDIA_DOMAIN + `/images/lendingBg.png`} alt="" />;
 }

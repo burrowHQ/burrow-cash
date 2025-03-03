@@ -74,7 +74,7 @@ export const UserLiquidity = ({ memeCategory }: { memeCategory?: boolean }) => {
         value: userBorrowedValue,
         text: "Borrowed",
         valueStyle: {
-          color: "#FF5500",
+          color: "#FF5E3A",
         },
       },
     ],

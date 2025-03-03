@@ -10,3 +10,24 @@ export function ThreeDotIcon() {
     </svg>
   );
 }
+
+export function WarnTipIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect width="16" height="16" rx="8" fill="#00F7A5" />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M8.82857 12.229H7V6.74324H8.82857V12.229ZM7.91429 5.82857C7.40934 5.82857 7 5.41923 7 4.91428C7 4.40934 7.40934 4 7.91429 4C8.41923 4 8.82857 4.40934 8.82857 4.91428C8.82857 5.41923 8.41923 5.82857 7.91429 5.82857Z"
+        fill="black"
+      />
+    </svg>
+  );
+}

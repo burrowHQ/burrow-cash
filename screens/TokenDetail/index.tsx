@@ -930,8 +930,6 @@ function TokenRateModeChart({
 }) {
   const { currentUtilRate } = interestRates?.[0] || {};
   const { borrowApy, supplyApy } = tokenRow || {};
-  // const { borrowRate, supplyRate } = fullRateDetail || {};
-
   return (
     <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-gray-800 xsm:p-4">
       <div className="font-bold text-lg text-white mb-5">Interest Rate Mode</div>
@@ -942,7 +940,6 @@ function TokenRateModeChart({
           leftIcon={<div className="bg-gray-400 mr-2 h-[2px] w-[10px]" />}
           right={currentUtilRate ? `${currentUtilRate.toFixed(2)}%` : "-"}
         />
-        {/* <LabelText left="Utilization Rate" right={fullRateDetail?.percentLabel || "-"} /> */}
         <LabelText
           left="Borrow Rate"
           leftIcon={<div className="rounded-full mr-2 bg-danger h-[10px] w-[10px]" />}

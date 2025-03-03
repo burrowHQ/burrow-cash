@@ -49,13 +49,13 @@ function TableHead({ sorting }) {
   }
   if (isMobile) return <HeadMobile sorting={sorting} />;
   return (
-    <div className="grid grid-cols-6 h-12 border border-dark-50">
-      <div className="col-span-1 bg-gray-800  flex items-center pl-5 text-sm text-gray-300 sans-bold">
+    <div className="grid grid-cols-6 h-12 bg-dark-110 rounded-t-sm overflow-hidden">
+      <div className="col-span-1 bg-gray-800  flex items-center pl-5 text-sm text-gray-120 jost-bold">
         Market
       </div>
       <div className="grid grid-cols-2 col-span-2 text-primary items-center text-sm bg-gray-800">
         <div
-          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap sans-bold"
+          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap jost-bold"
           onClick={() => {
             dispatch_sort_action("totalSupplyMoney");
           }}
@@ -64,7 +64,7 @@ function TableHead({ sorting }) {
           <SortButton sort={getCurColumnSort("totalSupplyMoney")} color="primary" />
         </div>
         <div
-          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap sans-bold"
+          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap jost-bold"
           onClick={() => {
             dispatch_sort_action("depositApy");
           }}
@@ -72,32 +72,32 @@ function TableHead({ sorting }) {
           Supply APY <SortButton sort={getCurColumnSort("depositApy")} color="primary" />
         </div>
       </div>
-      <div className="grid grid-cols-2 col-span-2 text-red-50 items-center text-sm bg-gray-800">
+      <div className="grid grid-cols-2 col-span-2 text-danger items-center text-sm bg-gray-800">
         <div
-          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap sans-bold"
+          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap jost-bold"
           onClick={() => {
             dispatch_sort_action("totalBorrowedMoney");
           }}
         >
-          Total Borrowed <SortButton sort={getCurColumnSort("totalBorrowedMoney")} color="red-50" />
+          Total Borrowed <SortButton sort={getCurColumnSort("totalBorrowedMoney")} color="danger" />
         </div>
         <div
-          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap sans-bold"
+          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap jost-bold"
           onClick={() => {
             dispatch_sort_action("borrowApy");
           }}
         >
-          Borrow APY <SortButton sort={getCurColumnSort("borrowApy")} color="red-50" />
+          Borrow APY <SortButton sort={getCurColumnSort("borrowApy")} color="danger" />
         </div>
       </div>
       <div
-        className="col-span-1 bg-gray-800 flex items-center text-sm text-white cursor-pointer pl-4 xl:pl-8 whitespace-nowrap"
+        className="col-span-1 bg-gray-800 flex items-center text-sm text-gray-120 cursor-pointer pl-4 xl:pl-8 whitespace-nowrap jost-bold"
         onClick={() => {
           dispatch_sort_action("availableLiquidityMoney");
         }}
       >
         Available Liquidity
-        <SortButton sort={getCurColumnSort("availableLiquidityMoney")} color="gray-300" />
+        <SortButton sort={getCurColumnSort("availableLiquidityMoney")} color="gray-120" />
       </div>
     </div>
   );
@@ -401,7 +401,7 @@ function TableRowPc({
       href={`/tokenDetail/${row.tokenId}?pageType=${isMeme ? "meme" : "main"}`}
     >
       <div
-        className={`grid grid-cols-6 bg-gray-800 hover:bg-dark-100 cursor-pointer mt-0.5 h-[60px] ${
+        className={`grid grid-cols-6 bg-gray-800 hover:bg-gray-500 cursor-pointer mt-0.5 h-[60px] ${
           lastRow ? "rounded-b-md" : ""
         }`}
       >

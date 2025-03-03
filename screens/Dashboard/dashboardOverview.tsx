@@ -226,7 +226,7 @@ const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
                     const healthColor = {
                       good: "text-primary",
                       warning: "text-warning",
-                      danger: "text-red-100",
+                      danger: "text-danger",
                     };
 
                     let tokensName = value?.type;
@@ -315,7 +315,7 @@ const HealthFactor = ({ userHealth }) => {
           className={twMerge(
             "h2b text-primary",
             isWarning && "text-warning",
-            isDanger && "text-red-100 flex gap-2 items-center",
+            isDanger && "text-danger flex gap-2 items-center",
           )}
         >
           {isDanger && (

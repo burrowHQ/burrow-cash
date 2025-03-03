@@ -5,6 +5,16 @@ module.exports = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "img.ref.finance",
+        port: "",
+        pathname: "/**",
+      },
+    ],
+  },
   webpack(config, { isServer, webpack, buildId }) {
     config.plugins.push(
       new webpack.DefinePlugin({
@@ -46,13 +56,4 @@ module.exports = {
 
     return config;
   },
-  // async redirects() {
-  //   return [
-  //     {
-  //       source: "/",
-  //       destination: "/markets",
-  //       permanent: true,
-  //     },
-  //   ];
-  // },
 };

@@ -84,7 +84,7 @@ const InterestRateChart = ({ data }) => {
         <Line
           type="monotone"
           dataKey="borrowRate"
-          stroke="#FF5500"
+          stroke="#FF5E3A"
           dot={<CustomizedDot />}
           activeDot={<ActiveDot />}
         />
@@ -139,12 +139,15 @@ const CustomTooltip = ({ active, payload, defaultPayload }: any) => {
 
   if (!defaultPayload && (!active || !payload2 || !payload2?.[0])) return null;
   return (
-    <div className="px-3 py-2 rounded-md min-w-max" style={{ backgroundColor: "#32344B" }}>
+    <div
+      className="px-3 py-2 rounded-md min-w-max border border-gray-130"
+      style={{ backgroundColor: "#25252C" }}
+    >
       <LabelText left="Utilization Rate" right={`${percent?.toFixed(2)}%`} />
       <LabelText
         left="Borrow Rate"
         right={`${borrowRate?.toFixed(2)}%`}
-        style={{ color: "#FF5500" }}
+        style={{ color: "#FF5E3A" }}
       />
       <LabelText
         left="Supply Rate"
@@ -197,41 +200,21 @@ const CustomLabel = (props) => {
   const WIDTH = 153;
   return (
     <g>
-      <rect x={x - WIDTH / 2} y={y} fill="#32344B" width={WIDTH} height={30} radius={100} />
+      <rect
+        x={x - WIDTH / 2}
+        y={y}
+        fill="#25252C"
+        width={WIDTH}
+        height={30}
+        rx={6}
+        ry={6}
+        stroke="#414B57"
+      />
       <text x={x - WIDTH / 2} y={y} fill="#fff" dy={19} dx={9} fontSize={11}>
         Current Utilization {value?.toFixed(2)}%
       </text>
     </g>
   );
-};
-
-const MobileRefLabel = (props) => {
-  const { viewBox, value, details } = props || {};
-  const { x, y } = viewBox || {};
-  const WIDTH = 153;
-  return (
-    <g>
-      <rect x={x - WIDTH / 2} y={y} fill="#32344B" width={WIDTH} height={100} radius={100} />
-      <text x={x - WIDTH / 2} y={y} fill="#fff" dy={19} dx={9} fontSize={11}>
-        Current Utilization {value?.toFixed(2)}%
-      </text>
-      <text x={x - WIDTH / 2} y={y + 20} fill="#fff" dy={19} dx={9} fontSize={11}>
-        Borrow Rate {details?.borrowRate?.toFixed(2)}%
-      </text>
-      <text x={x - WIDTH / 2} y={y + 40} fill="#fff" dy={19} dx={9} fontSize={11}>
-        Supply Rate {value?.toFixed(2)}%
-      </text>
-    </g>
-  );
-};
-
-const MobileLine = (props) => {
-  const { viewBox, data } = props || {};
-  const { x } = viewBox || {};
-  const fullRate = data?.find((d) => d.percent === 100);
-  const { borrowRate, supplyRate } = fullRate || {};
-  const y = Math.max(borrowRate, supplyRate);
-  return <text x={x - 50} y={y} fill="#fff" dy={19} dx={9} fontSize={12} />;
 };
 
 export default InterestRateChart;

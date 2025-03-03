@@ -118,7 +118,7 @@ export default function RangeSlider(props: any) {
         {!selectNavValueOnly && (
           <div
             className={`flex items-center justify-center absolute top-5 rounded-lg py-1 ${
-              actionShowRedColor ? "bg-red-100" : "bg-primary"
+              actionShowRedColor ? "bg-danger" : "bg-primary"
             }`}
             style={{ marginLeft: "-33px", left: "100%", width: "46px" }}
             ref={tipRef}

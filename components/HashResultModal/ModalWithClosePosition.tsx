@@ -104,7 +104,7 @@ const ModalWithFailure = ({
               <span className="font-normal text-base ml-2">{title}</span>
               <div
                 className={`${
-                  type == "Long" ? "text-toolTipBoxBorderColor" : "text-red-50"
+                  type == "Long" ? "text-toolTipBoxBorderColor" : "text-danger"
                 } text-sm ml-auto`}
               >
                 Filled
@@ -113,7 +113,7 @@ const ModalWithFailure = ({
             <div className="w-full h-1 bg-black">
               <div
                 className={`h-full ${
-                  type == "Long" ? "bg-toolTipBoxBorderColor" : "bg-red-50"
+                  type == "Long" ? "bg-toolTipBoxBorderColor" : "bg-danger"
                 } transition-all ease-linear`}
                 style={{
                   width: `${progress}%`,

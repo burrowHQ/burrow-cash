@@ -8,7 +8,7 @@ export function ArrowLeft(props) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path d="M5 11L1 6L5 1" stroke="#C0C4E9" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M5 11L1 6L5 1" stroke="#8A8A8D" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   );
 }
@@ -65,7 +65,7 @@ export function BorrowedEmptyIcon() {
     >
       <path
         d="M76.0898 21.3842C75.7869 21.846 75.9158 22.4659 76.3776 22.7688C76.8394 23.0717 77.4593 22.9429 77.7622 22.4811L76.0898 21.3842ZM82.2495 0.292806C81.859 -0.0977198 81.2259 -0.0977195 80.8353 0.292803L74.4714 6.65676C74.0808 7.04728 74.0808 7.68045 74.4714 8.07097C74.8619 8.46149 75.4951 8.4615 75.8856 8.07097L81.5424 2.41412L87.1993 8.07099C87.5898 8.46151 88.223 8.46151 88.6135 8.07099C89.004 7.68046 89.004 7.0473 88.6135 6.65677L82.2495 0.292806ZM77.7622 22.4811C83.456 13.8003 82.5424 7.36073 82.5424 0.999913L80.5424 0.99991C80.5424 7.5045 81.3968 13.2931 76.0898 21.3842L77.7622 22.4811Z"
-        fill="#FF5500"
+        fill="#FF5E3A"
       />
       <ellipse cx="56" cy="52.501" rx="56" ry="9.5" fill="#16161B" />
       <mask
@@ -85,11 +85,11 @@ export function BorrowedEmptyIcon() {
       <g mask="url(#mask0_398_489)">
         <path
           d="M82 51.0015C82 66.4654 69.464 79.0015 54 79.0015C38.536 79.0015 26 66.4654 26 51.0015C26 35.5375 38.536 24.0015 54 24.0015C67.5 24.0015 73 30.5015 73 30.5015C77.9487 35.5516 82 43.3722 82 51.0015Z"
-          fill="#FF5500"
+          fill="#FF5E3A"
           stroke="#23253A"
           strokeWidth="2"
         />
-        <circle cx="59" cy="55.0015" r="28" fill="#FF5500" stroke="#23253A" strokeWidth="2" />
+        <circle cx="59" cy="55.0015" r="28" fill="#FF5E3A" stroke="#23253A" strokeWidth="2" />
       </g>
     </svg>
   );
@@ -309,8 +309,8 @@ export function RedLinearGradient(props) {
           y2="124.871"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#FF5500" />
-          <stop offset="1" stopColor="#FF5500" stopOpacity="0" />
+          <stop stopColor="#FF5E3A" />
+          <stop offset="1" stopColor="#FF5E3A" stopOpacity="0" />
         </linearGradient>
       </defs>
     </svg>

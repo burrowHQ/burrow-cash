@@ -101,7 +101,7 @@ const ModalWithChangeCollateral = ({
                 <span className="font-normal text-base pr-2">{title}</span>
                 <div
                   className={`text-sm ${
-                    type == "Long" ? "text-toolTipBoxBorderColor" : "text-red-50"
+                    type == "Long" ? "text-toolTipBoxBorderColor" : "text-danger"
                   } rounded-sm p-1`}
                   style={{ backgroundColor: "rgba(210, 255, 58, 0.1)" }}
                 >

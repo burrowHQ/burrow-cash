@@ -17,7 +17,7 @@ import { isMobileDevice } from "../../../helpers/helpers";
 import { getRpcList, trimStr, ping_gas, pingChain, getCustomConfig, switchPoint } from "../tool";
 /* eslint-disable jsx-a11y/label-has-associated-control */
 export const displayCurrentRpc = (responseTimeList: any, key: any, inBox?: boolean) => {
-  const colorClass = responseTimeList[key] > 500 ? "text-yellow-100" : "text-green-100";
+  const colorClass = responseTimeList[key] > 500 ? "text-warning" : "text-green-100";
   if (responseTimeList[key] === -1) {
     return (
       <>

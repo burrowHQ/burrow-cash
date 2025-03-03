@@ -23,7 +23,7 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
             record.trend === "long"
               ? "text-primary text-xs"
               : record.trend === "short"
-              ? "text-red-50 text-xs"
+              ? "text-danger text-xs"
               : ""
           }
         >
@@ -159,7 +159,7 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
                 record.trend === "long"
                   ? "text-primary text-xs"
                   : record.trend === "short"
-                  ? "text-red-50 text-xs"
+                  ? "text-danger text-xs"
                   : ""
               }
             >

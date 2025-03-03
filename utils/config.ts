@@ -64,6 +64,7 @@ export const incentiveTokens = [
 export const topTokens = ["shadow_ref_v1-4179"];
 
 export const NBTC_ENV = "mainnet";
+export const AWS_MEDIA_DOMAIN = "https://img.ref.finance";
 const getConfig = (env: string = defaultNetwork) => {
   const RPC_LIST = getRpcList();
   let endPoint = "defaultRpc";

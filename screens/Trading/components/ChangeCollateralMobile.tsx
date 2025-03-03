@@ -451,7 +451,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                 <div
                   className={`bg-opacity-10  text-xs py-0.5 pl-2.5 pr-1.5 rounded text-primary ${
                     positionType.class
-                  } ${positionType.label === "Long" ? "bg-primary" : "bg-red-50"}`}
+                  } ${positionType.label === "Long" ? "bg-primary" : "bg-danger"}`}
                 >
                   {positionType.label}
                   <span className="ml-1.5">
@@ -476,7 +476,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
               </div>
               <div
                 className={`py-2 w-1/2 text-center cursor-pointer text-gray-300 text-lg ${
-                  ChangeCollateralTab === "Remove" ? "text-red-50 border-b border-red-50" : ""
+                  ChangeCollateralTab === "Remove" ? "text-danger border-b border-danger" : ""
                 }`}
                 onClick={() => handleChangeCollateralTabClick("Remove")}
               >
@@ -743,7 +743,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                     </div>
                   </div>
                   <div
-                    className={`flex items-center bg-red-50 justify-between text-dark-200 text-base rounded-md h-12 text-center  ${
+                    className={`flex items-center bg-danger justify-between text-dark-200 text-base rounded-md h-12 text-center  ${
                       Number(inputValue) === 0 ||
                       Number.isNaN(inputValue) ||
                       isDeleteCollateralLoading

@@ -9,6 +9,7 @@ import { useTableSorting } from "../../hooks/useTableSorting";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 import { RefreshIcon } from "../../components/Header/svg";
 import { setActiveCategory } from "../../redux/marginTrading";
+import { WarnTipIcon } from "../../components/Icons/IconsV2";
 
 const Market = () => {
   const router = useRouter();
@@ -28,23 +29,30 @@ const Market = () => {
   return (
     <LayoutBox className="flex flex-col items-center justify-center">
       <MarketsOverview />
-      <div className="w-full grid grid-cols-2 gap-x-1 cursor-pointer xsm:mt-4 xsm:ml-4 xsm:mr-4">
-        <div
-          className={`${
-            activeTab == "main" ? "bg-primary" : "bg-[#C0C4E94D]"
-          } text-center h-12 leading-[48px] text-black rounded-t-xl xsm:rounded-xl xsm:ml-4`}
+      <div className="flex items-center h-[48px] rounded-lg bg-gray-110 p-0.5 text-base text-gray-300 my-[46px]">
+        <span
+          className={`flex items-center justify-center w-[340px] h-full rounded-md cursor-pointer ${
+            activeTab == "main" ? "bg-primary text-black" : "text-gray-300"
+          }`}
           onClick={() => dispatch(setActiveCategory("main"))}
         >
-          Mainstream
-        </div>
-        <div
-          className={`${
-            activeTab == "meme" ? "bg-primary" : "bg-[#C0C4E94D]"
-          } text-center h-12 leading-[48px] text-black rounded-t-xl xsm:rounded-xl xsm:mr-4`}
+          Mainstream Position
+        </span>
+        <span
+          className={`flex items-center justify-center w-[340px] h-full rounded-md cursor-pointer ${
+            activeTab == "meme" ? "bg-primary text-black" : "text-gray-300"
+          }`}
           onClick={() => dispatch(setActiveCategory("meme"))}
         >
-          Meme
-        </div>
+          Meme position
+        </span>
+      </div>
+      <div className="flex items-center w-full mb-5">
+        <WarnTipIcon className="mr-1.5" />
+        <span className="text-sm text-white text-opacity-60">
+          The following positions cannot be borrowed from{" "}
+          {activeTab == "main" ? "Meme's" : "Mainstream's"} positions.
+        </span>
       </div>
       <MarketsTable
         rows={rows}

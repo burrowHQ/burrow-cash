@@ -27,16 +27,16 @@ const StyledDocument = styled.div`
   h1 {
     font-size: 26px;
     color: #00f7a5;
-    font-family: "work-sans-bold";
+    font-family: "work-jost-bold";
   }
   h2 {
     font-size: 22px;
     color: #00f7a5;
-    font-family: "work-sans-bold";
+    font-family: "work-jost-bold";
   }
   h3 {
     font-size: 16px;
-    font-family: "work-sans-bold";
+    font-family: "work-jost-bold";
   }
   p {
     font-size: 16px;
@@ -47,7 +47,7 @@ const StyledDocument = styled.div`
     font-size: 16px;
     color: #fff;
     font-weight: bold;
-    font-family: "work-sans-bold";
+    font-family: "work-jost-bold";
     margin-top: 20px;
     em {
       font-style: normal;

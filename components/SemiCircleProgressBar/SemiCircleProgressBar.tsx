@@ -110,8 +110,8 @@ const StyledWrapper = styled.div`
       opacity: 1;
 
       &.bar-warning {
-        border-bottom-color: #ffc34f;
-        border-right-color: #ffc34f;
+        border-bottom-color: #f3ba2f;
+        border-right-color: #f3ba2f;
       }
 
       &.bar-danger {

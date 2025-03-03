@@ -119,11 +119,11 @@ const btnColor = {
   primaryBorder:
     "border-primary border border-opacity-60 text-primary bg-primary hover:opacity-80 bg-opacity-5",
   errorBorder:
-    "border border-red-50 border-opacity-60 text-red-50 bg-red-50 bg-opacity-5 hover:opacity-80",
+    "border border-danger border-opacity-60 text-danger bg-danger bg-opacity-5 hover:opacity-80",
   secondary: "border border-gray-1300 hover:border-gray-400 text-gray-300",
   secondary2: "border border-pink-400 hover:border-pink-400 text-pink-400",
   third: "rounded-full border border-1 border-black text-black font-bold",
-  info: "border-yellow-50 bg-yellow-50 hover:opacity-80 text-black",
+  info: "border-warning bg-warning hover:opacity-80 text-black",
   custom: "",
 };
 

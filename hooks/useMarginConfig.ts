@@ -68,7 +68,7 @@ export function useMarginConfigToken() {
     } else {
       return {
         label: "Short",
-        class: "text-red-50",
+        class: "text-danger",
       };
     }
   };

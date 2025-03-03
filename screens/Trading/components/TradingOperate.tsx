@@ -622,7 +622,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
           <div
             className={
               activeTab === "short"
-                ? "bg-red-50 text-dark-200 py-2.5 px-5 rounded-md h-11 w-[50%] overflow-hidden text-ellipsis whitespace-nowrap"
+                ? "bg-danger text-dark-200 py-2.5 px-5 rounded-md h-11 w-[50%] overflow-hidden text-ellipsis whitespace-nowrap"
                 : getTabClassName("short")
             }
             onClick={() => handleTabClick("short")}
