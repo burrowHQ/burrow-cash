@@ -51,7 +51,7 @@ export function get_amount_from_msg(msg) {
 
 export function get_registered_dexes() {
   const state = store.getState();
-  const dexMap = Object.entries(state?.marginConfig?.registered_dexes || {}).reduce(
+  const dexMap = Object.entries(state?.marginConfigMEME?.registered_dexes || {}).reduce(
     (acc, cur: any) => {
       return {
         ...acc,
