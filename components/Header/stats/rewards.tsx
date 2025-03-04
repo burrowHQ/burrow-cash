@@ -200,7 +200,7 @@ const IncentiveMore = ({
   );
 };
 
-const IconMore = ({ allRewards }) => {
+export const IconMore = ({ allRewards }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const list = Object.values(allRewards);
   return (

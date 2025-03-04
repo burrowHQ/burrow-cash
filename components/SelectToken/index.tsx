@@ -72,7 +72,7 @@ export default function SelectToken({
       {is_mobile ? (
         <MUIModal open={open} onClose={handleClose}>
           <div
-            className="absolute bottom-0 left-0 shadow-100  w-full bg-dark-250 py-5 rounded-t-2xl max-h-[70vh] overflow-y-auto border border-dark-300 outline-none"
+            className="absolute bottom-0 left-0 shadow-100  w-full bg-dark-250 py-5 rounded-t-2xl max-h-[70vh] overflow-y-auto border border-dark-50 outline-none"
             ref={selectRef}
           >
             <div className="flex items-center justify-between mb-4 px-5">

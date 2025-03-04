@@ -445,7 +445,7 @@ function TokenFetchModal({ open, setOpen }: { open: boolean; setOpen: any }) {
 
   return (
     <MUIModal open={open} onClose={handleClose}>
-      <div className="absolute bottom-0 left-0 bg-dark-100 w-full rounded-t-2xl border border-dark-300 p-4 outline-none">
+      <div className="absolute bottom-0 left-0 bg-dark-100 w-full rounded-t-2xl border border-dark-50 p-4 outline-none">
         {/* Head */}
         <div className="flex items-center justify-between">
           <span className="text-base text-white font-bold">Get {tokenRow.symbol}</span>

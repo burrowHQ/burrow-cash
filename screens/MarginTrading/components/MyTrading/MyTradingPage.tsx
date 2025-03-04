@@ -150,7 +150,7 @@ const MyMarginTradingPage = () => {
                 </div>
                 {hasCollateral && showCollateralPopup && (
                   <div
-                    className="absolute left-28 top-0 bg-dark-100 border border-dark-300 text-gray-30 pt-3 pl-3 pr-3 rounded-md rounded-md w-max"
+                    className="absolute left-28 top-0 bg-dark-100 border border-dark-50 text-gray-30 pt-3 pl-3 pr-3 rounded-md rounded-md w-max"
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                   >
@@ -240,7 +240,7 @@ const MyMarginTradingPage = () => {
                 </div>
                 {hasCollateral && showCollateralPopup && (
                   <div
-                    className="absolute left-28 top-0 bg-dark-100 border border-dark-300 text-gray-30 pt-3 pl-3 pr-3 rounded-md rounded-md w-max"
+                    className="absolute left-28 top-0 bg-dark-100 border border-dark-50 text-gray-30 pt-3 pl-3 pr-3 rounded-md rounded-md w-max"
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                   >

@@ -205,7 +205,7 @@ export const ModalAddCustomNetWork = (props: any) => {
           }}
         />
         <div
-          className="relative z-10 px-4 py-7 text-white bg-dark-100 border border-dark-300 border-opacity-50 rounded-lg"
+          className="relative z-10 px-4 py-7 text-white bg-dark-100 border border-dark-50 border-opacity-50 rounded-lg"
           style={{
             width: cardWidth,
           }}

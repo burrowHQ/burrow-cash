@@ -328,7 +328,7 @@ function TableHeadMobile({ onSort, sortDirection, sortBy }) {
             <ArrowLineDownIcon />
           </div>
           <div
-            className={`border border-dark-300 rounded-md px-4 py-1 bg-dark-100 absolute right-0 w-[180px] top-[40px] ${
+            className={`border border-dark-50 rounded-md px-4 py-1 bg-dark-100 absolute right-0 w-[180px] top-[40px] ${
               showSelectBox ? "" : "hidden"
             }`}
           >

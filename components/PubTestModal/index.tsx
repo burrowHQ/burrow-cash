@@ -33,7 +33,7 @@ export default function PubTestModal() {
     >
       <div
         style={{ width: cardWidth, maxHeight: "95vh" }}
-        className="outline-none  bg-dark-100 border border-dark-300 overflow-auto rounded-2xl  xsm:rounded-lg p-5"
+        className="outline-none  bg-dark-100 border border-dark-50 overflow-auto rounded-2xl  xsm:rounded-lg p-5"
       >
         <div className="flex justify-between mb-4">
           <span className="text-white text-2xl gotham_bold xsm:text-xl">public testnet</span>

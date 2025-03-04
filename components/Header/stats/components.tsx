@@ -68,8 +68,6 @@ const COLORS = {
   },
 };
 
-const getColor = (color = "green") => COLORS[color];
-
 export const Stat = ({
   title,
   titleTooltip = "",
@@ -85,13 +83,11 @@ export const Stat = ({
 }) => {
   return (
     <div onClick={() => onClick && onClick()} style={{ minHeight: 81 }}>
-      {/* <div onClick={() => onClick && onClick()} style={{ minHeight: 81 }} className="md:w-[351px]"> */}
       <div className="flex items-center gap-1">
         {typeof title === "string" ? <div className="h6 text-gray-300">{title}</div> : title}
         {titleTooltip && <TagToolTip title={titleTooltip} />}
       </div>
       <div className="h2 my-1">{amount}</div>
-      {/* </Tooltip> */}
       {labels && (
         <Stack direction="row" gap="4px" flexWrap="wrap" alignItems="center">
           {isValidElement(labels) ? (

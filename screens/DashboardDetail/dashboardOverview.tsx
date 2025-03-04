@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { BeatLoader } from "react-spinners";
 import { twMerge } from "tailwind-merge";
-import { Modal, Box, useTheme } from "@mui/material";
+import { useTheme } from "@mui/material";
 import SemiCircleProgressBar from "../../components/SemiCircleProgressBar/SemiCircleProgressBar";
 import { useUserHealth } from "../../hooks/useUserHealth";
 import { formatTokenValue, isMobileDevice } from "../../helpers/helpers";
 import CustomButton from "../../components/CustomButton/CustomButton";
 import { useRewards } from "../../hooks/useRewards";
-import ClaimAllRewards from "../../components/ClaimAllRewards";
 import ModalHistoryInfo from "./modalHistoryInfo";
 import { modalProps } from "../../interfaces/common";
 import { DangerIcon, QuestionIcon, RecordsIcon } from "../../components/Icons/Icons";
@@ -19,8 +18,7 @@ import { APY } from "../../components/Header/stats/apy";
 import { ContentBox } from "../../components/ContentBox/ContentBox";
 import { StatLabel } from "../../components/Header/stats/components";
 import { TagToolTip } from "../../components/ToolTip";
-import { Wrapper } from "../../components/Modal/style";
-import { CloseIcon } from "../../components/Modal/svg";
+import ClaimRewardsModal from "../../components/Dashboard/claimRewardsModal";
 
 const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
   const [modal, setModal] = useState<modalProps>({
@@ -182,28 +180,11 @@ const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
                         >
                           Claim
                         </div>
-                        <Modal open={isModalOpen} onClose={closeModal}>
-                          <Wrapper
-                            sx={{
-                              "& *::-webkit-scrollbar": {
-                                backgroundColor: theme.custom.scrollbarBg,
-                              },
-                            }}
-                          >
-                            <Box sx={{ p: ["20px", "20px"] }}>
-                              <div className="flex items-center justify-between text-lg text-white mb-7">
-                                <span className="text-lg font-bold">Claim Rewards</span>
-                                <CloseIcon onClick={closeModal} className="cursor-pointer" />
-                              </div>
-                              {unclaimNodes}
-                              <ClaimAllRewards
-                                Button={ClaimButton}
-                                onDone={closeModal}
-                                location="dashboard"
-                              />
-                            </Box>
-                          </Wrapper>
-                        </Modal>
+                        <ClaimRewardsModal
+                          rewardsObj={rewardsObj}
+                          isOpen={isModalOpen}
+                          closeModal={closeModal}
+                        />
                       </div>
                     )}
                   </div>
