@@ -47,3 +47,9 @@ export function storageStore(namespace?: string, options?: { storage?: Storage }
     },
   };
 }
+
+export function getPageTypeFromUrl() {
+  const url = new URL(window.location.href);
+  const search = new URLSearchParams(url.search);
+  return search.get("pageType");
+}

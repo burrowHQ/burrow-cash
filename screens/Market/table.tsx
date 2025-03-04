@@ -72,7 +72,7 @@ function TableHead({ sorting }) {
           Supply APY <SortButton sort={getCurColumnSort("depositApy")} color="primary" />
         </div>
       </div>
-      <div className="grid grid-cols-2 col-span-2 text-danger items-center text-sm bg-gray-800">
+      <div className="grid grid-cols-2 col-span-2 text-orange items-center text-sm bg-gray-800">
         <div
           className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap jost-bold"
           onClick={() => {

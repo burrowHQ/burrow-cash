@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import Decimal from "decimal.js";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
-import { ComeBackIcon, MemeTagIcon, TokenArrow } from "./components/TradingIcon";
+import { MemeTagIcon, TokenArrow } from "./components/TradingIcon";
 import { NearIcon } from "../MarginTrading/components/Icon";
 import TradingTable from "./components/Table";
 import TradingOperate from "./components/TradingOperate";
@@ -25,6 +25,7 @@ import { beautifyPrice } from "../../utils/beautyNumber";
 import { getSymbolById } from "../../transformers/nearSymbolTrans";
 import { useRegisterTokenType } from "../../hooks/useRegisterTokenType";
 import { RefreshIcon } from "../../components/Header/svg";
+import Breadcrumb from "../../components/common/breadcrumb";
 
 const Trading = () => {
   const [open, setOpen] = useState(false);
@@ -189,12 +190,7 @@ const Trading = () => {
       ) : (
         <>
           {/* back */}
-          <div onClick={() => router.push("/marginTrading")}>
-            <div className="flex items-center text-sm text-gray-300 cursor-pointer lg:mb-8 xsm:m-2 xsm:mb-9">
-              <ComeBackIcon />
-              <p className="ml-3.5"> Margin Trading Markets</p>
-            </div>
-          </div>
+          <Breadcrumb title="Margin Trading Markets" path="/marginTrading" />
           {/* main */}
           <div className="lg:grid lg:grid-cols-6 lg:mb-4 xsm:flex xsm:flex-col xsm:w-full xsm:box-border xsm:mb-4">
             {/* left charts */}

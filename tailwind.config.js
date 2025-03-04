@@ -82,6 +82,7 @@ module.exports = {
         claim: "#7C89FF",
         warning: "#F3BA2F",
         danger: "#FF5E3A",
+        orange: "#FF6947",
         blue: {
           50: "#45AFFF",
           100: "#398FED",
@@ -122,6 +123,8 @@ module.exports = {
           120: "#7E8A93",
           130: "#414B57",
           140: "#B5B5B5",
+          150: "#38363C",
+          160: "#6F6E72",
           200: "#eeeeee",
           300: "#8A8A8D",
           380: "#6D708D",

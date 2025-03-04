@@ -8,7 +8,6 @@ import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 import { updatePosition } from "../../redux/appSlice";
 import { updatePosition as updatePositionMEME } from "../../redux/appSliceMEME";
 import {
-  ArrowLeft,
   SuppliedEmptyIcon,
   BorrowedEmptyIcon,
   REFIcon,
@@ -69,6 +68,8 @@ import { isMemeCategory, getActiveCategory } from "../../redux/categorySelectors
 import { setActiveCategory } from "../../redux/marginTrading";
 import { useBtcAction } from "../../hooks/useBtcBalance";
 import { SatoshiIcon, BtcChainIcon, ThefaucetIcon } from "../../components/Icons/Icons";
+import { getPageTypeFromUrl } from "../../utils/commonUtils";
+import Breadcrumb from "../../components/common/breadcrumb";
 
 const DetailData = createContext(null) as any;
 const TokenDetail = () => {
@@ -135,11 +136,6 @@ const TokenDetail = () => {
       }
     }
   }, [activeCategory, id, pageType]);
-  function getPageTypeFromUrl() {
-    const url = new URL(window.location.href);
-    const search = new URLSearchParams(url.search);
-    return search.get("pageType");
-  }
   if (!tokenRow || !match) return null;
   return <TokenDetailView tokenRow={tokenRow} assets={rows} isMeme={isMeme} />;
 };
@@ -352,15 +348,7 @@ function DetailMobile({ tokenDetails, handlePeriodClick }) {
     <LayoutBox>
       <div className="p-4">
         {/* Back */}
-        <div
-          className="inline-flex items-center cursor-pointer mb-8"
-          onClick={() => {
-            router.push("/markets");
-          }}
-        >
-          <ArrowLeft />
-          <span className="text-sm text-gray-300 ml-3"> Markets</span>
-        </div>
+        <Breadcrumb path="/markets" title="Markets" />
         {/* Token head */}
         <div className="flex items-center justify-between">
           <div className="flex items-center">
@@ -493,15 +481,7 @@ function DetailPc({ tokenDetails, handlePeriodClick }) {
 
   return (
     <LayoutBox>
-      <div
-        className="inline-flex items-center cursor-pointer mb-8"
-        onClick={() => {
-          router.push("/markets");
-        }}
-      >
-        <ArrowLeft />
-        <span className="text-sm text-gray-300 ml-3">Burrow Markets</span>
-      </div>
+      <Breadcrumb title="Burrow Markets" path="/markets" />
       <div className="grid grid-cols-3/5">
         <div className="mr-6">
           <TokenOverview />
@@ -942,7 +922,7 @@ function TokenRateModeChart({
         />
         <LabelText
           left="Borrow Rate"
-          leftIcon={<div className="rounded-full mr-2 bg-danger h-[10px] w-[10px]" />}
+          leftIcon={<div className="rounded-full mr-2 bg-orange h-[10px] w-[10px]" />}
           right={borrowApy ? `${borrowApy.toFixed(2)}%` : "-"}
         />
         <LabelText

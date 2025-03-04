@@ -10,6 +10,7 @@ import { getAverageNetRewardApy } from "../../../redux/selectors/getAverageNetRe
 import { getListTokenNetRewardApy } from "../../../redux/selectors/getListTokenNetRewardApy";
 import HtmlTooltip from "../../common/html-tooltip";
 import { format_apy } from "../../../utils/uiNumber";
+import { NetAPYTip } from "../../Dashboard/stat";
 
 export const APY = ({ memeCategory }: { memeCategory?: boolean }) => {
   const { netAPY, netLiquidityAPY } = useUserHealth(memeCategory);
@@ -42,7 +43,7 @@ export const APY = ({ memeCategory }: { memeCategory?: boolean }) => {
       <div className="flex items-end">
         <Stat
           title="Net APY"
-          titleTooltip="Net APY = Daily Total Profit / Your Net Liquidity * 365 days"
+          titleTooltip={NetAPYTip}
           amount={amount}
           labels={showLabels ? apyLabels : []}
         />

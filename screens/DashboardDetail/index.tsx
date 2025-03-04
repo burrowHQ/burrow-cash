@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import BookTokenSvg from "../../public/svg/Group 74.svg";
 import { ContentBox } from "../../components/ContentBox/ContentBox";
 import LayoutContainer from "../../components/LayoutContainer/LayoutContainer";
@@ -8,13 +8,7 @@ import BorrowTokenSvg from "../../public/svg/Group 24677.svg";
 import { useAccountId, usePortfolioAssets } from "../../hooks/hooks";
 import DashboardReward from "./dashboardReward";
 import CustomTable from "../../components/CustomTable/CustomTable";
-import {
-  formatTokenValue,
-  formatTokenValueWithMilify,
-  formatUSDValue,
-  isMobileDevice,
-  millifyNumber,
-} from "../../helpers/helpers";
+import { formatTokenValue, isMobileDevice } from "../../helpers/helpers";
 import assets from "../../components/Assets";
 import DashboardOverview from "./dashboardOverview";
 import { ConnectWalletButton } from "../../components/Header/WalletButton";
@@ -22,46 +16,24 @@ import SupplyBorrowListMobile from "./supplyBorrowListMobile";
 import { AdjustButton, WithdrawButton, RepayButton, MarketButton } from "./supplyBorrowButtons";
 import { hiddenAssets } from "../../utils/config";
 import { APYCell } from "../Market/APYCell";
-import { setActiveCategory } from "../../redux/marginTrading";
-import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { beautifyPrice } from "../../utils/beautyNumber";
+import { getPageTypeFromUrl } from "../../utils/commonUtils";
+import Breadcrumb from "../../components/common/breadcrumb";
 
 const Index = () => {
   const accountId = useAccountId();
-  const dispatch = useAppDispatch();
-  const { activeCategory: activeTab = "main" } = useAppSelector((state) => state.category);
-  const [
-    suppliedRowsMEME,
-    borrowedRowsMEME,
-    totalSuppliedUSDMEME,
-    totalBorrowedUSDMEME,
-    ,
-    borrowedAllMEME,
-  ] = usePortfolioAssets(true);
+  const pageType = getPageTypeFromUrl();
+  const isMemeCategory = pageType == "meme";
   const [suppliedRows, borrowedRows, totalSuppliedUSD, totalBorrowedUSD, , borrowedAll] =
-    usePortfolioAssets(false);
-  // useEffect(() => {
-  //   return () => {
-  //     dispatch(setActiveCategory("main"));
-  //   };
-  // }, [dispatch]);
+    usePortfolioAssets(isMemeCategory);
   const isMobile = isMobileDevice();
-  const isMemeTab = activeTab !== "main";
-  let overviewNodeMEME;
   let overviewNode;
   if (accountId) {
     overviewNode = (
       <DashboardOverview
         suppliedRows={suppliedRows}
         borrowedRows={borrowedRows}
-        memeCategory={false}
-      />
-    );
-    overviewNodeMEME = (
-      <DashboardOverview
-        suppliedRows={suppliedRowsMEME}
-        borrowedRows={borrowedRowsMEME}
-        memeCategory={true}
+        memeCategory={isMemeCategory}
       />
     );
   } else {
@@ -82,20 +54,11 @@ const Index = () => {
       </div>
     );
     overviewNode = unLoginUi;
-    overviewNodeMEME = unLoginUi;
   }
   let supplyBorrowNode;
-  let supplyBorrowNodeMEME;
   if (isMobile) {
     supplyBorrowNode = (
       <SupplyBorrowListMobile suppliedRows={suppliedRows} borrowedRows={borrowedAll} />
-    );
-    supplyBorrowNodeMEME = (
-      <SupplyBorrowListMobile
-        suppliedRows={suppliedRowsMEME}
-        borrowedRows={borrowedAllMEME}
-        memeCategory={true}
-      />
     );
   } else {
     supplyBorrowNode = (
@@ -108,52 +71,14 @@ const Index = () => {
         />
       </StyledSupplyBorrow>
     );
-    supplyBorrowNodeMEME = (
-      <StyledSupplyBorrow className="gap-6 lg:flex mb-10">
-        <YourSupplied
-          suppliedRows={suppliedRowsMEME}
-          total={totalSuppliedUSDMEME as number}
-          memeCategory={true}
-        />
-        <YourBorrowed
-          borrowedRows={borrowedAllMEME}
-          accountId={accountId}
-          total={totalBorrowedUSDMEME as number}
-          memeCategory={true}
-        />
-      </StyledSupplyBorrow>
-    );
   }
 
   return (
     <div>
       <LayoutContainer>
-        <div className="grid grid-cols-2 gap-x-1 mb-4 cursor-pointer">
-          <div
-            className={`${
-              activeTab == "main" ? "bg-primary" : "bg-[#C0C4E94D]"
-            } text-center h-12 leading-[48px] text-black rounded-xl`}
-            onClick={() => dispatch(setActiveCategory("main"))}
-          >
-            Mainstream
-          </div>
-          <div
-            className={`${
-              activeTab == "meme" ? "bg-primary" : "bg-[#C0C4E94D]"
-            } text-center h-12 leading-[48px] text-black rounded-xl`}
-            onClick={() => dispatch(setActiveCategory("meme"))}
-          >
-            Meme
-          </div>
-        </div>
-        <div className={`${isMemeTab ? "hidden" : ""}`}>
-          {overviewNode}
-          <div style={{ minHeight: isMobile ? 300 : 600 }}>{supplyBorrowNode}</div>
-        </div>
-        <div className={`${isMemeTab ? "" : "hidden"}`}>
-          {overviewNodeMEME}
-          <div style={{ minHeight: isMobile ? 300 : 600 }}>{supplyBorrowNodeMEME}</div>
-        </div>
+        <Breadcrumb path="/dashboard" title="Dashboard" />
+        {overviewNode}
+        <div style={{ minHeight: isMobile ? 300 : 600 }}>{supplyBorrowNode}</div>
       </LayoutContainer>
     </div>
   );

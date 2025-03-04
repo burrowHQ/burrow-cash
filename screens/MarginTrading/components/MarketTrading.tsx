@@ -19,7 +19,7 @@ type TokenTypeMap = {
   memeStream: string[];
 };
 
-const MarketMarginTrading = ({ hidden }: { hidden: boolean }) => {
+const MarketMarginTrading = () => {
   const isMobile = isMobileDevice();
   const { filteredTokenTypeMap } = useRegisterTokenType();
   const { filterMarginConfigList } = useMarginConfigToken();
@@ -129,7 +129,7 @@ const MarketMarginTrading = ({ hidden }: { hidden: boolean }) => {
     });
   }, [mergedData, sortBy, sortDirection, filterMarginConfigList]);
   return (
-    <div className={hidden ? "hidden" : "flex flex-col items-center justify-center w-full"}>
+    <div className="flex flex-col items-center justify-center w-full">
       {isMobile ? (
         <>
           <div className="w-full border-b border-dark-950 px-4">
@@ -281,7 +281,7 @@ function TableHead({
         </div>
       </div>
       <div
-        className="grid grid-cols-1 col-span-1 bg-danger rounded-t-2xl items-center text-sm text-black"
+        className="grid grid-cols-1 col-span-1 bg-orange rounded-t-2xl items-center text-sm text-black"
         onClick={() => onSort("shortPosition")}
       >
         <div className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap">
@@ -578,7 +578,7 @@ function TableBodyMobile({
                 </div>
                 <div className="flex items-center justify-between mb-4 text-sm">
                   <p className="text-gray-300 h4">Short Position</p>
-                  <p className="text-danger">
+                  <p className="text-orange">
                     {beautifyPrice(formattedMarginBalance)}
                     <span className="text-xs text-gray-300 ml-1">
                       (
@@ -594,7 +594,7 @@ function TableBodyMobile({
                   <div className="flex-1 bg-primary rounded-md text-base h-[36px] mr-2 text-dark-200 flex items-center justify-center">
                     Long
                   </div>
-                  <div className="flex-1 bg-danger rounded-md text-base h-[36px] flex items-center justify-center">
+                  <div className="flex-1 bg-orange rounded-md text-base h-[36px] flex items-center justify-center">
                     Short
                   </div>
                 </div>

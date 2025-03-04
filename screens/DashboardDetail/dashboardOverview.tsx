@@ -19,6 +19,7 @@ import { ContentBox } from "../../components/ContentBox/ContentBox";
 import { StatLabel } from "../../components/Header/stats/components";
 import { TagToolTip } from "../../components/ToolTip";
 import ClaimRewardsModal from "../../components/Dashboard/claimRewardsModal";
+import { UnclaimedRewardsTip, HealthFactorTip } from "../../components/Dashboard/stat";
 
 const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
   const [modal, setModal] = useState<modalProps>({
@@ -150,7 +151,7 @@ const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
                 <div className="flex flex-col">
                   <div className="h6 text-gray-300 flex items-center gap-1">
                     Unclaimed Rewards
-                    <TagToolTip title="Base APY earnings added to your supply balance." />
+                    <TagToolTip title={UnclaimedRewardsTip} />
                   </div>
                   <div className="items-start lg3:flex-row lg3:items-center lg3:gap-4">
                     <div className="flex items-center gap-4 my-1">
@@ -207,7 +208,7 @@ const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
                     const healthColor = {
                       good: "text-primary",
                       warning: "text-warning",
-                      danger: "text-danger",
+                      danger: "text-orange",
                     };
 
                     let tokensName = value?.type;
@@ -296,7 +297,7 @@ const HealthFactor = ({ userHealth }) => {
           className={twMerge(
             "h2b text-primary",
             isWarning && "text-warning",
-            isDanger && "text-danger flex gap-2 items-center",
+            isDanger && "text-orange flex gap-2 items-center",
           )}
         >
           {isDanger && (
@@ -314,10 +315,7 @@ const HealthFactor = ({ userHealth }) => {
         <div className="h5 text-gray-300 flex gap-1 items-center justify-center">
           Health Factor
           <div style={{ marginRight: -5 }} className="relative">
-            <CustomTooltips
-              style={tooltipStyles}
-              text={`Represents the combined collateral ratios of the borrowed assets. If it is less than ${dangerHealthFactor}%, your account can be partially liquidated`}
-            >
+            <CustomTooltips style={tooltipStyles} text={HealthFactorTip}>
               <QuestionIcon />
             </CustomTooltips>
           </div>

@@ -5,6 +5,8 @@ export const NetLiquidityTip = "Net Liquidity = Your total Supplied - Your total
 export const NetAPYTip = "Net APY = Daily Total Profit / Your Net Liquidity * 365 days";
 export const DailyRewardsTip = "Estimated daily profit";
 export const UnclaimedRewardsTip = "Base APY earnings added to your supply balance.";
+export const HealthFactorTip =
+  "Represents the combined collateral ratios of the borrowed assets. If it is less than 100%, your account can be partially liquidated";
 
 export function StatsRegular({
   title,
@@ -13,7 +15,7 @@ export function StatsRegular({
 }: {
   title: string;
   value: string | React.ReactElement;
-  tip: string;
+  tip?: string;
 }) {
   return (
     <div className="flex flex-col gap-1">

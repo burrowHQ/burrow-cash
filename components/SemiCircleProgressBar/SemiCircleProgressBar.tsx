@@ -34,7 +34,7 @@ const SemiCircleProgressBar = ({
     node = children;
   } else {
     node = (
-      <span className={twMerge(isWarning && "text-warning", isUnderDivider && "text-danger")}>
+      <span className={twMerge(isWarning && "text-warning", isUnderDivider && "text-orange")}>
         {percent}%
       </span>
     );
@@ -45,7 +45,7 @@ const SemiCircleProgressBar = ({
       <div className="bar-wrapper">
         <div className="bar-container">
           <div
-            className={twMerge("bar", isWarning && "bar-warning", isUnderDivider && "bar-danger")}
+            className={twMerge("bar", isWarning && "bar-warning", isUnderDivider && "bar-orange")}
             style={{ transform: `rotate(${rotateDegree}deg)` }}
           />
           <div className={twMerge("bg-primary bar-divider hidden", "block")} />
@@ -114,7 +114,7 @@ const StyledWrapper = styled.div`
         border-right-color: #f3ba2f;
       }
 
-      &.bar-danger {
+      &.bar-orange {
         border-bottom-color: #ff5500;
         border-right-color: #ff5500;
       }

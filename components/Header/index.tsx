@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useTheme, Box, Snackbar, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import LogoIcon from "../../public/logo.svg";
-import BrrrIcon from "../../public/brrr.svg";
 import WalletButton from "./WalletButton";
 import Bridge from "./Bridge";
 import Set from "./Set";
@@ -20,7 +18,14 @@ import { isMobileDevice } from "../../helpers/helpers";
 const MenuItem = ({ item }: { item: Imenu }) => {
   const { title, link, allLinks } = item;
   const router = useRouter();
-  const isSelected = allLinks?.includes(router.route);
+  let isSelected;
+  if (item.title == "Markets" && router.route == "/") {
+    isSelected = true;
+  } else {
+    isSelected = !!allLinks?.find((link) => {
+      return router.route.includes(link) && link !== "/";
+    });
+  }
   const style = isSelected ? { color: "#00F7A5" } : {};
 
   return (
