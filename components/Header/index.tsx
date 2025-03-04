@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useTheme, Box, Snackbar, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import LogoIcon from "../../public/logo.svg";
-import BrrrIcon from "../../public/brrr.svg";
 import WalletButton from "./WalletButton";
 import Bridge from "./Bridge";
 import Set from "./Set";
@@ -20,7 +18,14 @@ import { isMobileDevice } from "../../helpers/helpers";
 const MenuItem = ({ item }: { item: Imenu }) => {
   const { title, link, allLinks } = item;
   const router = useRouter();
-  const isSelected = allLinks?.includes(router.route);
+  let isSelected;
+  if (item.title == "Markets" && router.route == "/") {
+    isSelected = true;
+  } else {
+    isSelected = !!allLinks?.find((link) => {
+      return router.route.includes(link) && link !== "/";
+    });
+  }
   const style = isSelected ? { color: "#00F7A5" } : {};
 
   return (
@@ -93,7 +98,7 @@ const CommunityItem = () => {
       </svg>
       {isHovered && (
         <div className="absolute z-50 top-full left-0 pt-2">
-          <div className="w-48 p-2 bg-dark-100 shadow-lg border border-dark-300 rounded-md pt-4 pb-6 px-6">
+          <div className="w-48 p-2 bg-dark-100 shadow-lg border border-dark-50 rounded-md pt-4 pb-6 px-6">
             <h1 className="text-sm text-gray-300 mb-4">Community</h1>
             <LinksWrapper>
               <Links />
@@ -172,7 +177,7 @@ const Header = () => {
             onClose={handleClose}
             anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           >
-            <div className="flex items-center justify-center border border-dark-300 text-sm text-white rounded-md bg-dark-100 px-4 py-3.5">
+            <div className="flex items-center justify-center border border-dark-50 text-sm text-white rounded-md bg-dark-100 px-4 py-3.5">
               <RefreshIcon className="mr-2.5 flex-shrink-0 animate-spin h-5 w-5" /> Refreshing
               assets data...
             </div>

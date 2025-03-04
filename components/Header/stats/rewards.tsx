@@ -13,6 +13,7 @@ import {
 import { ThreeDotIcon } from "../../Icons/IconsV2";
 import { useAppSelector } from "../../../redux/hooks";
 import { beautifyPrice } from "../../../utils/beautyNumber";
+import { DailyRewardsTip } from "../../Dashboard/stat";
 
 const transformAssetReward = (r, text) => ({
   value: r.dailyAmount.toLocaleString(undefined, TOKEN_FORMAT),
@@ -77,7 +78,7 @@ export const UserDailyRewards = ({ memeCategory }: { memeCategory?: boolean }) =
     <div className="relative">
       <Stat
         title="Daily Rewards"
-        titleTooltip="Estimated daily profit"
+        titleTooltip={DailyRewardsTip}
         amount={
           <div className="flex items-center gap-2">
             {totalUsdDaily > 0 ? beautifyPrice(totalUsdDaily, true) : "$0"}
@@ -200,7 +201,7 @@ const IncentiveMore = ({
   );
 };
 
-const IconMore = ({ allRewards }) => {
+export const IconMore = ({ allRewards }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const list = Object.values(allRewards);
   return (
@@ -244,7 +245,7 @@ const IconsDisplay = ({ icons }) => (
         key={item?.asset?.token_id}
         src={item?.asset?.metadata?.icon}
         alt=""
-        className="w-5 h-5 rounded-3xl border-2 border-gray-800"
+        className="w-5 h-5 rounded-3xl border-2 border-dark-120"
         style={{
           marginLeft: icons.length > 1 && index > 0 ? `-8px` : undefined,
           zIndex: index + 1,
@@ -252,7 +253,7 @@ const IconsDisplay = ({ icons }) => (
       />
     ))}
     {icons.length > 5 && (
-      <div className="w-5 h-5 rounded-3xl border-2 border-gray-800 bg-dark-100 flex items-center justify-center -ml-2.5 z-50">
+      <div className="w-5 h-5 rounded-3xl border-2 border-dark-120 bg-gray-150 flex items-center justify-center -ml-2.5 z-50">
         <ThreeDotIcon />
       </div>
     )}

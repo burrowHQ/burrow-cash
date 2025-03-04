@@ -16,7 +16,7 @@ export const ToastMessage = () => {
       onClose={handleClose}
       anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
     >
-      <div className="flex items-center justify-center border border-dark-300 text-sm text-white rounded-md bg-dark-100 px-2 py-1">
+      <div className="flex items-center justify-center border border-dark-50 text-sm text-white rounded-md bg-dark-100 px-2 py-1">
         {toastMessage}
       </div>
     </Snackbar>

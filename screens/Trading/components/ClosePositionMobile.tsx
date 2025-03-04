@@ -283,7 +283,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
                 <p className="text-lg mr-2">Close Position</p>
                 <div
                   className={`bg-opacity-10  text-xs py-0.5 pl-2.5 pr-1.5 rounded ${
-                    actionShowRedColor ? "bg-primary text-primary" : "bg-danger text-danger"
+                    actionShowRedColor ? "bg-primary text-primary" : "bg-orange text-orange"
                   }`}
                 >
                   {positionType.label} {positionType.label === "Long" ? `${symbolP}` : `${symbolD}`}{" "}

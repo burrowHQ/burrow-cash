@@ -21,10 +21,10 @@ export const displayCurrentRpc = (responseTimeList: any, key: any, inBox?: boole
   if (responseTimeList[key] === -1) {
     return (
       <>
-        <label className="text-xs ml-1.5 mr-1 cursor-pointer text-danger whitespace-nowrap">
+        <label className="text-xs ml-1.5 mr-1 cursor-pointer text-orange whitespace-nowrap">
           time out
         </label>
-        <span className="cursor-pointer text-danger">
+        <span className="cursor-pointer text-orange">
           <CircleIcon />
         </span>
       </>
@@ -205,7 +205,7 @@ export const ModalAddCustomNetWork = (props: any) => {
           }}
         />
         <div
-          className="relative z-10 px-4 py-7 text-white bg-dark-100 border border-dark-300 border-opacity-50 rounded-lg"
+          className="relative z-10 px-4 py-7 text-white bg-dark-100 border border-dark-50 border-opacity-50 rounded-lg"
           style={{
             width: cardWidth,
           }}
@@ -228,7 +228,7 @@ export const ModalAddCustomNetWork = (props: any) => {
                 <span className="text-white text-sm mb-2.5">Network Name</span>
                 <div
                   className={`overflow-hidden rounded-md ${
-                    nameError ? "border border-danger" : ""
+                    nameError ? "border border-orange" : ""
                   }`}
                 >
                   <input
@@ -236,7 +236,7 @@ export const ModalAddCustomNetWork = (props: any) => {
                     onChange={({ target }) => changeNetName(target.value)}
                   />
                 </div>
-                <span className={`errorTip text-danger text-sm mt-2 ${nameError ? "" : "hidden"}`}>
+                <span className={`errorTip text-orange text-sm mt-2 ${nameError ? "" : "hidden"}`}>
                   The network name was already taken
                 </span>
               </div>
@@ -244,7 +244,7 @@ export const ModalAddCustomNetWork = (props: any) => {
                 <span className="text-white text-sm mb-2.5">RPC URL</span>
                 <div
                   className={`overflow-hidden rounded-md ${
-                    unavailableError ? "border border-danger" : ""
+                    unavailableError ? "border border-orange" : ""
                   }`}
                 >
                   <input
@@ -253,19 +253,19 @@ export const ModalAddCustomNetWork = (props: any) => {
                   />
                 </div>
                 <span
-                  className={`errorTip text-danger text-sm mt-2 ${
+                  className={`errorTip text-orange text-sm mt-2 ${
                     unavailableError ? "" : "hidden"
                   }`}
                 >
                   The network was invalid
                 </span>
                 <span
-                  className={`errorTip text-danger text-sm mt-2 ${testnetError ? "" : "hidden"}`}
+                  className={`errorTip text-orange text-sm mt-2 ${testnetError ? "" : "hidden"}`}
                 >
                   RPC server's network (testnet) is different with this network(mainnet)
                 </span>
                 <span
-                  className={`errorTip text-danger text-sm mt-2 ${
+                  className={`errorTip text-orange text-sm mt-2 ${
                     notSupportTestnetError ? "" : "hidden"
                   }`}
                 >

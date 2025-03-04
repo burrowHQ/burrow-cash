@@ -66,7 +66,7 @@ export const RepayButton = ({ tokenId, position }) => {
     <div
       role="button"
       onClick={handleRepayClick}
-      className="flex-1 flex items-center justify-center border border-danger border-opacity-60 cursor-pointer rounded-md text-base md:text-sm text-danger bg-danger bg-opacity-5 hover:opacity-80 py-2"
+      className="flex-1 flex items-center justify-center border border-orange border-opacity-60 cursor-pointer rounded-md text-base md:text-sm text-orange bg-orange bg-opacity-5 hover:opacity-80 py-2"
     >
       Repay
     </div>

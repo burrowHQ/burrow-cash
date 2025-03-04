@@ -10,7 +10,7 @@ export const mainMenuList: Imenu[] = [
   {
     title: "Markets",
     link: "/markets",
-    allLinks: ["/", "/markets", "/tokenDetail/[id]"],
+    allLinks: ["/", "/markets", "/tokenDetail"],
     icon: <MarketIcon />,
   },
   {
@@ -19,7 +19,17 @@ export const mainMenuList: Imenu[] = [
     allLinks: ["/marginTrading", "/trading"],
     icon: <MarketIcon />,
   },
-  { title: "Dashboard", link: "/dashboard", allLinks: ["/dashboard"], icon: <DashboardIcon /> },
-  { title: "Staking", link: "/staking", allLinks: ["/staking"], icon: <StakeIcon /> },
+  {
+    title: "Dashboard",
+    link: "/dashboard",
+    allLinks: ["/dashboard", "/dashboardDetail"],
+    icon: <DashboardIcon />,
+  },
+  {
+    title: "Staking",
+    link: "/staking",
+    allLinks: ["/staking", "/dashboardMarginDetail"],
+    icon: <StakeIcon />,
+  },
 ];
 export const helpMenu: Imenu = { title: "Docs", link: "https://docs.burrow.finance/" };

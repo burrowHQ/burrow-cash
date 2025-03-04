@@ -89,12 +89,12 @@ const ModalWithFailure = ({
             <div className="fc">
               <ClosePositionIcon />
               <span className="font-normal text-base px-2">{title}</span>
-              <div className="text-danger text-sm ml-auto">Failed</div>
+              <div className="text-orange text-sm ml-auto">Failed</div>
             </div>
-            <div className="text-sm text-danger">{errorMessage}</div>
+            <div className="text-sm text-orange">{errorMessage}</div>
             <div className="w-full h-1 bg-black">
               <div
-                className="h-full bg-danger transition-all ease-linear"
+                className="h-full bg-orange transition-all ease-linear"
                 style={{
                   width: `${progress}%`,
                   transitionDuration: "950ms",

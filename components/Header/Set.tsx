@@ -44,7 +44,7 @@ function Box({ children, className }) {
     <div className="absolute right-0 top-10 pt-2 z-50">
       <div
         className={twMerge(
-          "border border-dark-300 rounded-md bg-dark-100 p-4 min-w-[200px]",
+          "border border-dark-50 rounded-md bg-dark-100 p-4 min-w-[200px]",
           className,
         )}
       >

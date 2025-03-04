@@ -11,7 +11,7 @@ export function YellowSolidSubmitButton(props: IButtonProps) {
   return <Button appearanceClass="bg-primary text-dark-200" {...props} />;
 }
 export function RedSolidSubmitButton(props: IButtonProps) {
-  return <Button appearanceClass="bg-danger text-white" {...props} />;
+  return <Button appearanceClass="bg-orange text-white" {...props} />;
 }
 
 function Button({ appearanceClass, children, disabled, className, ...rest }: IButtonProps) {

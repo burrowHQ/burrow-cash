@@ -111,7 +111,7 @@ const ModalWithCountdown = ({
                 <span className="font-normal text-base pr-2">{title}</span>
                 <div
                   className={`text-sm ${
-                    type == "Long" ? "text-toolTipBoxBorderColor" : "text-danger"
+                    type == "Long" ? "text-toolTipBoxBorderColor" : "text-orange"
                   } rounded-sm p-1`}
                   style={{
                     maxWidth: "120px",

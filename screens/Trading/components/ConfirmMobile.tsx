@@ -209,7 +209,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
                 <p className="text-lg mr-2">Confirm</p>
                 <div
                   className={`bg-opacity-10  text-xs py-0.5 pl-2.5 pr-1.5 rounded ${
-                    actionShowRedColor ? "bg-primary text-primary" : "bg-danger text-danger"
+                    actionShowRedColor ? "bg-primary text-primary" : "bg-orange text-orange"
                   }`}
                 >
                   {action} {baseTokenSymbol} {confirmInfo.rangeMount}X

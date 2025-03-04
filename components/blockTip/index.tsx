@@ -44,7 +44,7 @@ export default function BlockTip() {
       }}
     >
       <div
-        className="text-white text-center bg-dark-100 px-5 pt-9 pb-7 rounded-md border border-dark-300"
+        className="text-white text-center bg-dark-100 px-5 pt-9 pb-7 rounded-md border border-dark-50"
         style={{ width: "278px" }}
       >
         <p className="text-sm">

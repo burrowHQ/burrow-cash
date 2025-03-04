@@ -12,6 +12,7 @@ import { useProtocolNetLiquidity } from "../../../hooks/useNetLiquidity";
 import { DoubtIcon } from "../../Icons/Icons";
 import CustomTooltips from "../../CustomTooltips/CustomTooltips";
 import { beautifyPrice } from "../../../utils/beautyNumber";
+import { NetLiquidityTip } from "../../Dashboard/stat";
 
 export const ProtocolLiquidity = () => {
   const { fullDigits, setDigits } = useFullDigits();
@@ -90,7 +91,7 @@ export const UserLiquidity = ({ memeCategory }: { memeCategory?: boolean }) => {
     <div className="relative">
       <Stat
         title="Net Liquidity"
-        titleTooltip="Net Liquidity = Your total Supplied - Your total Borrowed"
+        titleTooltip={NetLiquidityTip}
         amount={userNetLiquidityValue}
         labels={showLabels ? netLiquidityLabels : []}
         onClick={toggleValues}

@@ -154,7 +154,7 @@ export const HealthFactor = ({ value, title }: { value: number; title?: string }
     value === -1
       ? "text-primary"
       : value <= 100
-      ? "text-danger"
+      ? "text-orange"
       : value <= 180
       ? "text-warning"
       : "text-primary";
@@ -341,7 +341,7 @@ export const AlertWarning = ({ title, className }: { title: string; className?: 
 export const AlertError = ({ title, className }: { title: string; className?: string }) => {
   return (
     <div
-      className={`flex items-start gap-2 text-danger text-sm bg-danger bg-opacity-10 rounded-md p-3 ${
+      className={`flex items-start gap-2 text-orange text-sm bg-orange bg-opacity-10 rounded-md p-3 ${
         className || ""
       }`}
     >

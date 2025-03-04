@@ -202,7 +202,7 @@ const PositionRow = ({
       </td>
       <td className="pr-5">
         <div
-          className="text-gray-300 text-sm border cursor-pointer  border-dark-300 text-center h-6 rounded flex justify-center items-center"
+          className="text-gray-300 text-sm border cursor-pointer  border-dark-50 text-center h-6 rounded flex justify-center items-center"
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
