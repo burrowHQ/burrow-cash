@@ -382,7 +382,7 @@ const TradingTable = ({
                 ) : (
                   <tr>
                     <td colSpan={100}>
-                      <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+                      <div className="h-32 flex items-center justify-center w-full text-base text-gray-160">
                         Your open positions will appear here
                       </div>
                     </td>
@@ -501,7 +501,7 @@ const TradingTable = ({
                 ) : (
                   <tr>
                     <td colSpan={100}>
-                      <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+                      <div className="h-32 flex items-center justify-center w-full text-base text-gray-160">
                         No data
                       </div>
                     </td>
@@ -553,7 +553,7 @@ const TradingTable = ({
                 ) : (
                   <tr>
                     <td colSpan={4}>
-                      <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+                      <div className="h-32 flex items-center justify-center w-full text-base text-gray-160">
                         No data
                       </div>
                     </td>
@@ -645,7 +645,7 @@ const TradingTable = ({
               />
             ))
           ) : (
-            <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+            <div className="h-32 flex items-center justify-center w-full text-base text-gray-160">
               No data
             </div>
           )}
@@ -758,7 +758,7 @@ const TradingTable = ({
               );
             })
           ) : (
-            <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+            <div className="h-32 flex items-center justify-center w-full text-base text-gray-160">
               No data
             </div>
           )}
@@ -823,7 +823,7 @@ const TradingTable = ({
                     ) : (
                       <tr>
                         <td colSpan={4}>
-                          <div className="h-32 flex items-center justify-center w-full text-base text-gray-400">
+                          <div className="h-32 flex items-center justify-center w-full text-base text-gray-160">
                             No data
                           </div>
                         </td>

@@ -76,7 +76,7 @@ const SupplyBorrowListMobile = ({
 
 const NoLoginContent = ({ text = "No Data" }) => {
   return (
-    <ContentBox className="text-gray-400 h4 flex justify-center flex-col items-center">
+    <ContentBox className="text-gray-160 h4 flex justify-center flex-col items-center">
       <div className="mb-4">
         <NoDataMascot />
       </div>

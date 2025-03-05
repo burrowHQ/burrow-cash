@@ -36,7 +36,7 @@ const CustomTableMobile = ({ data, columns, noDataText, isLoading }) => {
     });
   } else if (!isLoading) {
     bodyNodes = (
-      <div className="flex justify-center items-center text-gray-400" style={{ height: 300 }}>
+      <div className="flex justify-center items-center text-gray-160" style={{ height: 300 }}>
         {noDataText || "No Data"}
       </div>
     );

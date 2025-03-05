@@ -335,7 +335,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
               <div className="text-gray-300">Current Total PnL</div>
               <div className="flex items-center justify-center">
                 {!pnl ? (
-                  <span className="text-sm text-gray-400 ml-1.5">-</span>
+                  <span className="text-sm text-gray-160 ml-1.5">-</span>
                 ) : (
                   <span className={`text-sm ${pnl > 0 ? "text-primary" : "text-danger"} ml-1.5`}>
                     {pnl > 0 ? `+$` : `-$`}

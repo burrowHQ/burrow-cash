@@ -123,7 +123,7 @@ const TradingToken: React.FC<TradingTokenInter> = ({
       {/* selected token symbol */}
       <div
         className={`flex items-center justify-end ${
-          type === "cate2" ? "hover:bg-gray-1250" : ""
+          type === "cate2" ? "hover:bg-white hover:bg-opacity-5" : ""
         }  p-1.5 rounded-md `}
         onMouseEnter={handleMouseEnter}
       >
@@ -165,7 +165,7 @@ const TradingToken: React.FC<TradingTokenInter> = ({
           {tokenList.map((token, index) => (
             <div
               key={index}
-              className="py-2 px-3.5 hover:bg-gray-950 flex items-center w-full rounded-md"
+              className="py-2 px-3.5 hover:bg-white hover:bg-opacity-10 flex items-center w-full rounded-md"
               onClick={() => handleTokenClick(token)}
             >
               {token?.token_id == nearTokenId ? (

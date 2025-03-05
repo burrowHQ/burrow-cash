@@ -73,7 +73,7 @@ export function MenuButton(props) {
       <rect x="8" y="10" width="16" height="2" rx="1" fill="white" />
       <rect x="8" y="15" width="16" height="2" rx="1" fill="white" />
       <rect x="8" y="20" width="12" height="2" rx="1" fill="white" />
-      <rect x="0.5" y="0.5" width="31" height="31" rx="6.5" stroke="#31344D" />
+      <rect x="0.5" y="0.5" width="31" height="31" rx="6.5" stroke="#303037" />
     </svg>
   );
 }

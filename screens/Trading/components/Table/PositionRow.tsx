@@ -308,19 +308,19 @@ const PositionRow = ({
           PnL{" "}
           <p
             className={`ml-1 ${
-              pnl > 0 ? "text-primary" : pnl < 0 ? "text-danger" : "text-gray-400"
+              pnl > 0 ? "text-primary" : pnl < 0 ? "text-danger" : "text-gray-160"
             }`}
           >
             {pnl === 0 ? "" : `${pnl > 0 ? `+$` : `-$`}`}
             {beautifyPrice(Math.abs(pnl), false, 3, 3)}
-            {/* <span className="text-gray-400 text-xs ml-0.5">
+            {/* <span className="text-gray-160 text-xs ml-0.5">
               {amplitude !== null && amplitude !== 0
                 ? `(${amplitude > 0 ? `+` : `-`}${toInternationalCurrencySystem_number(
                     Math.abs(amplitude),
                   )}%)`
                 : ``}
             </span> */}
-            {/* <span className="text-gray-400 text-xs ml-0.5">(-%)</span> */}
+            {/* <span className="text-gray-160 text-xs ml-0.5">(-%)</span> */}
           </p>
         </div>
         <div

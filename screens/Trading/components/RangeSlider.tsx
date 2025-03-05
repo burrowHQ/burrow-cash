@@ -98,7 +98,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRang
           >
             <span
               className={twMerge(
-                `flex items-center justify-center text-xs text-gray-400 w-11 py-0.5 border border-transparent hover:border-v3LiquidityRemoveBarColor
+                `flex items-center justify-center text-xs text-gray-160 w-11 py-0.5 border border-transparent hover:border-v3LiquidityRemoveBarColor
                  rounded-lg`,
                 p === value && "bg-black bg-opacity-20",
               )}

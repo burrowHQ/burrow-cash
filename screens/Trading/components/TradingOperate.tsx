@@ -658,7 +658,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
               <div className="bg-dark-200 p-1 rounded-md flex items-center mr-3.5">
                 <div
                   className={`py-2 px-5 ${
-                    selectedSetUpOption === "auto" ? "bg-gray-400 rounded " : ""
+                    selectedSetUpOption === "auto" ? "bg-white bg-opacity-5 rounded " : ""
                   }`}
                   onClick={() => handleSetUpOptionClick("auto")}
                 >
@@ -666,7 +666,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                 </div>
                 <div
                   className={`py-2 px-5 ${
-                    selectedSetUpOption === "custom" ? "bg-gray-400 rounded " : ""
+                    selectedSetUpOption === "custom" ? "bg-white bg-opacity-5 rounded " : ""
                   }`}
                   onClick={() => handleSetUpOptionClick("custom")}
                 >

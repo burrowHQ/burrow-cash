@@ -250,7 +250,7 @@ const Trading = () => {
                             (item, index) => (
                               <div
                                 key={index}
-                                className="py-1 pl-1.5 hover:bg-gray-950"
+                                className="py-1 pl-1.5 hover:bg-white hover:bg-opacity-10"
                                 onClick={() => handleTokenSelectCate2(item)}
                               >
                                 {getSymbolById(item.token_id, item.metadata?.symbol)}
