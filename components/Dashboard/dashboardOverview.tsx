@@ -54,7 +54,7 @@ export default function DashboardOverview({ memeCategory }: { memeCategory: bool
   // Unclaimed Rewards
   const rewardsObj = useRewards(memeCategory);
   const rewards = (
-    <div className="flex items-center gap-4 my-1">
+    <div className="flex items-center gap-4 my-1 relative z-10">
       <div className="h2">{rewardsObj?.data?.totalUnClaimUSDDisplay || "$0"}</div>
       <div className="flex items-center">
         {rewardsObj?.data?.array.map(({ data, tokenId }) => {
