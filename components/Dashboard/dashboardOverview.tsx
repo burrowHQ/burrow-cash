@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, createContext, useContext } from "react";
 import Decimal from "decimal.js";
 import { useRouter } from "next/router";
 import {
@@ -21,15 +21,19 @@ import { usePortfolioAssets } from "../../hooks/hooks";
 import { ThreeDotIcon } from "../Icons/IconsV2";
 import { TagToolTip } from "../ToolTip";
 import { MainAssetsIcon, MemeAssetsIcon } from "./icons";
+import { isMobileDevice } from "../../helpers/helpers";
 
 const ICONLENGTH = 4;
+const DashboardOverviewContext = createContext(null) as any;
 export default function DashboardOverview({ memeCategory }: { memeCategory: boolean }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const isMobile = isMobileDevice();
   const router = useRouter();
   const closeModal = () => {
     setIsModalOpen(false);
   };
-  const openModal = () => {
+  const openModal = (e) => {
+    e.stopPropagation();
     setIsModalOpen(true);
   };
   // net Liquidity
@@ -48,15 +52,15 @@ export default function DashboardOverview({ memeCategory }: { memeCategory: bool
   const dailyRewards = (
     <div className="flex items-center gap-1">
       {totalUsdDaily > 0 ? beautifyPrice(totalUsdDaily, true) : "$0"}
-      <IconMore allRewards={allRewards} />
+      {isMobile ? null : <IconMore allRewards={allRewards} />}
     </div>
   );
   // Unclaimed Rewards
   const rewardsObj = useRewards(memeCategory);
   const rewards = (
-    <div className="flex items-center gap-4 my-1 relative z-10">
+    <div className="flex xsm:flex-col xsm:items-start xsm:gap-2 items-center gap-4 my-1 relative z-10">
       <div className="h2">{rewardsObj?.data?.totalUnClaimUSDDisplay || "$0"}</div>
-      <div className="flex items-center">
+      <div className="flex items-center xsm:hidden">
         {rewardsObj?.data?.array.map(({ data, tokenId }) => {
           return (
             <img
@@ -71,7 +75,7 @@ export default function DashboardOverview({ memeCategory }: { memeCategory: bool
       {rewardsObj?.data?.totalUnClaimUSD > 0 ? (
         <span
           onClick={openModal}
-          className="flex items-center justify-center w-[80px] h-8 rounded-full text-sm text-dark-130 bg-primary cursor-pointer"
+          className="flex items-center justify-center w-[80px] h-8 xsm:h-[26px] rounded-full text-sm text-dark-130 bg-primary cursor-pointer"
         >
           Claim
         </span>
@@ -82,14 +86,55 @@ export default function DashboardOverview({ memeCategory }: { memeCategory: bool
   const [suppliedRows, , totalSuppliedUSD, totalBorrowedUSD, , borrowedRows] =
     usePortfolioAssets(memeCategory);
 
-  function jump() {
+  function jump(e) {
     router.push(`/dashboardDetail?pageType=${memeCategory ? "meme" : "main"}`);
   }
+  return (
+    <DashboardOverviewContext.Provider
+      value={{
+        memeCategory,
+        jump,
+        userNetLiquidityValue,
+        amountMain,
+        dailyRewards,
+        rewards,
+        suppliedRows,
+        totalSuppliedUSD,
+        borrowedRows,
+        totalBorrowedUSD,
+        allHealths,
+        rewardsObj,
+        isModalOpen,
+        closeModal,
+      }}
+    >
+      {isMobile ? <DashboardOverviewMobile /> : <DashboardOverviewPc />}
+    </DashboardOverviewContext.Provider>
+  );
+}
+
+function DashboardOverviewPc() {
+  const {
+    memeCategory,
+    jump,
+    userNetLiquidityValue,
+    amountMain,
+    dailyRewards,
+    rewards,
+    suppliedRows,
+    totalSuppliedUSD,
+    borrowedRows,
+    totalBorrowedUSD,
+    allHealths,
+    rewardsObj,
+    isModalOpen,
+    closeModal,
+  } = useContext(DashboardOverviewContext) as any;
   return (
     <div className="mb-[50px]">
       <div className="flex items-center justify-between">
         <span className="text-lg text-gray-140">
-          {memeCategory ? "Meme position" : "Mainstream"}
+          {memeCategory ? "Meme Position" : "Mainstream"}
         </span>
         <span className="text-sm text-primary underline cursor-pointer" onClick={jump}>
           Position Detail
@@ -181,6 +226,34 @@ export default function DashboardOverview({ memeCategory }: { memeCategory: bool
             </div>
           );
         })}
+      </div>
+      <ClaimRewardsModal rewardsObj={rewardsObj} isOpen={isModalOpen} closeModal={closeModal} />
+    </div>
+  );
+}
+function DashboardOverviewMobile() {
+  const {
+    jump,
+    userNetLiquidityValue,
+    amountMain,
+    dailyRewards,
+    rewards,
+    rewardsObj,
+    isModalOpen,
+    closeModal,
+    memeCategory,
+  } = useContext(DashboardOverviewContext) as any;
+  return (
+    <div className="px-4">
+      <div className="text-white text-xl mb-4">{memeCategory ? "Meme Position" : "Mainstream"}</div>
+      <div
+        className="grid grid-cols-2 gap-5  border border-dark-50 bg-dark-110 rounded-xl p-3.5 mb-4"
+        onClick={jump}
+      >
+        <StatsRegular title="Net Liquidity" value={userNetLiquidityValue} tip={NetLiquidityTip} />
+        <StatsRegular title="Net APY" value={amountMain} tip={NetAPYTip} />
+        <StatsRegular title="Daily Rewards" value={dailyRewards} tip={DailyRewardsTip} />
+        <StatsRegular title="Unclaimed Rewards" value={rewards} tip={UnclaimedRewardsTip} />
       </div>
       <ClaimRewardsModal rewardsObj={rewardsObj} isOpen={isModalOpen} closeModal={closeModal} />
     </div>

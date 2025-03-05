@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo, useRef, createContext, useContext } from "react";
 import { useRouter } from "next/router";
 import { useMarginAccount } from "../../hooks/useMarginAccount";
 import { useMarginConfigToken } from "../../hooks/useMarginConfig";
@@ -10,7 +10,9 @@ import { useAppSelector } from "../../redux/hooks";
 import { getAssets, getAssetsMEME } from "../../redux/assetsSelectors";
 import { beautifyPrice } from "../../utils/beautyNumber";
 import { MarginAssetsIcon } from "./icons";
+import { isMobileDevice } from "../../helpers/helpers";
 
+const DashboardMarginOverviewContext = createContext(null) as any;
 export default function DashboardMarginOverview({
   styleType,
   wrapClassName,
@@ -36,6 +38,7 @@ export default function DashboardMarginOverview({
   const { filteredTokenTypeMap } = useRegisterTokenType();
   const assets = useAppSelector(getAssets);
   const assetsMEME = useAppSelector(getAssetsMEME);
+  const isMobile = isMobileDevice();
   const totalMarginAccountList = useMemo(() => {
     return { ...(marginAccountList || {}), ...(marginAccountListMEME || {}) };
   }, [marginAccountList, marginAccountListMEME]);
@@ -109,18 +112,35 @@ export default function DashboardMarginOverview({
     setTotalPLN(pnlTotal);
   }
   const handleMouseEnter = () => {
+    if (isMobile) return;
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
     setShowCollateralPopup(true);
   };
   const handleMouseLeave = () => {
+    if (isMobile) return;
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
     timerRef.current = setTimeout(() => {
       setShowCollateralPopup(false);
     }, 200);
+  };
+  const handleTouchStart = (e) => {
+    if (!isMobile) return;
+    e.stopPropagation();
+    e.preventDefault();
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = setTimeout(() => {
+      setShowCollateralPopup(!showCollateralPopup);
+    }, 200);
+  };
+  const handleTouchEnd = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
   };
   const PNL_REACT_ELEMENT = (
     <span>
@@ -136,15 +156,24 @@ export default function DashboardMarginOverview({
       }`}
       onMouseEnter={hasCollateral ? handleMouseEnter : undefined}
       onMouseLeave={hasCollateral ? handleMouseLeave : undefined}
+      onTouchStart={hasCollateral ? handleTouchStart : undefined}
+      onTouchEnd={handleTouchEnd}
     >
-      <div className="text-h2" onMouseEnter={handleMouseEnter}>
+      <div
+        className="text-h2"
+        onMouseEnter={hasCollateral ? handleMouseEnter : undefined}
+        onTouchStart={hasCollateral ? handleTouchStart : undefined}
+        onTouchEnd={handleTouchEnd}
+      >
         {beautifyPrice(totalCollateral, true)}
       </div>
       {hasCollateral && showCollateralPopup && (
         <div
           className="absolute left-28 top-0 bg-dark-100 border border-gray-130 text-gray-30 pt-3 pl-3 pr-3 rounded-md w-max"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
+          onMouseEnter={hasCollateral ? handleMouseEnter : undefined}
+          onMouseLeave={hasCollateral ? handleMouseLeave : undefined}
+          onTouchStart={hasCollateral ? handleTouchStart : undefined}
+          onTouchEnd={handleTouchEnd}
         >
           {(() => {
             interface MergedCollateralData {
@@ -196,6 +225,33 @@ export default function DashboardMarginOverview({
     router.push("/dashboardMarginDetail");
   }
   return (
+    <DashboardMarginOverviewContext.Provider
+      value={{
+        wrapClassName,
+        styleType,
+        jump,
+        totalLongSizeValue,
+        totalShortSizeValue,
+        COLLATERAL_REACT_ELEMENT,
+        PNL_REACT_ELEMENT,
+      }}
+    >
+      {isMobile ? <DashboardMarginOverviewMobile /> : <DashboardMarginOverviewPc />}
+    </DashboardMarginOverviewContext.Provider>
+  );
+}
+
+function DashboardMarginOverviewPc() {
+  const {
+    wrapClassName,
+    styleType,
+    jump,
+    totalLongSizeValue,
+    totalShortSizeValue,
+    COLLATERAL_REACT_ELEMENT,
+    PNL_REACT_ELEMENT,
+  } = useContext(DashboardMarginOverviewContext) as any;
+  return (
     <div className={wrapClassName || ""}>
       <div
         className={`flex items-center justify-between mt-[52px] ${
@@ -220,6 +276,35 @@ export default function DashboardMarginOverview({
         <StatsRegular title="Collateral" value={COLLATERAL_REACT_ELEMENT} />
         <StatsRegular title="PnL" value={PNL_REACT_ELEMENT} />
         <MarginAssetsIcon className="absolute bottom-0 right-0" />
+      </div>
+    </div>
+  );
+}
+function DashboardMarginOverviewMobile() {
+  const {
+    jump,
+    totalLongSizeValue,
+    totalShortSizeValue,
+    COLLATERAL_REACT_ELEMENT,
+    PNL_REACT_ELEMENT,
+    styleType,
+  } = useContext(DashboardMarginOverviewContext) as any;
+  return (
+    <div className="px-4 w-full">
+      <div className="text-white text-xl mb-4">Margin Trading</div>
+      <div
+        className="grid grid-cols-2 gap-5  border border-dark-50 bg-dark-110 rounded-xl p-3.5 mb-4"
+        onClick={() => {
+          if (styleType !== "simple") jump();
+        }}
+      >
+        <StatsRegular title="Long Open Interest" value={beautifyPrice(totalLongSizeValue, true)} />
+        <StatsRegular
+          title="Short Open Interest"
+          value={beautifyPrice(totalShortSizeValue, true)}
+        />
+        <StatsRegular title="Collateral" value={COLLATERAL_REACT_ELEMENT} />
+        <StatsRegular title="PnL" value={PNL_REACT_ELEMENT} />
       </div>
     </div>
   );

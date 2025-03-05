@@ -131,7 +131,7 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
     </tr>
   ) : (
     <div className="bg-gray-800 rounded-xl mb-4" key={index}>
-      <div className="pt-5 px-4 pb-4 border-b border-dark-950 flex justify-between">
+      <div className="pt-5 px-4 pb-4 border-b border-dark-50 flex justify-between">
         <div className="flex items-center">
           <div className="flex items-center justify-center mr-3.5">
             <img

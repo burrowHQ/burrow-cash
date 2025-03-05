@@ -29,29 +29,34 @@ const Market = () => {
   return (
     <LayoutBox className="flex flex-col items-center justify-center">
       <MarketsOverview />
-      <div className="flex items-center h-[48px] rounded-lg bg-gray-110 p-0.5 text-base text-gray-300 my-[46px]">
-        <span
-          className={`flex items-center justify-center w-[340px] h-full rounded-md cursor-pointer ${
-            activeTab == "main" ? "bg-primary text-black" : "text-gray-300"
-          }`}
-          onClick={() => dispatch(setActiveCategory("main"))}
-        >
-          Mainstream Position
-        </span>
-        <span
-          className={`flex items-center justify-center w-[340px] h-full rounded-md cursor-pointer ${
-            activeTab == "meme" ? "bg-primary text-black" : "text-gray-300"
-          }`}
-          onClick={() => dispatch(setActiveCategory("meme"))}
-        >
-          Meme position
-        </span>
+      <div className="  h-[48px] rounded-lg lg:bg-gray-110 p-0.5 text-base text-gray-300 my-[46px] xsm:w-screen xsm:px-4">
+        <div className="flex items-center h-full xsm:bg-gray-110 rounded-lg">
+          <span
+            className={`flex items-center justify-center lg:w-[340px] xsm:flex-grow xsm:w-1 h-full rounded-md cursor-pointer ${
+              activeTab == "main" ? "bg-primary text-black" : "text-gray-300"
+            }`}
+            onClick={() => dispatch(setActiveCategory("main"))}
+          >
+            Mainstream Position
+          </span>
+          <span
+            className={`flex items-center justify-center lg:w-[340px] xsm:flex-grow xsm:w-1 h-full rounded-md cursor-pointer ${
+              activeTab == "meme" ? "bg-primary text-black" : "text-gray-300"
+            }`}
+            onClick={() => dispatch(setActiveCategory("meme"))}
+          >
+            Meme Position
+          </span>
+        </div>
       </div>
-      <div className="flex items-center w-full mb-5">
-        <WarnTipIcon className="mr-1.5" />
-        <span className="text-sm text-white text-opacity-60">
-          The following positions cannot be borrowed from{" "}
-          {activeTab == "main" ? "Meme's" : "Mainstream's"} positions.
+      <div className="flex items-center w-full mb-5 xsm:px-4 xsm:items-start">
+        <WarnTipIcon className="mr-1.5 xsm:mt-1.5 flex-shrink-0" />
+        <span>
+          <span className="text-sm text-white text-opacity-60 inline">
+            The following positions cannot be borrowed from{" "}
+            {activeTab == "main" ? "Meme's" : "Mainstream's"} positions.
+          </span>
+          <span className="text-base text-white inline">😬</span>
         </span>
       </div>
       <MarketsTable

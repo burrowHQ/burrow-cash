@@ -4,7 +4,7 @@ import { toInternationalCurrencySystem_usd, formatWithCommas_usd } from "../../u
 import { useProtocolNetLiquidity } from "../../hooks/useNetLiquidity";
 import { useRewards } from "../../hooks/useRewards";
 import { isMobileDevice } from "../../helpers/helpers";
-import { MarketBg, MarketTextIcon } from "./svg";
+import { MarketBg, MarketMobileBg, MarketTextIcon } from "./svg";
 
 const MarketOverviewData = createContext(null) as any;
 function MarketsOverview() {
@@ -57,25 +57,25 @@ function MarketsOverviewPc() {
       <div className="flex items-center pl-7 pr-5 z-10 w-full">
         <MarketTextIcon className="mr-20" />
         <div className="grid grid-cols-4 items-center justify-items-center flex-grow">
-          <div className="flex flex-col items-center col-span-1">
+          <div className="flex flex-col col-span-1">
             <span className="text-sm text-gray-300">Total Supplied</span>
             <span className="text-white font-bold text-[26px]">
               {toInternationalCurrencySystem_usd(protocolDeposited)}
             </span>
           </div>
-          <div className="flex flex-col items-center col-span-1">
+          <div className="flex flex-col col-span-1">
             <span className="text-sm text-gray-300">Total Borrowed</span>
             <span className="text-white font-bold text-[26px]">
               {toInternationalCurrencySystem_usd(protocolBorrowed)}
             </span>
           </div>
-          <div className="flex flex-col items-center col-span-1">
+          <div className="flex flex-col col-span-1">
             <span className="text-sm text-gray-300">Available Liquidity</span>
             <span className="text-white font-bold text-[26px]">
               {toInternationalCurrencySystem_usd(protocolNetLiquidity)}
             </span>
           </div>
-          <div className="flex flex-col items-center col-span-1">
+          <div className="flex flex-col col-span-1">
             <span className="text-sm text-gray-300">Daily Rewards</span>
             <span className="text-white font-bold text-[26px]">{formatWithCommas_usd(amount)}</span>
           </div>
@@ -89,22 +89,25 @@ function MarketsOverviewMobile() {
     MarketOverviewData,
   ) as any;
   return (
-    <div className="w-full px-4 pb-5 border-b border-dark-950">
-      <div className="text-xl font-bold text-white mb-6">Markets</div>
-      <div className="grid grid-cols-2 gap-y-5">
-        <TemplateMobile
-          title="Total Supplied"
-          value={toInternationalCurrencySystem_usd(protocolDeposited)}
-        />
-        <TemplateMobile
-          title="Total Borrowed"
-          value={toInternationalCurrencySystem_usd(protocolBorrowed)}
-        />
-        <TemplateMobile
-          title="Available Liquidity"
-          value={toInternationalCurrencySystem_usd(protocolNetLiquidity)}
-        />
-        <TemplateMobile title="Daily Rewards" value={formatWithCommas_usd(amount)} />
+    <div className="w-full px-4">
+      <div className="text-xl font-bold text-white mb-4 pl-2">Markets</div>
+      <div className="relative border border-primary rounded-2xl overflow-hidden">
+        <MarketMobileBg className="absolute w-full h-full" />
+        <div className="grid grid-cols-2 gap-y-5 relative z-10 p-4">
+          <TemplateMobile
+            title="Total Supplied"
+            value={toInternationalCurrencySystem_usd(protocolDeposited)}
+          />
+          <TemplateMobile
+            title="Total Borrowed"
+            value={toInternationalCurrencySystem_usd(protocolBorrowed)}
+          />
+          <TemplateMobile
+            title="Available Liquidity"
+            value={toInternationalCurrencySystem_usd(protocolNetLiquidity)}
+          />
+          <TemplateMobile title="Daily Rewards" value={formatWithCommas_usd(amount)} />
+        </div>
       </div>
     </div>
   );

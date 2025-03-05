@@ -72,7 +72,7 @@ const MenuItem = ({ item, isOuterLink, Icon, isLast, onClose }: PropsMenu) => {
       onClick={handleUrl}
       className={`flex items-center justify-between h-[60px] px-6 ${
         isLast ? "" : "border-b border-dark-50"
-      } ${isSelected ? "bg-dark-900" : ""}`}
+      } ${isSelected ? "bg-white bg-opacity-5" : ""}`}
     >
       <div className="flex items-center gap-2">
         {Icon}
@@ -89,7 +89,7 @@ const BridgeMenuItem = ({ onClose }: { onClose: () => void }) => {
     setOpen(!open);
   }
   return (
-    <div className={`${open ? "bg-dark-900" : ""}`}>
+    <div className={`${open ? "bg-white bg-opacity-5" : ""}`}>
       <div
         onClick={handleBridge}
         className={`flex items-center justify-between h-[60px] px-6 ${
@@ -128,7 +128,7 @@ const SetMenuItem = () => {
     setOpen(!open);
   }
   return (
-    <div className={`${open ? "bg-dark-900" : ""}`}>
+    <div className={`${open ? "bg-white bg-opacity-5" : ""}`}>
       <div
         onClick={handle}
         className={`flex items-center justify-between h-[60px] px-6 ${

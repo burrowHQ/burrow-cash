@@ -5,7 +5,7 @@ export const LOGIC_CONTRACT_NAME = process.env.NEXT_PUBLIC_CONTRACT_NAME as stri
 export const LOGIC_MEMECONTRACT_NAME = process.env.NEXT_PUBLIC_MEMECONTRACT_NAME as string;
 export const DUST_THRESHOLD = 0.001;
 
-export const hiddenAssets = ["meta-token.near", "usn"];
+export const hiddenAssets = ["meta-token.near", "usn", "nbtc.toalice.near"];
 export const lpTokenPrefix = "shadow_ref_v1";
 export const blackAssets = ["shadow_ref_v1-0"];
 export const MARGIN_MIN_COLLATERAL_USD = 0.1;

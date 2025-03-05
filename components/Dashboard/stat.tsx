@@ -23,7 +23,7 @@ export function StatsRegular({
         <span className="text-sm text-white text-opacity-40">{title}</span>
         {tip ? <TagToolTip title={tip} /> : null}
       </div>
-      <span className="text-3xl">{value}</span>
+      <span className="text-3xl xsm:text-2xl">{value}</span>
     </div>
   );
 }

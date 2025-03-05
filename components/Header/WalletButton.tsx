@@ -291,12 +291,12 @@ function AccountDetail({ onClose }: { onClose?: () => void }) {
 
   const changeWalletDisable = currentWallet?.id === "keypom";
   return (
-    <div className="border border-dark-50 bg-dark-100 lg:rounded-md p-4 xsm:rounded-b-xl xsm:p-6">
+    <div className="border border-dark-50 bg-dark-110 lg:rounded-md p-4 xsm:rounded-b-xl xsm:p-6">
       {isMobile && (
         <div className="relative flex items-center w-full justify-between h-[60px] mb-5">
-          <span className="text-dark-800 text-xl">Account</span>
+          <span className="text-gray-300 text-xl">Account</span>
           <CloseIcon onClick={onClose} />
-          <div className="absolute h-0.5 -left-6 -right-6 bottom-0 bg-dark-700" />
+          <div className="absolute h-px -left-6 -right-6 bottom-0 bg-dark-50" />
         </div>
       )}
       <div className="flex items-center justify-between">

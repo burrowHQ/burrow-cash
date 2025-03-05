@@ -132,7 +132,7 @@ const MarketMarginTrading = () => {
     <div className="flex flex-col items-center justify-center w-full">
       {isMobile ? (
         <>
-          <div className="w-full border-b border-dark-950 px-4">
+          <div className="w-full border-b border-dark-50 px-4">
             <div className="flex justify-between">
               <div className="flex flex-1 justify-center xsm:justify-start xsm:mb-[30px]">
                 <div>
@@ -507,7 +507,7 @@ function TableBodyMobile({
         return (
           <Link href={`/trading/${item.token_id}`} key={item.token_id}>
             <div className="mb-4 bg-gray-800 rounded-xl w-full">
-              <div className="flex items-center justify-between pt-6 pb-4 px-4 border-b border-dark-950 relative">
+              <div className="flex items-center justify-between pt-6 pb-4 px-4 border-b border-dark-50 relative">
                 <div className="flex items-center">
                   {item.token_id == nearTokenId ? (
                     <NearIcon />

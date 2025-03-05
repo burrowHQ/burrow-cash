@@ -69,7 +69,7 @@ export function MenuButton(props) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <rect x="0.5" y="0.5" width="31" height="31" rx="6.5" fill="#23253A" />
+      <rect x="0.5" y="0.5" width="31" height="31" rx="6.5" fill="#202026" />
       <rect x="8" y="10" width="16" height="2" rx="1" fill="white" />
       <rect x="8" y="15" width="16" height="2" rx="1" fill="white" />
       <rect x="8" y="20" width="12" height="2" rx="1" fill="white" />
@@ -94,7 +94,7 @@ export function CloseIcon(props) {
         height="2"
         rx="1"
         transform="rotate(-45 0 11.3135)"
-        fill="#979ABE"
+        fill="#8A8A8D"
       />
       <rect
         x="1.41431"
@@ -102,7 +102,7 @@ export function CloseIcon(props) {
         height="2"
         rx="1"
         transform="rotate(45 1.41431 0)"
-        fill="#979ABE"
+        fill="#8A8A8D"
       />
     </svg>
   );

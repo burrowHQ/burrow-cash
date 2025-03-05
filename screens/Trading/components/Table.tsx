@@ -615,7 +615,7 @@ const TradingTable = ({
               }`}
             >
               <span className="flex w-10 h-10 bg-gray-800" style={{ borderRadius: "50%" }} />
-              <YellowBallIcon className="absolute top-6" />
+              <YellowBallIcon className="absolute top-6" id="1019" />
             </div>
           </div>
         </div>

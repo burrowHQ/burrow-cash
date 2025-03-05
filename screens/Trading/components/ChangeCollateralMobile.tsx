@@ -485,7 +485,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
               {ChangeCollateralTab === "Add" && (
                 <div className="py-2">
                   <div className=" bg-dark-600 border border-dark-50 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md flex items-center justify-between mb-1.5">
-                    <div>
+                    <div className="flex-grow pr-8">
                       <input
                         type="text"
                         value={inputValue}
@@ -628,7 +628,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
               {ChangeCollateralTab === "Remove" && (
                 <div className="py-2">
                   <div className=" bg-dark-600 border border-dark-50 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md flex items-center justify-between mb-1.5">
-                    <div>
+                    <div className="flex-grow pr-4">
                       <input
                         type="text"
                         value={inputValue}

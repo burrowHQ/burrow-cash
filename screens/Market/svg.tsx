@@ -271,6 +271,9 @@ export function BoosterIcon(props) {
 export function MarketBg(props: any) {
   return <img {...props} src={AWS_MEDIA_DOMAIN + `/images/lendingBg.png`} alt="" />;
 }
+export function MarketMobileBg(props: any) {
+  return <img {...props} src={AWS_MEDIA_DOMAIN + `/images/lendingMobileBg.png`} alt="" />;
+}
 export function MarketTextIcon(props: any) {
   return (
     <svg

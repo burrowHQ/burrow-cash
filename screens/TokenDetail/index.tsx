@@ -406,7 +406,7 @@ function DetailMobile({ tokenDetails, handlePeriodClick }) {
               }`}
             >
               <span className="flex w-10 h-10 bg-gray-800" style={{ borderRadius: "50%" }} />
-              <YellowBallIcon className="absolute top-6" />
+              <YellowBallIcon className="absolute top-6" id="1019" />
             </div>
           </div>
         </div>
@@ -511,7 +511,7 @@ function TokenOverviewMobile() {
     isLpToken = true;
   }
   return (
-    <div className="grid grid-cols-1 gap-y-5 bg-gray-800 rounded-2xl p-4">
+    <div className="border border-dark-50  grid grid-cols-1 gap-y-5 bg-dark-110 rounded-2xl p-4">
       <LabelMobile
         title="Supply Cap"
         value={toInternationalCurrencySystem_number(tokenRow?.totalSupply)}
@@ -852,7 +852,7 @@ function TokenSupplyChart({ tokenDetails, handlePeriodClick }) {
   );
 }
 
-const HrLine = () => <hr className="hidden mt-6 mb-6 h-px my-8 bg-dark-500 border-0 xsm:block" />;
+const HrLine = () => <hr className="hidden mt-6 mb-6 h-px my-8 bg-dark-50 border-0 xsm:block" />;
 
 function TokenBorrowChart({ tokenDetails, handlePeriodClick }) {
   const { tokenBorrowDays, borrowAnimating } = tokenDetails || {};
@@ -1508,7 +1508,7 @@ function UserBox({
 }) {
   return (
     <div
-      className={`p-5 pb-[23px] border border-dark-50 lg:rounded-md xsm:rounded-xl bg-gray-800 ${className}`}
+      className={`p-5 pb-[23px] border border-dark-50 lg:rounded-md xsm:rounded-xl bg-dark-110 ${className}`}
     >
       {children}
     </div>
