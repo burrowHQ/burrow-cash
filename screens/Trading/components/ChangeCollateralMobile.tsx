@@ -17,7 +17,6 @@ import { decreaseCollateral } from "../../../store/marginActions/decreaseCollate
 import { getAccountBalance } from "../../../redux/accountSelectors";
 import { shrinkToken, expandToken } from "../../../store";
 import { showChangeCollateralPosition } from "../../../components/HashResultModal";
-import { setActiveTab } from "../../../redux/marginTabSlice";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { checkIfMeme } from "../../../utils/margin";
 import { ChangeCollateralMobileProps } from "../comInterface";
@@ -285,7 +284,6 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
         symbol: symbolC,
         addedValue: String(addedValue / priceC),
       };
-      dispatch(setActiveTab("my"));
       localStorage.setItem("marginTransactionType", "changeCollateral");
       localStorage.setItem("collateralInfo", JSON.stringify(collateralInfo));
       onClose();

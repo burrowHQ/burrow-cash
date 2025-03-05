@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { RemindCloseIcon, RemindIcon } from "./icon";
 import { useAppSelector } from "../../redux/hooks";
 import { getAccountId } from "../../redux/accountSelectors";
-import { setAccountDetailsOpen, setActiveTab, setSelectedTab } from "../../redux/marginTabSlice";
+import { setAccountDetailsOpen, setSelectedTab } from "../../redux/marginTabSlice";
 import {
   getMarginAccountSupplied,
   getMarginAccountSuppliedMEME,
@@ -49,10 +49,9 @@ const BalanceReminder = () => {
     }
   }, [accountId, router.pathname, Unreminded, combinedAccountSupplied]);
   const handleClaim = () => {
-    dispatch(setActiveTab("my"));
     dispatch(setSelectedTab("account"));
     dispatch(setAccountDetailsOpen(true));
-    router.push("/marginTrading");
+    router.push("/dashboardMarginDetail");
   };
   function closeTip() {
     const today = new Date().toDateString();
@@ -65,7 +64,7 @@ const BalanceReminder = () => {
   }
   return (
     <div
-      className="fixed lg:top-[80px] lg:right-[24px] xsm:top-[64px] xsm:left-[14px] border border-gray-1250 bg-dark-100 shadow-lg py-4 pl-3 pr-4
+      className="fixed lg:top-[80px] lg:right-[24px] xsm:top-[64px] xsm:left-[14px] bg-dark-100 shadow-lg py-4 pl-3 pr-4
      border border-dark-50 w-96 rounded-md flex 
      xsm:border-0 xsm:rounded-md xsm:rounded-t-md xsm:bg-dark-230 "
       style={{ zIndex: "50" }}
