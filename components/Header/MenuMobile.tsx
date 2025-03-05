@@ -71,7 +71,7 @@ const MenuItem = ({ item, isOuterLink, Icon, isLast, onClose }: PropsMenu) => {
     <div
       onClick={handleUrl}
       className={`flex items-center justify-between h-[60px] px-6 ${
-        isLast ? "" : "border-b border-dark-700"
+        isLast ? "" : "border-b border-dark-50"
       } ${isSelected ? "bg-dark-900" : ""}`}
     >
       <div className="flex items-center gap-2">
@@ -93,7 +93,7 @@ const BridgeMenuItem = ({ onClose }: { onClose: () => void }) => {
       <div
         onClick={handleBridge}
         className={`flex items-center justify-between h-[60px] px-6 ${
-          open ? "" : "border-b border-dark-700"
+          open ? "" : "border-b border-dark-50"
         }`}
       >
         <div className="flex items-center gap-2">
@@ -132,7 +132,7 @@ const SetMenuItem = () => {
       <div
         onClick={handle}
         className={`flex items-center justify-between h-[60px] px-6 ${
-          open ? "" : "border-b border-dark-700"
+          open ? "" : "border-b border-dark-50"
         }`}
       >
         <div className="flex items-center gap-2">
@@ -160,7 +160,7 @@ function SliderButton({ active, ...rest }: { active: boolean; onClick: any }) {
   return (
     <div
       {...rest}
-      className={`flex items-center h-5 w-9 rounded-xl p-0.5 cursor-pointer border border-dark-500 transition-all ${
+      className={`flex items-center h-5 w-9 rounded-xl p-0.5 cursor-pointer border border-dark-50 transition-all ${
         active ? "bg-primary" : "bg-dark-600"
       }`}
     >
@@ -199,7 +199,7 @@ const BridgeSubMenuItem = ({ title, pathname, subTitle, onClose }: PropsSubMenu)
 
 const CommunityItem = () => {
   return (
-    <div className="flex items-center justify-between h-[60px] px-6 border-b border-dark-700">
+    <div className="flex items-center justify-between h-[60px] px-6 border-b border-dark-50">
       <div className="flex items-center gap-2">
         <span className="text-base text-white">Community</span>
       </div>

@@ -633,7 +633,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
         </div>
         <div />
         <div
-          className="cursor-pointer border border-dark-500 rounded-md p-[8px] flex items-center justify-center mr-1"
+          className="cursor-pointer border border-dark-50 rounded-md p-[8px] flex items-center justify-center mr-1"
           onClick={() => {
             if (!tokenInAmount || forceUpdateLoading) {
               return;
@@ -652,7 +652,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
         <div className="relative z-40 cursor-pointer slip-fater" onMouseEnter={handleMouseEnter}>
           <SetUp className="text-gray-300 hover:text-white" onClick={handleSetUpFocus} />
 
-          <div className="slip-child absolute top-8 right-0 bg-dark-250 border border-dark-500 rounded-md py-6 px-4">
+          <div className="slip-child absolute top-8 right-0 bg-dark-250 border border-dark-50 rounded-md py-6 px-4">
             <p className="text-base mb-6">Max. Slippage Setting</p>
             <div className="flex items-center justify-between h-10">
               <div className="bg-dark-200 p-1 rounded-md flex items-center mr-3.5">
@@ -693,16 +693,14 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                 </div>
               </div>
             </div>
-            {!slippageTolerance && (
-              <p className="text-sm mt-2 text-red-150">Slippage is required</p>
-            )}
+            {!slippageTolerance && <p className="text-sm mt-2 text-danger">Slippage is required</p>}
           </div>
         </div>
         {/* slip end */}
       </div>
       <div className="mt-5">
         <div className={`${activeTab == "long" ? "" : "hidden"}`}>
-          <div className="relative bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-30">
+          <div className="relative bg-dark-600 border border-dark-50 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-30">
             <input
               onChange={tokenChange}
               type="text"
@@ -723,7 +721,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
           <div className="relative my-2.5 flex justify-end z-0 w-1/2" style={{ zoom: "2" }}>
             <ShrinkArrow />
           </div>
-          <div className="relative bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-20">
+          <div className="relative bg-dark-600 border border-dark-50 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-20">
             {/* long out  */}
             <div>{longOutput && beautifyPrice(Number(longOutput))}</div>
             {/*  */}
@@ -839,7 +837,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
           </div>
         </div>
         <div className={`${activeTab === "short" ? "" : "hidden"}`}>
-          <div className="relative bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-30">
+          <div className="relative bg-dark-600 border border-dark-50 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-30">
             <input
               onChange={tokenChange}
               type="text"
@@ -860,7 +858,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
           <div className="relative my-2.5 flex justify-end z-0 w-1/2" style={{ zoom: "2" }}>
             <ShrinkArrow />
           </div>
-          <div className="relative bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-20">
+          <div className="relative bg-dark-600 border border-dark-50 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md z-20">
             {/* short out */}
             <div>{shortOutput && beautifyPrice(Number(shortOutput))}</div>
             {/*  */}

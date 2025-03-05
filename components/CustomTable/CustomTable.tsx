@@ -151,7 +151,7 @@ const CustomTable = ({
           headersRef.current[i] = el;
         };
         return (
-          <div key={keyId} className="custom-table-th text-gray-400" style={styles} ref={assignRef}>
+          <div key={keyId} className="custom-table-th text-gray-180" style={styles} ref={assignRef}>
             {d.text}
           </div>
         );

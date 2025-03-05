@@ -77,7 +77,7 @@ const CustomButton = forwardRef((props: Props, ref: any) => {
         "border-transparent border rounded-md px-4 transition duration-500 ease select-none",
         getBtnSizeClassName(size),
         isDisabled
-          ? "bg-gray-500 hover:bg-gray-500 text-gray-400 border-transparent text-gray-300"
+          ? "bg-gray-500 hover:bg-gray-500 border-transparent text-gray-300"
           : getBtnColorClassName(color),
         isLoading2 && "_loading",
         className,
@@ -120,9 +120,9 @@ const btnColor = {
     "border-primary border border-opacity-60 text-primary bg-primary hover:opacity-80 bg-opacity-5",
   errorBorder:
     "border border-orange border-opacity-60 text-orange bg-orange bg-opacity-5 hover:opacity-80",
-  secondary: "border border-gray-1300 hover:border-gray-400 text-gray-300",
+  secondary: "border border-dark-50 text-white",
   secondary2: "border border-pink-400 hover:border-pink-400 text-pink-400",
-  third: "rounded-full border border-1 border-black text-black font-bold",
+  third: "rounded-md border border-gray-180 text-gray-180",
   info: "border-warning bg-warning hover:opacity-80 text-black",
   custom: "",
 };

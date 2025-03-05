@@ -289,12 +289,12 @@ const TradingTable = ({
   const sortList = {
     close_timestamp: "Close time",
     open_timestamp: "Opening time",
-    pnl: "PNL",
+    pnl: "PnL",
   };
   return (
     <div className="flex flex-col items-center justify-center lg:w-full xsm:w-[100vw] xsm:px-2">
       {/* pc */}
-      <div className="w-full border border-dark-50 bg-gray-800 rounded-md  xsm:hidden">
+      <div className="w-full border border-dark-50 bg-dark-110 rounded-md  xsm:hidden">
         {/* title */}
         <div className="w-full border-b border-dark-50 flex justify-between items-center">
           <div className="flex">
@@ -338,7 +338,7 @@ const TradingTable = ({
                   <th>Entry Price</th>
                   <th>Index Price</th>
                   <th>Liq. Price</th>
-                  <th>PNL</th>
+                  <th>PnL</th>
                   <th>
                     <div
                       onClick={() => handleSort("open_ts")}
@@ -437,7 +437,7 @@ const TradingTable = ({
                   <th>Fee</th>
                   <th onClick={() => handleSortChange("pnl")}>
                     <div className="flex items-center cursor-pointer">
-                      PNL
+                      PnL
                       <SortHistoryButton
                         activeColor="rgba(192, 196, 233, 1)"
                         inactiveColor="rgba(192, 196, 233, 0.5)"

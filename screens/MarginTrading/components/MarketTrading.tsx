@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import getConfig from "next/config";
-import { ArrowDownIcon, ArrowUpIcon, NearIcon } from "./Icon";
+import { ArrowDownIcon, ArrowUpIcon, NearIcon, MarginTradingTextIcon } from "./Icon";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
 import { formatWithCommas_usd } from "../../../utils/uiNumber";
 import { ArrowLineDownIcon, CheckIcon, NewTagIcon } from "../../Market/svg";
@@ -173,7 +173,10 @@ const MarketMarginTrading = () => {
         </>
       ) : (
         <>
-          <div className="flex justify-between items-center w-full h-[100px] border border-dark-50 bg-gray-800 rounded-md mb-8">
+          <div className="flex justify-between items-center w-full h-[100px] border border-dark-50 bg-dark-110 rounded-3xl mb-8 pl-[30px]">
+            <div className="flex flex-1">
+              <MarginTradingTextIcon />
+            </div>
             <div className="flex flex-1 justify-center xsm:justify-start xsm:mb-[30px]">
               <div>
                 <p className="text-gray-300 text-sm">Total Volume</p>
@@ -239,56 +242,48 @@ function TableHead({
   sortBy: string | null;
 }) {
   return (
-    <div className="w-full grid grid-cols-5 h-12">
-      <div className="grid grid-cols-3 col-span-3 border border-dark-50 bg-gray-800 rounded-t-2xl items-center text-sm text-gray-300">
-        <div className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap">
-          Market
-        </div>
-        <div
-          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
-          onClick={() => onSort("totalVolume")}
-        >
-          Total Volume
-          <SortButton
-            activeColor="rgba(192, 196, 233, 1)"
-            inactiveColor="rgba(192, 196, 233, 0.5)"
-            sort={sortBy === "totalVolume" ? sortDirection : null}
-          />
-        </div>
-        <div
-          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap"
-          onClick={() => onSort("volume24h")}
-        >
-          24H Volume
-          <SortButton
-            activeColor="rgba(192, 196, 233, 1)"
-            inactiveColor="rgba(192, 196, 233, 0.5)"
-            sort={sortBy === "volume24h" ? sortDirection : null}
-          />
-        </div>
+    <div className="w-full grid grid-cols-5 col-span-5 bg-dark-110 rounded-t-2xl items-center text-sm text-gray-300 h-12">
+      <div className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap jost-600-bold">
+        Market
       </div>
       <div
-        className="grid grid-cols-1 col-span-1 bg-primary rounded-t-2xl items-center text-sm text-black"
-        onClick={() => onSort("longPosition")}
+        className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap jost-600-bold"
+        onClick={() => onSort("totalVolume")}
       >
-        <div className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap">
+        Total Volume
+        <SortButton
+          activeColor="rgba(192, 196, 233, 1)"
+          inactiveColor="rgba(192, 196, 233, 0.5)"
+          sort={sortBy === "totalVolume" ? sortDirection : null}
+        />
+      </div>
+      <div
+        className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap jost-600-bold"
+        onClick={() => onSort("volume24h")}
+      >
+        24H Volume
+        <SortButton
+          activeColor="rgba(192, 196, 233, 1)"
+          inactiveColor="rgba(192, 196, 233, 0.5)"
+          sort={sortBy === "volume24h" ? sortDirection : null}
+        />
+      </div>
+      <div onClick={() => onSort("longPosition")}>
+        <div className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap text-primary jost-600-bold">
           Long Position
           <SortButton
-            activeColor="rgba(0, 0, 0, 1)"
-            inactiveColor="rgba(0, 0, 0, 0.5)"
+            activeColor="rgba(0, 247, 165, 1)"
+            inactiveColor="rgba(0, 247, 165, 0.5)"
             sort={sortBy === "longPosition" ? sortDirection : null}
           />
         </div>
       </div>
-      <div
-        className="grid grid-cols-1 col-span-1 bg-orange rounded-t-2xl items-center text-sm text-black"
-        onClick={() => onSort("shortPosition")}
-      >
-        <div className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap">
+      <div onClick={() => onSort("shortPosition")}>
+        <div className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap text-orange jost-600-bold">
           Short Position
           <SortButton
-            activeColor="rgba(0, 0, 0, 1)"
-            inactiveColor="rgba(0, 0, 0, 0.5)"
+            activeColor="rgba(255, 105, 71, 1)"
+            inactiveColor="rgba(255, 105, 71, 0.5)"
             sort={sortBy === "shortPosition" ? sortDirection : null}
           />
         </div>
@@ -401,7 +396,7 @@ function TableBody({
         const isMainStream = filteredTokenTypeMap.mainStream.includes(item.token_id);
         return (
           <Link href={`/trading/${item.token_id}`} key={item.token_id}>
-            <div className="w-full grid grid-cols-5 bg-gray-800 hover:bg-dark-100 cursor-pointer mt-0.5 h-[60px]">
+            <div className="w-full grid grid-cols-5 bg-dark-110 hover:bg-gray-500 cursor-pointer mt-0.5 h-[60px]">
               <div className="relative col-span-1 flex items-center justify-self-start pl-14">
                 {item.token_id == nearTokenId ? (
                   <NearIcon />

@@ -463,7 +463,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                 <CloseIcon onClick={onClose} />
               </div>
             </div>
-            <div className="flex justify-center items-center border-b border-dark-700 -mx-5 -px-5 mt-6 px-5">
+            <div className="flex justify-center items-center border-b border-dark-50 -mx-5 -px-5 mt-6 px-5">
               <div
                 className={`py-2 w-1/2 text-center cursor-pointer text-gray-300 text-lg ${
                   ChangeCollateralTab === "Add" ? "text-primary border-b border-primary" : ""
@@ -484,7 +484,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
             <div className="mt-4">
               {ChangeCollateralTab === "Add" && (
                 <div className="py-2">
-                  <div className=" bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md flex items-center justify-between mb-1.5">
+                  <div className=" bg-dark-600 border border-dark-50 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md flex items-center justify-between mb-1.5">
                     <div>
                       <input
                         type="text"
@@ -515,8 +515,8 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                     {leverData.map((item, index) => (
                       <div
                         key={index}
-                        className={`bg-dark-600 border border-dark-500 py-1 px-2 rounded-md text-xs text-gray-300 mr-2 cursor-pointer hover:bg-gray-700 ${
-                          selectedLever === item.value ? "bg-gray-700" : ""
+                        className={`bg-dark-600 border border-dark-50 py-1 px-2 rounded-md text-xs text-gray-300 mr-2 cursor-pointer hover:bg-opacity-20 ${
+                          selectedLever === item.value ? "bg-opacity-20" : ""
                         }`}
                         onClick={() => handleLeverAddClick(item.value)}
                       >
@@ -627,7 +627,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
               )}
               {ChangeCollateralTab === "Remove" && (
                 <div className="py-2">
-                  <div className=" bg-dark-600 border border-dark-500 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md flex items-center justify-between mb-1.5">
+                  <div className=" bg-dark-600 border border-dark-50 pt-3 pb-2.5 pr-3 pl-2.5 rounded-md flex items-center justify-between mb-1.5">
                     <div>
                       <input
                         type="text"
@@ -656,8 +656,8 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                     {leverData.map((item, index) => (
                       <div
                         key={index}
-                        className={`bg-dark-600 border border-dark-500 py-1 px-2 rounded-md text-xs text-gray-300 mr-2 cursor-pointer hover:bg-gray-700 ${
-                          selectedLever === item.value ? "bg-gray-700" : ""
+                        className={`bg-dark-600 border border-dark-50 py-1 px-2 rounded-md text-xs text-gray-300 mr-2 cursor-pointer hover:bg-opacity-20 ${
+                          selectedLever === item.value ? "bg-opacity-20" : ""
                         }`}
                         onClick={() => handleLeverDeleteClick(item.value)}
                       >

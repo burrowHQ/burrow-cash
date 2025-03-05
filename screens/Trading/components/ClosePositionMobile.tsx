@@ -294,7 +294,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
                 <CloseIcon onClick={onClose} />
               </div>
             </div>
-            <div className="pt-10 pb-8 flex items-center justify-around  border-b border-dark-700 -mx-5 px-5 mb-5">
+            <div className="pt-10 pb-8 flex items-center justify-around  border-b border-dark-50 -mx-5 px-5 mb-5">
               <div className="text-center leading-3">
                 <p className="text-lg">
                   {positionType.label === "Long"
@@ -332,12 +332,12 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
               </div>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
-              <div className="text-gray-300">Current Total PNL</div>
+              <div className="text-gray-300">Current Total PnL</div>
               <div className="flex items-center justify-center">
                 {!pnl ? (
                   <span className="text-sm text-gray-400 ml-1.5">-</span>
                 ) : (
-                  <span className={`text-sm ${pnl > 0 ? "text-green-150" : "text-red-150"} ml-1.5`}>
+                  <span className={`text-sm ${pnl > 0 ? "text-primary" : "text-danger"} ml-1.5`}>
                     {pnl > 0 ? `+$` : `-$`}
                     {beautifyPrice(Math.abs(pnl))}
                   </span>

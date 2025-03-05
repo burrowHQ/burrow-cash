@@ -28,7 +28,7 @@ export const mainMenuList: Imenu[] = [
   {
     title: "Staking",
     link: "/staking",
-    allLinks: ["/staking", "/dashboardMarginDetail"],
+    allLinks: ["/staking"],
     icon: <StakeIcon />,
   },
 ];

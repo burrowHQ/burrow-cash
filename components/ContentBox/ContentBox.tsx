@@ -29,7 +29,7 @@ const StyledTipBox = styled.div<{ padding?: string }>`
   position: relative;
   border-radius: 6px;
   border: 1px solid #303037;
-  background: #202026;
+  background: #1c1c22;
   font-size: 12px;
   padding: ${(p) => p.padding ?? "20px 30px"};
 `;
@@ -38,7 +38,7 @@ const StyledBox = styled.div<{ padding?: string }>`
   position: relative;
   border-radius: 12px;
   border: 1px solid #303037;
-  background: #202026;
+  background: #1c1c22;
   padding: ${(p) => p.padding ?? "20px 30px"};
 
   @media (max-width: 767px) {

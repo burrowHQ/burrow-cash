@@ -171,7 +171,7 @@ const ModalStaking = ({ isOpen, onClose }) => {
         <StyledRow>
           <div className="flex mb-4 items-center">
             <div className="mr-2">Reward</div>
-            <div className="border-b border-solid flex-grow border-dark-700" />
+            <div className="border-b border-solid flex-grow border-dark-50" />
           </div>
           <div className={`flex justify-between mb-4 ${avgStakeSupplyAPY > 0 ? "" : "hidden"}`}>
             <div className="h5 text-gray-300">Avg. Supply Reward APY</div>

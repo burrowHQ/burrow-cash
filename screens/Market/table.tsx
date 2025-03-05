@@ -50,12 +50,12 @@ function TableHead({ sorting }) {
   if (isMobile) return <HeadMobile sorting={sorting} />;
   return (
     <div className="grid grid-cols-6 h-12 bg-dark-110 rounded-t-sm overflow-hidden">
-      <div className="col-span-1 bg-gray-800  flex items-center pl-5 text-sm text-gray-120 jost-bold">
+      <div className="col-span-1 bg-gray-800  flex items-center pl-5 text-sm text-gray-120 jost-600-bold">
         Market
       </div>
       <div className="grid grid-cols-2 col-span-2 text-primary items-center text-sm bg-gray-800">
         <div
-          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap jost-bold"
+          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap jost-600-bold"
           onClick={() => {
             dispatch_sort_action("totalSupplyMoney");
           }}
@@ -64,7 +64,7 @@ function TableHead({ sorting }) {
           <SortButton sort={getCurColumnSort("totalSupplyMoney")} color="primary" />
         </div>
         <div
-          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap jost-bold"
+          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap jost-600-bold"
           onClick={() => {
             dispatch_sort_action("depositApy");
           }}
@@ -74,7 +74,7 @@ function TableHead({ sorting }) {
       </div>
       <div className="grid grid-cols-2 col-span-2 text-orange items-center text-sm bg-gray-800">
         <div
-          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap jost-bold"
+          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap jost-600-bold"
           onClick={() => {
             dispatch_sort_action("totalBorrowedMoney");
           }}
@@ -82,7 +82,7 @@ function TableHead({ sorting }) {
           Total Borrowed <SortButton sort={getCurColumnSort("totalBorrowedMoney")} color="danger" />
         </div>
         <div
-          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap jost-bold"
+          className="col-span-1 flex items-center cursor-pointer pl-6 xl:pl-14 whitespace-nowrap jost-600-bold"
           onClick={() => {
             dispatch_sort_action("borrowApy");
           }}
@@ -91,7 +91,7 @@ function TableHead({ sorting }) {
         </div>
       </div>
       <div
-        className="col-span-1 bg-gray-800 flex items-center text-sm text-gray-120 cursor-pointer pl-4 xl:pl-8 whitespace-nowrap jost-bold"
+        className="col-span-1 bg-gray-800 flex items-center text-sm text-gray-120 cursor-pointer pl-4 xl:pl-8 whitespace-nowrap jost-600-bold"
         onClick={() => {
           dispatch_sort_action("availableLiquidityMoney");
         }}

@@ -21,10 +21,9 @@ export const MarketButton = ({
   const isMeme = useAppSelector(isMemeCategory);
   const handleMarketClick = () => {
     window.open(`/tokenDetail/${tokenId}?pageType=${isMeme ? "meme" : "main"}`);
-    // router.push(`/tokenDetail/${tokenId}`);
   };
   return (
-    <CustomButton color="secondary" onClick={handleMarketClick} style={{ minHeight: 0, ...style }}>
+    <CustomButton color="third" onClick={handleMarketClick} style={{ minHeight: 0, ...style }}>
       <div className="flex items-center gap-2">
         Market info <ArrowUpIcon />
       </div>

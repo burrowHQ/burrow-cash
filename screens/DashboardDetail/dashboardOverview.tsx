@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { BeatLoader } from "react-spinners";
 import { twMerge } from "tailwind-merge";
-import { useTheme } from "@mui/material";
 import SemiCircleProgressBar from "../../components/SemiCircleProgressBar/SemiCircleProgressBar";
 import { useUserHealth } from "../../hooks/useUserHealth";
-import { formatTokenValue, isMobileDevice } from "../../helpers/helpers";
+import { isMobileDevice } from "../../helpers/helpers";
 import CustomButton from "../../components/CustomButton/CustomButton";
 import { useRewards } from "../../hooks/useRewards";
 import ModalHistoryInfo from "./modalHistoryInfo";
@@ -16,9 +14,9 @@ import { UserDailyRewards } from "../../components/Header/stats/rewards";
 import { UserLiquidity } from "../../components/Header/stats/liquidity";
 import { APY } from "../../components/Header/stats/apy";
 import { ContentBox } from "../../components/ContentBox/ContentBox";
-import { StatLabel } from "../../components/Header/stats/components";
 import { TagToolTip } from "../../components/ToolTip";
 import ClaimRewardsModal from "../../components/Dashboard/claimRewardsModal";
+import { MainAssetsIcon, MemeAssetsIcon } from "../../components/Dashboard/icons";
 import { UnclaimedRewardsTip, HealthFactorTip } from "../../components/Dashboard/stat";
 
 const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
@@ -29,7 +27,6 @@ const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
   const [userHealthCur, setUserHealthCur] = useState<any>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isMobile = isMobileDevice();
-  const theme = useTheme();
   const userHealth = useUserHealth(memeCategory);
   const rewardsObj = useRewards(memeCategory);
   const { unreadLiquidation, fetchUnreadLiquidation } = useUnreadLiquidation({
@@ -100,19 +97,6 @@ const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
     </div>
   );
 
-  const unclaimNodes = rewardsObj?.data?.array.map(({ data, tokenId }) => {
-    return (
-      <div className="flex justify-between mb-4 items-center" key={tokenId}>
-        <div className="flex items-center gap-1.5">
-          <img src={data?.icon} className="w-[26px] h-[26px] rounded-full" alt="" />
-          <span className="text-gray-300">{data?.symbol}</span>
-        </div>
-        <div className="flex-grow border-t border-dashed border-gray-300 mx-4" />
-        <div>{formatTokenValue(data?.unclaimedAmount)}</div>
-      </div>
-    );
-  });
-
   const handleHealthClick = (o) => {
     const valueLocale = o.healthFactor;
     setUserHealthCur({
@@ -137,8 +121,8 @@ const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
           {recordsButton}
         </div>
       </div>
-      <ContentBox className="mb-8">
-        <div className="lg3:flex lg3:justify-between">
+      <ContentBox className="mb-8 relative">
+        <div className="lg3:flex lg3:justify-between relative z-10">
           <div className="mb-4 lg3:max-w-[640px] lg3:mb-0">
             <div className="flex gap-2 justify-between lg3:gap-6">
               <div className="gap-6 flex flex-col flex-2">
@@ -199,10 +183,10 @@ const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
               {recordsButton}
             </div>
 
-            <div className="relative flex xsm2:flex-col xsm:items-center items-end gap-4">
+            <div className="relative flex flex-col xsm:items-center items-end gap-4 pr-[30px]">
               <HealthFactor userHealth={userHealthCur} />
               {hasMultiHealths ? (
-                <div className="lp-healths flex flex-col items-center gap-2 mt-4">
+                <div className="flex flex-col w-full">
                   {userHealth.allHealths.map((value: any) => {
                     const isActive = value.id === userHealthCur?.id;
                     const healthColor = {
@@ -222,28 +206,18 @@ const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
                     return (
                       <div
                         key={value.id}
-                        className={`cursor-pointer relative health-tab ${
-                          isActive && "health-tab-active"
-                        }`}
+                        className="flex items-center gap-1.5 border border-gray-120 bg-dark-110 bg-opacity-90 rounded-full h-6 my-1 text-xs px-2.5 hover:border-primary cursor-pointer"
                         onClick={() => handleHealthClick(value)}
                       >
-                        {isActive && <div className="arrow-left" />}
-                        <StatLabel
-                          title={{ text: tokensName }}
-                          wrapStyle={{
-                            background: "none",
-                            border: "1px solid #202026",
-                            padding: "7px 8px",
-                          }}
-                          titleWrapClass="w-[158px] rounded-[4px] md:rounded-[4px]"
-                          titleClass="w-[118px] truncate"
-                          row={[
-                            {
-                              value: `${value?.healthFactor}%`,
-                              valueClass: `${healthColor[value.healthStatus]}`,
-                            },
-                          ]}
+                        <span
+                          className={`w-[6px] h-[6px] rounded-full ${
+                            isActive ? "bg-primary" : "bg-dark-110"
+                          }`}
                         />
+                        <span className="text-gray-170">{tokensName}</span>
+                        <span className={healthColor[value.healthStatus]}>
+                          {value?.healthFactor}%
+                        </span>
                       </div>
                     );
                   })}
@@ -252,6 +226,11 @@ const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
             </div>
           </div>
         </div>
+        {memeCategory ? (
+          <MemeAssetsIcon className="absolute bottom-0 right-0" />
+        ) : (
+          <MainAssetsIcon className="absolute bottom-0 right-0" />
+        )}
       </ContentBox>
 
       <ModalHistoryInfo
@@ -322,18 +301,6 @@ const HealthFactor = ({ userHealth }) => {
         </div>
       </div>
     </SemiCircleProgressBar>
-  );
-};
-
-const ClaimButton = (props) => {
-  const { loading, disabled } = props;
-  return (
-    <div
-      {...props}
-      className="flex items-center justify-center bg-primary rounded-md cursor-pointer text-sm font-bold text-dark-200 hover:opacity-80 w-full h-8 mt-1.5 "
-    >
-      {loading ? <BeatLoader size={5} color="#16161B" /> : <>Claim</>}
-    </div>
   );
 };
 

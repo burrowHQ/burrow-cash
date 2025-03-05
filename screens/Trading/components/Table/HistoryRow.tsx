@@ -100,9 +100,7 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
         )}
       </td>
       <td
-        className={`ml-1 ${
-          record.pnl > 0 ? "text-green-150" : record.pnl < 0 ? "text-red-150" : ""
-        }`}
+        className={`ml-1 ${record.pnl > 0 ? "text-primary" : record.pnl < 0 ? "text-danger" : ""}`}
       >
         {record.pnl > 0 ? "+" : record.pnl < 0 ? "-" : ""}
         {record.pnl !== "0"
@@ -273,10 +271,10 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
           <p>{record.close_type}</p>
         </div>
         <div className="bg-dark-100 rounded-2xl flex items-center justify-center text-xs py-1 text-gray-300 mb-4">
-          PNL
+          PnL
           <p
             className={`ml-1 ${
-              record.pnl > 0 ? "text-green-150" : record.pnl < 0 ? "text-red-150" : ""
+              record.pnl > 0 ? "text-primary" : record.pnl < 0 ? "text-danger" : ""
             }`}
           >
             {record.pnl > 0 ? "+" : record.pnl < 0 ? "-" : ""}

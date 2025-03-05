@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Tooltip } from "react-tooltip";
 import { styled } from "styled-components";
-import { QuestionIcon, WarnIcon } from "./svg";
+import { WarnIcon } from "./svg";
+import { QuestionIcon } from "../Icons/Icons";
 import HtmlTooltip from "../common/html-tooltip";
 
 type ITipType = "warn" | "question" | undefined;

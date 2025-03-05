@@ -130,7 +130,7 @@ const PositionRow = ({
     entryPrice,
   };
   return !isMobile ? (
-    <tr className="text-base hover:bg-dark-100 font-normal align-text-top">
+    <tr className="text-base hover:bg-gray-500 font-normal align-text-top">
       <td className="py-5 pl-5">
         <div className="-mb-1.5">{marketTitle}</div>
         <span
@@ -184,16 +184,9 @@ const PositionRow = ({
       </td>
       <td>{beautifyPrice(LiqPrice)}</td>
       <td>
-        <p className={`${pnl > 0 ? "text-green-150" : pnl < 0 ? "text-red-150" : "text-gray-400"}`}>
+        <p className={`${pnl > 0 ? "text-primary" : pnl < 0 ? "text-danger" : "text-primary"}`}>
           {pnl === 0 ? "" : `${pnl > 0 ? `+$` : `-$`}`}
           {beautifyPrice(Math.abs(pnl), false, 3, 3)}
-          {/* <span className="text-gray-400 text-xs ml-0.5">
-            {amplitude !== null && amplitude !== 0
-              ? `(${amplitude > 0 ? `+` : `-`}${toInternationalCurrencySystem_number(
-                  Math.abs(amplitude),
-                )}%)`
-              : ``}
-          </span> */}
         </p>
       </td>
       <td>
@@ -312,10 +305,10 @@ const PositionRow = ({
           <p>{new Date(openTime).toLocaleString()}</p>
         </div>
         <div className="bg-dark-100 rounded-2xl flex items-center justify-center text-xs py-1 text-gray-300 mb-4">
-          PNL{" "}
+          PnL{" "}
           <p
             className={`ml-1 ${
-              pnl > 0 ? "text-green-150" : pnl < 0 ? "text-red-150" : "text-gray-400"
+              pnl > 0 ? "text-primary" : pnl < 0 ? "text-danger" : "text-gray-400"
             }`}
           >
             {pnl === 0 ? "" : `${pnl > 0 ? `+$` : `-$`}`}

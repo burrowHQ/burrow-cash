@@ -118,7 +118,7 @@ export const RepayTab = ({ asset }) => {
   return (
     <div className="mb-[20px]">
       {isRepay && degenMode.enabled && (
-        <div className="flex items-center justify-between border border-dark-500 rounded-md bg-dark-600 h-12 mt-5 p-1.5">
+        <div className="flex items-center justify-between border border-dark-50 rounded-md bg-dark-600 h-12 mt-5 p-1.5">
           <span
             onClick={() => setRepayFromDeposits(false)}
             className={`flex items-center justify-center flex-grow w-1 h-full text-sm rounded-md cursor-pointer ${
@@ -255,7 +255,7 @@ const Switch = ({ onChange, checked, disabled }) => {
         onClick={() => {
           onChange(false);
         }}
-        className="flex items-center justify-end w-[36px] h-5 rounded-xl border border-dark-500 bg-primary cursor-pointer p-0.5"
+        className="flex items-center justify-end w-[36px] h-5 rounded-xl border border-dark-50 bg-primary cursor-pointer p-0.5"
       >
         <span className="w-4 h-4 rounded-full bg-linear_gradient_dark shadow-100" />
       </div>
@@ -268,7 +268,7 @@ const Switch = ({ onChange, checked, disabled }) => {
             onChange(true);
           }
         }}
-        className="flex items-center w-[36px] h-5 rounded-xl border border-dark-500 bg-dark-600 cursor-pointer p-0.5"
+        className="flex items-center w-[36px] h-5 rounded-xl border border-dark-50 bg-dark-600 cursor-pointer p-0.5"
       >
         <span className="w-4 h-4 rounded-full bg-gray-300 shadow-100" />
       </div>

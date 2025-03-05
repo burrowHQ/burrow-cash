@@ -105,7 +105,7 @@ export const Stat = ({
                   key={`${firstData.text}${i}`}
                 >
                   <div
-                    className="flex md:items-center gap-2 h6 rounded md:rounded-[21px] bg-dark-100 truncate"
+                    className="flex md:items-center gap-2 h6 rounded md:rounded-[21px] bg-white bg-opacity-10 truncate"
                     style={{ padding: "3px 6px 5px" }}
                   >
                     <div style={firstData.textStyle} className="h6 text-gray-300">

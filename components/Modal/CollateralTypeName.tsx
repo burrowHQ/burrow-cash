@@ -20,7 +20,7 @@ export default function CollateralTypeName({ children }) {
         isMeme ? (
           ""
         ) : (
-          <div className="flex items-start gap-1 text-sm text-gray-1200 w-40">
+          <div className="flex items-start gap-1 text-sm text-white text-opacity-70 w-40">
             <Star className="relative top-1 flex-shrink-0" />
             <span>Try different collateral positions.</span>
           </div>

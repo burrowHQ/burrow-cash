@@ -31,7 +31,6 @@ export function CollateralTypeSelectorBorrow({
         acc + (cur.metadata?.symbol || "") + (index !== asset.tokens.length - 1 ? "-" : ""),
       "",
     );
-    // return `LP token (${symbols})`;
     return symbols;
   }
   return (
@@ -55,13 +54,12 @@ export function CollateralTypeSelectorBorrow({
               {getName(selectedCollateralType)}
             </span>
           </CollateralTypeName>
-          {/* TODO open after has lp asset */}
           <ArrowDownIcon className={`ml-1.5 ${show ? " transform rotate-180" : ""}`} />
         </div>
       </div>
       {/* list */}
       <div
-        className={`absolute border border-dark-500 rounded-md py-3.5 bg-dark-250 w-full z-50 top-8 ${
+        className={`absolute border border-dark-50 rounded-md py-3.5 bg-dark-250 w-full z-50 top-8 ${
           show ? "" : "hidden"
         }`}
       >
@@ -78,7 +76,7 @@ export function CollateralTypeSelectorBorrow({
                 setSelectedCollateralType(position);
                 setShow(false);
               }}
-              className="flex items-center justify-between text-sm text-white h-[46px] hover:bg-gray-950 px-3.5 cursor-pointer"
+              className="flex items-center justify-between text-sm text-white h-[46px] hover:bg-white hover:bg-opacity-10 px-3.5 cursor-pointer"
             >
               <div className="flex items-center">
                 <span className="mr-1.5">{getName(position)}</span>
@@ -147,7 +145,7 @@ export function CollateralTypeSelectorRepay({
       </div>
       {/* list */}
       <div
-        className={`absolute border border-dark-500 rounded-md py-3.5 bg-dark-250 w-full z-50 top-8 ${
+        className={`absolute border border-dark-50 rounded-md py-3.5 bg-dark-250 w-full z-50 top-8 ${
           show ? "" : "hidden"
         }`}
       >
@@ -168,7 +166,7 @@ export function CollateralTypeSelectorRepay({
                   setShow(false);
                 }
               }}
-              className={`flex items-center justify-between text-sm text-white h-[46px] hover:bg-gray-950 px-3.5 ${
+              className={`flex items-center justify-between text-sm text-white h-[46px] hover:bg-white hover:bg-opacity-10 px-3.5 ${
                 disabled ? "cursor-not-allowed" : "cursor-pointer"
               }`}
             >

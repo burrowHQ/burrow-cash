@@ -259,7 +259,7 @@ function TimeConponent({ originalData, txLoadingStates, handleTxClick }) {
         </div>
         {tooltipVisible && (
           <div
-            className="absolute right-0 top-6 bg-dark-250 border p-2 shadow-lg z-50 border-dark-500 rounded-lg"
+            className="absolute right-0 top-6 bg-dark-250 border p-2 shadow-lg z-50 border-dark-50 rounded-lg"
             style={{ width: "180px" }}
           >
             <div

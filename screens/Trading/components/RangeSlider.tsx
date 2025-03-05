@@ -74,7 +74,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRang
   };
   const actionShowRedColor = action === "Long";
   return (
-    <div className="mt-5 pb-5 border-b border-dark-700 -mx-4 px-4">
+    <div className="mt-5 pb-5 border-b border-dark-50 -mx-4 px-4">
       <div className="mb-3.5 text-sm text-gray-300">Leverage: {matchValue}X</div>
       <div className="relative flex flex-col z-10">
         <input

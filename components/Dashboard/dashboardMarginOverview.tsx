@@ -208,7 +208,7 @@ export default function DashboardMarginOverview({
         </span>
       </div>
       <div
-        className={`relative grid grid-cols-4 bg-dark-120 rounded-xl border border-dark-50 px-[30px] py-6 mt-4 ${
+        className={`relative grid grid-cols-4 bg-dark-110 rounded-xl border border-dark-50 px-[30px] py-6 mt-4 ${
           styleType == "simple" ? "" : "hover:border-primary"
         }`}
       >
@@ -218,7 +218,7 @@ export default function DashboardMarginOverview({
           value={beautifyPrice(totalShortSizeValue, true)}
         />
         <StatsRegular title="Collateral" value={COLLATERAL_REACT_ELEMENT} />
-        <StatsRegular title="PNL" value={PNL_REACT_ELEMENT} />
+        <StatsRegular title="PnL" value={PNL_REACT_ELEMENT} />
         <MarginAssetsIcon className="absolute bottom-0 right-0" />
       </div>
     </div>

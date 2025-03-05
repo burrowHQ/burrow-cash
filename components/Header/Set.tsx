@@ -65,7 +65,7 @@ function SliderButton({ active, ...rest }: { active: boolean; onClick: any }) {
   return (
     <div
       {...rest}
-      className={`flex items-center h-5 w-9 rounded-xl p-0.5 cursor-pointer border border-dark-500 transition-all ${
+      className={`flex items-center h-5 w-9 rounded-xl p-0.5 cursor-pointer border border-dark-50 transition-all ${
         active ? "bg-primary" : "bg-dark-600"
       }`}
     >

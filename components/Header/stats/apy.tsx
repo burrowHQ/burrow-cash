@@ -116,7 +116,7 @@ const IncentiveAPY = () => {
           setShowTooltip(!showTooltip);
         }}
       >
-        <div className="w-[22px] h-[22px] rounded-3xl bg-dark-100 flex items-center justify-center z-50 cursor-pointer">
+        <div className="w-[22px] h-[22px] rounded-3xl bg-white bg-opacity-10 flex items-center justify-center z-50 cursor-pointer">
           <GiftIcon />
         </div>
       </span>

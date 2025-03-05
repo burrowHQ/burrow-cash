@@ -158,7 +158,7 @@ const TradingToken: React.FC<TradingTokenInter> = ({
       {/* token list */}
       {showModal && type === "cate2" && (
         <div
-          className="absolute top-10 right-0 py-1.5 bg-dark-250 border border-dark-500 rounded-md z-80 w-52"
+          className="absolute top-10 right-0 py-1.5 bg-dark-250 border border-dark-50 rounded-md z-80 w-52"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >

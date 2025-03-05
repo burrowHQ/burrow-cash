@@ -244,7 +244,7 @@ const Trading = () => {
                         <div
                           onMouseEnter={() => handleMouseEnter("2")}
                           onMouseLeave={() => handleMouseLeave("2")}
-                          className="bg-dark-250 border border-dark-500 rounded-sm absolute z-10 top-8 left-0 right-0 pt-0.5 text-gray-300 text-xs pb-1.5"
+                          className="bg-dark-250 border border-dark-50 rounded-sm absolute z-10 top-8 left-0 right-0 pt-0.5 text-gray-300 text-xs pb-1.5"
                         >
                           {(isMainStream ? categoryAssets2 : categoryAssets2MEME).map(
                             (item, index) => (
@@ -325,7 +325,7 @@ const Trading = () => {
                             <div
                               onMouseEnter={() => handleMouseEnter("2")}
                               onMouseLeave={() => handleMouseLeave("2")}
-                              className="bg-dark-250 border border-dark-500 rounded-sm absolute z-10 top-6 left-0 right-0 pt-0.5 text-gray-300 text-xs pb-1.5"
+                              className="bg-dark-250 border border-dark-50 rounded-sm absolute z-10 top-6 left-0 right-0 pt-0.5 text-gray-300 text-xs pb-1.5"
                             >
                               {(isMainStream ? categoryAssets2 : categoryAssets2MEME).map(
                                 (item, index) => (

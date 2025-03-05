@@ -1,11 +1,10 @@
 import Decimal from "decimal.js";
 import { createContext, useContext } from "react";
-import Image from "next/image";
 import { toInternationalCurrencySystem_usd, formatWithCommas_usd } from "../../utils/uiNumber";
 import { useProtocolNetLiquidity } from "../../hooks/useNetLiquidity";
 import { useRewards } from "../../hooks/useRewards";
 import { isMobileDevice } from "../../helpers/helpers";
-import { MarketBg } from "./svg";
+import { MarketBg, MarketTextIcon } from "./svg";
 
 const MarketOverviewData = createContext(null) as any;
 function MarketsOverview() {
@@ -56,7 +55,7 @@ function MarketsOverviewPc() {
       <MarketBg className="absolute w-full h-full" />
       {/* content */}
       <div className="flex items-center pl-7 pr-5 z-10 w-full">
-        <span className="text-[26px] text-primary col-span-2 mr-20 xl:mr-40">Markets</span>
+        <MarketTextIcon className="mr-20" />
         <div className="grid grid-cols-4 items-center justify-items-center flex-grow">
           <div className="flex flex-col items-center col-span-1">
             <span className="text-sm text-gray-300">Total Supplied</span>

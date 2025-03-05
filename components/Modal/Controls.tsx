@@ -64,7 +64,7 @@ export default function Controls({ amount, available, action, asset, totalAvaila
         </span>
       </div>
       {/* input field */}
-      <div className="flex items-center justify-between border border-dark-500 rounded-md bg-dark-600 h-[55px] p-3.5 pr-2 gap-3">
+      <div className="flex items-center justify-between border border-dark-50 rounded-md bg-dark-600 h-[55px] p-3.5 pr-2 gap-3">
         <div className="flex items-center flex-grow">
           <input
             type="number"
