@@ -14,6 +14,7 @@ import { RefreshIcon } from "./svg";
 import { DiscordIcon, MediumIcon, TwitterIcon } from "../Footer/svg";
 import { LinksWrapper } from "../Footer/style";
 import { isMobileDevice } from "../../helpers/helpers";
+import { RheaLogo } from "../Icons/IconsV2";
 
 const MenuItem = ({ item }: { item: Imenu }) => {
   const { title, link, allLinks } = item;
@@ -192,7 +193,7 @@ const Header = () => {
               window.open("https://www.rhea.finance");
             }}
           >
-            <img src="/rheaLogo.png" width={80} height={30} alt="" className="cursor-pointer" />
+            <RheaLogo />
           </Logo>
           <Box className="flex items-center">
             <WalletButton />

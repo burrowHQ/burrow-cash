@@ -29,7 +29,7 @@ const CustomTableMobile = ({ data, columns, noDataText, isLoading }) => {
         );
       });
       return (
-        <div className="border-b border-gray-700 py-4 h4b" key={i}>
+        <div className=" py-4 h4b" key={i}>
           {colNode}
         </div>
       );

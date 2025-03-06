@@ -296,7 +296,7 @@ const TradingTable = ({
       {/* pc */}
       <div className="w-full border border-dark-50 bg-dark-110 rounded-md  xsm:hidden">
         {/* title */}
-        <div className="w-full border-b border-dark-50 flex justify-between items-center">
+        <div className="w-full  flex justify-between items-center">
           <div className="flex">
             <Tab
               tabName="Positions"
@@ -575,10 +575,10 @@ const TradingTable = ({
         </div>
       </div>
       {/* mobile */}
-      <div className="md:hidden w-[100vw] px-2 pb-[160px]">
+      <div className="md:hidden w-[100vw] px-4 pb-[160px]">
         {/* title */}
         <div className="grid grid-cols-2 bg-gray-800 rounded-md h-[42px] text-white text-base items-center justify-items-stretch mt-6 mb-6">
-          <div className="relative flex items-center justify-center border-r border-dark-1000">
+          <div className="relative flex items-center justify-center border-r border-dark-50">
             <span
               onClick={() => {
                 setSelectedMobileTab("positions");
@@ -777,7 +777,7 @@ const TradingTable = ({
         </div>
         {!filterTitle && filteredAccountSupplied.length > 0 && (
           <div
-            className="fixed rounded-t-xl bottom-0 left-0 right-0 z-50 bg-gray-1300 pt-[18px] px-[32px] pb-[52px] w-full"
+            className="fixed rounded-t-xl bottom-0 left-0 right-0 z-50 bg-gray-800 pt-[18px] px-[32px] pb-[52px] w-full"
             style={{
               boxShadow:
                 "0px -5px 12px 0px #0000001A, 0px -21px 21px 0px #00000017, 0px -47px 28px 0px #0000000D, 0px -84px 33px 0px #00000003, 0px -131px 37px 0px #00000000",
@@ -795,7 +795,7 @@ const TradingTable = ({
             {isAccountDetailsOpen && (
               <div className="h-[50vh] overflow-y-auto -ml-[32px] -mr-[32px]">
                 <table className="w-full text-left">
-                  <thead className="border-b border-gray-1350">
+                  <thead className="border-b border-dark-50">
                     <tr className="text-gray-300 text-sm font-normal">
                       <th className="pb-[14px] pl-[30px]">Token</th>
                       <th className="pb-[14px]">Balance</th>
@@ -834,19 +834,13 @@ const TradingTable = ({
               </div>
             )}
             <div
-              className="w-full bg-primary bg-opacity-5 text-primary h-[36px] rounded-md border border-marginWithdrawAllBtn flex items-center justify-center"
+              className="w-full bg-primary bg-opacity-10 text-primary h-[36px] rounded-md border border-primary flex items-center justify-center"
               onClick={handleWithdrawAllClick}
             >
               {isLoadingWithdraw ? <BeatLoader size={5} color="#C0C4E9" /> : "Withdraw all"}
             </div>
           </div>
         )}
-        {/* {isAccountDetailsOpen && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 overflow-hidden"
-            onClick={handleAccountDetailsClick}
-          />
-        )} */}
       </div>
     </div>
   );

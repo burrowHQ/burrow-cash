@@ -530,7 +530,7 @@ function TableRowMobile({
       <div
         className={`border border-dark-50 bg-dark-110 rounded-xl p-3.5 ${lastRow ? "" : "mb-4"}`}
       >
-        <div className="flex items-center pb-4 border-b border-dark-50 -ml-1 relative">
+        <div className="flex items-center pb-4  -ml-1 relative">
           {getIcons()}
           <div className="flex ml-2">{getSymbols()}</div>
           {is_new ? (

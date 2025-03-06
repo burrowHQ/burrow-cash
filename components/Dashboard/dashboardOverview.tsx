@@ -247,7 +247,7 @@ function DashboardOverviewMobile() {
     <div className="px-4">
       <div className="text-white text-xl mb-4">{memeCategory ? "Meme Position" : "Mainstream"}</div>
       <div
-        className="grid grid-cols-2 gap-5  border border-dark-50 bg-dark-110 rounded-xl p-3.5 mb-4"
+        className="grid grid-cols-2 gap-5  border border-dark-50 bg-dark-110 rounded-xl p-3.5 mb-8"
         onClick={jump}
       >
         <StatsRegular title="Net Liquidity" value={userNetLiquidityValue} tip={NetLiquidityTip} />

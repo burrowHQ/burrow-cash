@@ -60,7 +60,7 @@ const SupplyBorrowListMobile = ({
           active={tabIndex === 0}
           tabIndex={tabIndex}
         />
-        <div className="text-gray-700">|</div>
+        <div className="text-dark-50">|</div>
         <TabItem
           text="Borrowed"
           onClick={() => handleTabChange(1)}
@@ -184,7 +184,7 @@ const SupplyItem = ({ data, memeCategory }: { data: any; memeCategory?: boolean 
     <div>
       <div
         className="flex justify-between border-b"
-        style={{ padding: "16px", borderColor: "#31344C" }}
+        style={{ padding: "16px", borderColor: "#303037" }}
       >
         <div className="flex gap-2 items-center pr-2">
           {iconImg}
@@ -251,7 +251,7 @@ const BorrowItem = ({ data }) => {
     <div>
       <div
         className="flex justify-between border-b"
-        style={{ padding: "16px", borderColor: "#31344C" }}
+        style={{ padding: "16px", borderColor: "#303037" }}
       >
         <div className="flex gap-2 items-center">
           <img src={data?.icon} width={26} height={26} alt="token" className="rounded-full" />

@@ -130,8 +130,8 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
       <td>{record.close_type}</td>
     </tr>
   ) : (
-    <div className="bg-gray-800 rounded-xl mb-4" key={index}>
-      <div className="pt-5 px-4 pb-4 border-b border-dark-50 flex justify-between">
+    <div className="bg-dark-110 rounded-xl mb-4" key={index}>
+      <div className="pt-5 px-4 pb-4  flex justify-between">
         <div className="flex items-center">
           <div className="flex items-center justify-center mr-3.5">
             <img
@@ -270,7 +270,7 @@ const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
           <p className="text-gray-300">Operation</p>
           <p>{record.close_type}</p>
         </div>
-        <div className="bg-dark-100 rounded-2xl flex items-center justify-center text-xs py-1 text-gray-300 mb-4">
+        <div className="bg-white bg-opacity-10 rounded-2xl flex items-center justify-center text-xs py-1 text-gray-300 mb-4">
           PnL
           <p
             className={`ml-1 ${

@@ -70,9 +70,9 @@ const MenuItem = ({ item, isOuterLink, Icon, isLast, onClose }: PropsMenu) => {
   return (
     <div
       onClick={handleUrl}
-      className={`flex items-center justify-between h-[60px] px-6 ${
-        isLast ? "" : "border-b border-dark-50"
-      } ${isSelected ? "bg-white bg-opacity-5" : ""}`}
+      className={`flex items-center justify-between h-[60px] px-6 ${isLast ? "" : ""} ${
+        isSelected ? "bg-white bg-opacity-5" : ""
+      }`}
     >
       <div className="flex items-center gap-2">
         {Icon}
@@ -92,9 +92,7 @@ const BridgeMenuItem = ({ onClose }: { onClose: () => void }) => {
     <div className={`${open ? "bg-white bg-opacity-5" : ""}`}>
       <div
         onClick={handleBridge}
-        className={`flex items-center justify-between h-[60px] px-6 ${
-          open ? "" : "border-b border-dark-50"
-        }`}
+        className={`flex items-center justify-between h-[60px] px-6 ${open ? "" : ""}`}
       >
         <div className="flex items-center gap-2">
           <span className="text-base text-white">Bridge</span>
@@ -131,9 +129,7 @@ const SetMenuItem = () => {
     <div className={`${open ? "bg-white bg-opacity-5" : ""}`}>
       <div
         onClick={handle}
-        className={`flex items-center justify-between h-[60px] px-6 ${
-          open ? "" : "border-b border-dark-50"
-        }`}
+        className={`flex items-center justify-between h-[60px] px-6 ${open ? "" : ""}`}
       >
         <div className="flex items-center gap-2">
           <span className="text-base text-white">Setting</span>
@@ -199,7 +195,7 @@ const BridgeSubMenuItem = ({ title, pathname, subTitle, onClose }: PropsSubMenu)
 
 const CommunityItem = () => {
   return (
-    <div className="flex items-center justify-between h-[60px] px-6 border-b border-dark-50">
+    <div className="flex items-center justify-between h-[60px] px-6 ">
       <div className="flex items-center gap-2">
         <span className="text-base text-white">Community</span>
       </div>

@@ -5,7 +5,7 @@ import Breadcrumb from "../../components/common/breadcrumb";
 const Index = () => {
   return (
     <LayoutBox>
-      <Breadcrumb path="/dashboard" title="Dashboard" />
+      <Breadcrumb path="/dashboard" title="Dashboard" customCss="xsm:ml-4" />
       <MyMarginTrading />
     </LayoutBox>
   );

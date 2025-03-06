@@ -447,7 +447,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
               <div className="flex items-center justify-center">
                 <p className="text-lg mr-2">Change Collateral</p>
                 <div
-                  className={`bg-opacity-10  text-xs py-0.5 pl-2.5 pr-1.5 rounded text-primary ${
+                  className={`bg-opacity-10  text-xs py-0.5 pl-2.5 pr-1.5 rounded ${
                     positionType.class
                   } ${positionType.label === "Long" ? "bg-primary" : "bg-orange"}`}
                 >
@@ -463,7 +463,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                 <CloseIcon onClick={onClose} />
               </div>
             </div>
-            <div className="flex justify-center items-center border-b border-dark-50 -mx-5 -px-5 mt-6 px-5">
+            <div className="flex justify-center items-center  -mx-5 -px-5 mt-6 px-5">
               <div
                 className={`py-2 w-1/2 text-center cursor-pointer text-gray-300 text-lg ${
                   ChangeCollateralTab === "Add" ? "text-primary border-b border-primary" : ""

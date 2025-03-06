@@ -190,13 +190,13 @@ const Trading = () => {
       ) : (
         <>
           {/* back */}
-          <Breadcrumb title="Margin Trading Markets" path="/marginTrading" />
+          <Breadcrumb title="Margin Trading Markets" path="/marginTrading" customCss="xsm:ml-2.5" />
           {/* main */}
           <div className="lg:grid lg:grid-cols-6 lg:mb-4 xsm:flex xsm:flex-col xsm:w-full xsm:box-border xsm:mb-4">
             {/* left charts */}
             <div className="lg:col-span-4 bg-gray-800 border border-dark-50 rounded-md lg:mr-4 xsm:mx-2 xsm:mb-4 xsm:min-h-[488px]">
               {/* for pc */}
-              <div className="flex justify-between items-center border-b border-dark-50 py-6 lg:px-5 h-[100px] xsm:hidden">
+              <div className="flex justify-between items-center  py-6 lg:px-5 h-[100px] xsm:hidden">
                 {/* cate1 */}
                 <div
                   onMouseLeave={() => handleMouseLeave("1")}
@@ -283,7 +283,7 @@ const Trading = () => {
               </div>
 
               {/* for mobile */}
-              <div className="flex flex-col border-b border-dark-50 p-6 lg:hidden">
+              <div className="flex flex-col  p-6 lg:hidden">
                 {/* cate1 */}
                 <div className="cursor-pointer relative mb-[21px]">
                   <div className="flex">
@@ -325,13 +325,13 @@ const Trading = () => {
                             <div
                               onMouseEnter={() => handleMouseEnter("2")}
                               onMouseLeave={() => handleMouseLeave("2")}
-                              className="bg-dark-250 border border-dark-50 rounded-sm absolute z-10 top-6 left-0 right-0 pt-0.5 text-gray-300 text-xs pb-1.5"
+                              className="bg-dark-110 border border-dark-50 rounded-sm absolute z-10 top-6 left-0 right-0 pt-0.5 text-gray-300 text-xs pb-1.5"
                             >
                               {(isMainStream ? categoryAssets2 : categoryAssets2MEME).map(
                                 (item, index) => (
                                   <div
                                     key={index}
-                                    className="py-1 pl-1.5 hover:bg-gray-950"
+                                    className="py-1 pl-1.5 hover:bg-white hover:bg-opacity-5"
                                     onClick={() => handleTokenSelectCate2(item)}
                                   >
                                     {getSymbolById(item.token_id, item.metadata?.symbol)}
@@ -379,7 +379,7 @@ const Trading = () => {
             </div>
           </div>
           {/* for mobile */}
-          <div className="lg:hidden fixed bottom-0 left-0 right-0 w-full h-[116px] rounded-t-[8px] px-[26px] flex flex-col justify-center items-center bg-[#383A56] z-[12]">
+          <div className="lg:hidden fixed bottom-0 left-0 right-0 w-full h-[116px] rounded-t-[8px] px-[26px] flex flex-col justify-center items-center bg-gray-800 z-[12]">
             <div
               className="w-full flex items-center justify-center h-[46px] bg-primary rounded-[6px] text-[#14162B] text-base font-bold"
               onClick={() => {

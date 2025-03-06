@@ -219,8 +219,8 @@ const PositionRow = ({
       </td>
     </tr>
   ) : (
-    <div className="bg-gray-800 rounded-xl mb-4">
-      <div className="pt-5 px-4 pb-4 border-b border-dark-50 flex justify-between">
+    <div className="bg-dark-110 rounded-xl mb-4">
+      <div className="pt-5 px-4 pb-4  flex justify-between">
         <div className="flex items-center">
           <div className="flex items-center justify-center mr-3.5">
             <img
@@ -248,18 +248,17 @@ const PositionRow = ({
             </p>
           </div>
         </div>
-        <div className="text-right">
-          <div className="flex items-center">
-            <p className="mr-2">
-              {" "}
-              {beautifyPrice(size)} {assetLabel}
-            </p>
-            <span className="text-gray-300 text-sm">({beautifyPrice(sizeValue, true, 3, 3)})</span>
-          </div>
-          <p className="text-xs text-gray-300">Size</p>
-        </div>
       </div>
       <div className="p-4">
+        <div className="flex items-center justify-between text-sm mb-[18px]">
+          <p className="text-gray-300">Size</p>
+          <p>
+            {beautifyPrice(size)} {assetLabel}
+            <span className="text-gray-300 text-sm ml-0.5">
+              ({beautifyPrice(sizeValue, true, 3, 3)})
+            </span>
+          </p>
+        </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Net Value</p>
           <p>{beautifyPrice(netValue, true)}</p>
@@ -304,7 +303,7 @@ const PositionRow = ({
           <p className="text-gray-300">Opening time</p>
           <p>{new Date(openTime).toLocaleString()}</p>
         </div>
-        <div className="bg-dark-100 rounded-2xl flex items-center justify-center text-xs py-1 text-gray-300 mb-4">
+        <div className="bg-white bg-opacity-10 rounded-2xl flex items-center justify-center text-xs py-1 text-gray-300 mb-4">
           PnL{" "}
           <p
             className={`ml-1 ${

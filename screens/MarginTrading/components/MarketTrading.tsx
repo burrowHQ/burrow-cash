@@ -132,29 +132,27 @@ const MarketMarginTrading = () => {
     <div className="flex flex-col items-center justify-center w-full">
       {isMobile ? (
         <>
-          <div className="w-full border-b border-dark-50 px-4">
-            <div className="flex justify-between">
-              <div className="flex flex-1 justify-center xsm:justify-start xsm:mb-[30px]">
+          <div className="w-full px-4">
+            <div className="grid  grid-cols-2 gap-5 mx-auto border border-dark-50 bg-dark-110 p-4 rounded-2xl">
+              <div className="flex flex-1 justify-center xsm:justify-start">
                 <div>
                   <p className="text-gray-300 text-sm">Total Volume</p>
                   <h2 className="text-h2">${beautifyPrice(volumeStats.totalVolume)}</h2>
                 </div>
               </div>
-              <div className="flex flex-1 justify-center xsm:justify-start xsm:mb-[30px]">
+              <div className="flex flex-1 justify-center xsm:justify-start">
                 <div>
                   <p className="text-gray-300 text-sm">24H Volume</p>
                   <h2 className="text-h2">${beautifyPrice(volumeStats.volume24h)}</h2>
                 </div>
               </div>
-            </div>
-            <div className="flex justify-between">
-              <div className="flex flex-1 justify-center xsm:justify-start xsm:mb-[30px]">
+              <div className="flex flex-1 justify-center xsm:justify-start">
                 <div>
                   <p className="text-gray-300 text-sm">Long Open Interest</p>
                   <h2 className="text-h2">${beautifyPrice(totalLongUSD)}</h2>
                 </div>
               </div>
-              <div className="flex flex-1 justify-center xsm:justify-start xsm:mb-[30px]">
+              <div className="flex flex-1 justify-center xsm:justify-start">
                 <div>
                   <p className="text-gray-300 text-sm">Short Open Interest</p>
                   <h2 className="text-h2">${beautifyPrice(totalShortUSD)}</h2>
@@ -506,8 +504,8 @@ function TableBodyMobile({
         const formattedMarginBalance = shrinkToken(item.margin_debt.balance, assetDecimals);
         return (
           <Link href={`/trading/${item.token_id}`} key={item.token_id}>
-            <div className="mb-4 bg-gray-800 rounded-xl w-full">
-              <div className="flex items-center justify-between pt-6 pb-4 px-4 border-b border-dark-50 relative">
+            <div className="mb-4 bg-dark-110 rounded-xl w-full">
+              <div className="flex items-center justify-between pt-6 pb-4 px-4  relative">
                 <div className="flex items-center">
                   {item.token_id == nearTokenId ? (
                     <NearIcon />

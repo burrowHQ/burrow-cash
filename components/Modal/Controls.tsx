@@ -79,7 +79,7 @@ export default function Controls({ amount, available, action, asset, totalAvaila
       </div>
       {/* Slider */}
       <RangeSlider value={sliderValue} onChange={handleSliderChange} action={action} />
-      <div className="h-[1px] bg-dark-700 -mx-[20px] mt-14" />
+      <div className="h-[1px] bg-dark-50 -mx-[20px] mt-14" />
     </div>
   );
 }

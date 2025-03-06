@@ -294,7 +294,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
                 <CloseIcon onClick={onClose} />
               </div>
             </div>
-            <div className="pt-10 pb-8 flex items-center justify-around  border-b border-dark-50 -mx-5 px-5 mb-5">
+            <div className="pt-10 pb-8 flex items-center justify-around   -mx-5 px-5 mb-5">
               <div className="text-center leading-3">
                 <p className="text-lg">
                   {positionType.label === "Long"

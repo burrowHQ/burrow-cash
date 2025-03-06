@@ -115,7 +115,7 @@ const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
   return (
     <>
       <div className="flex gap-2 justify-between items-center mb-4 lg3:hidden">
-        <div className="h2">Dashboard</div>
+        <div className="h2">{memeCategory ? "Meme Position" : "Mainstream"}</div>
         <div className="flex gap-2">
           {liquidationButton}
           {recordsButton}

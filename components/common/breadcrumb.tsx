@@ -1,11 +1,20 @@
+import { twMerge } from "tailwind-merge";
 import { useRouter } from "next/router";
 import { ArrowLeft } from "../Icons/IconsV2";
 
-export default function Breadcrumb({ path, title }: { path: string; title: string }) {
+export default function Breadcrumb({
+  path,
+  title,
+  customCss,
+}: {
+  path: string;
+  title: string;
+  customCss?: string;
+}) {
   const router = useRouter();
   return (
     <div
-      className="inline-flex items-center cursor-pointer mb-4"
+      className={twMerge("inline-flex items-center cursor-pointer mb-4", customCss || "")}
       onClick={() => {
         router.push(path);
       }}

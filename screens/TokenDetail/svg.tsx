@@ -603,7 +603,7 @@ export function MarginAccountDetailIcon(props) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <path d="M1 1L6 5L11 1" stroke="#C0C4E9" strokeWidth="1.58" strokeLinecap="round" />
+      <path d="M1 1L6 5L11 1" stroke="#8A8A8D" strokeWidth="1.58" strokeLinecap="round" />
     </svg>
   );
 }

@@ -373,7 +373,7 @@ function DetailMobile({ tokenDetails, handlePeriodClick }) {
         </div>
         {/* Tab */}
         <div className="grid grid-cols-2 bg-gray-800 rounded-xl h-[42px] text-white text-base items-center justify-items-stretch mt-6 mb-6">
-          <div className="relative flex items-center justify-center border-r border-dark-1000">
+          <div className="relative flex items-center justify-center border-r border-dark-50">
             <span
               onClick={() => {
                 switchTab("market");
@@ -1147,7 +1147,7 @@ function YouSupplied() {
     <div className=" relative overflow-hidden">
       {is_empty ? (
         <UserBox className="mb-2.5">
-          <div className="flex items-start justify-between border-b border-dark-50 pb-2.5 -mx-5 px-5">
+          <div className="flex items-start justify-between  pb-2.5 -mx-5 px-5">
             <span className="text-lg text-white font-bold">You Supplied</span>
           </div>
           <div className="flex items-center justify-center py-5">
@@ -1159,7 +1159,7 @@ function YouSupplied() {
         </UserBox>
       ) : (
         <UserBox className="mb-2.5">
-          <div className="flex items-start justify-between border-b border-dark-50 pb-2.5 -mx-5 px-5">
+          <div className="flex items-start justify-between  pb-2.5 -mx-5 px-5">
             <span className="text-lg text-white font-bold">You Supplied</span>
             <div className="flex flex-col items-end">
               <span className="text-lg text-white font-bold">
@@ -1262,7 +1262,7 @@ function YouBorrowed() {
     <div className="relative overflow-hidden">
       {is_empty ? (
         <UserBox className="mb-2.5">
-          <div className="flex items-start justify-between border-b border-dark-50 pb-2.5 -mx-5 px-5">
+          <div className="flex items-start justify-between  pb-2.5 -mx-5 px-5">
             <span className="text-lg text-white font-bold">You Borrowed</span>
           </div>
           <div className="flex items-center justify-center py-5">
@@ -1274,7 +1274,7 @@ function YouBorrowed() {
         </UserBox>
       ) : (
         <UserBox className="mb-2.5">
-          <div className="flex items-start justify-between border-b border-dark-50 pb-2.5 -mx-5 px-5">
+          <div className="flex items-start justify-between  pb-2.5 -mx-5 px-5">
             <span className="text-lg text-white font-bold">You Borrowed</span>
             <div className="flex flex-col items-end">
               <span className="text-lg text-white font-bold">
@@ -1554,7 +1554,7 @@ function LabelOuterLink({
 
 function LabelOuterLinkIcon({ children }) {
   return (
-    <span className="flex items-center justify-center h-[22px] px-2.5  xsm:h-8 rounded-md lg:bg-gray-300 lg:bg-opacity-20 xsm:bg-dark-150 cursor-pointer">
+    <span className="flex items-center justify-center h-[22px] px-2.5  xsm:h-8 rounded-md bg-white bg-opacity-5 cursor-pointer">
       <span className="">{children}</span>
     </span>
   );
