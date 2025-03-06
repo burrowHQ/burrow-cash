@@ -69,7 +69,7 @@ const ModalWithCheckTxBeforeShowToast = ({ show, onClose, txHash }: ShowChangeCo
   return (
     <div>
       {isModalVisible && (
-        <div className="z-50 fixed lg:right-5 bottom-10 lg:w-93 xsm:w-[94vw] xsm:ml-[3vw] bg-dark-100 text-white  border border-gray-1250 rounded-sm">
+        <div className="z-50 fixed lg:right-5 bottom-10 lg:w-93 xsm:w-[94vw] xsm:ml-[3vw] bg-dark-110 text-white  border border-dark-50 rounded-sm">
           <div className="relatvie w-full h-full p-4 flex flex-col justify-between">
             <div
               onClick={hideModal}
@@ -83,7 +83,7 @@ const ModalWithCheckTxBeforeShowToast = ({ show, onClose, txHash }: ShowChangeCo
                 <TransactionSuccessfulIcon />
                 <span className="font-normal text-base ml-2"> Transaction successful</span>
               </div>
-              <div className="text-[#6FA300] text-sm ml-auto flex items-center">
+              <div className="text-primary text-sm ml-auto flex items-center">
                 <span className="mr-1">Filled</span>
                 <FilledIcon />
               </div>

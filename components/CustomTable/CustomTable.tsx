@@ -131,7 +131,7 @@ const CustomTable = ({
     return { text, size: d.size, minSize: d.minSize, maxSize: d.maxSize };
   });
 
-  const headersWidth = headersRef.current.map((d) => d.getBoundingClientRect().width);
+  const headersWidth = headersRef.current.map((d) => d?.getBoundingClientRect()?.width);
   const headerNode = (
     <div className="custom-table-tr custom-table-header-row">
       {headers?.map((d, i) => {
@@ -172,7 +172,7 @@ const CustomTable = ({
           content = d[col.accessorKey];
         }
         const styles: { flex?: string } = {};
-        const colSize = headersWidth[colIndex];
+        const colSize = col.size || headersWidth[colIndex];
         if (colSize) {
           styles.flex = `0 0 ${colSize}px`;
         }

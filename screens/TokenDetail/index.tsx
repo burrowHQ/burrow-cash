@@ -1022,7 +1022,7 @@ function TokenUserInfo() {
             <span className="text-sm text-gray-300">Available to Supply</span>
             <span className="flex items-center">
               <span
-                className="text-toolTipBoxBorderColor text-xs hover:cursor-pointer underline mr-[4px]"
+                className="text-primary text-xs hover:cursor-pointer underline mr-[4px]"
                 onClick={() => {
                   window.open("https://ramp.satos.network/", "_blank");
                 }}

@@ -90,7 +90,10 @@ module.exports = {
         green: {
           50: "#00B4B4",
           100: "#16F195",
-          150: "#6FA300",
+          150: "#00F7A5",
+        },
+        orangeRed: {
+          50: "#FFE3CC",
         },
         dark: {
           50: "#303037",
@@ -148,7 +151,6 @@ module.exports = {
         yellow: {
           50: "#DEF700",
         },
-        toolTipBoxBorderColor: "#00F7A5",
         toolTipBoxBgColor: "rgba(35,37,58,0.8)",
         marginCloseBtn: "rgba(192, 196, 233, 0.4)",
         marginWithdrawAllBtn: "rgba(210, 255, 58, 0.6)",

@@ -90,7 +90,7 @@ const ModalWithFailure = ({
   return (
     <div>
       {isModalVisible && (
-        <div className="z-50 fixed lg:right-5 bottom-10 lg:w-93 xsm:w-[94vw] xsm:ml-[3vw] bg-dark-100 text-white  border border-gray-1250 rounded-sm">
+        <div className="z-50 fixed lg:right-5 bottom-10 lg:w-93 xsm:w-[94vw] xsm:ml-[3vw] bg-dark-110 text-white  border border-dark-50 rounded-sm">
           <div className="relative w-full p-6 flex flex-col gap-3">
             <div
               onClick={hideModal}
@@ -102,18 +102,14 @@ const ModalWithFailure = ({
             <div className="fc">
               <ClosePositionIcon />
               <span className="font-normal text-base ml-2">{title}</span>
-              <div
-                className={`${
-                  type == "Long" ? "text-toolTipBoxBorderColor" : "text-orange"
-                } text-sm ml-auto`}
-              >
+              <div className={`${type == "Long" ? "text-primary" : "text-orange"} text-sm ml-auto`}>
                 Filled
               </div>
             </div>
             <div className="w-full h-1 bg-black">
               <div
                 className={`h-full ${
-                  type == "Long" ? "bg-toolTipBoxBorderColor" : "bg-orange"
+                  type == "Long" ? "bg-primary" : "bg-orange"
                 } transition-all ease-linear`}
                 style={{
                   width: `${progress}%`,

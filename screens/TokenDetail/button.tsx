@@ -13,7 +13,7 @@ export function YellowSolidButton(props: IButtonProps) {
 export function YellowLineButton(props: IButtonProps) {
   return (
     <Button
-      appearanceClass="bg-primary bg-opacity-5 text-primary cursor-pointer border border-primary border-opacity-60"
+      appearanceClass="text-white cursor-pointer border border-white border-opacity-60"
       {...props}
     />
   );
@@ -24,7 +24,7 @@ export function RedSolidButton(props: IButtonProps) {
 export function RedLineButton(props: IButtonProps) {
   return (
     <Button
-      appearanceClass="bg-orange bg-opacity-5 text-orange cursor-pointer border border-orange border-opacity-60"
+      appearanceClass="text-white cursor-pointer border border-white border-opacity-60"
       {...props}
     />
   );

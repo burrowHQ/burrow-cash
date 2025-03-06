@@ -118,12 +118,12 @@ export default function RangeSlider(props: any) {
         {!selectNavValueOnly && (
           <div
             className={`flex items-center justify-center absolute top-5 rounded-lg py-1 ${
-              actionShowRedColor ? "bg-orange" : "bg-primary"
+              actionShowRedColor ? "bg-orangeRed-50" : "bg-primary"
             }`}
             style={{ marginLeft: "-33px", left: "100%", width: "46px" }}
             ref={tipRef}
           >
-            <span className={`text-sm ${actionShowRedColor ? "text-white" : "text-dark-200"} `}>
+            <span className="text-sm text-dark-130">
               <span className="gotham_bold">{toPrecision(value?.toString(), 0)}</span>%
             </span>
           </div>

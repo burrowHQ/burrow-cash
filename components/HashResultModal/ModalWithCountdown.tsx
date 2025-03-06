@@ -20,7 +20,7 @@ interface PositionResultProps {
 export const FilledIcon = () => {
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="10" cy="10" r="10" fill="#6FA300" />
+      <circle cx="10" cy="10" r="10" fill="#00F7A5" />
       <path d="M5 9.21053L8.87097 13L15 7" stroke="#2E304B" strokeWidth="2" />
     </svg>
   );
@@ -88,7 +88,7 @@ const ModalWithCountdown = ({
       className="rounded-sm"
       style={{
         width: `${progress}%`,
-        backgroundColor: type == "Long" ? "#00F7A5" : "#ff6ba9",
+        backgroundColor: type == "Long" ? "#00F7A5" : "#FFE3CC",
         height: "3px",
       }}
     />
@@ -97,7 +97,7 @@ const ModalWithCountdown = ({
   return (
     <div>
       {isModalVisible && (
-        <div className="z-50 fixed lg:right-5 bottom-10 lg:w-93 xsm:w-[94vw] xsm:ml-[3vw] bg-dark-100 text-white  border border-gray-1250 rounded-sm">
+        <div className="z-50 fixed lg:right-5 bottom-10 lg:w-93 xsm:w-[94vw] xsm:ml-[3vw] bg-dark-110 text-white  border border-dark-50 rounded-sm">
           <div className="relatvie w-full h-full p-6 flex flex-col justify-between">
             <div
               onClick={hideModal}
@@ -111,11 +111,12 @@ const ModalWithCountdown = ({
                 <span className="font-normal text-base pr-2">{title}</span>
                 <div
                   className={`text-sm ${
-                    type == "Long" ? "text-toolTipBoxBorderColor" : "text-orange"
+                    type == "Long"
+                      ? "text-primary bg-primary bg-opacity-10"
+                      : "text-orange bg-orange bg-opacity-10"
                   } rounded-sm p-1`}
                   style={{
                     maxWidth: "120px",
-                    backgroundColor: "rgba(210, 255, 58, 0.1)",
                     whiteSpace: "normal",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -124,7 +125,7 @@ const ModalWithCountdown = ({
                   {type} {positionSize.baseTokenSymbol}
                 </div>
               </div>
-              <div className="text-[#6FA300] text-sm ml-auto flex items-center">
+              <div className="text-primary text-sm ml-auto flex items-center">
                 <span className="mr-1">Filled</span>
                 <FilledIcon />
               </div>
