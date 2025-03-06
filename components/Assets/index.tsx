@@ -50,8 +50,8 @@ const assets = {
             gradientUnits="userSpaceOnUse"
             gradientTransform="rotate(90) scale(93 229.5)"
           >
-            <stop stopColor="#FF6BA9" />
-            <stop offset="1" stopColor="#FF6BA9" stopOpacity="0" />
+            <stop stopColor="#FF6947" />
+            <stop offset="1" stopColor="#FF6947" stopOpacity="0" />
           </radialGradient>
         </defs>
       </svg>

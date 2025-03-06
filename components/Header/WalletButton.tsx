@@ -436,7 +436,7 @@ export const ConnectWalletButton = ({
             backgroundColor: "#00F7A5",
             opacity: "0.8",
           },
-          backgroundColor: isShort ? "#FF6BA9" : "#00F7A5",
+          backgroundColor: isShort ? "#FF6947" : "#00F7A5",
         }}
         variant={accountId ? "outlined" : "contained"}
         onClick={onWalletButtonClick}

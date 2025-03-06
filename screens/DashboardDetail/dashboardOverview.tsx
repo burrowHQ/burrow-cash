@@ -16,7 +16,12 @@ import { APY } from "../../components/Header/stats/apy";
 import { ContentBox } from "../../components/ContentBox/ContentBox";
 import { TagToolTip } from "../../components/ToolTip";
 import ClaimRewardsModal from "../../components/Dashboard/claimRewardsModal";
-import { MainAssetsIcon, MemeAssetsIcon } from "../../components/Dashboard/icons";
+import {
+  MainDetailIconPc,
+  MemeDetailIconPc,
+  MainDetailIconMobile,
+  MemeDetailIconMobile,
+} from "../../components/Dashboard/icons";
 import { UnclaimedRewardsTip, HealthFactorTip } from "../../components/Dashboard/stat";
 
 const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
@@ -227,9 +232,15 @@ const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
           </div>
         </div>
         {memeCategory ? (
-          <MemeAssetsIcon className="absolute bottom-0 right-0" />
+          <>
+            <MemeDetailIconPc className="absolute bottom-0 right-0 w-[245px] xsm:hidden" />
+            <MemeDetailIconMobile className="absolute bottom-0 right-0 w-[245px] lg:hidden" />
+          </>
         ) : (
-          <MainAssetsIcon className="absolute bottom-0 right-0" />
+          <>
+            <MainDetailIconPc className="absolute bottom-0 right-0 w-[242px] xsm:hidden" />
+            <MainDetailIconMobile className="absolute bottom-0 right-0 w-[242px] lg:hidden" />
+          </>
         )}
       </ContentBox>
 

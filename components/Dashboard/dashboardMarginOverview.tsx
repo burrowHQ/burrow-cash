@@ -9,7 +9,7 @@ import { shrinkToken } from "../../store/helper";
 import { useAppSelector } from "../../redux/hooks";
 import { getAssets, getAssetsMEME } from "../../redux/assetsSelectors";
 import { beautifyPrice } from "../../utils/beautyNumber";
-import { MarginAssetsIcon } from "./icons";
+import { MarginIconPc, MarginIconMobile } from "./icons";
 import { isMobileDevice } from "../../helpers/helpers";
 
 const DashboardMarginOverviewContext = createContext(null) as any;
@@ -275,7 +275,7 @@ function DashboardMarginOverviewPc() {
         />
         <StatsRegular title="Collateral" value={COLLATERAL_REACT_ELEMENT} />
         <StatsRegular title="PnL" value={PNL_REACT_ELEMENT} />
-        <MarginAssetsIcon className="absolute bottom-0 right-0" />
+        <MarginIconPc className="absolute bottom-0 right-0 w-[152px]" />
       </div>
     </div>
   );
@@ -292,19 +292,25 @@ function DashboardMarginOverviewMobile() {
   return (
     <div className="px-4 w-full">
       <div className="text-white text-xl mb-4">Margin Trading</div>
-      <div
-        className="grid grid-cols-2 gap-5  border border-dark-50 bg-dark-110 rounded-xl p-3.5 mb-8"
-        onClick={() => {
-          if (styleType !== "simple") jump();
-        }}
-      >
-        <StatsRegular title="Long Open Interest" value={beautifyPrice(totalLongSizeValue, true)} />
-        <StatsRegular
-          title="Short Open Interest"
-          value={beautifyPrice(totalShortSizeValue, true)}
-        />
-        <StatsRegular title="Collateral" value={COLLATERAL_REACT_ELEMENT} />
-        <StatsRegular title="PnL" value={PNL_REACT_ELEMENT} />
+      <div className="relative border border-dark-50 bg-dark-110 rounded-xl p-3.5 mb-8 pb-[68px]">
+        <div
+          className="grid grid-cols-2 gap-5 relative z-10"
+          onClick={() => {
+            if (styleType !== "simple") jump();
+          }}
+        >
+          <StatsRegular
+            title="Long Open Interest"
+            value={beautifyPrice(totalLongSizeValue, true)}
+          />
+          <StatsRegular
+            title="Short Open Interest"
+            value={beautifyPrice(totalShortSizeValue, true)}
+          />
+          <StatsRegular title="Collateral" value={COLLATERAL_REACT_ELEMENT} />
+          <StatsRegular title="PnL" value={PNL_REACT_ELEMENT} />
+        </div>
+        <MarginIconMobile className="absolute bottom-0 left-0 right-0 w-full" />
       </div>
     </div>
   );

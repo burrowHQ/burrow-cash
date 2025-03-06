@@ -20,7 +20,7 @@ import ClaimRewardsModal from "./claimRewardsModal";
 import { usePortfolioAssets } from "../../hooks/hooks";
 import { ThreeDotIcon } from "../Icons/IconsV2";
 import { TagToolTip } from "../ToolTip";
-import { MainAssetsIcon, MemeAssetsIcon } from "./icons";
+import { MainListIconPc, MemeListIconPc, MemeListIconMobile, MainListIconMobile } from "./icons";
 import { isMobileDevice } from "../../helpers/helpers";
 
 const ICONLENGTH = 4;
@@ -146,9 +146,9 @@ function DashboardOverviewPc() {
         <StatsRegular title="Daily Rewards" value={dailyRewards} tip={DailyRewardsTip} />
         <StatsRegular title="Unclaimed Rewards" value={rewards} tip={UnclaimedRewardsTip} />
         {memeCategory ? (
-          <MemeAssetsIcon className="absolute bottom-0 right-0" />
+          <MemeListIconPc className="absolute bottom-0 right-0 w-[152px]" />
         ) : (
-          <MainAssetsIcon className="absolute bottom-0 right-0" />
+          <MainListIconPc className="absolute bottom-0 right-0 w-[152px]" />
         )}
       </div>
       <div className="flex items-center gap-2 mt-3">
@@ -246,14 +246,18 @@ function DashboardOverviewMobile() {
   return (
     <div className="px-4">
       <div className="text-white text-xl mb-4">{memeCategory ? "Meme Position" : "Mainstream"}</div>
-      <div
-        className="grid grid-cols-2 gap-5  border border-dark-50 bg-dark-110 rounded-xl p-3.5 mb-8"
-        onClick={jump}
-      >
-        <StatsRegular title="Net Liquidity" value={userNetLiquidityValue} tip={NetLiquidityTip} />
-        <StatsRegular title="Net APY" value={amountMain} tip={NetAPYTip} />
-        <StatsRegular title="Daily Rewards" value={dailyRewards} tip={DailyRewardsTip} />
-        <StatsRegular title="Unclaimed Rewards" value={rewards} tip={UnclaimedRewardsTip} />
+      <div className="relative border border-dark-50 bg-dark-110 rounded-xl p-3.5 mb-8 pb-[55px]">
+        <div className="relative grid grid-cols-2 gap-5 z-10" onClick={jump}>
+          <StatsRegular title="Net Liquidity" value={userNetLiquidityValue} tip={NetLiquidityTip} />
+          <StatsRegular title="Net APY" value={amountMain} tip={NetAPYTip} />
+          <StatsRegular title="Daily Rewards" value={dailyRewards} tip={DailyRewardsTip} />
+          <StatsRegular title="Unclaimed Rewards" value={rewards} tip={UnclaimedRewardsTip} />
+        </div>
+        {memeCategory ? (
+          <MemeListIconMobile className="absolute bottom-0 left-0 right-0 w-full" />
+        ) : (
+          <MainListIconMobile className="absolute bottom-0 left-0 right-0 w-full" />
+        )}
       </div>
       <ClaimRewardsModal rewardsObj={rewardsObj} isOpen={isModalOpen} closeModal={closeModal} />
     </div>
