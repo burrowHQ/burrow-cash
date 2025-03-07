@@ -716,7 +716,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                 isMemeCategory={!isMainStream}
               />
             </div>
-            <p className="text-gray-300 mt-2 text-xs">${longInputUsd.toFixed(2)}</p>
+            <p className="text-gray-300 mt-2 text-xs">{beautifyPrice(longInputUsd, true)}</p>
           </div>
           <div className="relative my-2.5 flex justify-end z-0 w-1/2" style={{ zoom: "2" }}>
             <ShrinkArrow />
@@ -732,9 +732,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                 isMemeCategory={!isMainStream}
               />
             </div>
-            <p className="text-gray-300 mt-2 text-xs">
-              ${longOutputUsd && formatNumber(Number(longOutputUsd), 2)}
-            </p>
+            <p className="text-gray-300 mt-2 text-xs">{beautifyPrice(longOutputUsd || 0, true)}</p>
           </div>
           <RangeSlider defaultValue={rangeMount} action="Long" setRangeMount={setRangeMount} />
           <div className="mt-5">
@@ -853,7 +851,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                 isMemeCategory={!isMainStream}
               />
             </div>
-            <p className="text-gray-300 mt-2 text-xs">${shortInputUsd.toFixed(2)}</p>
+            <p className="text-gray-300 mt-2 text-xs">{beautifyPrice(shortInputUsd, true)}</p>
           </div>
           <div className="relative my-2.5 flex justify-end z-0 w-1/2" style={{ zoom: "2" }}>
             <ShrinkArrow />
@@ -869,9 +867,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                 isMemeCategory={!isMainStream}
               />
             </div>
-            <p className="text-gray-300 mt-2 text-xs">
-              ${shortOutputUsd && formatNumber(Number(shortOutputUsd), 2)}
-            </p>
+            <p className="text-gray-300 mt-2 text-xs">{beautifyPrice(shortOutputUsd || 0, true)}</p>
           </div>
           <RangeSlider defaultValue={rangeMount} action="Short" setRangeMount={setRangeMount} />
           <div className="mt-5">

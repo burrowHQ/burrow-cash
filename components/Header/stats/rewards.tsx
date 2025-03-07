@@ -180,7 +180,7 @@ const IncentiveMore = ({
           setShowTooltip(!showTooltip);
         }}
       >
-        <div className="w-[22px] h-[22px] rounded-3xl bg-white bg-opacity-10 flex items-center justify-center z-50 cursor-pointer mr-8">
+        <div className="w-[22px] h-[22px] rounded-3xl bg-white bg-opacity-10 flex items-center justify-center z-50 cursor-pointer">
           <svg
             width="12"
             height="4"
@@ -245,7 +245,7 @@ const IconsDisplay = ({ icons }) => (
         key={item?.asset?.token_id}
         src={item?.asset?.metadata?.icon}
         alt=""
-        className="w-5 h-5 rounded-3xl border-2 border-dark-120"
+        className="w-5 h-5 xsm:w-4 xsm:h-4 rounded-3xl border-2 border-dark-120"
         style={{
           marginLeft: icons.length > 1 && index > 0 ? `-8px` : undefined,
           zIndex: index + 1,
@@ -253,7 +253,7 @@ const IconsDisplay = ({ icons }) => (
       />
     ))}
     {icons.length > 5 && (
-      <div className="w-5 h-5 rounded-3xl border-2 border-dark-120 bg-gray-150 flex items-center justify-center -ml-2.5 z-50">
+      <div className="w-5 h-5 xsm:w-4 xsm:h-4 rounded-3xl border-2 border-dark-120 bg-gray-150 flex items-center justify-center -ml-2.5 z-50">
         <ThreeDotIcon />
       </div>
     )}

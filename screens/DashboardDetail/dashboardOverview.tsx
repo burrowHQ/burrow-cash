@@ -127,7 +127,7 @@ const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
         </div>
       </div>
       <ContentBox className="mb-8 relative">
-        <div className="lg3:flex lg3:justify-between relative z-10 lg:pb-5">
+        <div className="lg3:flex lg3:justify-between relative z-10 pb-10">
           <div className="mb-4 lg3:max-w-[640px] lg3:mb-0">
             <div className="flex gap-2 justify-between lg3:gap-6">
               <div className="gap-6 flex flex-col flex-2">
@@ -145,17 +145,14 @@ const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
                   <div className="items-start lg3:flex-row lg3:items-center lg3:gap-4">
                     <div className="flex items-center gap-4 my-1">
                       <div className="h2">{rewardsObj?.data?.totalUnClaimUSDDisplay || "$0"}</div>
-                      <div className="flex" style={{ marginRight: 5 }}>
+                      <div className="flex w-full" style={{ marginRight: 5 }}>
                         {rewardsObj?.data?.array.map(({ data, tokenId }) => {
                           return (
                             <img
                               src={data?.icon}
-                              width={20}
                               key={tokenId}
-                              height={20}
                               alt="token"
-                              className="rounded-full"
-                              style={{ margin: -3 }}
+                              className="rounded-full w-5 h-5 xsm:w-4 xsm:h-4 -ml-1.5"
                             />
                           );
                         })}
@@ -165,7 +162,7 @@ const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
                     {rewardsObj?.data?.totalUnClaimUSD > 0 && (
                       <div className="mt-1 lg3:mt-0">
                         <div
-                          className="flex items-center justify-center bg-primary rounded-md cursor-pointer text-sm font-bold text-dark-200 hover:opacity-80 w-20 h-8 mt-1.5"
+                          className="flex items-center justify-center bg-primary rounded-3xl cursor-pointer text-sm font-bold text-dark-200 hover:opacity-80 w-20 h-8 xsm:h-[26px] mt-1.5"
                           onClick={openModal}
                         >
                           Claim

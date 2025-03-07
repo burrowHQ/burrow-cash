@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import { useState } from "react";
-import BookTokenSvg from "../../public/svg/Group 74.svg";
 import { ContentBox } from "../../components/ContentBox/ContentBox";
 import LayoutContainer from "../../components/LayoutContainer/LayoutContainer";
 import SupplyTokenSvg from "../../public/svg/Group 24791.svg";
@@ -11,7 +10,6 @@ import CustomTable from "../../components/CustomTable/CustomTable";
 import { formatTokenValue, isMobileDevice } from "../../helpers/helpers";
 import assets from "../../components/Assets";
 import DashboardOverview from "./dashboardOverview";
-import { ConnectWalletButton } from "../../components/Header/WalletButton";
 import SupplyBorrowListMobile from "./supplyBorrowListMobile";
 import { AdjustButton, WithdrawButton, RepayButton, MarketButton } from "./supplyBorrowButtons";
 import { hiddenAssets } from "../../utils/config";
@@ -19,6 +17,7 @@ import { APYCell } from "../Market/APYCell";
 import { beautifyPrice } from "../../utils/beautyNumber";
 import { getPageTypeFromUrl } from "../../utils/commonUtils";
 import Breadcrumb from "../../components/common/breadcrumb";
+import UnLoginUi from "../../components/Dashboard/unLoginBox";
 
 const Index = () => {
   const accountId = useAccountId();
@@ -37,23 +36,7 @@ const Index = () => {
       />
     );
   } else {
-    const unLoginUi = (
-      <div className="bg-gray-800 p-4 mb-4 rounded md:bg-transparent md:p-0 md:mb-0 md:flex justify-between items-center">
-        <div>
-          <div className="h3 mb-2">Connect your wallet</div>
-          <div className="mb-4 text-gray-300 h4">
-            Please connect your wallet to see your supplies, borrowings, and open positions.
-          </div>
-          <div className="w-full md-w-auto">
-            <ConnectWalletButton accountId={accountId} />
-          </div>
-        </div>
-        <div className="hidden md:block" style={{ margin: "-20px 0 -40px" }}>
-          <BookTokenSvg />
-        </div>
-      </div>
-    );
-    overviewNode = unLoginUi;
+    overviewNode = <UnLoginUi wraperClass="mb-4" />;
   }
   let supplyBorrowNode;
   if (isMobile) {
