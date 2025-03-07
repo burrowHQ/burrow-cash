@@ -134,29 +134,6 @@ const StyledWrapper = styled.div`
       transform: rotate(11deg);
     }
   }
-
-  @media (max-width: 767px) {
-    //.bar-wrapper,
-    //.bar-container,
-    //.bar {
-    //  width: 160px !important;
-    //  height: 160px !important;
-    //}
-    //
-    //.bar-wrapper,
-    //.bar-container {
-    //  height: 80px !important;
-    //}
-    //
-    //.bar {
-    //  border-width: 6px !important;
-    //}
-    //
-    //.bar-divider {
-    //  top: 21px !important;
-    //  right: 19px !important;
-    //}
-  }
 `;
 
 export default SemiCircleProgressBar;

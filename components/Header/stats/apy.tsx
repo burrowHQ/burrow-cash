@@ -34,7 +34,7 @@ export const APY = ({ memeCategory }: { memeCategory?: boolean }) => {
     [
       {
         type: "component",
-        content: <IncentiveAPY />,
+        content: <IncentiveAPY memeCategory={memeCategory} />,
       },
     ],
   ];
@@ -51,12 +51,12 @@ export const APY = ({ memeCategory }: { memeCategory?: boolean }) => {
     </div>
   );
 };
-const IncentiveAPY = () => {
+const IncentiveAPY = ({ memeCategory }: { memeCategory?: boolean }) => {
   const [showTooltip, setShowTooltip] = useState(false);
-  const userSupplyApy = useAppSelector(getAverageSupplyRewardApy());
-  const userBorrowedApy = useAppSelector(getAverageBorrowedRewardApy());
-  const userNetApy = useAppSelector(getAverageNetRewardApy());
-  const userListTokenNetApy = useAppSelector(getListTokenNetRewardApy());
+  const userSupplyApy = useAppSelector(getAverageSupplyRewardApy(memeCategory));
+  const userBorrowedApy = useAppSelector(getAverageBorrowedRewardApy(memeCategory));
+  const userNetApy = useAppSelector(getAverageNetRewardApy(memeCategory));
+  const userListTokenNetApy = useAppSelector(getListTokenNetRewardApy(memeCategory));
   const empty = !userSupplyApy && !userBorrowedApy && !userNetApy && !userListTokenNetApy.length;
   if (empty) return null;
   return (

@@ -251,7 +251,7 @@ const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
 };
 
 const HealthFactor = ({ userHealth }) => {
-  const { data, healthFactor, lowHealthFactor, dangerHealthFactor } = userHealth || {};
+  const { healthFactor, lowHealthFactor, dangerHealthFactor } = userHealth || {};
   const isDanger = healthFactor !== -1 && healthFactor < dangerHealthFactor;
   const isWarning = healthFactor !== -1 && healthFactor < lowHealthFactor;
   const healthFactorLabel = [-1, null, undefined].includes(healthFactor)
