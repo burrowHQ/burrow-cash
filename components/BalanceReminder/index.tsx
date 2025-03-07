@@ -1,3 +1,4 @@
+import Decimal from "decimal.js";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
@@ -10,6 +11,8 @@ import {
   getMarginAccountSuppliedMEME,
 } from "../../redux/marginAccountSelectors";
 import { useMarginAccount } from "../../hooks/useMarginAccount";
+import { getAllAssetsData } from "../../redux/assetsSelectors";
+import { shrinkToken } from "../../store";
 
 const BalanceReminder = () => {
   const router = useRouter();
@@ -18,6 +21,7 @@ const BalanceReminder = () => {
   const [shouldShow, setShouldShow] = useState(false);
   const accountSupplied = useAppSelector(getMarginAccountSupplied);
   const accountSuppliedMEME = useAppSelector(getMarginAccountSuppliedMEME);
+  const allAssets = useAppSelector(getAllAssetsData);
   const combinedAccountSupplied = [
     ...accountSupplied.map((token) => ({ ...token, type: "main" })),
     ...accountSuppliedMEME.map((token) => ({ ...token, type: "meme" })),
@@ -41,8 +45,13 @@ const BalanceReminder = () => {
           assetDetails && token.balance.toString().length >= assetDetails.config.extra_decimals
         );
       });
-
-    if (accountId && Unreminded && hasValidAccountSupplied) {
+    const userWithdrawableUsd = combinedAccountSupplied?.reduce((acc, cur) => {
+      const asset = allAssets[cur.token_id];
+      const b = shrinkToken(cur.balance, asset.metadata.decimals + asset.config.extra_decimals);
+      const v = new Decimal(b || 0).mul(asset.price?.usd || 0);
+      return acc.plus(v);
+    }, new Decimal(0));
+    if (accountId && Unreminded && hasValidAccountSupplied && userWithdrawableUsd.gte(0.1)) {
       setShouldShow(true);
     } else {
       setShouldShow(false);
