@@ -133,6 +133,7 @@ const MarketMarginTrading = () => {
       {isMobile ? (
         <>
           <div className="w-full px-4">
+            <div className="text-xl text-white mb-4">Margin Trading</div>
             <div className="grid  grid-cols-2 gap-5 mx-auto border border-dark-50 bg-dark-110 p-4 rounded-2xl">
               <div className="flex flex-1 justify-center xsm:justify-start">
                 <div>
@@ -166,6 +167,7 @@ const MarketMarginTrading = () => {
               data={sortedData}
               setTotalLongUSD={setTotalLongUSD}
               setTotalShortUSD={setTotalShortUSD}
+              filteredTokenTypeMap={filteredTokenTypeMap}
             />
           </div>
         </>
@@ -472,10 +474,12 @@ function TableBodyMobile({
   data,
   setTotalLongUSD,
   setTotalShortUSD,
+  filteredTokenTypeMap,
 }: {
   data: Record<string, any>;
   setTotalLongUSD: (value: number) => void;
   setTotalShortUSD: (value: number) => void;
+  filteredTokenTypeMap: TokenTypeMap;
 }) {
   // console.log(data);
   const { NATIVE_TOKENS, NEW_TOKENS } = getConfig() as any;
@@ -502,10 +506,11 @@ function TableBodyMobile({
         const assetDecimals = item.metadata.decimals + item.config.extra_decimals;
         const formattedMarginPosition = shrinkToken(item.margin_position, assetDecimals);
         const formattedMarginBalance = shrinkToken(item.margin_debt.balance, assetDecimals);
+        const isMainStream = filteredTokenTypeMap.mainStream.includes(item.token_id);
         return (
           <Link href={`/trading/${item.token_id}`} key={item.token_id}>
             <div className="mb-4 bg-dark-110 rounded-xl w-full">
-              <div className="flex items-center justify-between pt-6 pb-4 px-4  relative">
+              <div className="flex items-center justify-between pt-6 pb-4 px-4 relative border-b border-dark-50">
                 <div className="flex items-center">
                   {item.token_id == nearTokenId ? (
                     <NearIcon />
@@ -516,8 +521,8 @@ function TableBodyMobile({
                       style={{ width: "26px", height: "26px", borderRadius: "50%" }}
                     />
                   )}
-                  <div className="flex flex-col items-start ml-2">
-                    <div className="flex items-center flex-wrap text-sm">
+                  <div className="flex flex-col gap-0.5 items-start ml-2">
+                    <div className="flex items-center flex-wrap text-sm gap-1">
                       {getSymbolById(item.token_id, item.metadata?.symbol)}
                       {is_native ? (
                         <span
@@ -527,6 +532,7 @@ function TableBodyMobile({
                           Native
                         </span>
                       ) : null}
+                      {!isMainStream && <MemeTagIcon />}
                     </div>
                     <span className="text-xs text-gray-300">
                       {beautifyPrice(item.price?.usd, true)}
@@ -540,20 +546,15 @@ function TableBodyMobile({
                     />
                   ) : null}
                 </div>
-                <div className="flex flex-col items-end ml-2">
-                  <div className="flex items-center flex-wrap text-sm">
-                    ${beautifyPrice(item.totalVolume)}
-                  </div>
-                  <span className="text-xs text-gray-300">Total Valume</span>
-                </div>
               </div>
-              <div className="px-4 py-6">
+              <div className="px-4 pt-4 pb-2">
+                <div className="flex items-center justify-between mb-4 text-sm">
+                  <p className="text-gray-300 h4">Total Volume</p>
+                  <p>${beautifyPrice(item.totalVolume)}</p>
+                </div>
                 <div className="flex items-center justify-between mb-4 text-sm">
                   <p className="text-gray-300 h4">24H Volume</p>
-                  <p>
-                    ${beautifyPrice(item.volume24h)}
-                    {/* <span className="text-xs text-gray-300">(-)</span> */}
-                  </p>
+                  <p>${beautifyPrice(item.volume24h)}</p>
                 </div>
                 <div className="flex items-center justify-between mb-4 text-sm">
                   <p className="text-gray-300 h4">Long Position</p>
@@ -582,14 +583,6 @@ function TableBodyMobile({
                       )
                     </span>
                   </p>
-                </div>
-                <div className="flex">
-                  <div className="flex-1 bg-primary rounded-md text-base h-[36px] mr-2 text-dark-200 flex items-center justify-center">
-                    Long
-                  </div>
-                  <div className="flex-1 bg-orange rounded-md text-base h-[36px] flex items-center justify-center">
-                    Short
-                  </div>
                 </div>
               </div>
             </div>

@@ -40,7 +40,6 @@ const TradingTable = ({
   };
 }) => {
   const { query } = useRouterQuery();
-  const { filterMarginConfigList } = useMarginConfigToken();
   const storeSelectedTab = useAppSelector((state) => state.tab.selectedTab);
   const isMobile = isMobileDevice();
   const dispatch = useAppDispatch();

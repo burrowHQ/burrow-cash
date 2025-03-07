@@ -198,10 +198,10 @@ function TableBody({ rows, sorting, isMeme }: TableProps) {
       }
     }
     if (order === "desc") {
-      if (incentiveTokens.includes(a.tokenId)) {
+      if (incentiveTokens.includes(a.tokenId) && !isMeme) {
         a_comparator_value = 99999999999999;
       }
-      if (incentiveTokens.includes(b.tokenId)) {
+      if (incentiveTokens.includes(b.tokenId) && !isMeme) {
         b_comparator_value = 99999999999999;
       }
       if (topTokens.includes(a.tokenId)) {
@@ -212,10 +212,10 @@ function TableBody({ rows, sorting, isMeme }: TableProps) {
       }
       return a_comparator_value - b_comparator_value;
     } else {
-      if (incentiveTokens.includes(a.tokenId)) {
+      if (incentiveTokens.includes(a.tokenId) && !isMeme) {
         a_comparator_value = -999999999999999;
       }
-      if (incentiveTokens.includes(b.tokenId)) {
+      if (incentiveTokens.includes(b.tokenId) && !isMeme) {
         b_comparator_value = -999999999999999;
       }
       if (topTokens.includes(a.tokenId)) {

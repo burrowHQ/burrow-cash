@@ -8,7 +8,6 @@ import MyMarginTradingPage from "./MyTradingPage";
 
 const MyMarginTrading = () => {
   const accountId = useAccountId();
-  const isMobile = isMobileDevice();
   let overviewNode;
   if (accountId) {
     overviewNode = <MyMarginTradingPage />;

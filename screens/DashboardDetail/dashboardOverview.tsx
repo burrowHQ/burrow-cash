@@ -127,7 +127,7 @@ const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
         </div>
       </div>
       <ContentBox className="mb-8 relative">
-        <div className="lg3:flex lg3:justify-between relative z-10">
+        <div className="lg3:flex lg3:justify-between relative z-10 lg:pb-5">
           <div className="mb-4 lg3:max-w-[640px] lg3:mb-0">
             <div className="flex gap-2 justify-between lg3:gap-6">
               <div className="gap-6 flex flex-col flex-2">

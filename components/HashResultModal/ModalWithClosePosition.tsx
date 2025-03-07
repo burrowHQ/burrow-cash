@@ -109,7 +109,7 @@ const ModalWithFailure = ({
             <div className="w-full h-1 bg-black">
               <div
                 className={`h-full ${
-                  type == "Long" ? "bg-primary" : "bg-orange"
+                  type == "Long" ? "bg-primary" : "bg-orangeRed-50"
                 } transition-all ease-linear`}
                 style={{
                   width: `${progress}%`,

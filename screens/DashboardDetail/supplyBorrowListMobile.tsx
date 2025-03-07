@@ -95,7 +95,7 @@ const TabItem = ({ text, onClick, active, tabIndex }) => {
       <div
         className={twMerge(
           "relative z-20",
-          active && (tabIndex === 1 ? "text-pink-500" : "text-primary"),
+          active && (tabIndex === 1 ? "text-orange" : "text-primary"),
         )}
       >
         {text}
@@ -104,7 +104,7 @@ const TabItem = ({ text, onClick, active, tabIndex }) => {
         <div
           className={twMerge(
             "tab-ball bg-primary shadow-primary",
-            tabIndex === 1 && "bg-pink-500 shadow-pink-500",
+            tabIndex === 1 && "bg-orange shadow-orange",
           )}
         />
       </StyledTabActiveBall>

@@ -2,9 +2,8 @@ import { isMobileDevice } from "../../../../helpers/helpers";
 import { shrinkToken } from "../../../../store/helper";
 import { getSymbolById } from "../../../../transformers/nearSymbolTrans";
 import { beautifyPrice } from "../../../../utils/beautyNumber";
-import { toInternationalCurrencySystem_number } from "../../../../utils/uiNumber";
 
-const HistoryRow = ({ key, index, record, assetP, assetD, assetC }) => {
+const HistoryRow = ({ index, record, assetP, assetD, assetC }) => {
   const isMobile = isMobileDevice();
   return !isMobile ? (
     <tr className="align-text-top">
