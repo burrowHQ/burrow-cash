@@ -1,3 +1,4 @@
+import Decimal from "decimal.js";
 import { isMobileDevice } from "../../../../helpers/helpers";
 import { shrinkToken } from "../../../../store/helper";
 import { getSymbolById } from "../../../../transformers/nearSymbolTrans";
@@ -5,6 +6,9 @@ import { beautifyPrice } from "../../../../utils/beautyNumber";
 
 const HistoryRow = ({ index, record, assetP, assetD, assetC }) => {
   const isMobile = isMobileDevice();
+  const holdingFeeUsd = new Decimal(record.d_token_price || 0).mul(
+    shrinkToken(record.fee, assetD.metadata.decimals + assetD.config.extra_decimals),
+  );
   return !isMobile ? (
     <tr className="align-text-top">
       <td className="py-5 pl-5">
@@ -90,14 +94,7 @@ const HistoryRow = ({ index, record, assetP, assetD, assetC }) => {
           {record.price !== "0" ? <span>{beautifyPrice(Number(record.price))}</span> : "-"}
         </div>
       </td>
-      <td>
-        {beautifyPrice(
-          Number(shrinkToken(record.fee, assetD.metadata.decimals + assetD.config.extra_decimals)),
-          true,
-          3,
-          3,
-        )}
-      </td>
+      <td>{beautifyPrice(holdingFeeUsd.toFixed(), true, 3, 3)}</td>
       <td
         className={`ml-1 ${record.pnl > 0 ? "text-primary" : record.pnl < 0 ? "text-danger" : ""}`}
       >
@@ -244,16 +241,7 @@ const HistoryRow = ({ index, record, assetP, assetD, assetC }) => {
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Fee</p>
-          <p>
-            {beautifyPrice(
-              Number(
-                shrinkToken(record.fee, assetD.metadata.decimals + assetD.config.extra_decimals),
-              ),
-              true,
-              3,
-              3,
-            )}
-          </p>
+          <p>{beautifyPrice(holdingFeeUsd.toFixed(), true, 3, 3)}</p>
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Opening time</p>
