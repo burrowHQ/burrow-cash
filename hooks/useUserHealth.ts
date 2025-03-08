@@ -14,7 +14,7 @@ import { trackShowDailyReturns } from "../utils/telemetry";
 import { useSlimStats } from "./hooks";
 import { useFullDigits } from "./useFullDigits";
 
-export function useUserHealth(memeCategory?) {
+export function useUserHealth(memeCategory?: boolean) {
   const dispatch = useAppDispatch();
   const { showDailyReturns } = useAppSelector(getAppState(memeCategory));
   const netAPY = useAppSelector(getNetAPY({ isStaking: false, memeCategory }));

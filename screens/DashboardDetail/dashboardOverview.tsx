@@ -51,6 +51,8 @@ const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
   useEffect(() => {
     if (userHealth?.allHealths?.length && userHealth?.hasBorrow) {
       handleHealthClick(userHealth.allHealths[0]);
+    } else {
+      setUserHealthCur(null);
     }
   }, [JSON.stringify(userHealth)]);
 
