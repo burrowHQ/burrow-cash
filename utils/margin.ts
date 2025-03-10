@@ -63,20 +63,13 @@ export function get_registered_dexes() {
   return dexMap;
 }
 
+/**
+ *
+ * @param debt_id: d_token_id;
+ * @param pos_id: p_token_id;
+ */
 export function checkIfMeme({ debt_id, pos_id }: { debt_id: string; pos_id: string }) {
   const state = store.getState();
-  // const mainTokens = state.marginConfig?.registered_tokens || {};
-  // const [mainLevel1Ids, mainLevel2Ids] = Object.entries(mainTokens).reduce(
-  //   (acc: string[][], [token_id, level]) => {
-  //     if (+level == 1) {
-  //       return [[...acc[0], token_id], acc[1]];
-  //     } else if (+level == 2) {
-  //       return [acc[0], [...acc[1], token_id]];
-  //     }
-  //     return acc;
-  //   },
-  //   [[], []],
-  // );
   const memeTokens = state.marginConfigMEME?.registered_tokens || {};
   const [memeLevel1Ids, memeLevel2Ids] = Object.entries(memeTokens).reduce(
     (acc: string[][], [token_id, level]) => {

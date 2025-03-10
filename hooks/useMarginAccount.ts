@@ -26,7 +26,6 @@ export function useMarginAccount() {
   const assetsMEME = useAppSelector(getAssetsMEME);
   const marginAccountList = useAppSelector(getMarginAccountPositions);
   const marginAccountListMEME = useAppSelector(getMarginAccountPositionsMEME);
-  const combinedAssetsData = { ...assets.data, ...assetsMEME.data };
   const parseTokenValue = (tokenAmount, decimals) => {
     if (!tokenAmount || !decimals) return 0;
     return Number(shrinkToken(tokenAmount, decimals));

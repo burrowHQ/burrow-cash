@@ -167,7 +167,6 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
   );
   const sizeValueLong = parseTokenValue(rowData.data.token_p_amount, decimalsP);
   const sizeValueShort = parseTokenValue(rowData.data.token_d_info.balance, decimalsD);
-  const size = positionType.label === "Long" ? sizeValueLong : sizeValueShort;
   const sizeValue =
     positionType.label === "Long" ? sizeValueLong * (priceP || 0) : sizeValueShort * (priceD || 0);
   const isMainStream = filteredTokenTypeMap.mainStream.includes(
@@ -303,63 +302,35 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
     }
   };
   const getMaxAvailableAmount = () => {
-    const targetMinLeverage = 1;
     const assetCbalances = shrinkToken(
       account.balances[rowData.data.token_c_info.token_id],
       assetC.metadata.decimals,
     );
-    const rawMaxAmount = Number(balance) / priceC;
-    const getNewLeverageAfterAdd = (addAmount: number) => {
-      const tokenCInfoBalance = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
-      const tokenDInfoBalance = parseTokenValue(rowData.data.token_d_info.balance, decimalsD);
-      const newCollateral = tokenCInfoBalance + addAmount;
-      return calculateLeverage(tokenDInfoBalance, priceD, newCollateral, priceC);
-    };
-    let left = 0;
-    let right = rawMaxAmount;
-    let result = 0;
-    while (left <= right) {
-      const mid = (left + right) / 2;
-      const newLeverage = getNewLeverageAfterAdd(mid);
-      if (newLeverage >= targetMinLeverage) {
-        result = mid;
-        left = mid + 0.0001;
-      } else {
-        right = mid - 0.0001;
-      }
-    }
-    const maxAmount = Math.min(rawMaxAmount, result);
+    const tokenCInfoBalance = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
+    const tokenDInfoBalance = parseTokenValue(rowData.data.token_d_info.balance, decimalsD);
+    const d_value = new Decimal(tokenDInfoBalance || 0).mul(priceD);
+    const max_c_amount = d_value.div(priceC);
+    const maxAmount = max_c_amount.minus(tokenCInfoBalance).toNumber();
+
     return Math.min(maxAmount, Number(assetCbalances));
   };
   const calculateMaxRemovable = () => {
+    // from liquidation
     const tokenCInfoBalance = parseTokenValue(rowData.data.token_c_info.balance, decimalsC);
     const tokenDInfoBalance = parseTokenValue(rowData.data.token_d_info.balance, decimalsD);
-    const maxLeverage = isMainStream
-      ? marginConfigTokens["max_leverage_rate"]
-      : marginConfigTokensMEME["max_leverage_rate"];
-
+    const tokenPInfoBalance = parseTokenValue(rowData.data.token_p_amount, decimalsP);
     const k2 =
       1 -
       (isMainStream
         ? marginConfigTokens.min_safety_buffer
         : marginConfigTokensMEME.min_safety_buffer) /
         10000;
-    let maxRemovableFromLiq = tokenCInfoBalance;
-
-    if (positionType.label === "Long") {
-      const k1 = Number(netValue) * leverage * priceC;
-      if (k1 !== 0) {
-        const minRequiredNetValue = Math.max(((size * priceP) / priceC) * (1 - k2), 0);
-        maxRemovableFromLiq = (tokenCInfoBalance - minRequiredNetValue) * 0.9;
-      }
-    } else {
-      const denominator = k2 * priceC;
-      if (denominator !== 0) {
-        const minRequiredNetValue = ((sizeValueShort + holding) * priceD) / denominator;
-        maxRemovableFromLiq =
-          (tokenCInfoBalance - (minRequiredNetValue - sizeValueLong) / priceC) * 0.9;
-      }
-    }
+    const d_value = new Decimal(tokenDInfoBalance || 0).mul(priceD);
+    const p_value = new Decimal(tokenPInfoBalance || 0).mul(priceP);
+    const holding_Value = new Decimal(holding || 0).mul(priceD);
+    const c_value = d_value.plus(holding_Value).div(k2).minus(p_value);
+    const c_amount = c_value.div(priceC);
+    let maxRemovableFromLiq = new Decimal(tokenCInfoBalance).minus(c_amount).mul(0.9).toNumber();
     if (
       Number.isNaN(maxRemovableFromLiq) ||
       !Number.isFinite(maxRemovableFromLiq) ||
@@ -367,20 +338,16 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
     ) {
       maxRemovableFromLiq = 0;
     }
-    let maxRemovableFromLeverage = 0;
-    let left = 0;
-    let right = tokenCInfoBalance;
-    while (left <= right) {
-      const mid = (left + right) / 2;
-      const remainingCollateral = tokenCInfoBalance - mid;
-      const newLeverage = calculateLeverage(tokenDInfoBalance, priceD, remainingCollateral, priceC);
-      if (newLeverage <= maxLeverage) {
-        maxRemovableFromLeverage = mid;
-        left = mid + 0.0001;
-      } else {
-        right = mid - 0.0001;
-      }
-    }
+    // from leverage
+    const maxLeverage = isMainStream
+      ? marginConfigTokens["max_leverage_rate"]
+      : marginConfigTokensMEME["max_leverage_rate"];
+
+    const max_leverage_c_value = d_value.div(maxLeverage);
+    const max_leverage_c_amount = max_leverage_c_value.div(priceC);
+    const maxRemovableFromLeverage = new Decimal(tokenCInfoBalance || 0)
+      .minus(max_leverage_c_amount)
+      .toNumber();
     const finalMax = Math.min(maxRemovableFromLeverage, maxRemovableFromLiq);
     return finalMax;
   };
