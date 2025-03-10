@@ -205,6 +205,7 @@ export const getAssetData = createSelector(
       action: app.selected.action,
       position: app.selected.position,
       portfolio,
+      assetOrigin: asset,
       ...(asset ? transformAsset(asset, account, assets, app) : {}),
     };
   },
