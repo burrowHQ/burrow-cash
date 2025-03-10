@@ -2,7 +2,6 @@ import { useState, createContext, FC } from "react";
 import Decimal from "decimal.js";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
-import { useDispatch } from "react-redux";
 import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
 import { CloseIcon } from "../../../components/Modal/svg";
@@ -27,7 +26,6 @@ import { IPositionType } from "../../../interfaces/margin";
 
 export const ModalContext = createContext(null) as any;
 const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose, rowData }) => {
-  const dispatch = useDispatch();
   const account = useAppSelector((state) => state.account);
   const { marginConfigTokens, marginConfigTokensMEME, getPositionType } = useMarginConfigToken();
   const {
@@ -45,7 +43,6 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
   const [inputValue, setInputValue] = useState("");
   const [addedValue, setAddedValue] = useState(0);
   const [addLeverage, setAddLeverage] = useState(0);
-  const balance = useAppSelector(getAccountBalance);
   const [selectedLever, setSelectedLever] = useState(null);
   const [isAddCollateralLoading, setIsAddCollateralLoading] = useState(false);
   const [isDeleteCollateralLoading, setIsDeleteCollateralLoading] = useState(false);
