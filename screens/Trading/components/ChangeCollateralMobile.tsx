@@ -303,7 +303,6 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
     }
   };
   const getMaxAvailableAmount = () => {
-    // const currentLeverage = leverage || 1;
     const targetMinLeverage = 1;
     const assetCbalances = shrinkToken(
       account.balances[rowData.data.token_c_info.token_id],

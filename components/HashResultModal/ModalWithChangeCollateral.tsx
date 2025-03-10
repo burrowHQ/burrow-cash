@@ -33,9 +33,9 @@ const ModalWithChangeCollateral = ({
       startCountdown();
     } else {
       setIsModalVisible(false);
-      clearTimeoutOrInterval(countdownTimer); //
+      clearTimeoutOrInterval(countdownTimer);
     }
-    return () => clearTimeoutOrInterval(countdownTimer); //
+    return () => clearTimeoutOrInterval(countdownTimer);
   }, [show, countdown]);
 
   const clearTimeoutOrInterval = (timerId) => {
@@ -114,10 +114,6 @@ const ModalWithChangeCollateral = ({
                 <FilledIcon />
               </div>
             </div>
-            {/* <div className="fc justify-between text-sm font-normal mb-4">
-              <span className="text-gray-300">symbol</span>
-              <span>{symbol}</span>
-            </div> */}
             <div className="fc justify-between text-sm font-normal">
               <span className="text-gray-300">collateral({symbol})</span>
               <span>{toInternationalCurrencySystem_number(Number(collateral))}</span>

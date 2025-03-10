@@ -100,7 +100,7 @@ const HistoryRow = ({ index, record, assetP, assetD, assetC }) => {
       >
         {record.pnl > 0 ? "+" : record.pnl < 0 ? "-" : ""}
         {record.pnl !== "0"
-          ? beautifyPrice(Math.abs(record.pnl * record.c_token_price), false, 3, 3)
+          ? beautifyPrice(Math.abs(record.pnl * record.c_token_price), true, 3, 3)
           : ""}
       </td>
       <td>
@@ -266,7 +266,7 @@ const HistoryRow = ({ index, record, assetP, assetD, assetC }) => {
           >
             {record.pnl > 0 ? "+" : record.pnl < 0 ? "-" : ""}
             {record.pnl !== "0"
-              ? beautifyPrice(Math.abs(record.pnl * record.c_token_price), false, 3, 3)
+              ? beautifyPrice(Math.abs(record.pnl * record.c_token_price), true, 3, 3)
               : ""}
           </p>
         </div>
