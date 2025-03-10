@@ -53,8 +53,7 @@ const Market = () => {
         <WarnTipIcon className="mr-1.5 xsm:mt-1.5 flex-shrink-0" />
         <span>
           <span className="text-sm text-white text-opacity-60 inline">
-            The following positions cannot be borrowed from{" "}
-            {activeTab == "main" ? "Meme's" : "Mainstream's"} positions.
+            The positions of MainStream and Meme are independent.
           </span>
           <span className="text-base text-white inline">😬</span>
         </span>
