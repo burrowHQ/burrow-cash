@@ -13,7 +13,6 @@ import { increaseCollateral } from "../../../store/marginActions/increaseCollate
 import { useAppSelector } from "../../../redux/hooks";
 import { getAssets, getAssetsMEME } from "../../../redux/assetsSelectors";
 import { decreaseCollateral } from "../../../store/marginActions/decreaseCollateral";
-import { getAccountBalance } from "../../../redux/accountSelectors";
 import { shrinkToken, expandToken } from "../../../store";
 import { showChangeCollateralPosition } from "../../../components/HashResultModal";
 import { getSymbolById } from "../../../transformers/nearSymbolTrans";
@@ -183,6 +182,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
   const token_c_id = rowData.data.token_c_info.token_id;
   const token_d_id = rowData.data.token_d_info.token_id;
   const token_p_id = rowData.data.token_p_id;
+  const baseTokenId = positionType.label == "Long" ? token_p_id : token_d_id;
   const LiqPrice = useLiqPrice({
     token_c_info: {
       token_id: rowData.data.token_c_info.token_id,
@@ -319,8 +319,10 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
     const k2 =
       1 -
       (isMainStream
-        ? marginConfigTokens.min_safety_buffer
-        : marginConfigTokensMEME.min_safety_buffer) /
+        ? marginConfigTokens.listBaseTokenConfig[baseTokenId]?.min_safety_buffer ||
+          marginConfigTokens.defaultBaseTokenConfig.min_safety_buffer
+        : marginConfigTokensMEME.listBaseTokenConfig[baseTokenId]?.min_safety_buffer ||
+          marginConfigTokensMEME.defaultBaseTokenConfig.min_safety_buffer) /
         10000;
     const d_value = new Decimal(tokenDInfoBalance || 0).mul(priceD);
     const p_value = new Decimal(tokenPInfoBalance || 0).mul(priceP);
@@ -337,8 +339,10 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
     }
     // from leverage
     const maxLeverage = isMainStream
-      ? marginConfigTokens["max_leverage_rate"]
-      : marginConfigTokensMEME["max_leverage_rate"];
+      ? marginConfigTokens.listBaseTokenConfig[baseTokenId]?.max_leverage_rate ||
+        marginConfigTokens.defaultBaseTokenConfig.max_leverage_rate
+      : marginConfigTokensMEME.listBaseTokenConfig[baseTokenId]?.max_leverage_rate ||
+        marginConfigTokensMEME.defaultBaseTokenConfig.max_leverage_rate;
 
     const max_leverage_c_value = d_value.div(maxLeverage);
     const max_leverage_c_amount = max_leverage_c_value.div(priceC);

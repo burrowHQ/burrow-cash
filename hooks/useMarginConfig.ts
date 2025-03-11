@@ -2,10 +2,8 @@ import { getAssets, getAssetsMEME } from "../redux/assetsSelectors";
 import { useAppSelector } from "../redux/hooks";
 import { getMarginConfig, getMarginConfigMEME } from "../redux/marginConfigSelectors";
 import { Asset } from "../redux/assetState";
-import { useRegisterTokenType } from "./useRegisterTokenType";
 
 export function useMarginConfigToken() {
-  const { filteredTokenTypeMap } = useRegisterTokenType();
   const assets = useAppSelector(getAssets);
   const assetsMEME = useAppSelector(getAssetsMEME);
   const marginConfigTokens = useAppSelector(getMarginConfig);

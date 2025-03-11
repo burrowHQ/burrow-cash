@@ -1,10 +1,24 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { initialState } from "./marginConfigState";
 import getMarginConfig from "../api/get-margin-config";
+import getDefaultMarginBaseTokenLimit from "../api/get-default-margin-base-token-limit";
+import getListMarginBaseTokenLimit from "../api/get-list-margin-base-token-limit";
 
 export const fetchMarginConfig = createAsyncThunk("marginConfig/fetchMarginConfig", async () => {
   const marginConfig = await getMarginConfig();
-  return marginConfig;
+  const defaultMarginBaseTokenLimit = await getDefaultMarginBaseTokenLimit();
+  const baseTokenIds: string[] = [];
+  Object.entries(marginConfig.registered_tokens).forEach(([tokenId, type]) => {
+    if (type == 1) {
+      baseTokenIds.push(tokenId);
+    }
+  });
+  const listMarginBaseTokenLimit = await getListMarginBaseTokenLimit(baseTokenIds);
+  return {
+    ...marginConfig,
+    defaultMarginBaseTokenLimit,
+    listMarginBaseTokenLimit,
+  };
 });
 
 export const marginConfigSlice = createSlice({
@@ -25,25 +39,24 @@ export const marginConfigSlice = createSlice({
       state.fetchedAt = new Date().toString();
       if (!action.payload) return;
       const {
-        max_leverage_rate,
         pending_debt_scale,
-        max_slippage_rate,
-        min_safety_buffer,
         margin_debt_discount_rate,
         open_position_fee_rate,
         registered_dexes,
         registered_tokens,
         max_active_user_margin_position,
+        defaultMarginBaseTokenLimit,
+        listMarginBaseTokenLimit,
       } = action.payload;
-      state.max_leverage_rate = max_leverage_rate;
+
       state.pending_debt_scale = pending_debt_scale;
-      state.max_slippage_rate = max_slippage_rate;
-      state.min_safety_buffer = min_safety_buffer;
       state.margin_debt_discount_rate = margin_debt_discount_rate;
       state.open_position_fee_rate = open_position_fee_rate;
       state.registered_dexes = registered_dexes;
       state.registered_tokens = registered_tokens;
       state.max_active_user_margin_position = max_active_user_margin_position;
+      state.defaultBaseTokenConfig = defaultMarginBaseTokenLimit;
+      state.listBaseTokenConfig = listMarginBaseTokenLimit;
     });
   },
 });

@@ -73,4 +73,22 @@ export interface IServerPool {
   token_out: string;
 }
 
+export interface IMarginBaseTokenConfig {
+  min_safety_buffer: number;
+  max_leverage_rate: number;
+  max_common_slippage_rate: number;
+  max_forceclose_slippage_rate: number;
+  liq_benefit_protocol_rate: number;
+  liq_benefit_liquidator_rate: number;
+  min_base_token_short_position: string;
+  min_base_token_long_position: string;
+  max_base_token_short_position: string;
+  max_base_token_long_position: string;
+  total_base_token_available_short: string;
+  total_base_token_available_long: string;
+}
+
+export interface IMarginBaseTokenConfigList {
+  [key: string]: IMarginBaseTokenConfig;
+}
 export type IPositionType = "Long" | "Short";

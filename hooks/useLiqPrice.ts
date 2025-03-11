@@ -25,7 +25,12 @@ export function useLiqPrice({
 }) {
   const assets = useAppSelector(getAssetsCategory(memeCategory));
   const marginConfig = useAppSelector(getMarginConfigCategory(memeCategory));
-  const safety_buffer = 1 - marginConfig.min_safety_buffer / 10000;
+  const baseTokenId = position_type == "Long" ? token_p_info.token_id : token_d_info.token_id;
+  const min_safety_buffer =
+    marginConfig.listBaseTokenConfig[baseTokenId]?.min_safety_buffer ||
+    marginConfig.defaultBaseTokenConfig.min_safety_buffer;
+
+  const safety_buffer = 1 - min_safety_buffer / 10000;
   const token_c_asset = assets.data[token_c_info.token_id];
   const token_p_asset = assets.data[token_p_info.token_id];
   const token_d_asset = assets.data[token_d_info.token_id];
@@ -54,46 +59,19 @@ export function useLiqPrice({
     hp_fee_amount,
     token_d_asset.metadata.decimals + token_d_asset.config.extra_decimals,
   );
-  // (token_c_value + token_p_value) * percent > total_debt + total_hp_fee
   if (position_type == "Long") {
-    // c and d are the same token
-    // const left = new Decimal(token_c_amount || 0)
-    //   .mul(token_c_price)
-    //   .plus(new Decimal(token_p_amount || 0).mul(token_p_price))
-    //   .mul(safety_buffer);
-    // const right = new Decimal(token_d_amount || 0).plus(hp_fee_amount || 0).mul(token_c_price);
     const liq_price = new Decimal(token_d_amount || 0)
       .plus(hp_fee)
       .minus(new Decimal(token_c_amount || 0).mul(safety_buffer))
       .div(new Decimal(token_p_amount || 0).mul(safety_buffer))
       .toFixed();
-    // const p_liq_price = new Decimal(token_d_amount || 0)
-    //   .mul(token_d_price)
-    //   .plus(hp_fee)
-    //   .div(safety_buffer)
-    //   .minus(new Decimal(token_c_amount || 0).mul(token_c_price))
-    //   .div(token_p_amount)
-    //   .toFixed();
     return liq_price;
   } else {
-    // Short c and p are the same token
-    // const left = new Decimal(token_c_amount || 0)
-    //   .mul(token_c_price)
-    //   .plus(new Decimal(token_p_amount || 0).mul(token_c_price))
-    //   .mul(safety_buffer);
-    // const right = new Decimal(token_d_amount || 0).plus(hp_fee_amount || 0).mul(token_d_price);
     const liq_price = new Decimal(token_c_amount || 0)
       .plus(token_p_amount || 0)
       .mul(safety_buffer)
       .div(new Decimal(token_d_amount || 0).plus(hp_fee))
       .toFixed();
-    // const d_liq_price = new Decimal(token_c_amount)
-    //   .mul(token_c_price)
-    //   .plus(new Decimal(token_p_amount).mul(token_p_price))
-    //   .mul(safety_buffer)
-    //   .minus(hp_fee)
-    //   .div(token_d_amount)
-    //   .toFixed();
     return liq_price;
   }
 }

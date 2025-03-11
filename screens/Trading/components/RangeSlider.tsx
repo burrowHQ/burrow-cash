@@ -10,9 +10,15 @@ interface RangeSliderProps {
   defaultValue: number;
   action: string;
   setRangeMount: (value: number) => void;
+  baseTokenId: string;
 }
 
-const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRangeMount }) => {
+const RangeSlider: React.FC<RangeSliderProps> = ({
+  defaultValue,
+  action,
+  setRangeMount,
+  baseTokenId,
+}) => {
   const [value, setValue] = useState(defaultValue);
   const [splitList, setSplitList] = useState<number[]>([]);
   const [matchValue, setMatchValue] = useState(value);
@@ -27,10 +33,11 @@ const RangeSlider: React.FC<RangeSliderProps> = ({ defaultValue, action, setRang
 
   useEffect(() => {
     const newAllowedValues = generateArithmeticSequence(
-      marginConfigTokensCombined["max_leverage_rate"],
+      marginConfigTokensCombined.listBaseTokenConfig[baseTokenId]?.max_leverage_rate ||
+        marginConfigTokensCombined.defaultBaseTokenConfig.max_leverage_rate,
     );
     setSplitList(newAllowedValues);
-  }, [marginConfigTokensCombined["max_leverage_rate"]]);
+  }, [marginConfigTokensCombined]);
   // init value
   useEffect(() => {
     if (splitList.length > 0) {

@@ -10,7 +10,7 @@ import { isEmpty } from "lodash";
 import Decimal from "decimal.js";
 import { useAppSelector } from "../redux/hooks";
 import { getAllAssetsData } from "../redux/assetsSelectors";
-import { getMarginConfig } from "../redux/marginConfigSelectors";
+import { getMarginConfigMEME } from "../redux/marginConfigSelectors";
 import { getAllPools } from "../redux/poolSelectors";
 import { expandTokenDecimal } from "../store";
 import { IEstimateResult, IFindPathResult, IServerPool, IRoute } from "../interfaces/margin";
@@ -44,7 +44,7 @@ export const useV1EstimateSwap = ({
   forceUpdate?: number;
 }) => {
   const combinedAssetsData = useAppSelector(getAllAssetsData);
-  const marginConfig = useAppSelector(getMarginConfig);
+  const marginConfigMEME = useAppSelector(getMarginConfigMEME);
   const allPools = useAppSelector(getAllPools);
   const [estimateData, setEstimateData] = useState<IEstimateResult>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -170,7 +170,10 @@ export const useV1EstimateSwap = ({
       setLoading(false);
     });
     const swapTransaction = transactionsRef.pop() as any;
-    const [dex_id, msg] = get_swap_indication_info(swapTransaction, marginConfig.registered_dexes);
+    const [dex_id, msg] = get_swap_indication_info(
+      swapTransaction,
+      marginConfigMEME.registered_dexes,
+    );
     const { min_amount_out, expand_amount_in } = get_amount_from_msg(msg);
     const fee = getAvgFee(
       swapTodos,

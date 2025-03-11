@@ -4,15 +4,15 @@ import { IMarginConfig } from "../interfaces";
 
 const getMarginConfig = async (): Promise<IMarginConfig> => {
   return {
-    max_leverage_rate: 5,
-    pending_debt_scale: 1000,
-    max_slippage_rate: 1000,
-    min_safety_buffer: 1000,
-    margin_debt_discount_rate: 9999,
+    max_leverage_rate: 0,
+    pending_debt_scale: 0,
+    max_slippage_rate: 0,
+    min_safety_buffer: 0,
+    margin_debt_discount_rate: 0,
     open_position_fee_rate: 0,
     registered_dexes: {},
     registered_tokens: {},
-    max_active_user_margin_position: 64,
+    max_active_user_margin_position: 0,
   };
   // const { view, logicContract } = await getBurrow();
   // try {

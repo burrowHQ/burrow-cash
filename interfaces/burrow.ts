@@ -11,7 +11,12 @@ import {
 } from "./asset";
 import { IAccount, IAccountDetailed, IAccountAllPositionsDetailed } from "./account";
 import { IPrices, IPythPrice } from "./oracle";
-import { IMarginConfig, IMarginAccountDetailedView } from "./margin";
+import {
+  IMarginConfig,
+  IMarginAccountDetailedView,
+  IMarginBaseTokenConfig,
+  IMarginBaseTokenConfigList,
+} from "./margin";
 import { IPoolDcl, IQuoteResult } from "./pool";
 
 export interface IConfig {
@@ -53,7 +58,9 @@ export type IViewReturnType =
   | IMarginAccountDetailedView
   | IPoolDcl[]
   | IQuoteResult
-  | IAssetDetailed[];
+  | IAssetDetailed[]
+  | IMarginBaseTokenConfig
+  | IMarginBaseTokenConfigList;
 
 export interface IBurrow {
   selector: WalletSelector;

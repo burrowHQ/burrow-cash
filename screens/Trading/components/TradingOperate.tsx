@@ -38,6 +38,9 @@ const tip_min_usd = `Deposit at least $${MARGIN_MIN_COLLATERAL_USD}`;
 const tip_max_positions = "Exceeded the maximum number of open positions.";
 const tip_max_available_debt = "Current maximum available position:";
 const tip_min_available_debt = "Current minimum available position:";
+const tip_min_base = "The position opened is too small, below the contract limit:";
+const tip_max_base = "The position opened is too large, exceeding the contract limit:";
+const tip_total_max_base = "The overall open position is too mall, exceeding the market limit:";
 const insufficient_balance = "Insufficient Balance";
 
 const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) => {
@@ -89,7 +92,10 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
     marginConfigTokensMEME,
   } = useMarginConfigToken();
   const { marginAccountList: marginAccountListMain, marginAccountListMEME } = useMarginAccount();
-  const { max_active_user_margin_position, min_safety_buffer } = isMainStream
+  const { defaultBaseTokenConfig, listBaseTokenConfig } = config;
+  const min_safety_buffer =
+    listBaseTokenConfig[id]?.min_safety_buffer || defaultBaseTokenConfig.min_safety_buffer;
+  const { max_active_user_margin_position } = isMainStream
     ? marginConfigTokens
     : marginConfigTokensMEME;
   const marginAccountList = isMainStream ? marginAccountListMain : marginAccountListMEME;
@@ -172,9 +178,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       if (ReduxcategoryAssets2 && ReduxcategoryAssets1 && estimateData) {
         if (activeTab == "long" && +(longInput || 0) > 0 && (longOutput || 0) > 0) {
           const safetyBufferFactor = 1 - min_safety_buffer / 10000;
-          // const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
-          // const token_c_value = new Decimal(longInput).mul(assetPrice || 0);
-          // const token_d_value = token_c_value.mul(rangeMount || 0);
           const token_c_amount = longInput;
           const token_d_amount = new Decimal(token_c_amount || 0).mul(rangeMount || 0);
           const token_p_amount = longOutput;
@@ -182,11 +185,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             .minus(new Decimal(token_c_amount || 0).mul(safetyBufferFactor))
             .div(new Decimal(token_p_amount || 0).mul(safetyBufferFactor))
             .toFixed();
-          // const liqPriceX = token_d_value
-          //   .div(safetyBufferFactor)
-          //   .minus(token_c_value)
-          //   .div(longOutput)
-          //   .toFixed();
           setLiqPrice(liq_price || "0");
         }
       }
@@ -205,27 +203,14 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
           +(shortOutput || 0) > 0
         ) {
           const safetyBufferFactor = 1 - min_safety_buffer / 10000;
-          // const assetPrice = getAssetPrice(ReduxcategoryAssets2) as any;
-          // const token_c_value = new Decimal(shortInput).mul(assetPrice || 0);
-          // const token_p_value = new Decimal(estimateData.amount_out).mul(assetPrice || 0);
           const token_c_amount = shortInput;
           const token_p_amount = estimateData.amount_out;
           const token_d_amount = shortOutput;
-
-          // const liq_price = new Decimal(token_c_amount || 0)
-          // .plus(token_p_amount || 0)
-          // .mul(safety_buffer)
-          // .div(new Decimal(token_d_amount || 0).plus(hp_fee))
-          // .toFixed();
           const liq_price = new Decimal(token_c_amount || 0)
             .plus(token_p_amount || 0)
             .mul(safetyBufferFactor)
             .div(token_d_amount)
             .toFixed();
-          // const liqPriceX = new Decimal(token_c_value)
-          //   .plus(token_p_value)
-          //   .mul(safetyBufferFactor)
-          //   .div(shortOutput);
           setLiqPrice(liq_price || "0");
         }
       }
@@ -288,6 +273,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
         } else if (new Decimal(longInput || 0).gt(ReduxcategoryCurrentBalance2 || 0)) {
           setWarnTip(insufficient_balance);
         } else {
+          // borrow limit
           const borrowLimit = getBorrowLimit(ReduxcategoryAssets2, tokenInAmount, config);
           const price_1 = getAssetPrice(ReduxcategoryAssets1);
           const price_2 = getAssetPrice(ReduxcategoryAssets2);
@@ -302,18 +288,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                   {ReduxcategoryAssets1?.metadata?.symbol}
                 </>,
               );
-              // const max_position = estimateDataBurrowLimit?.amount_out || 0;
-              // setWarnTip(
-              //   <span className={`${estimateLoadingBurrowLimt ? "flex items-center" : ""}`}>
-              //     {tip_max_available_debt}{" "}
-              //     {estimateLoadingBurrowLimt ? (
-              //       <BeatLoader size={4} color="red" className="mx-1" />
-              //     ) : (
-              //       beautifyPrice(Number(max_position || 0))
-              //     )}{" "}
-              //     {ReduxcategoryAssets1?.metadata?.symbol}
-              //   </span>,
-              // );
             }
           } else if (borrowLimit?.lowLoanLimit) {
             if (Number(price_1 || 0) > 0) {
@@ -328,7 +302,31 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
               );
             }
           } else {
-            setWarnTip("");
+            // TODOXX
+            // base token limit
+            // debugger;
+            // console.log("-------------ReduxcategoryAssets1", ReduxcategoryAssets1);
+            // console.log("-------------ReduxcategoryAssets2", ReduxcategoryAssets2);
+            // console.log("-------------estimateData", estimateData);
+            // console.log("-------------tokenInAmount", tokenInAmount);
+            const min_token_p_amount = expandToken(
+              estimateData?.min_amount_out || 0,
+              ReduxcategoryAssets1?.config?.extra_decimals || 0,
+            );
+            if (+min_token_p_amount > 0) {
+              const baseTokenDecimals =
+                (ReduxcategoryAssets1?.metadata?.decimals || 0) +
+                (ReduxcategoryAssets1?.config?.extra_decimals || 0);
+              getOpenPositionLimit({
+                baseTokenId: ReduxcategoryAssets1.token_id,
+                baseTokenAmount: min_token_p_amount,
+                baseTokenDecimals,
+                marginConfig: config,
+                actionType: "Long",
+              });
+            } else {
+              setWarnTip("");
+            }
           }
         }
       } else if (activeTab == "short" && shortOutput > 0) {
@@ -339,6 +337,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
         } else if (new Decimal(shortInput || 0).gt(ReduxcategoryCurrentBalance2 || 0)) {
           setWarnTip(insufficient_balance);
         } else {
+          // borrow limit
           const borrowLimit = getBorrowLimit(ReduxcategoryAssets1, tokenInAmount, config);
           if (borrowLimit?.isExceed) {
             setWarnTip(
@@ -355,7 +354,24 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
               </>,
             );
           } else {
-            setWarnTip("");
+            // TODOXX
+            // base token limit
+            // debugger;
+            // console.log("-------------ReduxcategoryAssets1", ReduxcategoryAssets1);
+            // console.log("-------------ReduxcategoryAssets2", ReduxcategoryAssets2);
+            // console.log("-------------estimateData", estimateData);
+            // console.log("-------------tokenInAmount", tokenInAmount);
+            const baseTokenDecimals =
+              (ReduxcategoryAssets1?.metadata?.decimals || 0) +
+              (ReduxcategoryAssets1?.config?.extra_decimals || 0);
+            const d_amount = expandToken(tokenInAmount || 0, baseTokenDecimals);
+            getOpenPositionLimit({
+              baseTokenId: ReduxcategoryAssets1.token_id,
+              baseTokenAmount: d_amount,
+              baseTokenDecimals,
+              marginConfig: config,
+              actionType: "Short",
+            });
           }
         }
       } else {
@@ -380,6 +396,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       longInput,
       shortInput,
       config,
+      estimateData,
     ],
   );
   const setMaxInputBanlance = (key: string) => {
@@ -533,8 +550,10 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
     const input = tab === "long" ? longInput : shortInput;
     const inputAmount = input ? Number(input) : 0;
     const openFeeAmount = (inputAmount * config.open_position_fee_rate) / 10000;
-    const rangeMountSafty =
-      +config.max_leverage_rate == +rangeMount ? +rangeMount * 0.999 : +rangeMount;
+    const max_leverage_rate =
+      config.listBaseTokenConfig[id]?.max_leverage_rate ||
+      config.defaultBaseTokenConfig.max_leverage_rate;
+    const rangeMountSafty = +max_leverage_rate == +rangeMount ? +rangeMount * 0.999 : +rangeMount;
     const adjustedInputAmount = inputAmount * inputUsdCharcate2 * rangeMountSafty;
     const inputUsdSetter = tab === "long" ? setLongInputUsd : setShortInputUsd;
 
@@ -545,15 +564,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
     } else {
       setTokenInAmount(adjustedInputAmount / inputUsdCharcate1);
     }
-  }
-  function formatNumber(value, len) {
-    let formattedValue = value.toFixed(len);
-    if (formattedValue.endsWith(".00")) {
-      formattedValue = formattedValue.substring(0, formattedValue.length - 3);
-    } else if (formattedValue.endsWith("0")) {
-      formattedValue = formattedValue.substring(0, formattedValue.length - 1);
-    }
-    return formattedValue;
   }
   const formatDecimal = (value: number) => {
     if (!value) return "0";
@@ -584,6 +594,97 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       }
     }
   }
+  function getOpenPositionLimit({
+    baseTokenId,
+    baseTokenAmount, // short: d_amount, long: min_token_p_amount,
+    baseTokenDecimals,
+    marginConfig,
+    actionType,
+  }: {
+    baseTokenId: string;
+    baseTokenAmount: string;
+    baseTokenDecimals: number;
+    marginConfig: IMarginConfigState;
+    actionType: "Long" | "Short";
+  }) {
+    const { listBaseTokenConfig, defaultBaseTokenConfig } = marginConfig;
+    const baseTokenAmountD = new Decimal(baseTokenAmount);
+    const { marketTotalBorrowAmount, marketTotalPositionAmount } = getMarketTotalData({
+      baseTokenId,
+      baseTokenAmount,
+    });
+    if (actionType == "Long") {
+      // long limit config
+      const min_base_token_long_position =
+        listBaseTokenConfig[baseTokenId]?.min_base_token_long_position ||
+        defaultBaseTokenConfig.min_base_token_long_position;
+      const max_base_token_long_position =
+        listBaseTokenConfig[baseTokenId]?.max_base_token_long_position ||
+        defaultBaseTokenConfig.max_base_token_long_position;
+      const total_base_token_available_long =
+        listBaseTokenConfig[baseTokenId]?.total_base_token_available_long ||
+        defaultBaseTokenConfig.total_base_token_available_long;
+      if (baseTokenAmountD.lt(min_base_token_long_position)) {
+        setWarnTip(
+          <>
+            {tip_min_base}
+            {beautifyPrice(shrinkToken(min_base_token_long_position, baseTokenDecimals))}
+          </>,
+        );
+      } else if (baseTokenAmountD.gt(max_base_token_long_position)) {
+        setWarnTip(
+          <>
+            {tip_max_base}
+            {beautifyPrice(shrinkToken(max_base_token_long_position, baseTokenDecimals))}
+          </>,
+        );
+      } else if (marketTotalPositionAmount.gt(total_base_token_available_long)) {
+        setWarnTip(
+          <>
+            {tip_total_max_base}
+            {beautifyPrice(shrinkToken(total_base_token_available_long, baseTokenDecimals))}
+          </>,
+        );
+      } else {
+        setWarnTip("");
+      }
+    } else {
+      // short limit config
+      const min_base_token_short_position =
+        listBaseTokenConfig[baseTokenId]?.min_base_token_short_position ||
+        defaultBaseTokenConfig.min_base_token_short_position;
+      const max_base_token_short_position =
+        listBaseTokenConfig[baseTokenId]?.max_base_token_short_position ||
+        defaultBaseTokenConfig.max_base_token_short_position;
+      const total_base_token_available_short =
+        listBaseTokenConfig[baseTokenId]?.total_base_token_available_short ||
+        defaultBaseTokenConfig.total_base_token_available_short;
+      if (baseTokenAmountD.lt(min_base_token_short_position)) {
+        setWarnTip(
+          <>
+            {tip_min_base}
+            {beautifyPrice(shrinkToken(min_base_token_short_position, baseTokenDecimals))}
+          </>,
+        );
+      } else if (baseTokenAmountD.gt(max_base_token_short_position)) {
+        setWarnTip(
+          <>
+            {tip_max_base}
+            {beautifyPrice(shrinkToken(max_base_token_short_position, baseTokenDecimals))}
+          </>,
+        );
+      } else if (marketTotalBorrowAmount.gt(total_base_token_available_short)) {
+        setWarnTip(
+          <>
+            {tip_total_max_base}
+            {beautifyPrice(shrinkToken(total_base_token_available_short, baseTokenDecimals))}
+          </>,
+        );
+      } else {
+        setWarnTip("");
+      }
+    }
+  }
   function getAvailableLiquidityForMargin({
     assetDebt,
     marginConfig,
@@ -606,6 +707,24 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
     const scale = marginConfig.pending_debt_scale / 10000;
     const availableLiquidityForMargin = availableLiquidity * scale;
     return availableLiquidityForMargin;
+  }
+  function getMarketTotalData({
+    baseTokenId,
+    baseTokenAmount,
+  }: {
+    baseTokenId: string;
+    baseTokenAmount: string;
+  }) {
+    const assetsMap = isMainStream ? assets.data : assetsMEME.data;
+    const asset = assetsMap[baseTokenId];
+    const temp1 = new Decimal(asset.margin_debt.balance || 0)
+      .plus(asset.margin_pending_debt || 0)
+      .plus(baseTokenAmount || 0);
+    const temp2 = new Decimal(asset.margin_position || 0).plus(baseTokenAmount);
+    return {
+      marketTotalBorrowAmount: temp1,
+      marketTotalPositionAmount: temp2,
+    };
   }
   const buttonLoading = estimateLoading || forceUpdateLoading;
   return (
@@ -734,7 +853,12 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             </div>
             <p className="text-gray-300 mt-2 text-xs">{beautifyPrice(longOutputUsd || 0, true)}</p>
           </div>
-          <RangeSlider defaultValue={rangeMount} action="Long" setRangeMount={setRangeMount} />
+          <RangeSlider
+            defaultValue={rangeMount}
+            action="Long"
+            setRangeMount={setRangeMount}
+            baseTokenId={id}
+          />
           <div className="mt-5">
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Position Size</div>
@@ -869,7 +993,12 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             </div>
             <p className="text-gray-300 mt-2 text-xs">{beautifyPrice(shortOutputUsd || 0, true)}</p>
           </div>
-          <RangeSlider defaultValue={rangeMount} action="Short" setRangeMount={setRangeMount} />
+          <RangeSlider
+            defaultValue={rangeMount}
+            action="Short"
+            setRangeMount={setRangeMount}
+            baseTokenId={id}
+          />
           <div className="mt-5">
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Position Size</div>

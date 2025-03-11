@@ -12,6 +12,8 @@ export enum ViewMethodsLogic {
   // config
   get_config,
   get_margin_config,
+  get_default_margin_base_token_limit,
+  list_margin_base_token_limit,
   // farms
   get_asset_farm,
   get_asset_farms,

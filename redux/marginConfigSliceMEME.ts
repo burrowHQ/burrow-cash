@@ -1,12 +1,26 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { initialState } from "./marginConfigState";
 import getMarginConfigMEME from "../api/get-margin-config-meme";
+import getDefaultMarginBaseTokenLimitMEME from "../api/get-default-margin-base-token-limit-meme";
+import getListMarginBaseTokenLimitMEME from "../api/get-list-margin-base-token-limit-meme";
 
 export const fetchMarginConfigMEME = createAsyncThunk(
   "marginConfigMEME/fetchMarginConfig",
   async () => {
-    const marginConfig = await getMarginConfigMEME();
-    return marginConfig;
+    const marginConfigMEME = await getMarginConfigMEME();
+    const defaultMarginBaseTokenLimitMEME = await getDefaultMarginBaseTokenLimitMEME();
+    const baseTokenIds: string[] = [];
+    Object.entries(marginConfigMEME.registered_tokens).forEach(([tokenId, type]) => {
+      if (type == 1) {
+        baseTokenIds.push(tokenId);
+      }
+    });
+    const listMarginBaseTokenLimitMEME = await getListMarginBaseTokenLimitMEME(baseTokenIds);
+    return {
+      ...marginConfigMEME,
+      defaultMarginBaseTokenLimitMEME,
+      listMarginBaseTokenLimitMEME,
+    };
   },
 );
 
@@ -28,25 +42,23 @@ export const marginConfigSliceMEME = createSlice({
       state.fetchedAt = new Date().toString();
       if (!action.payload) return;
       const {
-        max_leverage_rate,
         pending_debt_scale,
-        max_slippage_rate,
-        min_safety_buffer,
         margin_debt_discount_rate,
         open_position_fee_rate,
         registered_dexes,
         registered_tokens,
         max_active_user_margin_position,
+        defaultMarginBaseTokenLimitMEME,
+        listMarginBaseTokenLimitMEME,
       } = action.payload;
-      state.max_leverage_rate = max_leverage_rate;
       state.pending_debt_scale = pending_debt_scale;
-      state.max_slippage_rate = max_slippage_rate;
-      state.min_safety_buffer = min_safety_buffer;
       state.margin_debt_discount_rate = margin_debt_discount_rate;
       state.open_position_fee_rate = open_position_fee_rate;
       state.registered_dexes = registered_dexes;
       state.registered_tokens = registered_tokens;
       state.max_active_user_margin_position = max_active_user_margin_position;
+      state.defaultBaseTokenConfig = defaultMarginBaseTokenLimitMEME;
+      state.listBaseTokenConfig = listMarginBaseTokenLimitMEME;
     });
   },
 });

@@ -44,11 +44,16 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
   const isMemeStream = filteredTokenTypeMap.memeStream.includes(
     confirmInfo.longOutputName?.token_id,
   );
-  const { marginConfigTokens, marginConfigTokensMEME, filterMarginConfigList } =
-    useMarginConfigToken();
-  const { max_slippage_rate, min_safety_buffer } = isMainStream
+  const baseTokenId = confirmInfo.longOutputName?.token_id;
+  const { marginConfigTokens, marginConfigTokensMEME } = useMarginConfigToken();
+  const { defaultBaseTokenConfig, listBaseTokenConfig } = isMainStream
     ? marginConfigTokens
     : marginConfigTokensMEME;
+  const max_slippage_rate =
+    listBaseTokenConfig[baseTokenId]?.max_common_slippage_rate ||
+    defaultBaseTokenConfig.max_common_slippage_rate;
+  const min_safety_buffer =
+    listBaseTokenConfig[baseTokenId]?.min_safety_buffer || defaultBaseTokenConfig.min_safety_buffer;
   const account = useAppSelector(getAccountCategory(!isMainStream));
   const { getAssetDetails, getAssetById, getAssetByIdMEME } = useMarginAccount();
   const assetP = isMainStream

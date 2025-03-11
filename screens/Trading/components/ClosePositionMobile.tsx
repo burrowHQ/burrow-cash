@@ -71,6 +71,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   const assetD = getAssetById(item.token_d_info.token_id, item);
   const assetC = getAssetById(item.token_c_info.token_id, item);
   const assetP = getAssetById(item.token_p_id, item);
+  const baseTokenId = positionType.label === "Long" ? item.token_p_id : item.token_d_info.token_id;
   const { price: priceD, symbol: symbolD, decimals: decimalsD } = getAssetDetails(assetD);
   const { price: priceC, symbol: symbolC, decimals: decimalsC } = getAssetDetails(assetC);
   const { price: priceP, symbol: symbolP, decimals: decimalsP } = getAssetDetails(assetP);
@@ -155,8 +156,10 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     const regular_d_min_value = new Decimal(
       shrinkToken(estimateData!.min_amount_out || 0, assetD.metadata.decimals),
     ).mul(assetD.price?.usd || 0);
-
-    const saft_p_value = regular_p_value.mul(1 - marginConfig.max_slippage_rate / 10000);
+    const max_slippage_rate =
+      marginConfig.listBaseTokenConfig[baseTokenId]?.max_common_slippage_rate ||
+      marginConfig.defaultBaseTokenConfig.max_common_slippage_rate;
+    const saft_p_value = regular_p_value.mul(1 - max_slippage_rate / 10000);
     if (regular_d_min_value.lte(saft_p_value)) {
       setIsProcessingTx(false);
       setSwapUnSecurity(true);
