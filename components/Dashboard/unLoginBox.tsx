@@ -1,7 +1,7 @@
 import React from "react";
 import { twMerge } from "tailwind-merge";
-import BookTokenSvg from "../../public/svg/Group 74.svg";
 import { ConnectWalletButton } from "../Header/WalletButton";
+import { EmptyIcon } from "./icons";
 
 export default function UnLoginUi({ wraperClass }: { wraperClass?: string }) {
   return (
@@ -11,8 +11,8 @@ export default function UnLoginUi({ wraperClass }: { wraperClass?: string }) {
         wraperClass || "",
       )}
     >
-      <div className="lg:hidden transform scale-50 -mt-16">
-        <BookTokenSvg />
+      <div className="lg:hidden transform  scale-75 mt-6 mb-20">
+        <EmptyIcon num={2} />
       </div>
       <div className="flex flex-col justify-center items-center xsm:-mt-16">
         <div className="text-xl text-white">Connect your wallet</div>
@@ -22,7 +22,7 @@ export default function UnLoginUi({ wraperClass }: { wraperClass?: string }) {
       </div>
       <ConnectWalletButton accountId="" className="xsm:w-full" />
       <div className="absolute right-[30px] xsm:hidden">
-        <BookTokenSvg />
+        <EmptyIcon num={1} />
       </div>
     </div>
   );

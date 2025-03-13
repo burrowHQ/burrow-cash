@@ -10,9 +10,8 @@ import { useAppSelector } from "../../redux/hooks";
 import { isAssetsFetching } from "../../redux/assetsSelectors";
 import { helpMenu, dexMenu, mainMenuList, Imenu } from "./menuData";
 import MenuMobile from "./MenuMobile";
-import { RefreshIcon } from "./svg";
+import { RefreshIcon, OutlinkIcon } from "./svg";
 import { DiscordIcon, MediumIcon, TwitterIcon } from "../Footer/svg";
-import { LinksWrapper } from "../Footer/style";
 import { isMobileDevice } from "../../helpers/helpers";
 import { RheaLogo } from "../Icons/IconsV2";
 
@@ -123,13 +122,11 @@ const CommunityItem = () => {
       </svg>
       {isHovered && (
         <div className="absolute z-50 top-full left-0 pt-2">
-          <div className="w-48 p-2 bg-dark-100 shadow-lg border border-dark-50 rounded-md pt-4 pb-6 px-6">
-            <h1 className="text-sm text-gray-300 mb-4">Community</h1>
-            <LinksWrapper>
-              <Links />
-            </LinksWrapper>
-            <h1 className="text-sm text-gray-300 mt-4">Developer</h1>
-            <div>
+          <div className="w-48 bg-dark-100 shadow-lg border border-dark-50 rounded-md p-3.5">
+            <h1 className="text-sm text-gray-300 mb-2">Community</h1>
+            <Links />
+            <h1 className="text-sm text-gray-300 mt-4 mb-2">Developer</h1>
+            <div className="flex flex-col gap-1">
               <Github />
               <BugBounty />
             </div>
@@ -234,14 +231,9 @@ export default Header;
 const Links = () => {
   const theme = useTheme();
   return (
-    <Box
-      display="grid"
-      gridTemplateColumns="repeat(3, 1fr)"
-      alignItems="center"
-      lineHeight="0"
-      sx={{ gap: "32px" }}
-    >
+    <div className="flex items-center justify-between gap-1">
       <a
+        className="flex items-center justify-center h-[34px] bg-gray-190 w-1 flex-grow rounded-md border border-gray-190 hover:border-primary"
         href="https://twitter.com/rhea_finance"
         title="Twitter"
         target="_blank"
@@ -251,6 +243,7 @@ const Links = () => {
         <TwitterIcon />
       </a>
       <a
+        className="flex items-center justify-center h-[34px] bg-gray-190 w-1 flex-grow rounded-md border border-gray-190 hover:border-primary"
         href="https://discord.gg/rheafinance"
         title="Discord"
         target="_blank"
@@ -260,6 +253,7 @@ const Links = () => {
         <DiscordIcon />
       </a>
       <a
+        className="flex items-center justify-center h-[34px] bg-gray-190 w-1 flex-grow rounded-md border border-gray-190 hover:border-primary"
         href="https://rhea-finance.medium.com/"
         title="Medium"
         target="_blank"
@@ -268,7 +262,7 @@ const Links = () => {
       >
         <MediumIcon />
       </a>
-    </Box>
+    </div>
   );
 };
 const BugBounty = () => {
@@ -279,14 +273,10 @@ const BugBounty = () => {
       title="Bug Bounty"
       target="_blank"
       rel="noopener noreferrer"
+      className="flex items-center justify-between h-[34px] rounded-lg bg-gray-190 w-full px-2 border border-gray-190 hover:border-primary"
     >
-      <Typography
-        fontSize="14px"
-        lineHeight="16px"
-        style={{ color: isMobile ? "#6F7188" : "#ffffff", letterSpacing: "1px" }}
-      >
-        Bug Bounty
-      </Typography>
+      Bug Bounty
+      <OutlinkIcon />
     </a>
   );
 };
@@ -294,14 +284,15 @@ const BugBounty = () => {
 const Github = () => {
   const isMobile = isMobileDevice();
   return (
-    <a href="https://github.com/burrowHQ/" title="Github" target="_blank" rel="noopener noreferrer">
-      <Typography
-        fontSize="14px"
-        lineHeight="46px"
-        style={{ color: isMobile ? "#6F7188" : "#ffffff", letterSpacing: "1px" }}
-      >
-        Github
-      </Typography>
+    <a
+      href="https://github.com/burrowHQ/"
+      title="Github"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center justify-between h-[34px] rounded-lg bg-gray-190 w-full px-2 border border-gray-190 hover:border-primary"
+    >
+      Github
+      <OutlinkIcon />
     </a>
   );
 };

@@ -130,7 +130,7 @@ const ModalStaking = ({ isOpen, onClose }) => {
           <span className="h5 text-gray-300">{total.toLocaleString()}</span>
         </div>
         <StyledRow className="custom-input-wrap relative gap-2">
-          <BrrrLogo color="#00F7A5" />
+          <BrrrLogo />
           <input
             value={inputAmount}
             type="number"

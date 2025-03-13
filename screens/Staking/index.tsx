@@ -69,15 +69,21 @@ const Staking = () => {
   return (
     <LayoutContainer>
       <div>
-        <StyledStakingHeader className="flex items-end gap-4 mb-2 md:mb-12 md:items-center md:justify-center">
-          <div className="flex justify-center mascot">
-            <Mascot width={isMobile ? 122 : 158} height={isMobile ? 114 : 147} />
+        <StyledStakingHeader className="flex items-center justify-center mb-16 mt-8">
+          <div className="flex justify-center -ml-6 lg:mr-10">
+            <Mascot width={isMobile ? 200 : 315} height={isMobile ? 130 : 206} />
           </div>
           <div className="h2 flex items-center gap-3 mb-4 md:mb-0">
-            <BrrrLogo color="#00F7A5" className="brrr-logo" />
-            <div className="brrr-amount flex flex-col md:flex-row md:gap-4 md:items-center">
-              {totalAmount > 0 ? totalAmount.toLocaleString() : 0}
-              <div className="text-gray-300 brrr-token">BRRR</div>
+            <BrrrLogo
+              className="brrr-logo"
+              width={isMobile ? 34 : 44}
+              height={isMobile ? 34 : 44}
+            />
+            <div className="flex flex-col">
+              <span className="text-white text-3xl xsm:text-2xl">
+                {totalAmount > 0 ? totalAmount.toLocaleString() : 0}
+              </span>
+              <div className="text-dark-900 text-base xsm:text-sm">BRRR</div>
             </div>
           </div>
         </StyledStakingHeader>
@@ -194,7 +200,7 @@ const StakingBox = ({
       <div className="flex justify-between flex-col h-full">
         <div className="flex justify-end lg:justify-between mb-3">
           <div className={twMerge("hidden md:block relative", disabled && "opacity-60")}>
-            <BrrrLogo color="#00F7A5" />
+            <BrrrLogo />
             {logoIcon && (
               <div className="absolute" style={{ bottom: 8, right: -8 }}>
                 {logoIcon}
