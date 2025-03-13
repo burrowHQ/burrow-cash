@@ -194,6 +194,7 @@ export const MARGIN_WHITELIST = [
   "71b85bee14a52c42ce331d2b7ee789da4c542d72678cedcab0c762b43e28f244",
   "aquarius29.tg",
   "liqbot.near",
+  "pysr.near",
 ];
 export const DISABLE_WITHDRAW_ADDRESS = "bc1p";
 const getConfig = (env: string = defaultNetwork) => {
