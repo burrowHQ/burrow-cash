@@ -7,12 +7,12 @@ export function getExtendConfig(
       return {
         RPC_LIST: {
           defaultRpc: {
-            url: "https://rpc.testnet.near.org",
-            simpleName: "official rpc",
-          },
-          lavaRpc: {
             url: "https://g.w.lavanet.xyz/gateway/neart/rpc-http/a6e88c7710da77f09430aacd6328efd6",
             simpleName: "lava rpc",
+          },
+          officialRpc: {
+            url: "https://rpc.testnet.near.org",
+            simpleName: "official rpc",
           },
           // pagodaRpc: {
           //   url: "https://rpc.testnet.pagoda.co",
