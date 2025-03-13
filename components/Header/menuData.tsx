@@ -33,3 +33,4 @@ export const mainMenuList: Imenu[] = [
   },
 ];
 export const helpMenu: Imenu = { title: "Docs", link: "https://docs.burrow.finance/" };
+export const dexMenu: Imenu = { title: "Dex", link: "https://dex.rhea.finance/" };

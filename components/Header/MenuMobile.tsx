@@ -1,11 +1,11 @@
-import { useState, useEffect, useRef, createContext, useContext } from "react";
+import { useState } from "react";
 import { Box, Modal as MUIModal, useTheme } from "@mui/material";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { MenuButton, CloseIcon, ArrowRightIcon, ArrowTopRightIcon, ArrowDownIcon } from "./svg";
 import { WrapperMenuMobile } from "./style";
 import { bridgeList } from "./Bridge";
-import { mainMenuList, helpMenu, Imenu } from "./menuData";
+import { mainMenuList, helpMenu, dexMenu, Imenu } from "./menuData";
 import { toggleShowDust } from "../../redux/marginTrading";
 import { getShowDust } from "../../redux/categorySelectors";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
@@ -39,6 +39,7 @@ export default function MenuMobile() {
             <BridgeMenuItem onClose={handleClose} />
             <SetMenuItem />
             <MenuItem onClose={handleClose} item={helpMenu} isOuterLink />
+            <MenuItem onClose={handleClose} item={dexMenu} isOuterLink />
             <CommunityItem />
             <DeveloperItem />
           </div>
