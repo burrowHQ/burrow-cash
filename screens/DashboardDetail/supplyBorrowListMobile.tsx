@@ -222,10 +222,9 @@ const SupplyItem = ({ data, memeCategory }: { data: any; memeCategory?: boolean 
           />
         </ItemRow>
         <ItemRow label="Rewards">
-          <DashboardReward rewardList={data?.depositRewards} />
+          <DashboardReward rewardList={data?.rewards} supplyReward={data?.supplyReward} />
         </ItemRow>
         <ItemRow label="Collateral">
-          {/* <div>{formatTokenValue(data?.collateral)}</div> */}
           <div>{data.collateral > 0 ? formatUSDValue(data.collateral * data.price) : "-"}</div>
         </ItemRow>
 
@@ -285,7 +284,6 @@ const BorrowItem = ({ data }) => {
         <ItemRow label="Rewards">
           <div className="flex gap-2 items-center">
             <DashboardReward rewardList={data.rewards} />
-            {/* <div className="h6 text-gray-300">{data.price}</div> */}
           </div>
         </ItemRow>
 

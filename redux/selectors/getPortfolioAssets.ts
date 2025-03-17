@@ -111,6 +111,8 @@ export const getPortfolioAssets = (memeCategory?: boolean) => {
             );
           const suppliedUSD = (asset.price?.usd || 0) * suppliedToken;
           totalSuppliedUSD += suppliedUSD;
+          const supplyDailyAmount = new Decimal(suppliedToken).mul(asset.supply_apr || 0).div(365);
+          const supplyDailyAmountUsd = supplyDailyAmount.mul(asset.price?.usd ?? 0);
           return standardizeAsset({
             tokenId,
             metadata: asset.metadata,
@@ -136,6 +138,13 @@ export const getPortfolioAssets = (memeCategory?: boolean) => {
                 assets.data,
               ),
             ],
+            supplyReward: isLpToken
+              ? null
+              : {
+                  supplyDailyAmount: supplyDailyAmount.toFixed(),
+                  supplyDailyAmountUsd: supplyDailyAmountUsd.toFixed(),
+                  metadata: asset.metadata,
+                },
             depositRewards: getRewards("supplied", asset, assets.data),
             totalSupplyMoney: toUsd(totalSupplyD, asset),
           });

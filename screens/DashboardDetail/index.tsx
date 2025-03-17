@@ -76,7 +76,7 @@ const StyledSupplyBorrow = styled.div`
 const yourSuppliedColumns = (memeCategory?: boolean) => [
   {
     header: "Assets",
-    size: 130,
+    size: 120,
     cell: ({ originalData }) => {
       const { symbol: standardizeSymbol, metadata, icon } = originalData || {};
       const { tokens, symbol } = metadata || {};
@@ -135,7 +135,7 @@ const yourSuppliedColumns = (memeCategory?: boolean) => [
   },
   {
     header: "APY",
-    size: 160,
+    size: 130,
     cell: ({ originalData }) => {
       return (
         <APYCell
@@ -150,13 +150,20 @@ const yourSuppliedColumns = (memeCategory?: boolean) => [
     },
   },
   {
-    header: "Rewards",
+    header: "Daily Rewards",
     cell: ({ originalData }) => {
-      if (!originalData?.rewards?.length) {
+      if (
+        !originalData?.rewards?.length &&
+        +(originalData?.supplyReward?.supplyDailyAmount || 0) === 0
+      ) {
         return "-";
       }
-
-      return <DashboardReward rewardList={originalData?.rewards} page="deposit" />;
+      return (
+        <DashboardReward
+          rewardList={originalData?.rewards}
+          supplyReward={originalData?.supplyReward}
+        />
+      );
     },
   },
   {
@@ -294,7 +301,7 @@ const StyledCustomTable = styled(CustomTable)`
 const yourBorrowedColumns = (memeCategory?: boolean) => [
   {
     header: "Assets",
-    size: 140,
+    size: 120,
     cell: ({ originalData }) => {
       return (
         <div className="flex gap-2 items-center">
@@ -344,17 +351,12 @@ const yourBorrowedColumns = (memeCategory?: boolean) => [
     },
   },
   {
-    header: "Rewards",
+    header: "Daily Reward",
     cell: ({ originalData }) => {
       if (!originalData?.rewards?.length) {
         return "-";
       }
-      return (
-        <>
-          <DashboardReward rewardList={originalData.rewards} page="borrow" />
-          {/* <div className="h6 text-gray-300 mt-1">{originalData.price}</div> */}
-        </>
-      );
+      return <DashboardReward rewardList={originalData.rewards} page="borrow" />;
     },
   },
   {

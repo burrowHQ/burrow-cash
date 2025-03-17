@@ -302,13 +302,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
               );
             }
           } else {
-            // TODOXX
-            // base token limit
-            // debugger;
-            // console.log("-------------ReduxcategoryAssets1", ReduxcategoryAssets1);
-            // console.log("-------------ReduxcategoryAssets2", ReduxcategoryAssets2);
-            // console.log("-------------estimateData", estimateData);
-            // console.log("-------------tokenInAmount", tokenInAmount);
             const min_token_p_amount = expandToken(
               estimateData?.min_amount_out || 0,
               ReduxcategoryAssets1?.config?.extra_decimals || 0,
@@ -354,13 +347,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
               </>,
             );
           } else {
-            // TODOXX
-            // base token limit
-            // debugger;
-            // console.log("-------------ReduxcategoryAssets1", ReduxcategoryAssets1);
-            // console.log("-------------ReduxcategoryAssets2", ReduxcategoryAssets2);
-            // console.log("-------------estimateData", estimateData);
-            // console.log("-------------tokenInAmount", tokenInAmount);
             const baseTokenDecimals =
               (ReduxcategoryAssets1?.metadata?.decimals || 0) +
               (ReduxcategoryAssets1?.config?.extra_decimals || 0);
