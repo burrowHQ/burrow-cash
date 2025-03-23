@@ -120,7 +120,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
   };
   const confirmOpenPosition = async () => {
     setIsDisabled(true);
-    let hasError = false;
+    const hasError = false;
     try {
       // Swap Out Trial Calculation Result Verification
       const minTokenPAmount = Number(shrinkToken(openPositionParams.min_token_p_amount, decimalsP));
@@ -131,8 +131,9 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
       const calculatedValue = ((+tokenDAmount * tokenDPrice) / tokenPPrice) * slippageRate;
       if (minTokenPAmount < calculatedValue) {
         setIsMinTokenPAmount(true);
-        hasError = true;
-        return;
+        // TODOXX
+        // hasError = true;
+        // return;
       }
 
       // Position Verification
@@ -142,9 +143,10 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
       const total_cap = total_c_value.plus(total_p_value);
       const saft_value = total_cap.mul(1 - min_safety_buffer / 10000);
       if (saft_value.lte(total_d_value)) {
+        // TODOXX
         setHasLiquidationRisk(true);
-        hasError = true;
-        return;
+        // hasError = true;
+        // return;
       }
 
       // for pop up localstorage
