@@ -165,21 +165,10 @@ const Header = () => {
         <Wrapper style={{ position: "relative" }}>
           <Logo
             onClick={() => {
-              window.open("https://burrow.finance/");
+              window.open("https://www.rhea.finance");
             }}
           >
-            {/* <span className=" transform"><LogoIcon /></span> */}
-            {/* <img src="/public/logo.svg" width={30} height={30} /> */}
-            <img
-              src="/rheaLogo.png"
-              width={80}
-              height={30}
-              alt=""
-              className="cursor-pointer"
-              onClick={() => {
-                window.open("https://www.rhea.finance");
-              }}
-            />
+            <img src="/rheaLogo.png" width={80} height={30} alt="" className="cursor-pointer" />
           </Logo>
           <Menu>
             {mainMenuList.map((item) => {
