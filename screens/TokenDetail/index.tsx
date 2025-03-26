@@ -990,19 +990,6 @@ function TokenUserInfo() {
     <UserBox className="mb-[29px] xsm:mb-2.5">
       <div className="flex justify-between items-center">
         <span className="text-lg text-white font-bold">Your Info</span>
-        {isNBTC ? (
-          <span className="flex items-center">
-            <span
-              className="text-gray-300 text-xs hover:cursor-pointer underline mr-[4px]"
-              onClick={() => {
-                window.open("https://faucet.bitvmcn.xyz/", "_blank");
-              }}
-            >
-              Claim WBTC
-            </span>
-            <ThefaucetIcon />
-          </span>
-        ) : null}
       </div>
       {!isNBTC ? (
         <div className="flex items-center justify-between my-[25px]">
