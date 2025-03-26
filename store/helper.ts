@@ -174,25 +174,25 @@ const getPythPrices = async () => {
         },
       };
     }
-    try {
-      const listTokenPrice = await fetch(`${getConfig().indexUrl}/list-token-price`, {
-        method: "GET",
-        headers: {
-          Authentication: getAuthenticationHeaders("/list-token-price"),
-        },
-      }).then((r) => r.json());
-      if (listTokenPrice?.[SFRAX_TOKEN]?.price) {
-        format_price_map[SFRAX_TOKEN] = {
-          asset_id: SFRAX_TOKEN,
-          price: {
-            multiplier: new Decimal(listTokenPrice?.[SFRAX_TOKEN]?.price)
-              .mul(new Decimal(10).pow(FRACTION_DIGITS))
-              .toFixed(0),
-            decimals: 18 + FRACTION_DIGITS,
-          },
-        };
-      }
-    } catch (error) {}
+    // try {
+    //   const listTokenPrice = await fetch(`${getConfig().recordsUrl}/list-token-price`, {
+    //     method: "GET",
+    //     headers: {
+    //       Authentication: getAuthenticationHeaders("/list-token-price"),
+    //     },
+    //   }).then((r) => r.json());
+    //   if (listTokenPrice?.[SFRAX_TOKEN]?.price) {
+    //     format_price_map[SFRAX_TOKEN] = {
+    //       asset_id: SFRAX_TOKEN,
+    //       price: {
+    //         multiplier: new Decimal(listTokenPrice?.[SFRAX_TOKEN]?.price)
+    //           .mul(new Decimal(10).pow(FRACTION_DIGITS))
+    //           .toFixed(0),
+    //         decimals: 18 + FRACTION_DIGITS,
+    //       },
+    //     };
+    //   }
+    // } catch (error) {}
     return {
       prices: Object.values(format_price_map) as IAssetPrice[],
       recency_duration_sec: 0,
