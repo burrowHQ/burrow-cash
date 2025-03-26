@@ -156,7 +156,7 @@ const Modal = () => {
   const isBtcSupply = action === "Supply" && isBtcToken;
   const isBtcWithdraw = action === "Withdraw" && isBtcToken;
   if (isBtcWithdraw) {
-    const min_withdraw_amount = 0.00005;
+    const min_withdraw_amount = 0.000054;
     if (new Decimal(amount || 0).lt(min_withdraw_amount)) {
       alerts["btcWithdraw"] = {
         title: `You must withdraw at least ${min_withdraw_amount} NBTC`,
