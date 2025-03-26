@@ -68,17 +68,6 @@ const CustomTable = ({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  if (isMobile) {
-    return (
-      <CustomTableMobile
-        columns={columns}
-        data={data}
-        isLoading={isLoading}
-        noDataText={noDataText}
-      />
-    );
-  }
-
   const handleFirstClick = () => {
     if (setPagination) {
       setPagination((d) => ({
@@ -120,6 +109,30 @@ const CustomTable = ({
       onSelectRow(rowData, rowIndex);
     }
   };
+  if (isMobile) {
+    return (
+      <>
+        <CustomTableMobile
+          columns={columns}
+          data={data}
+          isLoading={isLoading}
+          noDataText={noDataText}
+        />
+        {pagination?.totalPages && pagination?.page ? (
+          <div className="custom-table-pagination flex justify-end mt-2">
+            <CustomPagination
+              page={pagination.page}
+              totalPages={pagination.totalPages}
+              prevClick={handlePrevClick}
+              nextClick={handleNextClick}
+              firstClick={handleFirstClick}
+              lastClick={handleLastClick}
+            />
+          </div>
+        ) : null}
+      </>
+    );
+  }
 
   const headers = columns?.map((d) => {
     let text;
