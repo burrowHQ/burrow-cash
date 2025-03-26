@@ -67,9 +67,10 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { isMemeCategory, getActiveCategory } from "../../redux/categorySelectors";
 import { setActiveCategory } from "../../redux/marginTrading";
 import { useBtcAction } from "../../hooks/useBtcBalance";
-import { SatoshiIcon, BtcChainIcon, ThefaucetIcon } from "../../components/Icons/Icons";
+import { SatoshiIcon, BtcChainIcon } from "../../components/Icons/Icons";
 import { getPageTypeFromUrl } from "../../utils/commonUtils";
 import Breadcrumb from "../../components/common/breadcrumb";
+import { beautifyPrice } from "../../utils/beautyNumber";
 
 const DetailData = createContext(null) as any;
 const TokenDetail = () => {
@@ -996,7 +997,7 @@ function TokenUserInfo() {
           <span className="text-sm text-gray-300">Available to Supply</span>
           <div className="flex items-center]">
             <span className="text-sm text-white mr-2.5">
-              {accountId ? formatWithCommas_number(supplyBalance) : "-"}
+              {accountId ? beautifyPrice(supplyBalance) : "-"}
             </span>
             <LPTokenCell asset={tokenRow} balance={supplyBalance}>
               {getIcons()}
@@ -1150,18 +1151,24 @@ function YouSupplied() {
             <span className="text-lg text-white font-bold">You Supplied</span>
             <div className="flex flex-col items-end">
               <span className="text-lg text-white font-bold">
-                {formatWithCommas_number(supplied?.supplied)}
+                {beautifyPrice(supplied?.supplied || 0)}
+                {/* {formatWithCommas_number(supplied?.supplied)} */}
               </span>
               <span className="text-xs text-gray-300">
                 {supplied
-                  ? formatWithCommas_usd(
+                  ? // ? formatWithCommas_usd(
+                    //     new Decimal(supplied?.supplied || 0).mul(supplied?.price || 0).toFixed(),
+                    //   )
+                    beautifyPrice(
                       new Decimal(supplied?.supplied || 0).mul(supplied?.price || 0).toFixed(),
+                      true,
                     )
                   : "$-"}
               </span>
             </div>
           </div>
-          <Label title="Collateral" content={formatWithCommas_number(supplied?.collateral)} />
+          {/* formatWithCommas_number(supplied?.collateral) */}
+          <Label title="Collateral" content={beautifyPrice(supplied?.collateral || 0)} />
           <div className="flex items-center justify-between gap-2 mt-[35px]">
             <YellowLineButton
               disabled={withdraw_disabled}
@@ -1265,12 +1272,17 @@ function YouBorrowed() {
             <span className="text-lg text-white font-bold">You Borrowed</span>
             <div className="flex flex-col items-end">
               <span className="text-lg text-white font-bold">
-                {digitalProcess(totalBorrowedAmount, 2)}
+                {/* {digitalProcess(totalBorrowedAmount, 2)} */}
+                {beautifyPrice(totalBorrowedAmount || 0)}
               </span>
               <span className="text-xs text-gray-300">
-                {formatWithCommas_usd(
+                {beautifyPrice(
                   new Decimal(totalBorrowedAmount).mul(tokenRow?.price || 0).toFixed(),
+                  true,
                 )}
+                {/* {formatWithCommas_usd(
+                  new Decimal(totalBorrowedAmount).mul(tokenRow?.price || 0).toFixed(),
+                )} */}
               </span>
             </div>
           </div>
@@ -1282,14 +1294,21 @@ function YouBorrowed() {
                 content={
                   <div className="flex items-center">
                     <span className="text-sm text-white mr-0.5">
-                      {formatWithCommas_number(borrowedData?.borrowed || 0)}
+                      {/* {formatWithCommas_number(borrowedData?.borrowed || 0)} */}
+                      {beautifyPrice(borrowedData?.borrowed || 0)}
                     </span>
                     <span className="text-xs text-gray-300">
                       (
-                      {formatWithCommas_usd(
+                      {/* {formatWithCommas_usd(
                         new Decimal(borrowedData?.borrowed || 0)
                           .mul(borrowedData?.price || 0)
                           .toFixed(),
+                      )} */}
+                      {beautifyPrice(
+                        new Decimal(borrowedData?.borrowed || 0)
+                          .mul(borrowedData?.price || 0)
+                          .toFixed(),
+                        true,
                       )}
                       )
                     </span>

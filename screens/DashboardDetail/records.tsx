@@ -16,6 +16,7 @@ import {
   PikespeakIcon,
   TxLeftArrow,
 } from "../../components/Icons/Icons";
+import { beautifyPrice } from "../../utils/beautyNumber";
 
 const Records = ({ isShow }) => {
   const [docs, setDocs] = useState<any>([]);
@@ -190,7 +191,8 @@ const getColumns = ({ showToast, handleTxClick, txLoadingStates }) => [
       const tokenAmount = Number(
         shrinkToken(amount, (metadata?.decimals || 0) + (extra_decimals || 0)),
       );
-      return <div>{tokenAmount.toLocaleString(undefined, TOKEN_FORMAT)}</div>;
+      // return <div>{tokenAmount.toLocaleString(undefined, TOKEN_FORMAT)}</div>;
+      return <div>{beautifyPrice(tokenAmount)}</div>;
     },
   },
   {
@@ -310,13 +312,6 @@ function TimeConponent({ originalData, txLoadingStates, handleTxClick }) {
                   <TxLeftArrow />
                 </div>
               )}
-              {/* {copyIconVisible[2] && (
-                    <CopyToClipboard text={txid} onCopy={() => showToast("Copied")}>
-                      <div className="cursor-pointer ml-2">
-                        <CopyIcon />
-                      </div>
-                    </CopyToClipboard>
-                  )} */}
             </div>
           </div>
         )}

@@ -4,6 +4,7 @@ import { UIAsset } from "../../interfaces";
 import { DEFAULT_POSITION } from "../../utils/config";
 import { digitalProcess } from "../../utils/uiNumber";
 import { useAvailableAssets } from "../../hooks/hooks";
+import { beautifyPrice } from "../../utils/beautyNumber";
 
 const AvailableBorrowCell = ({
   asset,
@@ -44,7 +45,8 @@ const AvailableBorrowCell = ({
         }}
       >
         <span className="text-sm text-white mr-2.5 border-b border-dashed border-dark-800">
-          {digitalProcess(borrowData?.[1], 2)}
+          {beautifyPrice(borrowData?.[1])}
+          {/* {digitalProcess(borrowData?.[1], 2)} */}
         </span>
         <img src={asset?.icon} className="w-5 h-5 rounded-full" alt="" />
       </div>

@@ -10,6 +10,7 @@ import { formatTokenValueWithMilify, getDateString } from "../../helpers/helpers
 import { getLiquidations } from "../../api/get-liquidations";
 import { setUnreadLiquidation } from "../../redux/appSlice";
 import { getAccountId } from "../../redux/accountSelectors";
+import { beautifyPrice } from "../../utils/beautyNumber";
 
 const Liquidations = ({ isShow, setLiquidationPage }) => {
   const [docs, setDocs] = useState([]);
@@ -144,7 +145,8 @@ const columns = [
             className="whitespace-normal"
             title={`${tokenAmount.toLocaleString(undefined, TOKEN_FORMAT)} ${tokenSymbol}`}
           >
-            {formatTokenValueWithMilify(tokenAmount, 4)} {tokenSymbol}
+            {/* {formatTokenValueWithMilify(tokenAmount, 4)} {tokenSymbol} */}
+            {beautifyPrice(tokenAmount || 0)} {tokenSymbol}
           </div>
         );
       });
