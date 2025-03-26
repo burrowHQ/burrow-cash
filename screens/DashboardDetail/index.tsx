@@ -46,7 +46,11 @@ const Index = () => {
   } else {
     supplyBorrowNode = (
       <StyledSupplyBorrow className="gap-6 lg:flex mb-10">
-        <YourSupplied suppliedRows={suppliedRows} total={totalSuppliedUSD as number} />
+        <YourSupplied
+          suppliedRows={suppliedRows}
+          memeCategory={isMemeCategory}
+          total={totalSuppliedUSD as number}
+        />
         <YourBorrowed
           borrowedRows={borrowedAll}
           accountId={accountId}

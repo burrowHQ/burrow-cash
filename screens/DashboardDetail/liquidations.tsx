@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import CustomTable from "../../components/CustomTable/CustomTable";
 import { shrinkToken, TOKEN_FORMAT } from "../../store";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
@@ -21,7 +22,8 @@ const Liquidations = ({ isShow, setLiquidationPage }) => {
     page: 1,
   });
   const dispatch = useAppDispatch();
-  const isMeme = useAppSelector(isMemeCategory);
+  const router = useRouter();
+  const isMeme = router.query.pageType == "meme";
   const assets = useAppSelector(getAssetsCategory(isMeme));
   const accountId = useAppSelector(getAccountId);
   useEffect(() => {

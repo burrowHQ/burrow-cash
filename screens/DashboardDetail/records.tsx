@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/router";
 import CustomTable from "../../components/CustomTable/CustomTable";
 import Datasource from "../../data/datasource";
 import { useAccountId, useToastMessage } from "../../hooks/hooks";
@@ -28,7 +29,8 @@ const Records = ({ isShow }) => {
   const [txLoadingStates, setTxLoadingStates] = useState({});
   const accountId = useAccountId();
   const { toastMessage, showToast } = useToastMessage();
-  const isMeme = useAppSelector(isMemeCategory);
+  const router = useRouter();
+  const isMeme = router.query.pageType == "meme";
   const assets = useAppSelector(getAssetsCategory(isMeme));
   const [isLoading, setIsLoading] = useState(false);
 
