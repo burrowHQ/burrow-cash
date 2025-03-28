@@ -18,7 +18,7 @@ export function StatsRegular({
   tip?: string;
 }) {
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1 relative z-10">
       <div className="flex items-center gap-1">
         <span className="text-sm text-white text-opacity-40">{title}</span>
         {tip ? <TagToolTip title={tip} /> : null}

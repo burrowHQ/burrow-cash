@@ -140,7 +140,7 @@ function DashboardOverviewPc() {
           Position Detail
         </span>
       </div>
-      <div className="relative grid grid-cols-4 bg-dark-110 rounded-xl border border-dark-50 px-[30px] py-6 mt-4 hover:border-primary">
+      <div className="relative grid grid-cols-4 bg-dark-110 rounded-xl border border-dark-50 px-[30px] py-6 mt-4 hover:border-primary overflow-hidden">
         <StatsRegular title="Net Liquidity" value={userNetLiquidityValue} tip={NetLiquidityTip} />
         <StatsRegular title="Net APY" value={amountMain} tip={NetAPYTip} />
         <StatsRegular title="Daily Rewards" value={dailyRewards} tip={DailyRewardsTip} />
