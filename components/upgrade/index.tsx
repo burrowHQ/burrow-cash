@@ -42,6 +42,7 @@ export default function Upgrade({ Component, pageProps }) {
     portfolio.positions,
     Object.keys(assets?.data || {}).length,
     JSON.stringify(config || {}),
+    JSON.stringify(configMEME || {}),
   ]);
   async function fetch() {
     localStorage.removeItem("persist:root");
