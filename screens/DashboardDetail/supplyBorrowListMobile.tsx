@@ -6,7 +6,7 @@ import DashboardReward from "./dashboardReward";
 import { formatTokenValue, formatUSDValue, millifyNumber } from "../../helpers/helpers";
 import { AdjustButton, MarketButton, RepayButton, WithdrawButton } from "./supplyBorrowButtons";
 import { NoDataMascot } from "../../components/Icons/Icons";
-import { hiddenAssets } from "../../utils/config";
+import { hiddenAssets, hiddenAssetsMEME } from "../../utils/config";
 import CustomTooltips from "../../components/CustomTooltips/CustomTooltips";
 import { APYCell } from "../Market/APYCell";
 
@@ -190,7 +190,9 @@ const SupplyItem = ({ data, memeCategory }: { data: any; memeCategory?: boolean 
           {iconImg}
           <div className="flex flex-col">
             <div className="h4b">{symbolNode}</div>
-            {hiddenAssets.includes(data?.tokenId || "") ? null : (
+            {(memeCategory ? hiddenAssetsMEME : hiddenAssets).includes(
+              data?.tokenId || "",
+            ) ? null : (
               <MarketButton
                 tokenId={data?.tokenId}
                 style={{

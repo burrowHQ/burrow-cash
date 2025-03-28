@@ -12,6 +12,14 @@ export const hiddenAssets = [
   "4691937a7508860f876c9c0a2a617e7d9e945d4b.factory.bridge.near",
   "v2-nearx.stader-labs.near",
 ];
+export const hiddenAssetsMEME = [
+  "wrap.near",
+  "ftv2.nekotoken.near",
+  "usdt.tether-token.near",
+  "nbtc.toalice.near",
+  "token.burrow.near",
+  "abg-966.meme-cooking.near",
+];
 export const lpTokenPrefix = "shadow_ref_v1";
 export const blackAssets = ["shadow_ref_v1-0"];
 export const MARGIN_MIN_COLLATERAL_USD = 1;

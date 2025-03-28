@@ -12,7 +12,7 @@ import assets from "../../components/Assets";
 import DashboardOverview from "./dashboardOverview";
 import SupplyBorrowListMobile from "./supplyBorrowListMobile";
 import { AdjustButton, WithdrawButton, RepayButton, MarketButton } from "./supplyBorrowButtons";
-import { hiddenAssets } from "../../utils/config";
+import { hiddenAssets, hiddenAssetsMEME } from "../../utils/config";
 import { APYCell } from "../Market/APYCell";
 import { beautifyPrice } from "../../utils/beautyNumber";
 import { getPageTypeFromUrl } from "../../utils/commonUtils";
@@ -249,7 +249,9 @@ const YourSupplied = ({
         selectedRowIndex={selected?.index}
         actionRow={
           <div className="flex gap-2 pb-6 table-action-row">
-            {hiddenAssets.includes(selected?.data?.tokenId || "") ? null : (
+            {(memeCategory ? hiddenAssetsMEME : hiddenAssets).includes(
+              selected?.data?.tokenId || "",
+            ) ? null : (
               <MarketButton tokenId={selected?.data?.tokenId} />
             )}
             <WithdrawButton tokenId={selected?.data?.tokenId} />

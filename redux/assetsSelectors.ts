@@ -2,7 +2,7 @@ import Decimal from "decimal.js";
 import { createSelector } from "@reduxjs/toolkit";
 
 import type { RootState } from "./store";
-import { hiddenAssets } from "../utils/config";
+import { hiddenAssets, hiddenAssetsMEME } from "../utils/config";
 import { toUsd, transformAsset } from "./utils";
 
 export const getAvailableAssets = ({ source }: { source?: "supply" | "borrow" | "" }) =>
@@ -19,21 +19,24 @@ export const getAvailableAssets = ({ source }: { source?: "supply" | "borrow" | 
       let app: typeof appMain;
       let assets: typeof assetsMain;
       let account: typeof accountMain;
+      let hidden;
       if (isMeme) {
         app = appMEME;
         assets = assetsMEME;
         account = accountMEME;
+        hidden = hiddenAssetsMEME;
       } else {
         app = appMain;
         assets = assetsMain;
         account = accountMain;
+        hidden = hiddenAssets;
       }
       const filterKey = source === "supply" ? "can_deposit" : "can_borrow";
       const assets_filter_by_source = source
         ? Object.keys(assets).filter((tokenId) => assets[tokenId].config[filterKey])
         : Object.keys(assets);
       return assets_filter_by_source
-        .filter((tokenId) => !hiddenAssets.includes(assets[tokenId].token_id))
+        .filter((tokenId) => !hidden.includes(assets[tokenId].token_id))
         .map((tokenId) => {
           return transformAsset(assets[tokenId], account, assets, app);
         });
