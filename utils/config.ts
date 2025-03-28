@@ -8,6 +8,8 @@ export const hiddenAssets = [
   "meta-token.near",
   "usn",
   "a663b02cf0a4b149d2ad41910cb81e23e1c41c32.factory.bridge.near",
+  "4691937a7508860f876c9c0a2a617e7d9e945d4b.factory.bridge.near",
+  "v2-nearx.stader-labs.near",
 ];
 export const lpTokenPrefix = "shadow_ref_v1";
 
