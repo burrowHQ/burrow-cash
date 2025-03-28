@@ -348,8 +348,9 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
     const max_leverage_c_amount = max_leverage_c_value.div(priceC);
     const maxRemovableFromLeverage = new Decimal(tokenCInfoBalance || 0)
       .minus(max_leverage_c_amount)
+      .mul(0.99)
       .toNumber();
-    const finalMax = Math.min(maxRemovableFromLeverage, maxRemovableFromLiq);
+    const finalMax = Math.max(Math.min(maxRemovableFromLeverage, maxRemovableFromLiq), 0);
     return finalMax;
   };
   const handleLeverAddClick = (value) => {
@@ -412,7 +413,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
           <Box sx={{ p: ["20px", "20px"] }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center justify-center">
-                <p className="text-lg mr-2">Change Collateral</p>
+                <p className="text-lg mr-2">Change Collateral 2</p>
                 <div
                   className={`bg-opacity-10  text-xs py-0.5 pl-2.5 pr-1.5 rounded ${
                     positionType.class
