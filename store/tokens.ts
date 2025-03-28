@@ -1,7 +1,10 @@
 import { Contract } from "near-api-js";
 import Decimal from "decimal.js";
 import BN from "bn.js";
-
+// eslint-disable-next-line import/no-cycle
+import { Transaction as SelectorTransaction } from "@near-wallet-selector/core";
+// eslint-disable-next-line import/no-cycle
+import { expandToken, expandTokenDecimal, getContract, shrinkToken } from "./helper";
 import { getBurrow } from "../utils";
 import {
   DEFAULT_PRECISION,
@@ -10,8 +13,8 @@ import {
   NEAR_STORAGE_DEPOSIT,
   NEAR_STORAGE_DEPOSIT_MIN,
   NEAR_STORAGE_EXTRA_DEPOSIT,
+  NEAR_STORAGE_TOKEN,
 } from "./constants";
-import { expandToken, expandTokenDecimal, getContract, shrinkToken } from "./helper";
 import {
   ViewMethodsLogic,
   ChangeMethodsLogic,
@@ -25,11 +28,11 @@ import {
   executeMultipleTransactions,
   FunctionCallOptions,
   isRegistered,
-  isRegisteredNew,
   Transaction,
 } from "./wallet";
 
 import getConfig from "../utils/config";
+import { store } from "../redux/store";
 
 const { SPECIAL_REGISTRATION_TOKEN_IDS } = getConfig() as any;
 
@@ -100,52 +103,21 @@ export const getAllMetadata = async (token_ids: string[]): Promise<IMetadata[]> 
 
 export const prepareAndExecuteTokenTransactions = async (
   tokenContract: Contract,
-  functionCall?: FunctionCallOptions,
-  additionalOperations: Transaction[] = [],
+  functionCall: FunctionCallOptions,
 ) => {
   const { account } = await getBurrow();
   const transactions: Transaction[] = [];
 
   const functionCalls: FunctionCallOptions[] = [];
-
   // check if account is registered in the token contract
   if (
-    !(await isRegistered(account.accountId, tokenContract)) &&
+    !(await isRegistered(account.accountId, tokenContract.contractId)) &&
     !NO_STORAGE_DEPOSIT_CONTRACTS.includes(tokenContract.contractId)
   ) {
-    if (SPECIAL_REGISTRATION_TOKEN_IDS.includes(tokenContract.contractId)) {
-      const r = await isRegisteredNew(account.accountId, tokenContract);
-      if (r) {
-        transactions.push({
-          receiverId: tokenContract.contractId,
-          functionCalls: [
-            {
-              methodName: ChangeMethodsToken[ChangeMethodsToken.storage_deposit],
-              attachedDeposit: new BN(expandToken(NEAR_STORAGE_DEPOSIT, NEAR_DECIMALS)),
-            },
-          ],
-        });
-      } else {
-        transactions.push({
-          receiverId: tokenContract.contractId,
-          functionCalls: [
-            {
-              methodName: ChangeMethodsToken[ChangeMethodsToken.register_account],
-              gas: new BN("10000000000000"),
-              args: {
-                account_id: account.accountId,
-              },
-              attachedDeposit: new BN(0),
-            },
-          ],
-        });
-      }
-    } else {
-      functionCalls.push({
-        methodName: ChangeMethodsToken[ChangeMethodsToken.storage_deposit],
-        attachedDeposit: new BN(expandToken(NEAR_STORAGE_DEPOSIT, NEAR_DECIMALS)),
-      });
-    }
+    functionCalls.push({
+      methodName: ChangeMethodsToken[ChangeMethodsToken.storage_deposit],
+      attachedDeposit: new BN(expandToken(NEAR_STORAGE_TOKEN, NEAR_DECIMALS)),
+    });
   }
 
   if (functionCall) {
@@ -157,32 +129,43 @@ export const prepareAndExecuteTokenTransactions = async (
     receiverId: tokenContract.contractId,
     functionCalls,
   });
-
-  transactions.push(...additionalOperations);
-
   await prepareAndExecuteTransactions(transactions);
 };
 
-export const prepareAndExecuteTransactions = async (operations: Transaction[] = []) => {
-  const { account, logicContract, view } = await getBurrow();
+export const prepareAndExecuteTransactions = async (
+  operations: Transaction[] = [],
+  isMeme?: boolean,
+  extraTranstion?: SelectorTransaction,
+) => {
+  const { account, logicContract, view, logicMEMEContract } = await getBurrow();
   const transactions: Transaction[] = [];
-
+  const isMemeCur = store?.getState()?.category?.activeCategory == "meme";
+  let isMemeCategory;
+  if (isMeme == undefined) {
+    isMemeCategory = isMemeCur;
+  } else {
+    isMemeCategory = isMeme;
+  }
+  // check if account is registered in burrow cash
+  const burrowContract = isMemeCategory ? logicMEMEContract : logicContract;
   const storageDepositTransaction = (deposit: number) => ({
-    receiverId: logicContract.contractId,
+    receiverId: burrowContract.contractId,
     functionCalls: [
       {
         methodName: ChangeMethodsLogic[ChangeMethodsLogic.storage_deposit],
+        args: {
+          registration_only: false,
+          account_id: account.accountId,
+        },
         attachedDeposit: new BN(expandToken(deposit, NEAR_DECIMALS)),
       },
     ],
   });
-
-  // check if account is registered in burrow cash
-  if (!(await isRegistered(account.accountId, logicContract))) {
+  if (!(await isRegistered(account.accountId, burrowContract.contractId))) {
     transactions.push(storageDepositTransaction(NEAR_STORAGE_DEPOSIT));
   } else {
     const balance = (await view(
-      logicContract,
+      burrowContract,
       ViewMethodsLogic[ViewMethodsLogic.storage_balance_of],
       {
         account_id: account.accountId,
@@ -198,5 +181,5 @@ export const prepareAndExecuteTransactions = async (operations: Transaction[] = 
   }
 
   transactions.push(...operations);
-  await executeMultipleTransactions(transactions);
+  return executeMultipleTransactions(transactions, extraTranstion);
 };

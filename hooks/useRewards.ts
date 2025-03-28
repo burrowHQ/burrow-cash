@@ -14,17 +14,16 @@ import {
 import { getTokenLiquidity } from "../redux/selectors/getTokenLiquidity";
 import { useProtocolNetLiquidity } from "./useNetLiquidity";
 import { shrinkToken, USD_FORMAT } from "../store";
-import { useAvailableAssets } from "./hooks";
 import { getAccountPortfolio } from "../redux/accountSelectors";
 import { getRewards } from "../redux/utils";
-import { getAssets } from "../redux/assetsSelectors";
+import { getAssetsCategory } from "../redux/assetsSelectors";
 import { standardizeAsset, filterSentOutFarms } from "../utils";
 import { getNetGains } from "../redux/selectors/getAverageNetRewardApy";
 
-export function useRewards() {
-  const assetRewards = useAppSelector(getAccountRewards);
-  const protocol = useAppSelector(getProtocolRewards);
-  const tokenNetBalanceRewards = useAppSelector(getTokenNetBalanceRewards);
+export function useRewards(memeCategory?: boolean) {
+  const assetRewards = useAppSelector(getAccountRewards(memeCategory));
+  const protocol = useAppSelector(getProtocolRewards(memeCategory));
+  const tokenNetBalanceRewards = useAppSelector(getTokenNetBalanceRewards(memeCategory));
   const { brrr, totalUnClaimUSD } = assetRewards || {};
   const extra = Object.entries(assetRewards.extra);
   const net = Object.entries(assetRewards.net);
@@ -66,24 +65,27 @@ export function useRewards() {
     },
   };
 }
-export function useDailyRewards() {
-  const assetRewards = useAppSelector(getAccountDailyRewards);
+export function useDailyRewards(memeCategory) {
+  const assetRewards = useAppSelector(getAccountDailyRewards(memeCategory));
   return assetRewards;
 }
 
 export function useNetLiquidityRewards() {
+  const { activeCategory } = useAppSelector((state) => state.category);
   const rewards = useAppSelector(getNetLiquidityRewards);
   return rewards;
 }
 export function useTokenNetLiquidityRewards(tokenId: string) {
-  const assets = useAppSelector(getAssets);
+  const { activeCategory } = useAppSelector((state) => state.category);
+  const assets = useAppSelector(getAssetsCategory());
   const asset = assets.data[tokenId];
   const rewards = getRewards("tokennetbalance", asset, assets.data);
   return rewards;
 }
 
 export function useProRataNetLiquidityReward(tokenId, dailyAmount) {
-  const assets = useAppSelector(getAssets);
+  const { activeCategory } = useAppSelector((state) => state.category);
+  const assets = useAppSelector(getAssetsCategory());
   const net_tvl_multiplier = (assets?.data?.[tokenId].config.net_tvl_multiplier || 0) / 10000;
   const { protocolNetLiquidity } = useProtocolNetLiquidity(true);
   const tokenLiquidity = useAppSelector(getTokenLiquidity(tokenId));
@@ -93,10 +95,10 @@ export function useProRataNetLiquidityReward(tokenId, dailyAmount) {
   return dailyAmount * share;
 }
 
-export function useStakeRewardApy() {
-  const assetRewards = useAppSelector(getAccountRewardsForApy);
-  const portfolio = useAppSelector(getAccountPortfolio);
-  const assets = useAppSelector(getAssets);
+export function useStakeRewardApy(memeCategory?: boolean) {
+  const assetRewards = useAppSelector(getAccountRewardsForApy(memeCategory));
+  const portfolio = useAppSelector(getAccountPortfolio(memeCategory));
+  const assets = useAppSelector(getAssetsCategory(memeCategory));
   if (!assets?.data)
     return {
       avgStakeSupplyAPY: 0,

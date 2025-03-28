@@ -1,9 +1,8 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState } from "react";
 import { UIAsset } from "../../interfaces";
 import { ArrowDownIcon } from "./svg";
 import SelectToken, { IAssetType } from "../SelectToken";
 import { IToken } from "../../interfaces/asset";
-import { standardizeAsset } from "../../utils";
 import { isMobileDevice } from "../../helpers/helpers";
 
 export default function TokenBox({ asset, action }: { asset: UIAsset; action: string }) {

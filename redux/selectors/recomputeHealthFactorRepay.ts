@@ -10,8 +10,21 @@ import { getAdjustedSum } from "./getWithdrawMaxAmount";
 export const recomputeHealthFactorRepay = (tokenId: string, amount: number, position: string) =>
   createSelector(
     (state: RootState) => state.assets,
+    (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account,
-    (assets, account) => {
+    (state: RootState) => state.accountMEME,
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, category) => {
+      const isMeme = category.activeCategory == "meme";
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
+      if (isMeme) {
+        assets = assetsMEME;
+        account = accountMEME;
+      } else {
+        assets = assetsMain;
+        account = accountMain;
+      }
       if (!hasAssets(assets)) return { healthFactor: 0, maxBorrowValue: 0 };
       if (
         !account.portfolio ||

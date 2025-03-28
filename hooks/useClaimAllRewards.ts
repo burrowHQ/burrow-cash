@@ -1,17 +1,22 @@
 import { useAppSelector, useAppDispatch } from "../redux/hooks";
 import { isClaiming } from "../redux/accountSelectors";
-import { trackClaimButton } from "../utils/telemetry";
 import { farmClaimAll, fetchAccount } from "../redux/accountSlice";
+import { farmClaimAllMEME, fetchAccountMEME } from "../redux/accountSliceMEME";
 
-export function useClaimAllRewards(location: string) {
-  const dispatch = useAppDispatch();
+export function useClaimAllRewards(isMemeCategory?: boolean) {
   const isLoading = useAppSelector(isClaiming);
+  const dispatch = useAppDispatch();
 
   const handleClaimAll = () => {
-    trackClaimButton(location);
-    dispatch(farmClaimAll()).then(() => {
-      dispatch(fetchAccount());
-    });
+    if (isMemeCategory) {
+      dispatch(farmClaimAllMEME()).then(() => {
+        dispatch(fetchAccountMEME());
+      });
+    } else {
+      dispatch(farmClaimAll()).then(() => {
+        dispatch(fetchAccount());
+      });
+    }
   };
 
   return { handleClaimAll, isLoading };

@@ -123,6 +123,7 @@ export const getModalData = (asset): UIAsset & Props & { disabled: boolean } => 
       data.rates = [];
       break;
     case "Repay": {
+      // TODO available
       let minRepay = "0";
       if (poolAsset?.supplied?.shares) {
         minRepay = shrinkToken(
@@ -138,6 +139,7 @@ export const getModalData = (asset): UIAsset & Props & { disabled: boolean } => 
         interestChargedIn1min = new Decimal(borrowApy)
           .div(365 * 24 * 60)
           .div(100)
+          .mul(3)
           .mul(borrowed)
           .toFixed(decimals, 2);
       }
@@ -176,12 +178,7 @@ export const getModalData = (asset): UIAsset & Props & { disabled: boolean } => 
     }
     default:
   }
-  if (
-    action === "Borrow" ||
-    action === "Supply" ||
-    action === "Withdraw" ||
-    (action === "Repay" && !isRepayFromDeposits)
-  ) {
+  if (action === "Borrow" || action === "Supply" || action === "Withdraw" || action === "Repay") {
     if (new Decimal(amount || 0).gt(0) && new Decimal(expandToken(amount, asset.decimals)).lt(1)) {
       data.alerts["wallet"] = {
         title:
@@ -189,6 +186,20 @@ export const getModalData = (asset): UIAsset & Props & { disabled: boolean } => 
         severity: "warning",
       };
       disabled = true;
+    } else if (action == "Repay" && new Decimal(amount || 0).gt(0)) {
+      const ASSET = asset.assetOrigin;
+      const expandAmount = new Decimal(expandToken(amount, asset.decimals));
+      const share = new Decimal(ASSET?.borrowed?.shares || 0).div(
+        +(ASSET?.borrowed?.balance || 0) || 1,
+      );
+      if (expandAmount.mul(share).lt(1)) {
+        data.alerts["wallet"] = {
+          title:
+            "The current balance is too below, so that it cannot be processed by the contract.",
+          severity: "warning",
+        };
+        disabled = true;
+      }
     }
   }
 

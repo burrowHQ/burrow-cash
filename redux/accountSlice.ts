@@ -69,6 +69,8 @@ export const accountSlice = createSlice({
 
       if (portfolio) {
         state.portfolio = portfolio;
+      } else {
+        state.portfolio = initialState.portfolio;
       }
     });
   },

@@ -8,7 +8,10 @@ export const useAPY = ({
   onlyMarket = false,
   isStaking = false,
   excludeNetApy = false,
-}) => {
+  memeCategory,
+}: {
+  memeCategory?: boolean;
+} & Record<string, any>) => {
   const isBorrow = page === "borrow";
   const {
     computeRewardAPY,
@@ -20,6 +23,7 @@ export const useAPY = ({
     tokenId,
     isBorrow,
     onlyMarket: !!onlyMarket,
+    memeCategory,
   });
 
   const extraAPY = list.reduce((acc: number, { metadata, rewards, price, config }) => {
@@ -46,7 +50,7 @@ export const useAPY = ({
   const stakeBoostedAPY =
     baseAPY +
     (isBorrow || excludeNetApy ? 0 : netLiquidityAPY) * netTvlMultiplier +
-    (isBorrow ? 0 : Number(tokenNetAPY) * 1.5) +
+    (isBorrow ? 0 : Number(tokenNetAPY) * (memeCategory ? 1 : 1.5)) +
     sign * apy;
   return [boostedAPY, stakeBoostedAPY];
 };

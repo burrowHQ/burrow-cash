@@ -6,8 +6,8 @@ import { MenuButton, CloseIcon, ArrowRightIcon, ArrowTopRightIcon, ArrowDownIcon
 import { WrapperMenuMobile } from "./style";
 import { bridgeList } from "./Bridge";
 import { mainMenuList, helpMenu, dexMenu, Imenu } from "./menuData";
-import { toggleShowDust } from "../../redux/appSlice";
-import { getShowDust } from "../../redux/appSelectors";
+import { toggleShowDust } from "../../redux/marginTrading";
+import { getShowDust } from "../../redux/categorySelectors";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { DiscordIcon, MediumIcon, TwitterIcon } from "../Footer/svg";
 
@@ -71,9 +71,9 @@ const MenuItem = ({ item, isOuterLink, Icon, isLast, onClose }: PropsMenu) => {
   return (
     <div
       onClick={handleUrl}
-      className={`flex items-center justify-between h-[60px] px-6 ${
-        isLast ? "" : "border-b border-dark-700"
-      } ${isSelected ? "bg-dark-900" : ""}`}
+      className={`flex items-center justify-between h-[60px] px-6 ${isLast ? "" : ""} ${
+        isSelected ? "bg-white bg-opacity-5" : ""
+      }`}
     >
       <div className="flex items-center gap-2">
         {Icon}
@@ -90,12 +90,10 @@ const BridgeMenuItem = ({ onClose }: { onClose: () => void }) => {
     setOpen(!open);
   }
   return (
-    <div className={`${open ? "bg-dark-900" : ""}`}>
+    <div className={`${open ? "bg-white bg-opacity-5" : ""}`}>
       <div
         onClick={handleBridge}
-        className={`flex items-center justify-between h-[60px] px-6 ${
-          open ? "" : "border-b border-dark-700"
-        }`}
+        className={`flex items-center justify-between h-[60px] px-6 ${open ? "" : ""}`}
       >
         <div className="flex items-center gap-2">
           <span className="text-base text-white">Bridge</span>
@@ -129,12 +127,10 @@ const SetMenuItem = () => {
     setOpen(!open);
   }
   return (
-    <div className={`${open ? "bg-dark-900" : ""}`}>
+    <div className={`${open ? "bg-white bg-opacity-5" : ""}`}>
       <div
         onClick={handle}
-        className={`flex items-center justify-between h-[60px] px-6 ${
-          open ? "" : "border-b border-dark-700"
-        }`}
+        className={`flex items-center justify-between h-[60px] px-6 ${open ? "" : ""}`}
       >
         <div className="flex items-center gap-2">
           <span className="text-base text-white">Setting</span>
@@ -161,7 +157,7 @@ function SliderButton({ active, ...rest }: { active: boolean; onClick: any }) {
   return (
     <div
       {...rest}
-      className={`flex items-center h-5 w-9 rounded-xl p-0.5 cursor-pointer border border-dark-500 transition-all ${
+      className={`flex items-center h-5 w-9 rounded-xl p-0.5 cursor-pointer border border-dark-50 transition-all ${
         active ? "bg-primary" : "bg-dark-600"
       }`}
     >
@@ -200,7 +196,7 @@ const BridgeSubMenuItem = ({ title, pathname, subTitle, onClose }: PropsSubMenu)
 
 const CommunityItem = () => {
   return (
-    <div className="flex items-center justify-between h-[60px] px-6 border-b border-dark-700">
+    <div className="flex items-center justify-between h-[60px] px-6 ">
       <div className="flex items-center gap-2">
         <span className="text-base text-white">Community</span>
       </div>

@@ -33,7 +33,7 @@ NEXT_PUBLIC_CONTRACT_NAME=contract.1638481328.burrow.testnet
 # NEXT_PUBLIC_DEFAULT_NETWORK=mainnet
 # NEXT_PUBLIC_CONTRACT_NAME=contract.main.burrow.near
 
-NEXT_PUBLIC_NEAR_STORAGE_DEPOSIT=0.25
+NEXT_PUBLIC_NEAR_STORAGE_DEPOSIT=0.15
 
 # get the id from the walletconnect.com website (create a new project in dashboard)
 NEXT_PUBLIC_WALLET_CONNECT_ID=

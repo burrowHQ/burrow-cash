@@ -6,7 +6,6 @@ import { setupNightly } from "@near-wallet-selector/nightly";
 import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
 import { setupMeteorWallet } from "@near-wallet-selector/meteor-wallet";
 import { setupWalletConnect } from "@near-wallet-selector/wallet-connect";
-import { setupNeth } from "@near-wallet-selector/neth";
 import { setupNearMobileWallet } from "@near-wallet-selector/near-mobile-wallet";
 import { setupModal } from "ref-modal-ui";
 import { setupLedger } from "@near-wallet-selector/ledger";
@@ -40,8 +39,10 @@ import { getRpcList } from "../components/Rpc/tool";
 import getConfig, {
   defaultNetwork,
   LOGIC_CONTRACT_NAME,
+  LOGIC_MEMECONTRACT_NAME,
   WALLET_CONNECT_ID,
   isTestnet,
+  NBTC_ENV,
 } from "./config";
 
 declare global {
@@ -113,7 +114,7 @@ const web3Modal = createWeb3Modal({
 const walletConnect2 = setupWalletConnect({
   projectId: WALLET_CONNECT_ID,
   metadata: {
-    name: "RHEA Finance",
+    name: "REHA Finance",
     description: "Burrow with NEAR Wallet Selector",
     url: "https://github.com/near/wallet-selector",
     icons: ["https://avatars.githubusercontent.com/u/37784886"],
@@ -154,6 +155,7 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
   } catch (error) {}
   selector = await setupWalletSelector({
     modules: [
+      setupMeteorWallet(),
       setupEthereumWallets({
         wagmiConfig,
         web3Modal,
@@ -161,12 +163,11 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
       } as any),
       setupBTCWallet({
         autoConnect: true,
-        env: "mainnet",
+        env: NBTC_ENV,
       }) as any,
-      setupOKXWallet({}),
       myNearWallet,
+      setupOKXWallet({}),
       setupSender() as any,
-      setupMeteorWallet(),
       walletConnect2,
       setupNearMobileWallet({
         dAppMetadata: {
@@ -176,10 +177,6 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
       }),
       setupHereWallet(),
       setupNightly(),
-      setupNeth({
-        bundle: false,
-        gas: "300000000000000",
-      }),
       setupKeypom({
         networkId: defaultNetwork,
         signInContractId: LOGIC_CONTRACT_NAME,

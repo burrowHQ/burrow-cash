@@ -4,6 +4,7 @@ import { setProtocolStats } from "../redux/appSlice";
 
 export function useStatsToggle() {
   const dispatch = useAppDispatch();
+  const { activeCategory } = useAppSelector((state) => state.category);
   const protocolStats = useAppSelector(getProtocolStats);
 
   const setStats = (v: boolean) => dispatch(setProtocolStats(v));

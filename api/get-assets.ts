@@ -1,13 +1,13 @@
 import Decimal from "decimal.js";
-import { getAllMetadata, getAssetsDetailed, getPrices, getUnitLptAssets } from "../store";
+import { getAllMetadata, getAssetsDetail, getPrices, getUnitLptAssets } from "../store";
 import { shrinkToken } from "../store/helper";
-import { lpTokenPrefix } from "../utils/config";
+import { lpTokenPrefix, blackAssets } from "../utils/config";
 import { IToken, IUnitLptAssetDetail, IMetadata } from "../interfaces/asset";
 import { standardizeAsset } from "../utils";
 
 const getPrice = (tokenId, priceResponse, metadata) => {
   const price = priceResponse.prices.find((p) => p.asset_id === tokenId)?.price || undefined;
-  if (!price) return 0;
+  if (!price) return { usd: "0", decimals: metadata.decimals, multiplier: "0" };
   const usd = Number(price.multiplier) / 10 ** (price.decimals - metadata.decimals);
   return { ...price, usd };
 };
@@ -40,7 +40,8 @@ const getLptMetadata = (lp_token_details: IUnitLptAssetDetail, priceMap, metadat
 };
 
 const getAssets = async () => {
-  const assets = await getAssetsDetailed();
+  const assets_pending = await getAssetsDetail();
+  const assets = assets_pending.filter((asset) => !blackAssets.includes(asset.token_id));
   const token_ids_from_regular = assets
     .filter((asset) => asset.token_id.indexOf(lpTokenPrefix) === -1)
     .map((asset) => asset.token_id);
@@ -56,7 +57,7 @@ const getAssets = async () => {
   const tokenIds = Array.from(new Set(token_ids_from_regular.concat(token_ids_from_lp)));
   const metadata = await getAllMetadata(tokenIds);
   const metadataMap = metadata.reduce((acc, cur) => ({ ...acc, [cur.token_id]: cur }), {});
-  const priceResponse = await getPrices();
+  const priceResponse = await getPrices({});
   const priceMap = tokenIds.reduce(
     (acc, cur) => ({ ...acc, [cur]: getPrice(cur, priceResponse, metadataMap[cur]) }),
     {},

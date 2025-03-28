@@ -9,10 +9,11 @@ interface Props {
   location: string;
   onDone?: () => void;
   disabled?: boolean;
+  memeCategory?: boolean;
 }
 
-function ClaimAllRewards({ Button, location, onDone, disabled = false }: Props) {
-  const { handleClaimAll, isLoading } = useClaimAllRewards(location);
+function ClaimAllRewards({ Button, onDone, disabled = false, memeCategory }: Props) {
+  const { handleClaimAll, isLoading } = useClaimAllRewards(memeCategory);
   const [hasClicked, setHasClicked] = useState(false);
 
   const loading = Button.name === "ClaimMenuItem" ? undefined : isLoading;

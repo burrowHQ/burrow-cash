@@ -12,8 +12,21 @@ import { DEFAULT_POSITION } from "../../utils/config";
 export const recomputeHealthFactorWithdraw = (tokenId: string, amount: number) =>
   createSelector(
     (state: RootState) => state.assets,
+    (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account,
-    (assets, account) => {
+    (state: RootState) => state.accountMEME,
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, category) => {
+      const isMeme = category.activeCategory == "meme";
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
+      if (isMeme) {
+        assets = assetsMEME;
+        account = accountMEME;
+      } else {
+        assets = assetsMain;
+        account = accountMain;
+      }
       if (!hasAssets(assets)) return { healthFactor: 0, maxBorrowValue: 0 };
       if (!account.portfolio || !tokenId) return { healthFactor: 0, maxBorrowValue: 0 };
       const asset = assets.data[tokenId];
@@ -47,14 +60,6 @@ export const recomputeHealthFactorWithdraw = (tokenId: string, amount: number) =
           apr: "0",
         };
       }
-
-      // if (!clonedAccount.portfolio.collateral[tokenId]) {
-      //   clonedAccount.portfolio.collateral[tokenId] = {
-      //     balance: "0",
-      //     shares: "0",
-      //     apr: "0",
-      //   };
-      // }
       const collateralBalance = new Decimal(
         clonedAccount.portfolio.positions[position].collateral[tokenId].balance,
       );
@@ -71,9 +76,6 @@ export const recomputeHealthFactorWithdraw = (tokenId: string, amount: number) =
         shares: newCollateralBalance.toFixed(),
         balance: newCollateralBalance.toFixed(),
       };
-      // clonedAccount.portfolio.positions[position].collateral[tokenId].balance =
-      //   newCollateralBalance.toFixed();
-
       const adjustedCollateralSum = getAdjustedSum(
         "collateral",
         clonedAccount.portfolio,

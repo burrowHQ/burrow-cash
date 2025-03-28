@@ -16,7 +16,7 @@ import {
   IConfig,
   IPrice,
 } from "../interfaces";
-import { isRegistered } from "./wallet";
+import { isRegistered, Transaction } from "./wallet";
 import {
   NEARX_TOKEN,
   LINEAR_TOKEN,
@@ -47,18 +47,23 @@ export const rateToApr = (rate: string): string => {
   return apr.toFixed(2);
 };
 
-export const getPrices = async (): Promise<IPrices | undefined> => {
-  const { view, logicContract } = await getBurrow();
-  const config = (await view(
-    logicContract,
-    ViewMethodsLogic[ViewMethodsLogic.get_config],
-  )) as IConfig;
+export const getPrices = async ({ isMeme }: { isMeme?: boolean }): Promise<IPrices | undefined> => {
+  const { view, logicContract, logicMEMEContract } = await getBurrow();
+  let config;
+  if (isMeme) {
+    config = (await view(
+      logicMEMEContract,
+      ViewMethodsLogic[ViewMethodsLogic.get_config],
+    )) as IConfig;
+  } else {
+    config = (await view(logicContract, ViewMethodsLogic[ViewMethodsLogic.get_config])) as IConfig;
+  }
   const { enable_pyth_oracle } = config;
   if (enable_pyth_oracle) {
     const pythResponse = await getPythPrices();
     return pythResponse;
   } else {
-    const oracleResponse = await getOraclePrices();
+    const oracleResponse = await getOraclePrices(isMeme);
     return oracleResponse;
   }
 };
@@ -197,11 +202,11 @@ const getPythPrices = async () => {
     return undefined;
   }
 };
-const getOraclePrices = async () => {
-  const { view, oracleContract } = await getBurrow();
+const getOraclePrices = async (isMeme?: boolean) => {
+  const { view, oracleContract, memeOracleContract } = await getBurrow();
   try {
     const priceResponse: IPrices = (await view(
-      oracleContract,
+      isMeme ? memeOracleContract : oracleContract,
       ViewMethodsOracle[ViewMethodsOracle.get_price_data],
     )) as IPrices;
 
@@ -234,11 +239,15 @@ export const expandToken = (
   return expandTokenDecimal(value, decimals).toFixed(fixed);
 };
 
+export const shrinkTokenDecimal = (value: string | number, decimals: string | number): Decimal => {
+  return new Decimal(value).div(new Decimal(10).pow(decimals));
+};
 export const shrinkToken = (
   value: string | number,
   decimals: string | number,
   fixed?: number,
 ): string => {
+  if (!value) return "";
   return new Decimal(value).div(new Decimal(10).pow(decimals)).toFixed(fixed);
 };
 
@@ -258,17 +267,62 @@ export const getContract = async (
       .filter((m) => typeof m === "string")
       .map((m) => m as string),
   });
-
   return contract;
 };
 
-export const registerNearFnCall = async (accountId: string, contract: Contract) =>
-  !(await isRegistered(accountId, contract))
-    ? [
-        {
-          methodName: ChangeMethodsLogic[ChangeMethodsLogic.storage_deposit],
-          attachedDeposit: new BN(expandToken(0.00125, NEAR_DECIMALS)),
-          gas: new BN("5000000000000"),
+/**
+ * @param accountId;
+ * @param contract;
+ * @returns;
+ */
+export const registerNearFnCall = async (accountId: string, contract: Contract) => {
+  const registered = await isRegistered(accountId, contract.contractId);
+  if (!registered) {
+    const storage = await getStorageBalanceBounds(contract.contractId);
+    return [
+      {
+        methodName: ChangeMethodsLogic[ChangeMethodsLogic.storage_deposit],
+        attachedDeposit: new BN(storage),
+        gas: new BN("5000000000000"),
+      },
+    ];
+  }
+  return [];
+};
+
+export const registerAccountOnToken = async (accountId: string, tokenId: string) => {
+  const storage = await getStorageBalanceBounds(tokenId);
+  return {
+    receiverId: tokenId,
+    functionCalls: [
+      {
+        methodName: ChangeMethodsLogic[ChangeMethodsLogic.storage_deposit],
+        args: {
+          registration_only: true,
+          account_id: accountId,
         },
-      ]
-    : [];
+        attachedDeposit: new BN(storage),
+      },
+    ],
+  } as Transaction;
+};
+export const registerAccountOnTokenWithQuery = async (accountId: string, tokenId: string) => {
+  const registered = await isRegistered(accountId, tokenId);
+  if (!registered) {
+    const registerTranstion = registerAccountOnToken(accountId, tokenId);
+    return registerTranstion as unknown as Transaction;
+  }
+};
+
+export const getStorageBalanceBounds = async (tokenId: string) => {
+  const { view } = await getBurrow();
+  const tokenContract: Contract = await getTokenContract(tokenId);
+  const storage: any = await view(
+    tokenContract,
+    ViewMethodsToken[ViewMethodsToken.storage_balance_bounds],
+  );
+  if (storage) {
+    return storage.max || storage.min;
+  }
+  return 100000000000000000000000;
+};

@@ -17,7 +17,12 @@ import {
   setUnreadLiquidation,
   setToastMessage,
 } from "../redux/appSlice";
+import {
+  setRepayFrom as setRepayFromMEME,
+  setUnreadLiquidation as setUnreadLiquidationMEME,
+} from "../redux/appSliceMEME";
 import { getViewAs } from "../utils";
+import { isMemeCategory } from "../redux/categorySelectors";
 import { getWeightedAssets, getWeightedNetLiquidity } from "../redux/selectors/getAccountRewards";
 import { getLiquidations } from "../api/get-liquidations";
 
@@ -49,26 +54,28 @@ export function useAccountId() {
   return useAppSelector(getAccountId);
 }
 
-export function useNonFarmedAssets() {
-  const weightedNetLiquidity = useAppSelector(getWeightedNetLiquidity);
-  const hasNonFarmedAssets = useAppSelector(getHasNonFarmedAssets);
+export function useNonFarmedAssets(memeCategory?: boolean) {
+  const weightedNetLiquidity = useAppSelector(getWeightedNetLiquidity(memeCategory));
+  const hasNonFarmedAssets = useAppSelector(getHasNonFarmedAssets(memeCategory));
+  const assets = useAppSelector(getWeightedAssets(memeCategory));
   const hasNegativeNetLiquidity = weightedNetLiquidity < 0;
-  const assets = useAppSelector(getWeightedAssets);
 
   return { hasNonFarmedAssets, weightedNetLiquidity, hasNegativeNetLiquidity, assets };
 }
 
-export function useAvailableAssets(type?: "supply" | "borrow" | "") {
-  const rows = useAppSelector(getAvailableAssets(type));
+export function useAvailableAssets(params?: { source?: "supply" | "borrow" | "" }) {
+  const { source } = params || {};
+  const rows = useAppSelector(getAvailableAssets({ source }));
   return rows;
 }
 
-export function usePortfolioAssets() {
-  return useAppSelector(getPortfolioAssets);
+export function usePortfolioAssets(memeCategory?: boolean) {
+  return useAppSelector(getPortfolioAssets(memeCategory));
 }
 
 export function useDegenMode() {
   const degenMode = useAppSelector(getDegenMode);
+  const isMeme = useAppSelector(isMemeCategory);
   const dispatch = useAppDispatch();
 
   const setDegenMode = () => {
@@ -76,7 +83,11 @@ export function useDegenMode() {
   };
 
   const setRepayFromDeposits = (repayFromDeposits: boolean) => {
-    dispatch(setRepayFrom({ repayFromDeposits }));
+    if (isMeme) {
+      dispatch(setRepayFromMEME({ repayFromDeposits }));
+    } else {
+      dispatch(setRepayFrom({ repayFromDeposits }));
+    }
   };
 
   const isRepayFromDeposits = degenMode.enabled && degenMode.repayFromDeposits;
@@ -95,7 +106,20 @@ export function useDarkMode() {
   return { toggle, theme, isDark: theme === "dark" };
 }
 
-export function useUnreadLiquidation(liquidationPage = 1) {
+export function useUnreadLiquidation({
+  liquidationPage = 1,
+  memeCategory,
+}: {
+  liquidationPage?: number;
+  memeCategory?: boolean;
+}) {
+  const isMemeCur = useAppSelector(isMemeCategory);
+  let isMeme: boolean;
+  if (typeof memeCategory !== "boolean") {
+    isMeme = isMemeCur;
+  } else {
+    isMeme = memeCategory;
+  }
   const unreadLiquidation = useAppSelector(getUnreadLiquidation);
   const accountId = useAccountId();
   const dispatch = useAppDispatch();
@@ -104,12 +128,21 @@ export function useUnreadLiquidation(liquidationPage = 1) {
     try {
       const { liquidationData } = await getLiquidations(accountId, liquidationPage || 1, 10);
       if (liquidationData?.unread !== undefined) {
-        dispatch(
-          setUnreadLiquidation({
-            count: liquidationData.unread,
-            unreadIds: unreadLiquidation?.unreadIds || [],
-          }),
-        );
+        if (isMeme) {
+          dispatch(
+            setUnreadLiquidationMEME({
+              count: liquidationData.unread,
+              unreadIds: unreadLiquidation?.unreadIds || [],
+            }),
+          );
+        } else {
+          dispatch(
+            setUnreadLiquidation({
+              count: liquidationData.unread,
+              unreadIds: unreadLiquidation?.unreadIds || [],
+            }),
+          );
+        }
       }
     } catch (e) {
       console.error(e);

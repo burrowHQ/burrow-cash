@@ -6,7 +6,7 @@ import { formatAPYValue } from "../../helpers/helpers";
 
 const YourAPYCell = () => {
   const [showTooltip, setShowTooltip] = useState(false);
-  const yourAPY: any = useAppSelector(getYourNetAPY());
+  const yourAPY: any = useAppSelector(getYourNetAPY(false));
   const { baseAPY, tokenNetAPY, totalAPY } = yourAPY;
   return (
     <HtmlTooltip

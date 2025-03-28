@@ -30,7 +30,6 @@ export interface AppState {
   protocolStats: boolean;
   displayAsTokenValue: boolean;
   showTicker: boolean;
-  showDust: boolean;
   slimStats: boolean;
   showDailyReturns: boolean;
   fullDigits: {
@@ -80,7 +79,6 @@ export const initialState: AppState = {
   showInfo: true,
   protocolStats: true,
   displayAsTokenValue: true,
-  showDust: false,
   showTicker: false,
   slimStats: false,
   showDailyReturns: false,
@@ -132,6 +130,8 @@ export const initialState: AppState = {
     boost_suppress_factor: 0,
     enable_price_oracle: false,
     enable_pyth_oracle: true,
+    meme_oracle_account_id: "",
+    meme_ref_exchange_id: "",
   },
 };
 
@@ -171,9 +171,6 @@ export const appSlice = createSlice({
     },
     toggleDisplayValues(state) {
       state.displayAsTokenValue = !state.displayAsTokenValue;
-    },
-    toggleShowDust(state) {
-      state.showDust = !state.showDust;
     },
     toggleSlimStats(state) {
       state.slimStats = !state.slimStats;
@@ -243,7 +240,6 @@ export const {
   updateAmount,
   toggleUseAsCollateral,
   toggleDisplayValues,
-  toggleShowDust,
   toggleSlimStats,
   setFullDigits,
   toggleShowTicker,

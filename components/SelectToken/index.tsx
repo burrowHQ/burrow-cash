@@ -12,9 +12,11 @@ import { getModalData } from "../../redux/appSelectors";
 import { isMobileDevice } from "../../helpers/helpers";
 import { CloseIcon } from "../Modal/svg";
 import { toggleUseAsCollateral } from "../../redux/appSlice";
+import { toggleUseAsCollateral as toggleUseAsCollateralMEME } from "../../redux/appSliceMEME";
 import { IToken } from "../../interfaces/asset";
 import { DEFAULT_POSITION } from "../../utils/config";
 import { ModalContext } from "../Modal/index";
+import { isMemeCategory } from "../../redux/categorySelectors";
 
 export type IAssetType = "borrow" | "supply";
 type IBalance = { supply_balance?: string; borrow_balance?: string };
@@ -31,7 +33,9 @@ export default function SelectToken({
 }) {
   const [updateAsset, setUpdateAsset] = useState<Record<string, IUIAsset>>({});
   const [assetList, setAssetList] = useState<IUIAsset[]>([]);
-  const rows = useAvailableAssets(assetType);
+  const rows = useAvailableAssets({
+    source: assetType,
+  });
   const selectRef = useRef(null);
   const is_mobile = isMobileDevice();
   if (!rows?.length) return null;
@@ -68,7 +72,7 @@ export default function SelectToken({
       {is_mobile ? (
         <MUIModal open={open} onClose={handleClose}>
           <div
-            className="absolute bottom-0 left-0 shadow-100  w-full bg-dark-250 py-5 rounded-t-2xl max-h-[70vh] overflow-y-auto border border-dark-300 outline-none"
+            className="absolute bottom-0 left-0 shadow-100  w-full bg-dark-250 py-5 rounded-t-2xl max-h-[70vh] overflow-y-auto border border-dark-50 outline-none"
             ref={selectRef}
           >
             <div className="flex items-center justify-between mb-4 px-5">
@@ -121,6 +125,7 @@ function TokenRow({
     isLpToken,
     tokens,
   } = asset;
+  const isMeme = useAppSelector(isMemeCategory);
   const handleSupplyClick = useSupplyTrigger(tokenId);
   const handleBorrowClick = useBorrowTrigger(tokenId);
   const selected = useAppSelector(getModalData);
@@ -133,7 +138,11 @@ function TokenRow({
       handleBorrowClick();
       selectRef.current.scrollTop = 0;
     }
-    dispatch(toggleUseAsCollateral({ useAsCollateral: canUseAsCollateral }));
+    if (isMeme) {
+      dispatch(toggleUseAsCollateralMEME({ useAsCollateral: canUseAsCollateral }));
+    } else {
+      dispatch(toggleUseAsCollateral({ useAsCollateral: canUseAsCollateral }));
+    }
     onClose();
   }
   const is_checked = selected?.tokenId === asset.tokenId;

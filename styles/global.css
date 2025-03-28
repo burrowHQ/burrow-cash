@@ -3,17 +3,28 @@
 @tailwind utilities;
 @import "../node_modules/ref-modal-ui/styles.css";
 @font-face {
-  font-family: "work-sans";
-  src: url("./work-sans/WorkSans-Regular.otf");
+  font-family: "jost";
+  src: url("./jost/Jost-400-Book.otf");
 }
-
 @font-face {
-  font-family: "work-sans-bold";
-  src: url("./work-sans/WorkSans-Bold.otf");
+  font-family: "jost-500-bold";
+  src: url("./jost/Jost-500-Medium.otf");
+}
+@font-face {
+  font-family: "jost-600-bold";
+  src: url("./jost/Jost-600-Semi.otf");
+}
+@font-face {
+  font-family: "jost-700-bold";
+  src: url("./jost/Jost-700-Bold.otf");
+}
+@font-face {
+  font-family: "jost-bold";
+  src: url("./jost/Jost-800-Hevy.otf");
 }
 
 body {
-  font-family: "work-sans";
+  font-family: "jost";
   margin: 0;
   padding: 0;
   height: 100%;
@@ -27,8 +38,17 @@ body {
   height: 100%;
 }
 
-.sans-bold {
-  font-family: "work-sans-bold";
+.jost-bold {
+  font-family: "jost-bold";
+}
+.jost-500-bold {
+  font-family: "jost-500-bold";
+}
+.jost-600-bold {
+  font-family: "jost-600-bold";
+}
+.jost-700-bold {
+  font-family: "jost-700-bold";
 }
 
 html {
@@ -215,7 +235,7 @@ body,
 
   border-radius: 6px;
   border: 1px solid #303037;
-  background: #202026;
+  background: #1c1c22;
   box-shadow: 0px 0px 10px 4px rgba(0, 0, 0, 0.15);
 }
 
@@ -471,7 +491,7 @@ body,
   }
 }
 .nws-modal-wrapper .nws-modal .modal-left .modal-left-title {
-  background: #202026;
+  background: #1c1c22;
 }
 input {
   margin: 0;
@@ -502,10 +522,10 @@ input[type="range"] {
   display: block;
   appearance: none;
   -webkit-appearance: none;
-  background: #131317;
+  background: #3f4147;
   height: 10px;
   border-radius: 6px;
-  border: 1px solid #40435a;
+  border: 1px solid #303037;
   margin: 0 auto;
   outline: none;
   background-image: linear-gradient(#00f7a5, #00f7a5);
@@ -514,7 +534,7 @@ input[type="range"] {
 }
 
 .redInput[type="range"] {
-  background-image: linear-gradient(#ff5500, #ff5500);
+  background-image: linear-gradient(#ffe3cc, #ffe3cc);
 }
 
 .redInput[type="range"]::-webkit-slider-thumb,
@@ -530,7 +550,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .redInput[type="range"]::-webkit-slider-thumb {
-  background-color: #ff5500;
+  background-color: #ffe3cc;
 }
 
 input[type="range"]::-webkit-slider-runnable-track {
@@ -542,7 +562,7 @@ input[type="range"]::-webkit-slider-runnable-track {
 
 .btn-sm {
   border-radius: 6px;
-  border: 1px solid #40435a;
+  border: 1px solid #303037;
   color: #c0c4e9;
   font-size: 12px;
   font-style: normal;
@@ -557,7 +577,7 @@ input[type="range"]::-webkit-slider-runnable-track {
   justify-content: space-between;
   align-items: center;
   border-radius: 6px;
-  border: 1px solid #40435a;
+  border: 1px solid #303037;
   background: #131317;
   padding: 14px 14px;
 }
@@ -789,8 +809,8 @@ options-list::-webkit-scrollbar {
   height: 10px;
   top: 6px;
   border-radius: 6px;
-  background-color: #131317;
-  border: 1px solid #40435a;
+  background-color: #3f4147;
+  border: 1px solid #303037;
 }
 
 .month-slider .thumb {
@@ -843,7 +863,7 @@ options-list::-webkit-scrollbar {
 }
 .health-tab:hover,
 .health-tab-active {
-  background: #202026;
+  background: #1c1c22;
 }
 
 .health-tab .arrow-left {
@@ -868,4 +888,21 @@ options-list::-webkit-scrollbar {
 
 .MuiTooltip-tooltip {
   max-width: 350px !important;
+}
+
+#TVChartContainer.fullscreen {
+  @apply fixed top-0 left-0 w-screen h-screen z-[1000] bg-black/50;
+}
+
+.need-small {
+  font-size: 8px !important;
+}
+.slip-fater:hover .slip-child {
+  display: block;
+}
+.slip-child {
+  display: none;
+}
+.slip-child:hover {
+  display: block;
 }

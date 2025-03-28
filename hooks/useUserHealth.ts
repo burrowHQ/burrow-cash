@@ -14,14 +14,14 @@ import { trackShowDailyReturns } from "../utils/telemetry";
 import { useSlimStats } from "./hooks";
 import { useFullDigits } from "./useFullDigits";
 
-export function useUserHealth() {
+export function useUserHealth(memeCategory?: boolean) {
   const dispatch = useAppDispatch();
-  const { showDailyReturns } = useAppSelector(getAppState);
-  const netAPY = useAppSelector(getNetAPY({ isStaking: false }));
-  const netLiquidityAPY = useAppSelector(getNetTvlAPY({ isStaking: false }));
-  const dailyReturns = useAppSelector(getDailyReturns);
-  const healthFactor = useAppSelector(getHealthFactor);
-  const LPHealthFactor = useAppSelector(getLPHealthFactor);
+  const { showDailyReturns } = useAppSelector(getAppState(memeCategory));
+  const netAPY = useAppSelector(getNetAPY({ isStaking: false, memeCategory }));
+  const netLiquidityAPY = useAppSelector(getNetTvlAPY({ isStaking: false, memeCategory }));
+  const dailyReturns = useAppSelector(getDailyReturns(memeCategory));
+  const healthFactor = useAppSelector(getHealthFactor(memeCategory));
+  const LPHealthFactor = useAppSelector(getLPHealthFactor(memeCategory));
   const { fullDigits, setDigits } = useFullDigits();
   const slimStats = useSlimStats();
 

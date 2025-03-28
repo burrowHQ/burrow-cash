@@ -11,6 +11,9 @@ import {
   toInternationalCurrencySystem_number,
 } from "../../../utils/uiNumber";
 import { ThreeDotIcon } from "../../Icons/IconsV2";
+import { useAppSelector } from "../../../redux/hooks";
+import { beautifyPrice } from "../../../utils/beautyNumber";
+import { DailyRewardsTip } from "../../Dashboard/stat";
 
 const transformAssetReward = (r, text) => ({
   value: r.dailyAmount.toLocaleString(undefined, TOKEN_FORMAT),
@@ -21,7 +24,7 @@ const transformAssetReward = (r, text) => ({
 
 const sumRewards = (acc, r) => acc + r.dailyAmount * r.price;
 
-export const UserDailyRewards = () => {
+export const UserDailyRewards = ({ memeCategory }: { memeCategory?: boolean }) => {
   const {
     baseDepositUsdDaily,
     baseBorrowedUsdDaily,
@@ -32,18 +35,18 @@ export const UserDailyRewards = () => {
     farmTotalUsdDaily,
     totalUsdDaily,
     allRewards,
-  } = useDailyRewards();
-  useDailyRewards();
+  } = useDailyRewards(memeCategory);
+
   const rewardsLabels = [
     [
       {
-        value: toInternationalCurrencySystem_usd(baseDepositUsdDaily),
+        value: beautifyPrice(baseDepositUsdDaily, true),
         text: "Supply",
       },
     ],
     [
       {
-        value: toInternationalCurrencySystem_usd(farmTotalUsdDaily),
+        value: beautifyPrice(farmTotalUsdDaily, true),
         text: "Incentive",
       },
     ],
@@ -62,11 +65,11 @@ export const UserDailyRewards = () => {
     ],
     [
       {
-        value: `${
-          baseBorrowedUsdDaily > 0
-            ? `-${toInternationalCurrencySystem_usd(baseBorrowedUsdDaily)}`
-            : "$0"
-        }`,
+        value: (
+          <span>
+            -{baseBorrowedUsdDaily > 0 ? beautifyPrice(baseBorrowedUsdDaily, true) : "$0"}
+          </span>
+        ),
         text: "Borrow Interest",
       },
     ],
@@ -75,10 +78,10 @@ export const UserDailyRewards = () => {
     <div className="relative">
       <Stat
         title="Daily Rewards"
-        titleTooltip="Estimated daily profit"
+        titleTooltip={DailyRewardsTip}
         amount={
           <div className="flex items-center gap-2">
-            {totalUsdDaily > 0 ? totalUsdDaily.toLocaleString(undefined, USD_FORMAT) : "$0"}
+            {totalUsdDaily > 0 ? beautifyPrice(totalUsdDaily, true) : "$0"}
             <IconMore allRewards={allRewards} />
           </div>
         }
@@ -135,7 +138,7 @@ const IncentiveMore = ({
           >
             <span className="text-gray-300 font-normal">Supply Incentive</span>
             <span className="text-white font-normal">
-              {toInternationalCurrencySystem_usd(farmSuppliedUsdDaily)}
+              {beautifyPrice(farmSuppliedUsdDaily, true)}
             </span>
           </div>
           <div
@@ -145,7 +148,7 @@ const IncentiveMore = ({
           >
             <span className="text-gray-300 font-normal">Borrow Incentive</span>
             <span className="text-white font-normal">
-              {toInternationalCurrencySystem_usd(farmBorrowedUsdDaily)}
+              {beautifyPrice(farmBorrowedUsdDaily, true)}
             </span>
           </div>
           <div
@@ -155,7 +158,7 @@ const IncentiveMore = ({
           >
             <span className="text-gray-300 font-normal">Net Liquidity</span>
             <span className="text-white font-normal">
-              {toInternationalCurrencySystem_usd(farmNetTvlUsdDaily)}
+              {beautifyPrice(farmNetTvlUsdDaily, true)}
             </span>
           </div>
           <div
@@ -165,7 +168,7 @@ const IncentiveMore = ({
           >
             <span className="text-gray-300 font-normal">Net Liquidity</span>
             <span className="text-white font-normal">
-              {toInternationalCurrencySystem_usd(farmTokenNetUsdDaily)}
+              {beautifyPrice(farmTokenNetUsdDaily, true)}
             </span>
           </div>
         </div>
@@ -177,7 +180,7 @@ const IncentiveMore = ({
           setShowTooltip(!showTooltip);
         }}
       >
-        <div className="w-[22px] h-[22px] rounded-3xl bg-dark-100 flex items-center justify-center z-50 cursor-pointer mr-8">
+        <div className="w-[22px] h-[22px] rounded-3xl bg-white bg-opacity-10 flex items-center justify-center z-50 cursor-pointer">
           <svg
             width="12"
             height="4"
@@ -198,7 +201,7 @@ const IncentiveMore = ({
   );
 };
 
-const IconMore = ({ allRewards }) => {
+export const IconMore = ({ allRewards }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const list = Object.values(allRewards);
   return (
@@ -242,7 +245,7 @@ const IconsDisplay = ({ icons }) => (
         key={item?.asset?.token_id}
         src={item?.asset?.metadata?.icon}
         alt=""
-        className="w-5 h-5 rounded-3xl border-2 border-gray-800"
+        className="w-5 h-5 xsm:w-4 xsm:h-4 rounded-3xl border-2 border-dark-120"
         style={{
           marginLeft: icons.length > 1 && index > 0 ? `-8px` : undefined,
           zIndex: index + 1,
@@ -250,7 +253,7 @@ const IconsDisplay = ({ icons }) => (
       />
     ))}
     {icons.length > 5 && (
-      <div className="w-5 h-5 rounded-3xl border-2 border-gray-800 bg-dark-100 flex items-center justify-center -ml-2.5 z-50">
+      <div className="w-5 h-5 xsm:w-4 xsm:h-4 rounded-3xl border-2 border-dark-120 bg-gray-150 flex items-center justify-center -ml-2.5 z-50">
         <ThreeDotIcon />
       </div>
     )}

@@ -14,10 +14,20 @@ import {
 import storage from "redux-persist/lib/storage";
 
 import assetsReducer from "./assetsSlice";
+import assetsMEMEReducer from "./assetsSliceMEME";
 import accountReducer from "./accountSlice";
+import accountMEMEReducer from "./accountSliceMEME";
+import marginAccountReducer from "./marginAccountSlice";
+import marginAccountMEMEReducer from "./marginAccountSliceMEME";
+import marginConfigReducer from "./marginConfigSlice";
+import marginConfigMEMEReducer from "./marginConfigSliceMEME";
 import appReducer from "./appSlice";
+import appMEMEReducer from "./appSliceMEME";
 import feedReducer from "./feedSlice";
 import { migrations } from "./migrations";
+import marginCategoryReducer from "./marginTrading";
+import poolReducer from "./poolSlice";
+import tabReducer from "./marginTabSlice";
 
 const persistConfig = {
   key: "root",
@@ -29,9 +39,19 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   assets: assetsReducer,
+  assetsMEME: assetsMEMEReducer,
   account: accountReducer,
+  accountMEME: accountMEMEReducer,
+  marginAccount: marginAccountReducer,
+  marginAccountMEME: marginAccountMEMEReducer,
+  marginConfig: marginConfigReducer,
+  marginConfigMEME: marginConfigMEMEReducer,
   app: appReducer,
+  appMEME: appMEMEReducer,
   feed: feedReducer,
+  category: marginCategoryReducer,
+  poolData: poolReducer,
+  tab: tabReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

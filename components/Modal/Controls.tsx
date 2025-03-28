@@ -1,21 +1,15 @@
 import Decimal from "decimal.js";
 import { updateAmount } from "../../redux/appSlice";
-import { useAppDispatch } from "../../redux/hooks";
+import { updateAmount as updateAmountMEME } from "../../redux/appSliceMEME";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { formatWithCommas_number } from "../../utils/uiNumber";
 import RangeSlider from "./RangeSlider";
 import TokenBox from "./TokenBox";
+import { isMemeCategory } from "../../redux/categorySelectors";
 
-export default function Controls({
-  amount,
-  available,
-  action,
-  tokenId,
-  asset,
-  totalAvailable,
-  available$,
-}) {
+export default function Controls({ amount, available, action, asset, totalAvailable, available$ }) {
   const dispatch = useAppDispatch();
-
+  const isMeme = useAppSelector(isMemeCategory);
   const handleInputChange = (e) => {
     const { value } = e.target;
     const numRegex = /^([0-9]*\.?[0-9]*$)/;
@@ -23,18 +17,33 @@ export default function Controls({
       e.preventDefault();
       return;
     }
-    dispatch(updateAmount({ isMax: false, amount: value }));
+    if (isMeme) {
+      dispatch(updateAmountMEME({ isMax: false, amount: value }));
+    } else {
+      dispatch(updateAmount({ isMax: false, amount: value }));
+    }
   };
-
   const handleSliderChange = (percent) => {
     const p = percent < 1 ? 0 : percent > 99 ? 100 : percent;
     const value = new Decimal(available).mul(p).div(100).toFixed();
-    dispatch(
-      updateAmount({
-        isMax: p === 100,
-        amount: new Decimal(value || 0).toFixed(),
-      }),
-    );
+    const decimalLength = value?.split(".")?.[1]?.length || 0;
+    if (isMeme) {
+      dispatch(
+        updateAmountMEME({
+          isMax: p === 100,
+          // amount: new Decimal(value || 0).toFixed(Math.min(decimalLength, asset.decimals)),
+          amount: new Decimal(value || 0).toFixed(),
+        }),
+      );
+    } else {
+      dispatch(
+        updateAmount({
+          isMax: p === 100,
+          // amount: new Decimal(value || 0).toFixed(Math.min(decimalLength, asset.decimals)),
+          amount: new Decimal(value || 0).toFixed(),
+        }),
+      );
+    }
   };
 
   const sliderValue = Math.round((amount * 100) / available) || 0;
@@ -55,7 +64,7 @@ export default function Controls({
         </span>
       </div>
       {/* input field */}
-      <div className="flex items-center justify-between border border-dark-500 rounded-md bg-dark-600 h-[55px] p-3.5 pr-2 gap-3">
+      <div className="flex items-center justify-between border border-dark-50 rounded-md bg-dark-600 h-[55px] p-3.5 pr-2 gap-3">
         <div className="flex items-center flex-grow">
           <input
             type="number"
@@ -70,7 +79,7 @@ export default function Controls({
       </div>
       {/* Slider */}
       <RangeSlider value={sliderValue} onChange={handleSliderChange} action={action} />
-      <div className="h-[1px] bg-dark-700 -mx-[20px] mt-14" />
+      <div className="h-[1px] bg-dark-50 -mx-[20px] mt-14" />
     </div>
   );
 }

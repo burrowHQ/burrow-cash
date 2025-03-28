@@ -4,11 +4,29 @@ import { shrinkToken } from "../../store";
 import { RootState } from "../store";
 import { sumReducer, hasAssets } from "../utils";
 
-export const getTotalAccountBalance = (source: "borrowed" | "supplied") =>
+export const getTotalAccountBalance = (source: "borrowed" | "supplied", memeCategory?: boolean) =>
   createSelector(
     (state: RootState) => state.assets,
+    (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account,
-    (assets, account) => {
+    (state: RootState) => state.accountMEME,
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, category) => {
+      let isMeme: boolean;
+      if (typeof memeCategory !== "boolean") {
+        isMeme = category.activeCategory == "meme";
+      } else {
+        isMeme = memeCategory;
+      }
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
+      if (isMeme) {
+        assets = assetsMEME;
+        account = accountMEME;
+      } else {
+        assets = assetsMain;
+        account = accountMain;
+      }
       if (!hasAssets(assets)) return 0;
       let tokenUsds: any[] = [];
       tokenUsds = sumTokenUsds(account, assets, source);

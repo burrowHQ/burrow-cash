@@ -2,12 +2,7 @@ import React, { useEffect, useMemo, useState, memo } from "react";
 import { BeatLoader } from "react-spinners";
 import { twMerge } from "tailwind-merge";
 import { useRouter } from "next/router";
-import {
-  useNonFarmedAssets,
-  useAccountId,
-  usePortfolioAssets,
-  useAvailableAssets,
-} from "../../../hooks/hooks";
+import { useNonFarmedAssets, useAccountId, usePortfolioAssets } from "../../../hooks/hooks";
 import { IPortfolioAsset } from "../../../interfaces";
 import { incentiveTokens } from "../../../utils/config";
 import ClaimAllRewards from "../../ClaimAllRewards";
@@ -40,7 +35,7 @@ const SupplyCarousel = () => {
     return 0;
   }, [needJoinAndClaim, accountId, suppliedRows]);
   function jump(tokenId) {
-    router.push(`/tokenDetail/${tokenId}`);
+    router.push(`/tokenDetail/${tokenId}?pageType=main`);
   }
   return (
     <div className="flex items-center justify-center">

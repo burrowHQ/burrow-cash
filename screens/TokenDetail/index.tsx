@@ -3,10 +3,11 @@ import Decimal from "decimal.js";
 import { useEffect, useState, createContext, useContext, useMemo } from "react";
 import { Modal as MUIModal } from "@mui/material";
 import { twMerge } from "tailwind-merge";
+import { useBtcWalletSelector } from "btc-wallet";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 import { updatePosition } from "../../redux/appSlice";
+import { updatePosition as updatePositionMEME } from "../../redux/appSliceMEME";
 import {
-  ArrowLeft,
   SuppliedEmptyIcon,
   BorrowedEmptyIcon,
   REFIcon,
@@ -54,7 +55,7 @@ import getConfig, {
   DEFAULT_POSITION,
   lpTokenPrefix,
   STABLE_POOL_IDS,
-  incentiveTokens,
+  NBTCTokenId,
 } from "../../utils/config";
 import InterestRateChart, { LabelText } from "./interestRateChart";
 import TokenBorrowSuppliesChart from "./tokenBorrowSuppliesChart";
@@ -62,21 +63,93 @@ import { useTokenDetails } from "../../hooks/useTokenDetails";
 import { IToken } from "../../interfaces/asset";
 import LPTokenCell from "./LPTokenCell";
 import AvailableBorrowCell from "./AvailableBorrowCell";
-import { useAppDispatch } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { isMemeCategory, getActiveCategory } from "../../redux/categorySelectors";
+import { setActiveCategory } from "../../redux/marginTrading";
+import { useBtcAction } from "../../hooks/useBtcBalance";
+import { SatoshiIcon, BtcChainIcon } from "../../components/Icons/Icons";
+import { getPageTypeFromUrl } from "../../utils/commonUtils";
+import Breadcrumb from "../../components/common/breadcrumb";
+import { beautifyPrice } from "../../utils/beautyNumber";
 
 const DetailData = createContext(null) as any;
 const TokenDetail = () => {
+  const dispatch = useAppDispatch();
+  const isMeme = useAppSelector(isMemeCategory);
+  const activeCategory = useAppSelector(getActiveCategory);
   const router = useRouter();
   const rows = useAvailableAssets();
+  const { account, autoConnect } = useBtcWalletSelector();
   const { id } = router.query;
+  const [updaterCounter, setUpDaterCounter] = useState(1);
   const tokenRow = rows.find((row: UIAsset) => {
     return row.tokenId === id;
   });
-  if (!tokenRow) return null;
-  return <TokenDetailView tokenRow={tokenRow} assets={rows} />;
+  const accountId = useAccountId();
+  const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
+  const isNBTC = NBTCTokenId === id && selectedWalletId === "btc-wallet";
+  useEffect(() => {
+    const t = setInterval(() => {
+      setUpDaterCounter((pre) => {
+        return pre + 1;
+      });
+    }, 60000);
+    if (!id || !isNBTC) {
+      clearInterval(t);
+    }
+    return () => {
+      clearInterval(t);
+    };
+  }, [isNBTC]);
+  // connect btc wallet to get btc balance;
+  useEffect(() => {
+    if (accountId && isNBTC && !account) {
+      autoConnect();
+    }
+  }, [isNBTC, account, accountId, selectedWalletId]);
+  const pageType = getPageTypeFromUrl();
+  const match = activeCategory == pageType;
+  // update search params if no pageType on url
+  useEffect(() => {
+    if (id && !pageType) {
+      const updatedQuery = { pageType: "main" };
+      router.replace({
+        pathname: `/tokenDetail/${id}`,
+        query: updatedQuery,
+      });
+    }
+  }, [id, pageType]);
+  // update activeCategory if pageType do not match with cache
+  useEffect(() => {
+    if (pageType && activeCategory && id) {
+      if (pageType !== activeCategory) {
+        if (pageType == "meme") {
+          dispatch(setActiveCategory("meme"));
+        } else if (pageType == "main") {
+          dispatch(setActiveCategory("main"));
+        } else {
+          router.replace({
+            pathname: `/tokenDetail/${id}`,
+            query: { pageType: "main" },
+          });
+          dispatch(setActiveCategory("main"));
+        }
+      }
+    }
+  }, [activeCategory, id, pageType]);
+  if (!tokenRow || !match) return null;
+  return <TokenDetailView tokenRow={tokenRow} assets={rows} isMeme={isMeme} />;
 };
 
-function TokenDetailView({ tokenRow, assets }: { tokenRow: UIAsset; assets: UIAsset[] }) {
+function TokenDetailView({
+  tokenRow,
+  assets,
+  isMeme,
+}: {
+  tokenRow: UIAsset;
+  assets: UIAsset[];
+  isMeme: boolean;
+}) {
   const [suppliers_number, set_suppliers_number] = useState<number>();
   const [borrowers_number, set_borrowers_number] = useState<number>();
   const isMobile = isMobileDevice();
@@ -123,7 +196,7 @@ function TokenDetailView({ tokenRow, assets }: { tokenRow: UIAsset; assets: UIAs
 
   useEffect(() => {
     fetchTokenDetails(tokenRow.tokenId, 365).catch();
-    get_token_detail(tokenRow.tokenId).then((response) => {
+    get_token_detail(tokenRow.tokenId, isMeme).then((response) => {
       const { total_suppliers, total_borrowers } = response[0] || {};
       if (!isInvalid(total_suppliers)) {
         set_suppliers_number(total_suppliers);
@@ -235,6 +308,7 @@ function TokenDetailView({ tokenRow, assets }: { tokenRow: UIAsset; assets: UIAs
         assets,
         getIcons,
         getSymbols,
+        isMeme,
       }}
     >
       {isMobile ? (
@@ -275,15 +349,7 @@ function DetailMobile({ tokenDetails, handlePeriodClick }) {
     <LayoutBox>
       <div className="p-4">
         {/* Back */}
-        <div
-          className="inline-flex items-center cursor-pointer mb-8"
-          onClick={() => {
-            router.push("/markets");
-          }}
-        >
-          <ArrowLeft />
-          <span className="text-sm text-gray-300 ml-3"> Markets</span>
-        </div>
+        <Breadcrumb path="/markets" title="Markets" />
         {/* Token head */}
         <div className="flex items-center justify-between">
           <div className="flex items-center">
@@ -308,7 +374,7 @@ function DetailMobile({ tokenDetails, handlePeriodClick }) {
         </div>
         {/* Tab */}
         <div className="grid grid-cols-2 bg-gray-800 rounded-xl h-[42px] text-white text-base items-center justify-items-stretch mt-6 mb-6">
-          <div className="relative flex items-center justify-center border-r border-dark-1000">
+          <div className="relative flex items-center justify-center border-r border-dark-50">
             <span
               onClick={() => {
                 switchTab("market");
@@ -341,7 +407,7 @@ function DetailMobile({ tokenDetails, handlePeriodClick }) {
               }`}
             >
               <span className="flex w-10 h-10 bg-gray-800" style={{ borderRadius: "50%" }} />
-              <YellowBallIcon className="absolute top-6" />
+              <YellowBallIcon className="absolute top-6" id="1019" />
             </div>
           </div>
         </div>
@@ -368,7 +434,7 @@ function TokenFetchModal({ open, setOpen }: { open: boolean; setOpen: any }) {
 
   return (
     <MUIModal open={open} onClose={handleClose}>
-      <div className="absolute bottom-0 left-0 bg-dark-100 w-full rounded-t-2xl border border-dark-300 p-4 outline-none">
+      <div className="absolute bottom-0 left-0 bg-dark-100 w-full rounded-t-2xl border border-dark-50 p-4 outline-none">
         {/* Head */}
         <div className="flex items-center justify-between">
           <span className="text-base text-white font-bold">Get {tokenRow.symbol}</span>
@@ -416,15 +482,7 @@ function DetailPc({ tokenDetails, handlePeriodClick }) {
 
   return (
     <LayoutBox>
-      <div
-        className="inline-flex items-center cursor-pointer mb-8"
-        onClick={() => {
-          router.push("/markets");
-        }}
-      >
-        <ArrowLeft />
-        <span className="text-sm text-gray-300 ml-3">Burrow Markets</span>
-      </div>
+      <Breadcrumb title="Burrow Markets" path="/markets" />
       <div className="grid grid-cols-3/5">
         <div className="mr-6">
           <TokenOverview />
@@ -454,7 +512,7 @@ function TokenOverviewMobile() {
     isLpToken = true;
   }
   return (
-    <div className="grid grid-cols-1 gap-y-5 bg-gray-800 rounded-2xl p-4">
+    <div className="border border-dark-50  grid grid-cols-1 gap-y-5 bg-dark-110 rounded-2xl p-4">
       <LabelMobile
         title="Supply Cap"
         value={toInternationalCurrencySystem_number(tokenRow?.totalSupply)}
@@ -472,7 +530,7 @@ function TokenOverviewMobile() {
         }
         hidden={isLpToken}
       />
-      <LabelMobileAPY title="Supply APY" tokenRow={tokenRow} />
+      <LabelMobileAPY title="Supply APY" tokenRow={tokenRow} isMeme={isMemeCategory} />
       <LabelMobile
         title="Borrow APY"
         value={!tokenRow?.can_borrow ? "-" : format_apy(tokenRow?.borrowApy)}
@@ -537,6 +595,7 @@ function TokenOverview() {
     getIcons,
     getSymbols,
     assets,
+    isMeme,
   } = useContext(DetailData) as any;
   let isLpToken = false;
   if (tokenRow?.tokenId?.indexOf(lpTokenPrefix) > -1) {
@@ -579,6 +638,7 @@ function TokenOverview() {
                   page="deposit"
                   tokenId={tokenRow.tokenId}
                   onlyMarket
+                  memeCategory={isMeme}
                 />
               </div>
             </div>
@@ -683,6 +743,7 @@ function TokenOverview() {
                   page="deposit"
                   tokenId={tokenRow.tokenId}
                   onlyMarket
+                  memeCategory={isMeme}
                 />
               </div>
             </div>
@@ -719,7 +780,7 @@ function TokenOverview() {
 
 function TokenSupplyChart({ tokenDetails, handlePeriodClick }) {
   const { tokenSupplyDays, supplyAnimating } = tokenDetails || {};
-  const { tokenRow, depositAPY } = useContext(DetailData) as any;
+  const { tokenRow, depositAPY, isMeme } = useContext(DetailData) as any;
   const value = toInternationalCurrencySystem_number(tokenRow?.totalSupply);
   const value_value = toInternationalCurrencySystem_usd(tokenRow?.totalSupplyMoney);
   const apy = format_apy(depositAPY);
@@ -745,6 +806,7 @@ function TokenSupplyChart({ tokenDetails, handlePeriodClick }) {
               page="deposit"
               tokenId={tokenRow.tokenId}
               onlyMarket
+              memeCategory={isMeme}
             />
           </span>
         </div>
@@ -763,7 +825,7 @@ function TokenSupplyChart({ tokenDetails, handlePeriodClick }) {
       {/* only mobile */}
       <div className="grid grid-cols-1 gap-y-4 lg:hidden">
         <LabelMobile title="Total Supplied" value={value} subValue={value_value} subMode="space" />
-        <LabelMobileAPY title="APY" tokenRow={tokenRow} />
+        <LabelMobileAPY title="APY" tokenRow={tokenRow} isMeme={isMeme} />
         <LabelMobile
           title="Rewards/day"
           value={
@@ -791,7 +853,7 @@ function TokenSupplyChart({ tokenDetails, handlePeriodClick }) {
   );
 }
 
-const HrLine = () => <hr className="hidden mt-6 mb-6 h-px my-8 bg-dark-500 border-0 xsm:block" />;
+const HrLine = () => <hr className="hidden mt-6 mb-6 h-px my-8 bg-dark-50 border-0 xsm:block" />;
 
 function TokenBorrowChart({ tokenDetails, handlePeriodClick }) {
   const { tokenBorrowDays, borrowAnimating } = tokenDetails || {};
@@ -849,8 +911,6 @@ function TokenRateModeChart({
 }) {
   const { currentUtilRate } = interestRates?.[0] || {};
   const { borrowApy, supplyApy } = tokenRow || {};
-  // const { borrowRate, supplyRate } = fullRateDetail || {};
-
   return (
     <div className="lg:mb-1.5 lg:rounded-md lg:p-7 xsm:rounded-2xl bg-gray-800 xsm:p-4">
       <div className="font-bold text-lg text-white mb-5">Interest Rate Mode</div>
@@ -861,10 +921,9 @@ function TokenRateModeChart({
           leftIcon={<div className="bg-gray-400 mr-2 h-[2px] w-[10px]" />}
           right={currentUtilRate ? `${currentUtilRate.toFixed(2)}%` : "-"}
         />
-        {/* <LabelText left="Utilization Rate" right={fullRateDetail?.percentLabel || "-"} /> */}
         <LabelText
           left="Borrow Rate"
-          leftIcon={<div className="rounded-full mr-2 bg-danger h-[10px] w-[10px]" />}
+          leftIcon={<div className="rounded-full mr-2 bg-orange h-[10px] w-[10px]" />}
           right={borrowApy ? `${borrowApy.toFixed(2)}%` : "-"}
         />
         <LabelText
@@ -884,13 +943,19 @@ function TokenRateModeChart({
 
 function TokenUserInfo() {
   const { tokenRow } = useContext(DetailData) as any;
+  const { availableBalance: btcAvailableBalance } = useBtcAction({
+    tokenId: tokenRow?.tokenId || "",
+    decimals: tokenRow?.decimals || 0,
+  });
   const { tokenId, tokens, isLpToken, price } = tokenRow;
   const accountId = useAccountId();
+  const isMeme = useAppSelector(isMemeCategory);
   const isWrappedNear = tokenRow.symbol === "NEAR";
   const { supplyBalance, maxBorrowAmountPositions } = useUserBalance(tokenId, isWrappedNear);
   const handleSupplyClick = useSupplyTrigger(tokenId);
   const handleBorrowClick = useBorrowTrigger(tokenId);
   const dispatch = useAppDispatch();
+  const isBtc = tokenId === NBTCTokenId;
   function getIcons() {
     return (
       <div className="flex items-center justify-center flex-wrap flex-shrink-0">
@@ -920,20 +985,59 @@ function TokenUserInfo() {
     (acc, { maxBorrowAmount }) => acc + maxBorrowAmount,
     0,
   );
+  const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
+  const isNBTC = NBTCTokenId === tokenId && selectedWalletId === "btc-wallet";
   return (
     <UserBox className="mb-[29px] xsm:mb-2.5">
-      <span className="text-lg text-white font-bold">Your Info</span>
-      <div className="flex items-center justify-between my-[25px]">
-        <span className="text-sm text-gray-300">Available to Supply</span>
-        <div className="flex items-center]">
-          <span className="text-sm text-white mr-2.5">
-            {accountId ? formatWithCommas_number(supplyBalance) : "-"}
-          </span>
-          <LPTokenCell asset={tokenRow} balance={supplyBalance}>
-            {getIcons()}
-          </LPTokenCell>
-        </div>
+      <div className="flex justify-between items-center">
+        <span className="text-lg text-white font-bold">Your Info</span>
       </div>
+      {!isNBTC ? (
+        <div className="flex items-center justify-between my-[25px]">
+          <span className="text-sm text-gray-300">Available to Supply</span>
+          <div className="flex items-center]">
+            <span className="text-sm text-white mr-2.5">
+              {accountId ? beautifyPrice(supplyBalance) : "-"}
+            </span>
+            <LPTokenCell asset={tokenRow} balance={supplyBalance}>
+              {getIcons()}
+            </LPTokenCell>
+          </div>
+        </div>
+      ) : (
+        <div className="my-[25px]">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-300">Available to Supply</span>
+            <span className="flex items-center">
+              <span
+                className="text-primary text-xs hover:cursor-pointer underline mr-[4px]"
+                onClick={() => {
+                  window.open("https://ramp.satos.network/", "_blank");
+                }}
+              >
+                BTC Bridge
+              </span>
+              <SatoshiIcon />
+            </span>
+          </div>
+          {/* <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
+            <span className="text-gray-300">NEAR Chain</span>
+            <span className="flex items-center">
+              <span className="mr-[6px] text-sm">{accountId ? supplyBalance : "-"}</span>
+              <BtcChainIcon />
+            </span>
+          </div> */}
+          <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
+            <span className="text-gray-300">BTC Chain</span>
+            <span className="flex items-center">
+              <span className="mr-[6px] text-sm">
+                {accountId ? digitalProcess(btcAvailableBalance || 0, 8) : "-"}
+              </span>
+              <BtcChainIcon />
+            </span>
+          </div>
+        </div>
+      )}
       <div
         className={`flex justify-between ${
           !isLpToken && accountId && tokenRow?.can_borrow ? "items-start" : "items-center "
@@ -974,7 +1078,7 @@ function TokenUserInfo() {
         {accountId ? (
           <>
             <YellowSolidButton
-              disabled={!+supplyBalance}
+              disabled={isBtc ? !+btcAvailableBalance : !+supplyBalance}
               className="w-1 flex-grow"
               onClick={handleSupplyClick}
             >
@@ -986,7 +1090,11 @@ function TokenUserInfo() {
                 className="w-1 flex-grow"
                 onClick={() => {
                   handleBorrowClick();
-                  dispatch(updatePosition({ position: DEFAULT_POSITION }));
+                  if (isMeme) {
+                    dispatch(updatePositionMEME({ position: DEFAULT_POSITION }));
+                  } else {
+                    dispatch(updatePosition({ position: DEFAULT_POSITION }));
+                  }
                 }}
               >
                 Borrow
@@ -1004,6 +1112,7 @@ function TokenUserInfo() {
 function YouSupplied() {
   const { tokenRow, supplied } = useContext(DetailData) as any;
   const { tokenId } = tokenRow;
+  const accountId = useAccountId();
   const [icons, totalDailyRewardsMoney] = supplied?.rewards?.reduce(
     (acc, cur) => {
       const { rewards, metadata, config, price } = cur;
@@ -1017,16 +1126,6 @@ function YouSupplied() {
     },
     [[], 0],
   ) || [[], 0];
-  const RewardsReactNode = supplied?.rewards?.length ? (
-    <div className="flex items-center">
-      {icons.map((icon, index) => {
-        return <img key={index} src={icon} className="w-4 h-4 rounded-full -ml-0.5" alt="" />;
-      })}
-      <span className="ml-2">{formatWithCommas_usd(totalDailyRewardsMoney)}</span>
-    </div>
-  ) : (
-    "-"
-  );
   const handleWithdrawClick = useWithdrawTrigger(tokenId);
   const handleAdjustClick = useAdjustTrigger(tokenId);
   const withdraw_disabled = !supplied || !supplied?.canWithdraw;
@@ -1036,7 +1135,7 @@ function YouSupplied() {
     <div className=" relative overflow-hidden">
       {is_empty ? (
         <UserBox className="mb-2.5">
-          <div className="flex items-start justify-between border-b border-dark-50 pb-2.5 -mx-5 px-5">
+          <div className="flex items-start justify-between  pb-2.5 -mx-5 px-5">
             <span className="text-lg text-white font-bold">You Supplied</span>
           </div>
           <div className="flex items-center justify-center py-5">
@@ -1048,35 +1147,28 @@ function YouSupplied() {
         </UserBox>
       ) : (
         <UserBox className="mb-2.5">
-          <div className="flex items-start justify-between border-b border-dark-50 pb-2.5 -mx-5 px-5">
+          <div className="flex items-start justify-between  pb-2.5 -mx-5 px-5">
             <span className="text-lg text-white font-bold">You Supplied</span>
             <div className="flex flex-col items-end">
               <span className="text-lg text-white font-bold">
-                {formatWithCommas_number(supplied?.supplied)}
+                {beautifyPrice(supplied?.supplied || 0)}
+                {/* {formatWithCommas_number(supplied?.supplied)} */}
               </span>
               <span className="text-xs text-gray-300">
                 {supplied
-                  ? formatWithCommas_usd(
+                  ? // ? formatWithCommas_usd(
+                    //     new Decimal(supplied?.supplied || 0).mul(supplied?.price || 0).toFixed(),
+                    //   )
+                    beautifyPrice(
                       new Decimal(supplied?.supplied || 0).mul(supplied?.price || 0).toFixed(),
+                      true,
                     )
                   : "$-"}
               </span>
             </div>
           </div>
-          {/* <Label
-            title="Your APY"
-            content={
-              <APYCell
-                rewards={tokenRow.depositRewards}
-                baseAPY={tokenRow.supplyApy}
-                page="deposit"
-                tokenId={tokenRow.tokenId}
-                // excludeNetApy={!incentiveTokens.includes(tokenRow.tokenId)}
-              />
-            }
-          />
-          <Label title="Daily rewards" content={RewardsReactNode} /> */}
-          <Label title="Collateral" content={formatWithCommas_number(supplied?.collateral)} />
+          {/* formatWithCommas_number(supplied?.collateral) */}
+          <Label title="Collateral" content={beautifyPrice(supplied?.collateral || 0)} />
           <div className="flex items-center justify-between gap-2 mt-[35px]">
             <YellowLineButton
               disabled={withdraw_disabled}
@@ -1105,6 +1197,7 @@ function YouSupplied() {
 function YouBorrowed() {
   const { tokenRow, borrowed, borrowedLp, assets } = useContext(DetailData) as any;
   const { tokenId } = tokenRow;
+  const isMeme = useAppSelector(isMemeCategory);
   const [icons, totalDailyRewardsMoney] = borrowed?.rewards?.reduce(
     (acc, cur) => {
       const { rewards, metadata, config, price } = cur;
@@ -1163,7 +1256,7 @@ function YouBorrowed() {
     <div className="relative overflow-hidden">
       {is_empty ? (
         <UserBox className="mb-2.5">
-          <div className="flex items-start justify-between border-b border-dark-50 pb-2.5 -mx-5 px-5">
+          <div className="flex items-start justify-between  pb-2.5 -mx-5 px-5">
             <span className="text-lg text-white font-bold">You Borrowed</span>
           </div>
           <div className="flex items-center justify-center py-5">
@@ -1175,16 +1268,21 @@ function YouBorrowed() {
         </UserBox>
       ) : (
         <UserBox className="mb-2.5">
-          <div className="flex items-start justify-between border-b border-dark-50 pb-2.5 -mx-5 px-5">
+          <div className="flex items-start justify-between  pb-2.5 -mx-5 px-5">
             <span className="text-lg text-white font-bold">You Borrowed</span>
             <div className="flex flex-col items-end">
               <span className="text-lg text-white font-bold">
-                {digitalProcess(totalBorrowedAmount, 2)}
+                {/* {digitalProcess(totalBorrowedAmount, 2)} */}
+                {beautifyPrice(totalBorrowedAmount || 0)}
               </span>
               <span className="text-xs text-gray-300">
-                {formatWithCommas_usd(
+                {beautifyPrice(
                   new Decimal(totalBorrowedAmount).mul(tokenRow?.price || 0).toFixed(),
+                  true,
                 )}
+                {/* {formatWithCommas_usd(
+                  new Decimal(totalBorrowedAmount).mul(tokenRow?.price || 0).toFixed(),
+                )} */}
               </span>
             </div>
           </div>
@@ -1196,14 +1294,21 @@ function YouBorrowed() {
                 content={
                   <div className="flex items-center">
                     <span className="text-sm text-white mr-0.5">
-                      {formatWithCommas_number(borrowedData?.borrowed || 0)}
+                      {/* {formatWithCommas_number(borrowedData?.borrowed || 0)} */}
+                      {beautifyPrice(borrowedData?.borrowed || 0)}
                     </span>
                     <span className="text-xs text-gray-300">
                       (
-                      {formatWithCommas_usd(
+                      {/* {formatWithCommas_usd(
                         new Decimal(borrowedData?.borrowed || 0)
                           .mul(borrowedData?.price || 0)
                           .toFixed(),
+                      )} */}
+                      {beautifyPrice(
+                        new Decimal(borrowedData?.borrowed || 0)
+                          .mul(borrowedData?.price || 0)
+                          .toFixed(),
+                        true,
                       )}
                       )
                     </span>
@@ -1227,7 +1332,11 @@ function YouBorrowed() {
                   className="w-1 flex-grow"
                   onClick={() => {
                     handleRepayClick();
-                    dispatch(updatePosition({ position }));
+                    if (isMeme) {
+                      dispatch(updatePositionMEME({ position }));
+                    } else {
+                      dispatch(updatePosition({ position }));
+                    }
                   }}
                 >
                   Repay
@@ -1405,7 +1514,7 @@ function UserBox({
 }) {
   return (
     <div
-      className={`p-5 pb-[23px] border border-dark-50 lg:rounded-md xsm:rounded-xl bg-gray-800 ${className}`}
+      className={`p-5 pb-[23px] border border-dark-50 lg:rounded-md xsm:rounded-xl bg-dark-110 ${className}`}
     >
       {children}
     </div>
@@ -1451,7 +1560,7 @@ function LabelOuterLink({
 
 function LabelOuterLinkIcon({ children }) {
   return (
-    <span className="flex items-center justify-center h-[22px] px-2.5  xsm:h-8 rounded-md lg:bg-gray-300 lg:bg-opacity-20 xsm:bg-dark-150 cursor-pointer">
+    <span className="flex items-center justify-center h-[22px] px-2.5  xsm:h-8 rounded-md bg-white bg-opacity-5 cursor-pointer">
       <span className="">{children}</span>
     </span>
   );
@@ -1486,7 +1595,7 @@ function LabelMobile({
     </div>
   );
 }
-function LabelMobileAPY({ tokenRow, title }) {
+function LabelMobileAPY({ tokenRow, title, isMeme }) {
   return (
     <div className="flex items-center justify-between">
       <span className="text-sm text-gray-300">{title}</span>
@@ -1497,6 +1606,7 @@ function LabelMobileAPY({ tokenRow, title }) {
           page="deposit"
           tokenId={tokenRow.tokenId}
           onlyMarket
+          memeCategory={isMeme}
         />
       </span>
     </div>

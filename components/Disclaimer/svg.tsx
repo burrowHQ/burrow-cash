@@ -30,7 +30,7 @@ function UnCheckedIcon(props) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#23253A" stroke="#00F7A5" />
+      <rect x="0.5" y="0.5" width="15" height="15" rx="3.5" fill="#202026" stroke="#00F7A5" />
     </svg>
   );
 }

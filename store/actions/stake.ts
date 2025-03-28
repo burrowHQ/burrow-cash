@@ -1,9 +1,10 @@
 import { getBurrow } from "../../utils";
 import { expandToken } from "../helper";
-import { ChangeMethodsLogic, IConfig } from "../../interfaces";
+import { ChangeMethodsLogic } from "../../interfaces";
 import { Transaction } from "../wallet";
 import { prepareAndExecuteTransactions } from "../tokens";
 import { ViewMethodsLogic } from "../../interfaces/contract-methods";
+import { IConfig } from "../../interfaces/burrow";
 
 export async function stake({ amount, months }: { amount: number; months: number }) {
   const { logicContract, view } = await getBurrow();

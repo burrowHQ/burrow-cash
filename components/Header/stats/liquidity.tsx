@@ -11,6 +11,8 @@ import { getWeightedNetLiquidity } from "../../../redux/selectors/getAccountRewa
 import { useProtocolNetLiquidity } from "../../../hooks/useNetLiquidity";
 import { DoubtIcon } from "../../Icons/Icons";
 import CustomTooltips from "../../CustomTooltips/CustomTooltips";
+import { beautifyPrice } from "../../../utils/beautyNumber";
+import { NetLiquidityTip } from "../../Dashboard/stat";
 
 export const ProtocolLiquidity = () => {
   const { fullDigits, setDigits } = useFullDigits();
@@ -48,14 +50,14 @@ export const ProtocolLiquidity = () => {
   );
 };
 
-export const UserLiquidity = () => {
+export const UserLiquidity = ({ memeCategory }: { memeCategory?: boolean }) => {
   const { fullDigits, setDigits } = useFullDigits();
-  const userDeposited = useAppSelector(getTotalAccountBalance("supplied"));
-  const userBorrowed = useAppSelector(getTotalAccountBalance("borrowed"));
+  const userDeposited = useAppSelector(getTotalAccountBalance("supplied", memeCategory));
+  const userBorrowed = useAppSelector(getTotalAccountBalance("borrowed", memeCategory));
   const userNetLiquidity = new Decimal(userDeposited).minus(userBorrowed).toNumber();
-  const userNetLiquidityValue = userNetLiquidity > 0 ? `$${m(userNetLiquidity)}` : `$0`;
-  const userDepositedValue = userDeposited > 0 ? `$${m(userDeposited)}` : `$0`;
-  const userBorrowedValue = userBorrowed > 0 ? `$${m(userBorrowed)}` : "$0";
+  const userNetLiquidityValue = userNetLiquidity > 0 ? beautifyPrice(userNetLiquidity, true) : `$0`;
+  const userDepositedValue = userDeposited > 0 ? beautifyPrice(userDeposited, true) : `$0`;
+  const userBorrowedValue = userBorrowed > 0 ? beautifyPrice(userBorrowed, true) : "$0";
   const showLabels = userDeposited > 0 || userBorrowed > 0;
 
   const netLiquidityLabels = [
@@ -73,7 +75,7 @@ export const UserLiquidity = () => {
         value: userBorrowedValue,
         text: "Borrowed",
         valueStyle: {
-          color: "#FF5500",
+          color: "#FF5E3A",
         },
       },
     ],
@@ -89,7 +91,7 @@ export const UserLiquidity = () => {
     <div className="relative">
       <Stat
         title="Net Liquidity"
-        titleTooltip="Net Liquidity = Your total Supplied - Your total Borrowed"
+        titleTooltip={NetLiquidityTip}
         amount={userNetLiquidityValue}
         labels={showLabels ? netLiquidityLabels : []}
         onClick={toggleValues}

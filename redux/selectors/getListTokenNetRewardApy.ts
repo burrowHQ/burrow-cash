@@ -5,12 +5,29 @@ import { shrinkToken } from "../../store";
 import { Farm } from "../accountState";
 import { filterAccountSentOutFarms, standardizeAsset } from "../../utils/index";
 
-export const getListTokenNetRewardApy = () =>
+export const getListTokenNetRewardApy = (memeCategory?: boolean) =>
   createSelector(
     (state: RootState) => state.assets,
+    (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account,
-    (assets, account) => {
-      // todo
+    (state: RootState) => state.accountMEME,
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, category) => {
+      let isMeme: boolean;
+      if (typeof memeCategory !== "boolean") {
+        isMeme = category.activeCategory == "meme";
+      } else {
+        isMeme = memeCategory;
+      }
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
+      if (isMeme) {
+        assets = assetsMEME;
+        account = accountMEME;
+      } else {
+        assets = assetsMain;
+        account = accountMain;
+      }
       const { supplied, collateral, borrowed, farms } = account.portfolio;
       const tokenNetFarms = farms.tokennetbalance || {};
       const list = Object.entries(tokenNetFarms)

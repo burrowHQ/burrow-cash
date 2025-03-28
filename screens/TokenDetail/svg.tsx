@@ -1,18 +1,3 @@
-export function ArrowLeft(props) {
-  return (
-    <svg
-      {...props}
-      width="6"
-      height="12"
-      viewBox="0 0 6 12"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path d="M5 11L1 6L5 1" stroke="#C0C4E9" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 export function SuppliedEmptyIcon() {
   return (
     <svg
@@ -65,7 +50,7 @@ export function BorrowedEmptyIcon() {
     >
       <path
         d="M76.0898 21.3842C75.7869 21.846 75.9158 22.4659 76.3776 22.7688C76.8394 23.0717 77.4593 22.9429 77.7622 22.4811L76.0898 21.3842ZM82.2495 0.292806C81.859 -0.0977198 81.2259 -0.0977195 80.8353 0.292803L74.4714 6.65676C74.0808 7.04728 74.0808 7.68045 74.4714 8.07097C74.8619 8.46149 75.4951 8.4615 75.8856 8.07097L81.5424 2.41412L87.1993 8.07099C87.5898 8.46151 88.223 8.46151 88.6135 8.07099C89.004 7.68046 89.004 7.0473 88.6135 6.65677L82.2495 0.292806ZM77.7622 22.4811C83.456 13.8003 82.5424 7.36073 82.5424 0.999913L80.5424 0.99991C80.5424 7.5045 81.3968 13.2931 76.0898 21.3842L77.7622 22.4811Z"
-        fill="#FF5500"
+        fill="#FF5E3A"
       />
       <ellipse cx="56" cy="52.501" rx="56" ry="9.5" fill="#16161B" />
       <mask
@@ -85,11 +70,11 @@ export function BorrowedEmptyIcon() {
       <g mask="url(#mask0_398_489)">
         <path
           d="M82 51.0015C82 66.4654 69.464 79.0015 54 79.0015C38.536 79.0015 26 66.4654 26 51.0015C26 35.5375 38.536 24.0015 54 24.0015C67.5 24.0015 73 30.5015 73 30.5015C77.9487 35.5516 82 43.3722 82 51.0015Z"
-          fill="#FF5500"
+          fill="#FF5E3A"
           stroke="#23253A"
           strokeWidth="2"
         />
-        <circle cx="59" cy="55.0015" r="28" fill="#FF5500" stroke="#23253A" strokeWidth="2" />
+        <circle cx="59" cy="55.0015" r="28" fill="#FF5E3A" stroke="#23253A" strokeWidth="2" />
       </g>
     </svg>
   );
@@ -273,7 +258,7 @@ export function RedLinearGradient(props) {
         <path
           opacity="0.2"
           d="M0 6C0 2.68629 2.68629 0 6 0H414C417.314 0 420 2.68629 420 6V204C420 210.627 414.627 216 408 216H12C5.37258 216 0 210.627 0 204V6Z"
-          fill="#23253A"
+          fill="#202026"
         />
       </mask>
       <g mask="url(#mask0_398_431)">
@@ -309,8 +294,8 @@ export function RedLinearGradient(props) {
           y2="124.871"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#FF5500" />
-          <stop offset="1" stopColor="#FF5500" stopOpacity="0" />
+          <stop stopColor="#FF5E3A" />
+          <stop offset="1" stopColor="#FF5E3A" stopOpacity="0" />
         </linearGradient>
       </defs>
     </svg>
@@ -338,7 +323,7 @@ export function YellowLinearGradient(props) {
         <path
           opacity="0.1"
           d="M0 6C0 2.68629 2.68629 0 6 0H414C417.314 0 420 2.68629 420 6V204C420 210.627 414.627 216 408 216H12C5.37258 216 0 210.627 0 204V6Z"
-          fill="#23253A"
+          fill="#202026"
         />
       </mask>
       <g mask="url(#mask0_398_426)">
@@ -393,7 +378,7 @@ export function ModalCloseIcon(props) {
     >
       <path
         d="M7.73284 6.00004L11.7359 1.99701C12.0368 1.696 12.0882 1.2593 11.8507 1.0219L10.9779 0.14909C10.7404 -0.0884125 10.3043 -0.0363122 10.0028 0.264491L6.00013 4.26743L1.99719 0.264591C1.69619 -0.036712 1.25948 -0.0884125 1.02198 0.14939L0.149174 1.0223C-0.0882276 1.2594 -0.0368271 1.6961 0.264576 1.99711L4.26761 6.00004L0.264576 10.0033C-0.0363271 10.3041 -0.0884276 10.7405 0.149174 10.978L1.02198 11.8509C1.25948 12.0884 1.69619 12.0369 1.99719 11.736L6.00033 7.73276L10.0029 11.7354C10.3044 12.037 10.7405 12.0884 10.978 11.8509L11.8508 10.978C12.0882 10.7405 12.0368 10.3041 11.736 10.0029L7.73284 6.00004Z"
-        fill="#C0C4E9"
+        fill="#6A7279"
       />
     </svg>
   );
@@ -408,12 +393,12 @@ export function YellowBallIcon(props) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g filter="url(#filter0_d_1115_1018)">
+      <g filter={`url(#filter0_d_1115_${props.id || 1018})`}>
         <circle cx="7.5" cy="7.5" r="3.5" fill="#00F7A5" />
       </g>
       <defs>
         <filter
-          id="filter0_d_1115_1018"
+          id={`filter0_d_1115_${props.id || 1018}`}
           x="0"
           y="0"
           width="15"
@@ -604,6 +589,21 @@ export function CoinbaseIcon(props) {
           <rect width="55.9805" height="10" fill="white" />
         </clipPath>
       </defs>
+    </svg>
+  );
+}
+
+export function MarginAccountDetailIcon(props) {
+  return (
+    <svg
+      {...props}
+      width="12"
+      height="7"
+      viewBox="0 0 12 7"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M1 1L6 5L11 1" stroke="#8A8A8D" strokeWidth="1.58" strokeLinecap="round" />
     </svg>
   );
 }

@@ -99,7 +99,7 @@ export const StakingModal = ({ open, onClose }) => {
       >
         <Stack sx={{ overflowY: "auto", p: ["1.2rem", "2rem"] }} direction="column" spacing={2}>
           <Stack direction="row" spacing={1.5} alignItems="center">
-            <BrrrLogo color="#594a42" width={40} height={40} />
+            <BrrrLogo width={40} height={40} />
             <Typography color={theme.custom.textStaking} fontWeight="semibold" fontSize="1.125rem">
               Stake BRRR
             </Typography>

@@ -1,22 +1,28 @@
 import BN from "bn.js";
 import Decimal from "decimal.js";
 
+import { getWithdrawTransaction } from "btc-wallet";
 import { decimalMax, decimalMin, getBurrow, nearTokenId } from "../../utils";
-import { expandToken, expandTokenDecimal } from "../helper";
+import {
+  expandToken,
+  expandTokenDecimal,
+  registerAccountOnTokenWithQuery,
+  shrinkToken,
+  shrinkTokenDecimal,
+} from "../helper";
 import { ChangeMethodsLogic, ChangeMethodsOracle, ChangeMethodsToken } from "../../interfaces";
 import { getTokenContract, prepareAndExecuteTransactions } from "../tokens";
 import { ChangeMethodsNearToken } from "../../interfaces/contract-methods";
-import { Transaction, isRegistered, isRegisteredNew } from "../wallet";
+import { Transaction, isRegistered } from "../wallet";
 import { NEAR_DECIMALS, NO_STORAGE_DEPOSIT_CONTRACTS, NEAR_STORAGE_DEPOSIT } from "../constants";
 import getAssets from "../../api/get-assets";
 import { transformAssets } from "../../transformers/asstets";
 import getAccount from "../../api/get-account";
 import { transformAccount } from "../../transformers/account";
 import { computeWithdrawMaxAmount } from "../../redux/selectors/getWithdrawMaxAmount";
-import getConfig from "../../utils/config";
+import getConfig, { NBTCTokenId, NBTC_ENV } from "../../utils/config";
 import { shadow_action_withdraw } from "./shadow";
-import type { Assets } from "../../redux/assetState";
-import type { Portfolio } from "../../redux/accountState";
+import { store } from "../../redux/store";
 
 const { SPECIAL_REGISTRATION_TOKEN_IDS } = getConfig() as any;
 interface Props {
@@ -24,10 +30,8 @@ interface Props {
   extraDecimals: number;
   amount: string;
   isMax: boolean;
-  enable_pyth_oracle: boolean;
-  assets: Assets;
-  accountPortfolio: Portfolio;
-  accountId: string;
+  isMeme: boolean;
+  available: number;
 }
 
 export async function withdraw({
@@ -35,29 +39,42 @@ export async function withdraw({
   extraDecimals,
   amount,
   isMax,
-  enable_pyth_oracle,
-  assets,
-  accountPortfolio,
-  accountId,
+  isMeme,
+  available,
 }: Props) {
+  const state = store.getState();
+  const { oracleContract, logicContract, memeOracleContract, logicMEMEContract, selector } =
+    await getBurrow();
+  let assets: typeof state.assets.data;
+  let account: typeof state.account;
+  let enable_pyth_oracle: boolean;
+  let logicContractId: string;
+  let oracleContractId: string;
+  if (isMeme) {
+    assets = state.assetsMEME.data;
+    account = state.accountMEME;
+    enable_pyth_oracle = state.appMEME.config.enable_pyth_oracle;
+    logicContractId = logicMEMEContract.contractId;
+    oracleContractId = memeOracleContract.contractId;
+  } else {
+    assets = state.assets.data;
+    account = state.account;
+    enable_pyth_oracle = state.app.config.enable_pyth_oracle;
+    logicContractId = logicContract.contractId;
+    oracleContractId = oracleContract.contractId;
+  }
   // const assets = await getAssets().then(transformAssets);
   // const account = await getAccount().then(transformAccount);
-  // console.log('0000000000000-assets', assets)
-  // console.log('0000000000000-accountPortfolio', accountPortfolio)
-  // console.log('0000000000000-accountId', accountId)
-  // console.log('0000000000000-account', account)
-  if (!accountId) return;
+  if (!account) return;
   const asset = assets[tokenId];
   const { decimals } = asset.metadata;
-  const { logicContract, oracleContract } = await getBurrow();
   const isNEAR = tokenId === nearTokenId;
   const { isLpToken } = asset;
-  const suppliedBalance = new Decimal(accountPortfolio?.supplied[tokenId]?.balance || 0);
-  const hasBorrow = accountPortfolio?.borrows?.length > 0;
-  const maxAmount = computeWithdrawMaxAmount(tokenId, assets, accountPortfolio!);
-
+  const suppliedBalance = new Decimal(account.portfolio?.supplied[tokenId]?.balance || 0);
+  const hasBorrow = account.portfolio?.borrows?.length > 0;
+  const maxAmount = computeWithdrawMaxAmount(tokenId, assets, account.portfolio!);
   const expandedAmount = isMax
-    ? maxAmount
+    ? decimalMin(maxAmount, expandTokenDecimal(available, decimals + extraDecimals))
     : decimalMin(maxAmount, expandTokenDecimal(amount, decimals + extraDecimals));
 
   const transactions: Transaction[] = [];
@@ -71,49 +88,9 @@ export async function withdraw({
       enable_pyth_oracle,
     });
   } else {
-    const tokenContract = await getTokenContract(tokenId);
-    if (
-      !(await isRegistered(accountId, tokenContract)) &&
-      !NO_STORAGE_DEPOSIT_CONTRACTS.includes(tokenContract.contractId)
-    ) {
-      if (SPECIAL_REGISTRATION_TOKEN_IDS.includes(tokenContract.contractId)) {
-        const r = await isRegisteredNew(accountId, tokenContract);
-        if (r) {
-          transactions.push({
-            receiverId: tokenContract.contractId,
-            functionCalls: [
-              {
-                methodName: ChangeMethodsToken[ChangeMethodsToken.storage_deposit],
-                attachedDeposit: new BN(expandToken(NEAR_STORAGE_DEPOSIT, NEAR_DECIMALS)),
-              },
-            ],
-          });
-        } else {
-          transactions.push({
-            receiverId: tokenContract.contractId,
-            functionCalls: [
-              {
-                methodName: ChangeMethodsToken[ChangeMethodsToken.register_account],
-                gas: new BN("10000000000000"),
-                args: {
-                  account_id: accountId,
-                },
-                attachedDeposit: new BN(0),
-              },
-            ],
-          });
-        }
-      } else {
-        transactions.push({
-          receiverId: tokenContract.contractId,
-          functionCalls: [
-            {
-              methodName: ChangeMethodsToken[ChangeMethodsToken.storage_deposit],
-              attachedDeposit: new BN(expandToken(NEAR_STORAGE_DEPOSIT, NEAR_DECIMALS)),
-            },
-          ],
-        });
-      }
+    const registerToken = await registerAccountOnTokenWithQuery(account.accountId, tokenId);
+    if (registerToken) {
+      transactions.push(registerToken);
     }
 
     const withdrawAction = {
@@ -124,7 +101,7 @@ export async function withdraw({
     };
     if (decreaseCollateralAmount.gt(0)) {
       transactions.push({
-        receiverId: enable_pyth_oracle ? logicContract.contractId : oracleContract.contractId,
+        receiverId: enable_pyth_oracle ? logicContractId : oracleContractId,
         functionCalls: [
           {
             methodName: enable_pyth_oracle
@@ -145,7 +122,7 @@ export async function withdraw({
                   ],
                 }
               : {
-                  receiver_id: logicContract.contractId,
+                  receiver_id: logicContractId,
                   msg: JSON.stringify({
                     Execute: {
                       actions: [
@@ -166,7 +143,7 @@ export async function withdraw({
       });
     } else {
       transactions.push({
-        receiverId: logicContract.contractId,
+        receiverId: logicContractId,
         functionCalls: [
           {
             methodName: ChangeMethodsLogic[ChangeMethodsLogic.execute],
@@ -178,6 +155,7 @@ export async function withdraw({
       });
     }
     // 10 yocto is for rounding errors.
+    const tokenContract = await getTokenContract(tokenId);
     if (isNEAR && expandedAmount.gt(10)) {
       transactions.push({
         receiverId: tokenContract.contractId,
@@ -191,6 +169,17 @@ export async function withdraw({
         ],
       });
     }
-    await prepareAndExecuteTransactions(transactions);
+    const wallet = await selector.wallet();
+    let withdraw_to_btc;
+    if (wallet.id == "btc-wallet" && tokenId === NBTCTokenId) {
+      const withdrawAmount = shrinkTokenDecimal(expandedAmount.toFixed(0), extraDecimals).toFixed(
+        0,
+      );
+      withdraw_to_btc = await getWithdrawTransaction({
+        amount: withdrawAmount,
+        env: NBTC_ENV,
+      });
+    }
+    await prepareAndExecuteTransactions(transactions, isMeme, withdraw_to_btc);
   }
 }

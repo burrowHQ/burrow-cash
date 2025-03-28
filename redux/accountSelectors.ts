@@ -7,11 +7,51 @@ export const getAccountId = createSelector(
   (state: RootState) => state.account,
   (account) => account.accountId,
 );
+export const getAccountCategory = (memeCategory?: boolean) => {
+  return createSelector(
+    (state: RootState) => state.account,
+    (state: RootState) => state.accountMEME,
+    (state: RootState) => state.category,
+    (accountMain, accountMeme, category) => {
+      let isMeme: boolean;
+      if (typeof memeCategory !== "boolean") {
+        isMeme = category.activeCategory == "meme";
+      } else {
+        isMeme = memeCategory;
+      }
+      let account: typeof accountMain;
+      if (isMeme) {
+        account = accountMeme;
+      } else {
+        account = accountMain;
+      }
+      return account;
+    },
+  );
+};
 
-export const getAccountPortfolio = createSelector(
-  (state: RootState) => state.account,
-  (account) => account.portfolio,
-);
+export const getAccountPortfolio = (memeCategory?: boolean) => {
+  return createSelector(
+    (state: RootState) => state.account,
+    (state: RootState) => state.accountMEME,
+    (state: RootState) => state.category,
+    (accountMain, accountMEME, category) => {
+      let isMeme: boolean;
+      if (typeof memeCategory !== "boolean") {
+        isMeme = category.activeCategory == "meme";
+      } else {
+        isMeme = memeCategory;
+      }
+      let account: typeof accountMain;
+      if (isMeme) {
+        account = accountMEME;
+      } else {
+        account = accountMain;
+      }
+      return account.portfolio;
+    },
+  );
+};
 
 export const getAccountBalance = createSelector(
   (state: RootState) => state.account.balances,
@@ -30,7 +70,25 @@ export const isClaiming = createSelector(
   (account) => account.isClaiming === "pending",
 );
 
-export const getHasNonFarmedAssets = createSelector(
-  (state: RootState) => state.account,
-  (account) => account.portfolio.hasNonFarmedAssets,
-);
+export const getHasNonFarmedAssets = (memeCategory?: boolean) => {
+  return createSelector(
+    (state: RootState) => state.account,
+    (state: RootState) => state.accountMEME,
+    (state: RootState) => state.category,
+    (accountMain, accountMEME, category) => {
+      let isMeme: boolean;
+      if (typeof memeCategory !== "boolean") {
+        isMeme = category.activeCategory == "meme";
+      } else {
+        isMeme = memeCategory;
+      }
+      let account: typeof accountMain;
+      if (isMeme) {
+        account = accountMEME;
+      } else {
+        account = accountMain;
+      }
+      return account.portfolio.hasNonFarmedAssets;
+    },
+  );
+};

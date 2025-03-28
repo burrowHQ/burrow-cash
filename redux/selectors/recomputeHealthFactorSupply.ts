@@ -1,7 +1,6 @@
 import Decimal from "decimal.js";
 import { clone } from "ramda";
 import { createSelector } from "@reduxjs/toolkit";
-
 import { MAX_RATIO, expandTokenDecimal } from "../../store";
 import { RootState } from "../store";
 import { hasAssets } from "../utils";
@@ -11,9 +10,26 @@ import { DEFAULT_POSITION } from "../../utils/config";
 export const recomputeHealthFactorSupply = (tokenId: string, amount: number) =>
   createSelector(
     (state: RootState) => state.assets,
+    (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account,
+    (state: RootState) => state.accountMEME,
     (state: RootState) => state.app,
-    (assets, account, app) => {
+    (state: RootState) => state.appMEME,
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category) => {
+      const isMeme = category.activeCategory == "meme";
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
+      let app: typeof appMain;
+      if (isMeme) {
+        assets = assetsMEME;
+        account = accountMEME;
+        app = appMEME;
+      } else {
+        assets = assetsMain;
+        account = accountMain;
+        app = appMain;
+      }
       if (!hasAssets(assets)) return { healthFactor: 0, maxBorrowValue: 0 };
       if (!account.portfolio || !tokenId) return { healthFactor: 0, maxBorrowValue: 0 };
       const asset = assets.data[tokenId];
@@ -49,18 +65,6 @@ export const recomputeHealthFactorSupply = (tokenId: string, amount: number) =>
         shares: newBalance.toFixed(),
         balance: newBalance.toFixed(),
       };
-      // clonedAccount.portfolio.positions[position].collateral[tokenId].balance =
-      //   newBalance.toFixed();
-      // if (!clonedAccount.portfolio.collateral[tokenId]) {
-      //   clonedAccount.portfolio.collateral[tokenId] = {
-      //     balance: "0",
-      //     shares: "0",
-      //     apr: "0",
-      //   };
-      // }
-      // const collateralBalance = new Decimal(clonedAccount.portfolio.collateral[tokenId].balance);
-      // const newBalance = collateralBalance.plus(app.selected.useAsCollateral ? amountDecimal : 0);
-      // clonedAccount.portfolio.collateral[tokenId].balance = newBalance.toFixed();
       const adjustedCollateralSum = getAdjustedSum(
         "collateral",
         clonedAccount.portfolio,

@@ -22,8 +22,36 @@ const assets = {
             gradientUnits="userSpaceOnUse"
             gradientTransform="rotate(90) scale(93 229.5)"
           >
-            <stop stopColor="#FF5500" />
-            <stop offset="1" stopColor="#FF5500" stopOpacity="0" />
+            <stop stopColor="#FF5E3A" />
+            <stop offset="1" stopColor="#FF5E3A" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+      </svg>
+    ),
+    borrowMemeBg: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="235"
+        height="94"
+        viewBox="0 0 235 94"
+        fill="none"
+      >
+        <path
+          opacity="0.2"
+          d="M0 12C0 5.37257 5.37258 0 12 0H235V93.4125H0V12Z"
+          fill="url(#paint0_radial_406_11791_1)"
+        />
+        <defs>
+          <radialGradient
+            id="paint0_radial_406_11791_1"
+            cx="0"
+            cy="0"
+            r="1"
+            gradientUnits="userSpaceOnUse"
+            gradientTransform="rotate(90) scale(93 229.5)"
+          >
+            <stop stopColor="#FF6947" />
+            <stop offset="1" stopColor="#FF6947" stopOpacity="0" />
           </radialGradient>
         </defs>
       </svg>
@@ -44,6 +72,34 @@ const assets = {
         <defs>
           <radialGradient
             id="paint0_radial_406_11793"
+            cx="0"
+            cy="0"
+            r="1"
+            gradientUnits="userSpaceOnUse"
+            gradientTransform="rotate(90) scale(93 229.5)"
+          >
+            <stop stopColor="#00F7A5" />
+            <stop offset="1" stopColor="#00F7A5" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+      </svg>
+    ),
+    suppliedMemeBg: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="235"
+        height="94"
+        viewBox="0 0 235 94"
+        fill="none"
+      >
+        <path
+          opacity="0.2"
+          d="M0 12C0 5.37257 5.37258 0 12 0H235V93.4125H0V12Z"
+          fill="url(#paint0_radial_406_11793_1)"
+        />
+        <defs>
+          <radialGradient
+            id="paint0_radial_406_11793_1"
             cx="0"
             cy="0"
             r="1"

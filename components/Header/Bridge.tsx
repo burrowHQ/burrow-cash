@@ -21,7 +21,7 @@ const Bridge = () => {
         Bridge
       </span>
       <div className={`absolute top-10 pt-3 z-50 ${show_bridge_box ? "" : "hidden"}`}>
-        <div className={`border border-dark-300 bg-dark-100 rounded-md p-2.5 pb-1.5 `}>
+        <div className={`border border-dark-50 bg-dark-100 rounded-md p-2.5 pb-1.5 `}>
           {bridgeList.map(({ title, subTitle, link }, index: number) => {
             return (
               // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions

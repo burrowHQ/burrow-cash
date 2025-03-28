@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { SetIcon } from "./svg";
-import { toggleShowDust } from "../../redux/appSlice";
-import { getShowDust } from "../../redux/appSelectors";
+import { toggleShowDust } from "../../redux/marginTrading";
+import { getShowDust } from "../../redux/categorySelectors";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 
 const Set = () => {
@@ -44,7 +44,7 @@ function Box({ children, className }) {
     <div className="absolute right-0 top-10 pt-2 z-50">
       <div
         className={twMerge(
-          "border border-dark-300 rounded-md bg-dark-100 p-4 min-w-[200px]",
+          "border border-dark-50 rounded-md bg-dark-100 p-4 min-w-[200px]",
           className,
         )}
       >
@@ -65,7 +65,7 @@ function SliderButton({ active, ...rest }: { active: boolean; onClick: any }) {
   return (
     <div
       {...rest}
-      className={`flex items-center h-5 w-9 rounded-xl p-0.5 cursor-pointer border border-dark-500 transition-all ${
+      className={`flex items-center h-5 w-9 rounded-xl p-0.5 cursor-pointer border border-dark-50 transition-all ${
         active ? "bg-primary" : "bg-dark-600"
       }`}
     >

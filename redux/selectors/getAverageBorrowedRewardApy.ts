@@ -2,14 +2,33 @@ import { createSelector } from "@reduxjs/toolkit";
 import Decimal from "decimal.js";
 import { RootState } from "../store";
 import { shrinkToken } from "../../store";
+import { filterAccountSentOutFarms } from "../../utils";
 import { Farm } from "../accountState";
-import { filterAccountSentOutFarms } from "../../utils/index";
 
-export const getAverageBorrowedRewardApy = () =>
+export const getAverageBorrowedRewardApy = (memeCategory?: boolean) =>
   createSelector(
     (state: RootState) => state.assets,
+    (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account,
-    (assets, account) => {
+    (state: RootState) => state.accountMEME,
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, category) => {
+      let isMeme: boolean;
+      if (typeof memeCategory !== "boolean") {
+        isMeme = category.activeCategory == "meme";
+      } else {
+        isMeme = memeCategory;
+      }
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
+      if (isMeme) {
+        assets = assetsMEME;
+        account = accountMEME;
+      } else {
+        assets = assetsMain;
+        account = accountMain;
+      }
+
       const { borrows, farms } = account.portfolio;
       const borrowFarms = farms.borrowed || {};
       const [dailyTotalBorrowProfit, totalBorrow] = Object.entries(borrowFarms)

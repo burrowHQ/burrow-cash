@@ -124,9 +124,26 @@ export const computeWithdrawMaxAmount = (tokenId: string, assets: Assets, portfo
 export const getWithdrawMaxAmount = (tokenId: string) =>
   createSelector(
     (state: RootState) => state.app,
+    (state: RootState) => state.appMEME,
     (state: RootState) => state.assets.data,
+    (state: RootState) => state.assetsMEME.data,
     (state: RootState) => state.account.portfolio,
-    (app, assets, portfolio) => {
+    (state: RootState) => state.accountMEME.portfolio,
+    (state: RootState) => state.category,
+    (appMain, appMEME, assetsMain, assetsMEME, portfolioMain, portfolioMEME, category) => {
+      const isMeme = category.activeCategory == "meme";
+      let assets: typeof assetsMain;
+      let portfolio: typeof portfolioMain;
+      let app: typeof appMain;
+      if (isMeme) {
+        assets = assetsMEME;
+        portfolio = portfolioMEME;
+        app = appMEME;
+      } else {
+        assets = assetsMain;
+        portfolio = portfolioMain;
+        app = appMain;
+      }
       const asset = assets[tokenId];
       if (!asset || app.selected.tokenId !== tokenId) return 0;
       if (!["Withdraw", "Adjust", "Repay"].includes(app.selected.action as string)) return 0;

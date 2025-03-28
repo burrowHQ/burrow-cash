@@ -29,14 +29,14 @@ const CustomTableMobile = ({ data, columns, noDataText, isLoading }) => {
         );
       });
       return (
-        <div className="border-b border-gray-700 py-4 h4b" key={i}>
+        <div className="border-b border-dark-50 py-4 h4b" key={i}>
           {colNode}
         </div>
       );
     });
   } else if (!isLoading) {
     bodyNodes = (
-      <div className="flex justify-center items-center text-gray-400" style={{ height: 300 }}>
+      <div className="flex justify-center items-center text-gray-160" style={{ height: 300 }}>
         {noDataText || "No Data"}
       </div>
     );

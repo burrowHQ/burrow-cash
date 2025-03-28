@@ -5,7 +5,6 @@ import { MAX_RATIO } from "../../store";
 import { RootState } from "../store";
 import { hasAssets, transformAsset } from "../utils";
 import { Assets } from "../assetState";
-import { Portfolio } from "../accountState";
 import { getAdjustedSum } from "./getWithdrawMaxAmount";
 import { DEFAULT_POSITION } from "../../utils/config";
 import { UIAsset } from "../../interfaces";
@@ -45,9 +44,26 @@ export const computeBorrowMaxAmount = (tokenId: string, assets: Assets, account,
 export const getBorrowMaxAmount = (tokenId: string) =>
   createSelector(
     (state: RootState) => state.assets,
+    (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account,
+    (state: RootState) => state.accountMEME,
     (state: RootState) => state.app,
-    (assets, account, app) => {
+    (state: RootState) => state.appMEME,
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category) => {
+      const isMeme = category.activeCategory == "meme";
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
+      let app: typeof appMain;
+      if (isMeme) {
+        assets = assetsMEME;
+        account = accountMEME;
+        app = appMEME;
+      } else {
+        assets = assetsMain;
+        account = accountMain;
+        app = appMain;
+      }
       if (!account.accountId || !tokenId)
         return { [DEFAULT_POSITION]: { maxBorrowAmount: 0, maxBorrowValue: 0 } };
       if (!hasAssets(assets))

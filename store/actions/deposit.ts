@@ -13,14 +13,21 @@ export async function deposit({
   amount,
   useAsCollateral,
   isMax,
+  isMeme,
 }: {
   amount: string;
   useAsCollateral: boolean;
   isMax: boolean;
+  isMeme: boolean;
 }) {
-  const { account, logicContract } = await getBurrow();
+  const { account, logicContract, logicMEMEContract } = await getBurrow();
   const tokenContract: Contract = await getTokenContract(nearTokenId);
-
+  let logicContractId;
+  if (isMeme) {
+    logicContractId = logicMEMEContract.contractId;
+  } else {
+    logicContractId = logicContract.contractId;
+  }
   const accountBalance = decimalMax(
     0,
     new Decimal((await account.getAccountBalance()).available).sub(NEAR_STORAGE_DEPOSIT_DECIMAL),
@@ -63,7 +70,7 @@ export async function deposit({
             methodName: ChangeMethodsToken[ChangeMethodsToken.ft_transfer_call],
             gas: new BN("100000000000000"),
             args: {
-              receiver_id: logicContract.contractId,
+              receiver_id: logicContractId,
               amount: expandedAmount.toFixed(0),
               msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
             },

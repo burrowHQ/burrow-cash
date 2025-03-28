@@ -1,82 +1,53 @@
 import BN from "bn.js";
 
 import { getBurrow, nearTokenId } from "../../utils";
-import { expandToken, expandTokenDecimal } from "../helper";
-import {
-  ChangeMethodsNearToken,
-  ChangeMethodsOracle,
-  ChangeMethodsToken,
-  ChangeMethodsLogic,
-} from "../../interfaces";
-import { Transaction, isRegistered, isRegisteredNew } from "../wallet";
+import { expandTokenDecimal, registerAccountOnTokenWithQuery } from "../helper";
+import { ChangeMethodsNearToken, ChangeMethodsOracle, ChangeMethodsLogic } from "../../interfaces";
+import { Transaction } from "../wallet";
 import { prepareAndExecuteTransactions, getMetadata, getTokenContract } from "../tokens";
-import { NEAR_DECIMALS, NO_STORAGE_DEPOSIT_CONTRACTS, NEAR_STORAGE_DEPOSIT } from "../constants";
-import getConfig, { DEFAULT_POSITION } from "../../utils/config";
+import { DEFAULT_POSITION } from "../../utils/config";
+import { store } from "../../redux/store";
 
-const { SPECIAL_REGISTRATION_TOKEN_IDS } = getConfig() as any;
 export async function borrow({
   tokenId,
   extraDecimals,
   amount,
   collateralType,
-  enable_pyth_oracle,
+  isMeme,
 }: {
   tokenId: string;
   extraDecimals: number;
   amount: string;
   collateralType: string;
-  enable_pyth_oracle: boolean;
+  isMeme?: boolean;
 }) {
-  const { oracleContract, logicContract, account } = await getBurrow();
+  const state = store.getState();
+  const { oracleContract, logicContract, account, memeOracleContract, logicMEMEContract } =
+    await getBurrow();
+  let enable_pyth_oracle;
+  let logicContractId;
+  let oracleContractId;
+  if (isMeme) {
+    enable_pyth_oracle = state.appMEME.config.enable_pyth_oracle;
+    logicContractId = logicMEMEContract.contractId;
+    oracleContractId = memeOracleContract.contractId;
+  } else {
+    enable_pyth_oracle = state.app.config.enable_pyth_oracle;
+    logicContractId = logicContract.contractId;
+    oracleContractId = oracleContract.contractId;
+  }
   const { decimals } = (await getMetadata(tokenId))!;
   const tokenContract = await getTokenContract(tokenId);
   const isNEAR = tokenId === nearTokenId;
-
   const transactions: Transaction[] = [];
 
   const expandedAmount = expandTokenDecimal(amount, decimals + extraDecimals);
-  if (
-    !(await isRegistered(account.accountId, tokenContract)) &&
-    !NO_STORAGE_DEPOSIT_CONTRACTS.includes(tokenContract.contractId)
-  ) {
-    if (SPECIAL_REGISTRATION_TOKEN_IDS.includes(tokenContract.contractId)) {
-      const r = await isRegisteredNew(account.accountId, tokenContract);
-      if (r) {
-        transactions.push({
-          receiverId: tokenContract.contractId,
-          functionCalls: [
-            {
-              methodName: ChangeMethodsToken[ChangeMethodsToken.storage_deposit],
-              attachedDeposit: new BN(expandToken(NEAR_STORAGE_DEPOSIT, NEAR_DECIMALS)),
-            },
-          ],
-        });
-      } else {
-        transactions.push({
-          receiverId: tokenContract.contractId,
-          functionCalls: [
-            {
-              methodName: ChangeMethodsToken[ChangeMethodsToken.register_account],
-              gas: new BN("10000000000000"),
-              args: {
-                account_id: account.accountId,
-              },
-              attachedDeposit: new BN(0),
-            },
-          ],
-        });
-      }
-    } else {
-      transactions.push({
-        receiverId: tokenContract.contractId,
-        functionCalls: [
-          {
-            methodName: ChangeMethodsToken[ChangeMethodsToken.storage_deposit],
-            attachedDeposit: new BN(expandToken(NEAR_STORAGE_DEPOSIT, NEAR_DECIMALS)),
-          },
-        ],
-      });
-    }
+  const registerToken = await registerAccountOnTokenWithQuery(
+    account.accountId,
+    tokenContract.contractId,
+  );
+  if (registerToken) {
+    transactions.push(registerToken);
   }
   let borrowTemplate;
   if (!collateralType || collateralType === DEFAULT_POSITION) {
@@ -123,7 +94,7 @@ export async function borrow({
   }
 
   transactions.push({
-    receiverId: enable_pyth_oracle ? logicContract.contractId : oracleContract.contractId,
+    receiverId: enable_pyth_oracle ? logicContractId : oracleContractId,
     functionCalls: [
       {
         methodName: enable_pyth_oracle
@@ -135,7 +106,7 @@ export async function borrow({
               actions: borrowTemplate.Execute.actions,
             }
           : {
-              receiver_id: logicContract.contractId,
+              receiver_id: logicContractId,
               msg: JSON.stringify(borrowTemplate),
             },
       },

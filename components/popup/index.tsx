@@ -54,7 +54,7 @@ const Popup = ({ className }) => {
                   className="cursor-pointer mr-4 xsm:right-4 z-50"
                   onClick={closePopup}
                 />
-                <div onClick={() => router.push(`/tokenDetail/shadow_ref_v1-4179/`)}>
+                <div onClick={() => router.push(`/tokenDetail/shadow_ref_v1-4179?pageType=main`)}>
                   <LpTokenCarouse />
                 </div>
               </div>
@@ -83,7 +83,7 @@ const Popup = ({ className }) => {
                 <SupplyCarousel />
               </>
             </SwiperSlide>
-            <SwiperSlide>
+            {/* <SwiperSlide>
               <CloseButton
                 className="absolute cursor-pointer top-8 right-8 xsm:top-3.5 xsm:right-7 z-50"
                 onClick={closePopup}
@@ -91,7 +91,7 @@ const Popup = ({ className }) => {
               <div className={`${isMobileDevice() ? "mt-0" : "mt-8"} relative`}>
                 <StakeCarousel />
               </div>
-            </SwiperSlide>
+            </SwiperSlide> */}
           </Swiper>
         </div>
       </div>

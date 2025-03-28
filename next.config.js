@@ -1,9 +1,19 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
-  reactStrictMode: true,
-  trailingSlash: true,
+  reactStrictMode: false,
+  trailingSlash: false,
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "img.ref.finance",
+        port: "",
+        pathname: "/**",
+      },
+    ],
   },
   webpack(config, { isServer, webpack, buildId }) {
     config.plugins.push(
@@ -26,6 +36,19 @@ module.exports = {
       },
       exclude: /node_modules/,
     });
+    config.module.rules.push({
+      test: /satoshi-wellet/,
+      use: [
+        {
+          loader: "ts-loader",
+          options: {
+            compilerOptions: { noEmit: false },
+            onlyCompileBundledFiles: true,
+            allowTsInNodeModules: true,
+          },
+        },
+      ],
+    });
 
     if (!isServer) {
       config.resolve.fallback.fs = false;
@@ -33,13 +56,4 @@ module.exports = {
 
     return config;
   },
-  // async redirects() {
-  //   return [
-  //     {
-  //       source: "/",
-  //       destination: "/markets",
-  //       permanent: true,
-  //     },
-  //   ];
-  // },
 };

@@ -1,4 +1,5 @@
 import Decimal from "decimal.js";
+import * as math from "mathjs";
 
 export function formatWithCommas(value: string): string {
   const pattern = /(-?\d+)(\d{3})/;
@@ -39,4 +40,16 @@ export const toPrecision = (
   }
 
   return str;
+};
+export const percentLess = (percent: number, num: number | string) => {
+  return math.format(math.evaluate(`${num} - ${percentOf(percent, num)}`), {
+    notation: "fixed",
+  });
+};
+
+export const percentOf = (percent: number, num: number | string) => {
+  return math.evaluate(`${convertToPercentDecimal(percent)} * ${num}`);
+};
+export const convertToPercentDecimal = (percent: number) => {
+  return math.divide(percent, 100);
 };

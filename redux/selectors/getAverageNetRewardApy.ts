@@ -5,11 +5,29 @@ import { toUsd } from "../utils";
 import { AssetsState } from "../assetState";
 import { filterAccountSentOutFarms } from "../../utils/index";
 
-export const getAverageNetRewardApy = () =>
+export const getAverageNetRewardApy = (memeCategory?: boolean) =>
   createSelector(
     (state: RootState) => state.assets,
+    (state: RootState) => state.assetsMEME,
     (state: RootState) => state.account,
-    (assets, account) => {
+    (state: RootState) => state.accountMEME,
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, category) => {
+      let isMeme: boolean;
+      if (typeof memeCategory !== "boolean") {
+        isMeme = category.activeCategory == "meme";
+      } else {
+        isMeme = memeCategory;
+      }
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
+      if (isMeme) {
+        assets = assetsMEME;
+        account = accountMEME;
+      } else {
+        assets = assetsMain;
+        account = accountMain;
+      }
       const [, totalCollateral] = getNetGains(account.portfolio.collaterals, assets);
       const [, totalSupplied] = getNetGains(account.portfolio.supplies, assets);
       const [, totalBorrowed] = getNetGains(account.portfolio.borrows, assets);

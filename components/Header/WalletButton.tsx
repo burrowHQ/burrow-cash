@@ -1,49 +1,37 @@
 import { useState, useEffect, useRef, createContext, useContext } from "react";
-import {
-  Button,
-  Box,
-  IconButton,
-  useTheme,
-  useMediaQuery,
-  Typography,
-  Modal as MUIModal,
-} from "@mui/material";
+import { Button, Box, useTheme, Modal as MUIModal } from "@mui/material";
 import type { WalletSelector } from "@near-wallet-selector/core";
 import { BeatLoader } from "react-spinners";
+import { useDebounce } from "react-use";
 import { fetchAssets, fetchRefPrices } from "../../redux/assetsSlice";
+import { fetchAssetsMEME } from "../../redux/assetsSliceMEME";
 import { logoutAccount, fetchAccount, setAccountId } from "../../redux/accountSlice";
+import { logoutAccount as logoutAccountMEME, fetchAccountMEME } from "../../redux/accountSliceMEME";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { getBurrow, accountTrim } from "../../utils";
-
 import { hideModal as _hideModal } from "../../redux/appSlice";
-
+import { hideModal as _hideModalMEME } from "../../redux/appSliceMEME";
 import { getAccountBalance, getAccountId } from "../../redux/accountSelectors";
-import { getAccountRewards, IAccountRewards } from "../../redux/selectors/getAccountRewards";
+import { getAccountRewards } from "../../redux/selectors/getAccountRewards";
 import { trackConnectWallet, trackLogout } from "../../utils/telemetry";
-import { useDegenMode } from "../../hooks/hooks";
-import { HamburgerMenu } from "./Menu";
 import Disclaimer from "../Disclaimer";
 import { useDisclaimer } from "../../hooks/useDisclaimer";
 import { NearSolidIcon, ArrowDownIcon, CloseIcon, ArrowRightTopIcon } from "./svg";
 import ClaimAllRewards from "../ClaimAllRewards";
 import { formatWithCommas_usd } from "../../utils/uiNumber";
 import { isMobileDevice } from "../../helpers/helpers";
-import getConfig from "../../utils/config";
 import CopyToClipboardComponent from "./CopyToClipboardComponent";
 import CustomButton from "../CustomButton/CustomButton";
-
-const config = getConfig();
+import { fetchMarginAccount } from "../../redux/marginAccountSlice";
+import { fetchMarginAccountMEME } from "../../redux/marginAccountSliceMEME";
 
 const WalletContext = createContext(null) as any;
 const WalletButton = () => {
   const theme = useTheme();
   const dispatch = useAppDispatch();
-  // const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isMobile = isMobileDevice();
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const balance = useAppSelector(getAccountBalance);
   const accountId = useAppSelector(getAccountId);
-  const { degenMode } = useDegenMode();
   const [isDisclaimerOpen, setDisclaimer] = useState(false);
   const { getDisclaimer: hasAgreedDisclaimer } = useDisclaimer();
   const [show_account_detail, set_show_account_detail] = useState(false);
@@ -51,20 +39,38 @@ const WalletButton = () => {
   const selectorRef = useRef<WalletSelector>();
   const [selector, setSelector] = useState<WalletSelector | null>(null);
   const [currentWallet, setCurrentWallet] = useState<any>(null);
-  const rewards = useAppSelector(getAccountRewards);
-  const isSignedIn = selector?.isSignedIn();
+  const rewards = useAppSelector(getAccountRewards());
   const hideModal = () => {
     dispatch(_hideModal());
+    dispatch(_hideModalMEME());
   };
-
   const fetchData = (id?: string) => {
+    if (
+      id &&
+      accountId &&
+      accountId !== id &&
+      (window.localStorage.getItem("near-wallet-selector:selectedWalletId") == '"btc-wallet"' ||
+        accountId.startsWith("bc1"))
+    ) {
+      // for btc wallet to switch accountId
+      dispatch(setAccountId(id));
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+      return;
+    }
     dispatch(setAccountId(id));
     dispatch(fetchAccount());
+    dispatch(fetchAccountMEME());
+    dispatch(fetchMarginAccount());
+    dispatch(fetchMarginAccountMEME());
     dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
+    dispatch(fetchAssetsMEME()).then(() => dispatch(fetchRefPrices()));
   };
 
   const signOut = () => {
     dispatch(logoutAccount());
+    dispatch(logoutAccountMEME());
   };
 
   const onMount = async () => {
@@ -85,9 +91,13 @@ const WalletButton = () => {
     }
   };
 
-  useEffect(() => {
-    onMount();
-  }, [accountId]);
+  useDebounce(
+    () => {
+      onMount();
+    },
+    500,
+    [accountId],
+  );
 
   const onWalletButtonClick = async () => {
     if (!hasAgreedDisclaimer) {
@@ -105,12 +115,11 @@ const WalletButton = () => {
       signOutBurrow();
     }
     trackLogout();
-    setAnchorEl(null);
     setDisclaimer(false);
   };
   const handleSwitchWallet = async () => {
     await handleSignOut();
-    window.modal.show();
+    // window.modal.show();
   };
 
   const getUnClaimRewards = () => formatWithCommas_usd(rewards.totalUnClaimUSD);
@@ -282,12 +291,12 @@ function AccountDetail({ onClose }: { onClose?: () => void }) {
 
   const changeWalletDisable = currentWallet?.id === "keypom";
   return (
-    <div className="border border-dark-300 bg-dark-100 lg:rounded-md p-4 xsm:rounded-b-xl xsm:p-6">
+    <div className="border border-dark-50 bg-dark-110 lg:rounded-md p-4 xsm:rounded-b-xl xsm:p-6">
       {isMobile && (
         <div className="relative flex items-center w-full justify-between h-[60px] mb-5">
-          <span className="text-dark-800 text-xl">Account</span>
+          <span className="text-gray-300 text-xl">Account</span>
           <CloseIcon onClick={onClose} />
-          <div className="absolute h-0.5 -left-6 -right-6 bottom-0 bg-dark-700" />
+          <div className="absolute h-px -left-6 -right-6 bottom-0 bg-dark-50" />
         </div>
       )}
       <div className="flex items-center justify-between">
@@ -373,10 +382,10 @@ function AccountDetail({ onClose }: { onClose?: () => void }) {
 }
 
 const ClaimButtonInAccount = (props) => {
-  const { loading, disabled } = props;
+  const { loading, disabled, ...restProps } = props;
   return (
     <div
-      {...props}
+      {...restProps}
       className="flex items-center justify-center bg-primary rounded-md cursor-pointer text-sm font-bold text-dark-200 hover:opacity-80 w-20 h-8"
     >
       {loading ? <BeatLoader size={5} color="#16161B" /> : <>Claim</>}
@@ -387,9 +396,13 @@ const ClaimButtonInAccount = (props) => {
 export const ConnectWalletButton = ({
   accountId,
   className,
+  isShort,
+  loading,
 }: {
   accountId;
   className?: string;
+  isShort?: boolean;
+  loading?: boolean;
 }) => {
   const [isDisclaimerOpen, setDisclaimer] = useState(false);
   const { getDisclaimer: hasAgreedDisclaimer } = useDisclaimer();
@@ -417,18 +430,19 @@ export const ConnectWalletButton = ({
           textTransform: "none",
           fontSize: "16px",
           padding: "0 20px",
-          height: "42px",
+          height: className?.includes("h-") ? undefined : "42px",
           borderRadius: "6px",
           ":hover": {
             backgroundColor: "#00F7A5",
             opacity: "0.8",
           },
+          backgroundColor: isShort ? "#FF6947" : "#00F7A5",
         }}
         variant={accountId ? "outlined" : "contained"}
         onClick={onWalletButtonClick}
         disableRipple={!!accountId}
       >
-        Connect Wallet
+        {loading ? <BeatLoader size={4} color="black" /> : <>Connect Wallet</>}
       </Button>
       <Disclaimer isOpen={isDisclaimerOpen} onClose={() => setDisclaimer(false)} />
     </>

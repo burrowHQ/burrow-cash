@@ -13,7 +13,6 @@ import { getStaking } from "./getStaking";
 import { INetTvlFarmRewards } from "../../interfaces";
 import { hasAssets, toUsd, emptySuppliedAsset, emptyBorrowedAsset } from "../utils";
 import { cloneObj } from "../../helpers/helpers";
-import { useAppSelector } from "../hooks";
 import { getMarketRewardsDataUtil } from "./getMarketRewards";
 import {
   standardizeAsset,
@@ -341,289 +340,372 @@ export const computeNetLiquidityDailyAmount = (
   return { dailyAmount, newDailyAmount, multiplier, totalBoostedShares, shares };
 };
 
-export const getAccountRewards = createSelector(
-  (state: RootState) => state.assets,
-  (state: RootState) => state.account,
-  (state: RootState) => state.app,
-  getStaking,
-  (assets, account, app, staking) => {
-    const brrrTokenId = app.config.booster_token_id;
-    const { xBRRR, extraXBRRRAmount } = staking;
-    const xBRRRAmount = xBRRR + extraXBRRRAmount;
-    const { borrows, collaterals } = account.portfolio || {};
-    const [, totalSupplied] = getGains(account.portfolio, assets, "supplied");
-    const [, totalCollateral] = collaterals
-      ? getGainsArr(account.portfolio.collaterals, assets)
-      : getGains(account.portfolio, assets, "collateral");
-    const [, totalBorrowed] = borrows
-      ? getGainsArr(account.portfolio.borrows, assets)
-      : getGains(account.portfolio, assets, "borrowed");
+export const getAccountRewards = (memeCategory?: boolean) => {
+  return createSelector(
+    (state: RootState) => state.assets,
+    (state: RootState) => state.assetsMEME,
+    (state: RootState) => state.account,
+    (state: RootState) => state.accountMEME,
+    (state: RootState) => state.app,
+    (state: RootState) => state.appMEME,
+    (state: RootState) => state.category,
+    getStaking(memeCategory),
+    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category, stakingMain) => {
+      let isMeme: boolean;
+      if (typeof memeCategory !== "boolean") {
+        isMeme = category.activeCategory == "meme";
+      } else {
+        isMeme = memeCategory;
+      }
 
-    const netLiquidity = totalCollateral + totalSupplied - totalBorrowed;
-    const computePoolsRewards =
-      (type: "supplied" | "borrowed" | "tokennetbalance") =>
-      ([tokenId, farm]: [string, Farm]) => {
-        return Object.entries(farm).map(([rewardTokenId, farmData]) => {
-          const asset = assets.data[tokenId];
-          const rewardAsset = assets.data[rewardTokenId];
-          const rewardAssetDecimals =
-            rewardAsset.metadata.decimals + rewardAsset.config.extra_decimals;
-          const { icon, symbol, name } = rewardAsset.metadata;
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
+      let app: typeof appMain;
+      let staking;
+      if (isMeme) {
+        assets = assetsMEME;
+        account = accountMEME;
+        app = appMEME;
+        staking = {
+          xBRRR: 0,
+          extraXBRRRAmount: 0,
+        };
+      } else {
+        assets = assetsMain;
+        account = accountMain;
+        app = appMain;
+        staking = stakingMain;
+      }
+      const brrrTokenId = app.config.booster_token_id;
+      const { xBRRR, extraXBRRRAmount } = staking;
+      const xBRRRAmount = xBRRR + extraXBRRRAmount;
+      const { borrows, collaterals } = account.portfolio || {};
+      const [, totalSupplied] = getGains(account.portfolio, assets, "supplied");
+      const [, totalCollateral] = collaterals
+        ? getGainsArr(account.portfolio.collaterals, assets)
+        : getGains(account.portfolio, assets, "collateral");
+      const [, totalBorrowed] = borrows
+        ? getGainsArr(account.portfolio.borrows, assets)
+        : getGains(account.portfolio, assets, "borrowed");
 
-          const unclaimedAmount = Number(
-            shrinkToken(farmData.unclaimed_amount, rewardAssetDecimals),
-          );
+      const netLiquidity = totalCollateral + totalSupplied - totalBorrowed;
+      const computePoolsRewards =
+        (type: "supplied" | "borrowed" | "tokennetbalance") =>
+        ([tokenId, farm]: [string, Farm]) => {
+          return Object.entries(farm).map(([rewardTokenId, farmData]) => {
+            const asset = assets.data[tokenId];
+            const rewardAsset = assets.data[rewardTokenId];
+            const rewardAssetDecimals =
+              rewardAsset.metadata.decimals + rewardAsset.config.extra_decimals;
+            const { icon, symbol, name } = rewardAsset.metadata;
 
-          const { dailyAmount, newDailyAmount, multiplier } = computePoolsDailyAmount(
-            type,
-            asset,
-            rewardAsset,
-            account.portfolio,
-            xBRRRAmount,
-            farmData,
-            app.config.booster_decimals,
-            app.config.boost_suppress_factor,
-          );
-          return {
-            icon,
-            name,
-            symbol,
-            tokenId: rewardTokenId,
-            unclaimedAmount,
-            dailyAmount,
-            newDailyAmount,
-            multiplier,
-            price: rewardAsset.price?.usd || 0,
-            unclaimedAmountUSD: unclaimedAmount * (rewardAsset.price?.usd || 0),
-            remaining_rewards: farmData?.asset_farm_reward?.remaining_rewards || "0",
-          };
-        });
+            const unclaimedAmount = Number(
+              shrinkToken(farmData.unclaimed_amount, rewardAssetDecimals),
+            );
+
+            const { dailyAmount, newDailyAmount, multiplier } = computePoolsDailyAmount(
+              type,
+              asset,
+              rewardAsset,
+              account.portfolio,
+              xBRRRAmount,
+              farmData,
+              app.config.booster_decimals,
+              app.config.boost_suppress_factor,
+            );
+            return {
+              icon,
+              name,
+              symbol,
+              tokenId: rewardTokenId,
+              unclaimedAmount,
+              dailyAmount,
+              newDailyAmount,
+              multiplier,
+              price: rewardAsset.price?.usd || 0,
+              unclaimedAmountUSD: unclaimedAmount * (rewardAsset.price?.usd || 0),
+              remaining_rewards: farmData?.asset_farm_reward?.remaining_rewards || "0",
+            };
+          });
+        };
+
+      const computeNetLiquidityRewards = ([rewardTokenId, farmData]: [string, FarmData]) => {
+        const rewardAsset = assets.data[rewardTokenId];
+        const rewardAssetDecimals =
+          rewardAsset.metadata.decimals + rewardAsset.config.extra_decimals;
+        const { icon, symbol, name } = rewardAsset.metadata;
+        const unclaimedAmount = Number(shrinkToken(farmData.unclaimed_amount, rewardAssetDecimals));
+        const { dailyAmount, newDailyAmount, multiplier } = computeNetLiquidityDailyAmount(
+          rewardAsset,
+          xBRRRAmount,
+          assets.netTvlFarm,
+          farmData,
+          app.config.booster_decimals,
+          xBRRR,
+          app.config.boost_suppress_factor,
+        );
+        return {
+          icon,
+          name,
+          symbol,
+          tokenId: rewardTokenId,
+          unclaimedAmount,
+          dailyAmount,
+          newDailyAmount,
+          multiplier,
+          price: rewardAsset.price?.usd || 0,
+          unclaimedAmountUSD: unclaimedAmount * (rewardAsset.price?.usd || 0),
+          remaining_rewards: farmData?.asset_farm_reward?.remaining_rewards || "0",
+        };
       };
-
-    const computeNetLiquidityRewards = ([rewardTokenId, farmData]: [string, FarmData]) => {
-      const rewardAsset = assets.data[rewardTokenId];
-      const rewardAssetDecimals = rewardAsset.metadata.decimals + rewardAsset.config.extra_decimals;
-      const { icon, symbol, name } = rewardAsset.metadata;
-      const unclaimedAmount = Number(shrinkToken(farmData.unclaimed_amount, rewardAssetDecimals));
-
-      const { dailyAmount, newDailyAmount, multiplier } = computeNetLiquidityDailyAmount(
-        rewardAsset,
-        xBRRRAmount,
-        assets.netTvlFarm,
-        farmData,
-        app.config.booster_decimals,
-        xBRRR,
-        app.config.boost_suppress_factor,
-      );
-
+      const { supplied, borrowed, netTvl, tokennetbalance } = account.portfolio.farms;
+      const suppliedRewards = Object.entries(supplied).map(computePoolsRewards("supplied")).flat();
+      const borrowedRewards = Object.entries(borrowed).map(computePoolsRewards("borrowed")).flat();
+      const tokenNetRewards = Object.entries(tokennetbalance)
+        .map(computePoolsRewards("tokennetbalance"))
+        .flat();
+      const netLiquidityRewards = Object.entries(netTvl).map(computeNetLiquidityRewards);
+      const sumArrays = (array) => {
+        const clonedArray = cloneObj(array);
+        return clonedArray.reduce((rewards, asset) => {
+          if (!rewards[asset.tokenId]) return { ...rewards, [asset.tokenId]: asset };
+          const updatedAsset = rewards[asset.tokenId];
+          updatedAsset.unclaimedAmount += asset.unclaimedAmount;
+          updatedAsset.dailyAmount += asset.dailyAmount;
+          updatedAsset.newDailyAmount += asset.newDailyAmount;
+          return { ...rewards, [asset.tokenId]: updatedAsset };
+        }, {});
+      };
+      const allRewards = [
+        ...suppliedRewards,
+        ...borrowedRewards,
+        ...netLiquidityRewards,
+        ...tokenNetRewards,
+      ];
+      const sumRewards = sumArrays(allRewards);
+      const poolRewards = sumArrays([...suppliedRewards, ...borrowedRewards, ...tokenNetRewards]);
+      let totalUnClaimUSD = 0;
+      allRewards.forEach((d) => {
+        totalUnClaimUSD += d.unclaimedAmountUSD;
+      });
       return {
-        icon,
-        name,
-        symbol,
-        tokenId: rewardTokenId,
-        unclaimedAmount,
-        dailyAmount,
-        newDailyAmount,
-        multiplier,
-        price: rewardAsset.price?.usd || 0,
-        unclaimedAmountUSD: unclaimedAmount * (rewardAsset.price?.usd || 0),
-        remaining_rewards: farmData?.asset_farm_reward?.remaining_rewards || "0",
+        brrr: poolRewards[brrrTokenId] || {},
+        extra: omit(poolRewards, brrrTokenId) || {},
+        poolRewards: poolRewards || {},
+        net: netLiquidityRewards.reduce(
+          (rewards, asset) => ({ ...rewards, [asset.tokenId]: asset }),
+          {},
+        ),
+        sumRewards,
+        totalUnClaimUSD,
+      } as IAccountRewards;
+    },
+  );
+};
+export const getAccountRewardsForApy = (memeCategory?: boolean) => {
+  return createSelector(
+    (state: RootState) => state.assets,
+    (state: RootState) => state.assetsMEME,
+    (state: RootState) => state.account,
+    (state: RootState) => state.accountMEME,
+    (state: RootState) => state.app,
+    (state: RootState) => state.appMEME,
+    (state: RootState) => state.category,
+    getStaking(memeCategory),
+    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category, stakingMain) => {
+      let isMeme: boolean;
+      if (typeof memeCategory !== "boolean") {
+        isMeme = category.activeCategory == "meme";
+      } else {
+        isMeme = memeCategory;
+      }
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
+      let app: typeof appMain;
+      let staking;
+      if (isMeme) {
+        assets = assetsMEME;
+        account = accountMEME;
+        app = appMEME;
+        staking = {
+          xBRRR: 0,
+          extraXBRRRAmount: 0,
+        };
+      } else {
+        assets = assetsMain;
+        account = accountMain;
+        app = appMain;
+        staking = stakingMain;
+      }
+      const { xBRRR, extraXBRRRAmount } = staking;
+      const xBRRRAmount = xBRRR + extraXBRRRAmount;
+
+      const computePoolsRewards =
+        (type: "supplied" | "borrowed" | "tokennetbalance") =>
+        ([tokenId, farm]: [string, Farm]) => {
+          return Object.entries(farm).map(([rewardTokenId, farmData]) => {
+            const asset = assets.data[tokenId];
+            const rewardAsset = assets.data[rewardTokenId];
+            const rewardAssetDecimals =
+              rewardAsset.metadata.decimals + rewardAsset.config.extra_decimals;
+            const { icon, symbol, name } = rewardAsset.metadata;
+
+            const unclaimedAmount = Number(
+              shrinkToken(farmData.unclaimed_amount, rewardAssetDecimals),
+            );
+
+            const { dailyAmount, newDailyAmount, multiplier } = computePoolsDailyAmount(
+              type,
+              asset,
+              rewardAsset,
+              account.portfolio,
+              xBRRRAmount,
+              farmData,
+              app.config.booster_decimals,
+              app.config.boost_suppress_factor,
+            );
+
+            return {
+              icon,
+              name,
+              symbol,
+              tokenId: rewardTokenId,
+              unclaimedAmount,
+              dailyAmount,
+              newDailyAmount,
+              multiplier,
+              price: rewardAsset.price?.usd || 0,
+              unclaimedAmountUSD: unclaimedAmount * (rewardAsset.price?.usd || 0),
+              assetTokenId: tokenId,
+            };
+          });
+        };
+
+      const computeNetLiquidityRewards = ([rewardTokenId, farmData]: [string, FarmData]) => {
+        const rewardAsset = assets.data[rewardTokenId];
+        const rewardAssetDecimals =
+          rewardAsset.metadata.decimals + rewardAsset.config.extra_decimals;
+        const { icon, symbol, name } = rewardAsset.metadata;
+        const unclaimedAmount = Number(shrinkToken(farmData.unclaimed_amount, rewardAssetDecimals));
+
+        const { dailyAmount, newDailyAmount, multiplier } = computeNetLiquidityDailyAmount(
+          rewardAsset,
+          xBRRRAmount,
+          assets.netTvlFarm,
+          farmData,
+          app.config.booster_decimals,
+          xBRRR,
+          app.config.boost_suppress_factor,
+        );
+
+        return {
+          icon,
+          name,
+          symbol,
+          tokenId: rewardTokenId,
+          unclaimedAmount,
+          dailyAmount,
+          newDailyAmount,
+          multiplier,
+          price: rewardAsset.price?.usd || 0,
+          unclaimedAmountUSD: unclaimedAmount * (rewardAsset.price?.usd || 0),
+        };
       };
-    };
 
-    const { supplied, borrowed, netTvl, tokennetbalance } = account.portfolio.farms;
-    const suppliedRewards = Object.entries(supplied).map(computePoolsRewards("supplied")).flat();
-    const borrowedRewards = Object.entries(borrowed).map(computePoolsRewards("borrowed")).flat();
-    const tokenNetRewards = Object.entries(tokennetbalance)
-      .map(computePoolsRewards("tokennetbalance"))
-      .flat();
-    const netLiquidityRewards = Object.entries(netTvl).map(computeNetLiquidityRewards);
-    const sumArrays = (array) => {
-      const clonedArray = cloneObj(array);
-      return clonedArray.reduce((rewards, asset) => {
-        if (!rewards[asset.tokenId]) return { ...rewards, [asset.tokenId]: asset };
-        const updatedAsset = rewards[asset.tokenId];
-        updatedAsset.unclaimedAmount += asset.unclaimedAmount;
-        updatedAsset.dailyAmount += asset.dailyAmount;
-        updatedAsset.newDailyAmount += asset.newDailyAmount;
-        return { ...rewards, [asset.tokenId]: updatedAsset };
-      }, {});
-    };
-
-    const allRewards = [
-      ...suppliedRewards,
-      ...borrowedRewards,
-      ...netLiquidityRewards,
-      ...tokenNetRewards,
-    ];
-    const sumRewards = sumArrays(allRewards);
-    const poolRewards = sumArrays([...suppliedRewards, ...borrowedRewards, ...tokenNetRewards]);
-    let totalUnClaimUSD = 0;
-    allRewards.forEach((d) => {
-      totalUnClaimUSD += d.unclaimedAmountUSD;
-    });
-    return {
-      brrr: poolRewards[brrrTokenId] || {},
-      extra: omit(poolRewards, brrrTokenId) || {},
-      poolRewards: poolRewards || {},
-      net: netLiquidityRewards.reduce(
-        (rewards, asset) => ({ ...rewards, [asset.tokenId]: asset }),
-        {},
-      ),
-      sumRewards,
-      totalUnClaimUSD,
-    } as IAccountRewards;
-  },
-);
-export const getAccountRewardsForApy = createSelector(
-  (state: RootState) => state.assets,
-  (state: RootState) => state.account,
-  (state: RootState) => state.app,
-  getStaking,
-  (assets, account, app, staking) => {
-    const { xBRRR, extraXBRRRAmount } = staking;
-    const xBRRRAmount = xBRRR + extraXBRRRAmount;
-
-    const computePoolsRewards =
-      (type: "supplied" | "borrowed" | "tokennetbalance") =>
-      ([tokenId, farm]: [string, Farm]) => {
-        return Object.entries(farm).map(([rewardTokenId, farmData]) => {
-          const asset = assets.data[tokenId];
-          const rewardAsset = assets.data[rewardTokenId];
-          const rewardAssetDecimals =
-            rewardAsset.metadata.decimals + rewardAsset.config.extra_decimals;
-
-          const { icon, symbol, name } = rewardAsset.metadata;
-
-          const unclaimedAmount = Number(
-            shrinkToken(farmData.unclaimed_amount, rewardAssetDecimals),
-          );
-
-          const { dailyAmount, newDailyAmount, multiplier } = computePoolsDailyAmount(
-            type,
-            asset,
-            rewardAsset,
-            account.portfolio,
-            xBRRRAmount,
-            farmData,
-            app.config.booster_decimals,
-            app.config.boost_suppress_factor,
-          );
-
-          return {
-            icon,
-            name,
-            symbol,
-            tokenId: rewardTokenId,
-            unclaimedAmount,
-            dailyAmount,
-            newDailyAmount,
-            multiplier,
-            price: rewardAsset.price?.usd || 0,
-            unclaimedAmountUSD: unclaimedAmount * (rewardAsset.price?.usd || 0),
-            assetTokenId: tokenId,
-          };
-        });
-      };
-
-    const computeNetLiquidityRewards = ([rewardTokenId, farmData]: [string, FarmData]) => {
-      const rewardAsset = assets.data[rewardTokenId];
-      const rewardAssetDecimals = rewardAsset.metadata.decimals + rewardAsset.config.extra_decimals;
-      const { icon, symbol, name } = rewardAsset.metadata;
-      const unclaimedAmount = Number(shrinkToken(farmData.unclaimed_amount, rewardAssetDecimals));
-
-      const { dailyAmount, newDailyAmount, multiplier } = computeNetLiquidityDailyAmount(
-        rewardAsset,
-        xBRRRAmount,
-        assets.netTvlFarm,
-        farmData,
-        app.config.booster_decimals,
-        xBRRR,
-        app.config.boost_suppress_factor,
+      const { supplied, borrowed, netTvl, tokennetbalance } = filterAccountAllSentOutFarms(
+        account.portfolio,
       );
-
+      const hasNetTvlFarm = !!Object.entries(assets.netTvlFarm).length;
+      const suppliedRewards = Object.entries(supplied).map(computePoolsRewards("supplied")).flat();
+      const borrowedRewards = Object.entries(borrowed).map(computePoolsRewards("borrowed")).flat();
+      const tokenNetRewards = Object.entries(tokennetbalance)
+        .map(computePoolsRewards("tokennetbalance"))
+        .flat();
+      const netLiquidityRewards = hasNetTvlFarm
+        ? Object.entries(netTvl).map(computeNetLiquidityRewards)
+        : [];
+      const allRewards = [
+        ...suppliedRewards,
+        ...borrowedRewards,
+        ...tokenNetRewards,
+        ...netLiquidityRewards,
+      ];
+      let totalUnClaimUSD = 0;
+      allRewards.forEach((d) => {
+        totalUnClaimUSD += d.unclaimedAmountUSD;
+      });
       return {
-        icon,
-        name,
-        symbol,
-        tokenId: rewardTokenId,
-        unclaimedAmount,
-        dailyAmount,
-        newDailyAmount,
-        multiplier,
-        price: rewardAsset.price?.usd || 0,
-        unclaimedAmountUSD: unclaimedAmount * (rewardAsset.price?.usd || 0),
-      };
-    };
-
-    const { supplied, borrowed, netTvl, tokennetbalance } = filterAccountAllSentOutFarms(
-      account.portfolio,
-    );
-    const hasNetTvlFarm = !!Object.entries(assets.netTvlFarm).length;
-    const suppliedRewards = Object.entries(supplied).map(computePoolsRewards("supplied")).flat();
-    const borrowedRewards = Object.entries(borrowed).map(computePoolsRewards("borrowed")).flat();
-    const tokenNetRewards = Object.entries(tokennetbalance)
-      .map(computePoolsRewards("tokennetbalance"))
-      .flat();
-    const netLiquidityRewards = hasNetTvlFarm
-      ? Object.entries(netTvl).map(computeNetLiquidityRewards)
-      : [];
-    const allRewards = [
-      ...suppliedRewards,
-      ...borrowedRewards,
-      ...tokenNetRewards,
-      ...netLiquidityRewards,
-    ];
-    let totalUnClaimUSD = 0;
-    allRewards.forEach((d) => {
-      totalUnClaimUSD += d.unclaimedAmountUSD;
-    });
-    return {
-      suppliedRewards,
-      borrowedRewards,
-      netLiquidityRewards,
-      tokenNetRewards,
-    } as IAccountRewards;
-  },
-);
-
-export const getAccountBoostRatioData = createSelector(
-  (state: RootState) => state.account,
-  (state: RootState) => state.app,
-  getStaking,
-  (state: RootState) => state.assets,
-  (account, app, staking, assets) => {
-    const { booster_log_base: booster_log_base_only_tokenBalance } =
-      getMarketRewardsDataUtil(assets);
-    const { totalXBRRR, BRRR, amount, totalXBRRRStaked } = staking;
-    const xBRRRAmount = totalXBRRR;
-    if (!app?.config?.boost_suppress_factor || !app?.config?.booster_decimals)
-      return [BRRR, amount, 1, 1];
-    const { tokennetbalance, supplied, borrowed } = filterAccountAllSentOutFarms(account.portfolio);
-    let booster_log_base = getBoosterLogBaseFromAccountFarms(tokennetbalance);
-    if (!booster_log_base) {
-      booster_log_base = getBoosterLogBaseFromAccountFarms(supplied);
+        suppliedRewards,
+        borrowedRewards,
+        netLiquidityRewards,
+        tokenNetRewards,
+      } as IAccountRewards;
+    },
+  );
+};
+export const getAccountBoostRatioData = (memeCategory?: boolean) => {
+  return createSelector(
+    (state: RootState) => state.assets,
+    (state: RootState) => state.assetsMEME,
+    (state: RootState) => state.account,
+    (state: RootState) => state.accountMEME,
+    (state: RootState) => state.app,
+    (state: RootState) => state.appMEME,
+    (state: RootState) => state.category,
+    getStaking(memeCategory),
+    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category, staking) => {
+      let isMeme: boolean;
+      if (typeof memeCategory !== "boolean") {
+        isMeme = category.activeCategory == "meme";
+      } else {
+        isMeme = memeCategory;
+      }
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
+      let app: typeof appMain;
+      if (isMeme) {
+        assets = assetsMEME;
+        account = accountMEME;
+        app = appMEME;
+      } else {
+        assets = assetsMain;
+        account = accountMain;
+        app = appMain;
+      }
+      const { booster_log_base: booster_log_base_only_tokenBalance } =
+        getMarketRewardsDataUtil(assets);
+      const { totalXBRRR, BRRR, amount, totalXBRRRStaked } = staking;
+      const xBRRRAmount = totalXBRRR;
+      if (!app?.config?.boost_suppress_factor || !app?.config?.booster_decimals)
+        return [BRRR, amount, 1, 1];
+      const { tokennetbalance, supplied, borrowed } = filterAccountAllSentOutFarms(
+        account.portfolio,
+      );
+      let booster_log_base = getBoosterLogBaseFromAccountFarms(tokennetbalance);
       if (!booster_log_base) {
-        booster_log_base = getBoosterLogBaseFromAccountFarms(borrowed);
+        booster_log_base = getBoosterLogBaseFromAccountFarms(supplied);
         if (!booster_log_base) {
-          // for no supply situation but has tokenBalance farm on market
-          booster_log_base = booster_log_base_only_tokenBalance;
+          booster_log_base = getBoosterLogBaseFromAccountFarms(borrowed);
+          if (!booster_log_base) {
+            // for no supply situation but has tokenBalance farm on market
+            booster_log_base = booster_log_base_only_tokenBalance;
+          }
         }
       }
-    }
-    if (booster_log_base) {
-      const boosterLogBase = Number(shrinkToken(booster_log_base, app.config.booster_decimals));
-      const log =
-        Math.log(xBRRRAmount / app.config.boost_suppress_factor) / Math.log(boosterLogBase);
-      const logStaked =
-        Math.log(totalXBRRRStaked / app.config.boost_suppress_factor) / Math.log(boosterLogBase);
-      const multiplier = log >= 0 ? 1 + log : 1;
-      const multiplierStaked = logStaked >= 0 ? 1 + logStaked : 1;
-      return [BRRR, amount, multiplier, multiplierStaked];
-    }
-    return [BRRR, amount, 1, 1];
-  },
-);
+      if (booster_log_base) {
+        const boosterLogBase = Number(shrinkToken(booster_log_base, app.config.booster_decimals));
+        const log =
+          Math.log(xBRRRAmount / app.config.boost_suppress_factor) / Math.log(boosterLogBase);
+        const logStaked =
+          Math.log(totalXBRRRStaked / app.config.boost_suppress_factor) / Math.log(boosterLogBase);
+        const multiplier = log >= 0 ? 1 + log : 1;
+        const multiplierStaked = logStaked >= 0 ? 1 + logStaked : 1;
+        return [BRRR, amount, multiplier, multiplierStaked];
+      }
+      return [BRRR, amount, 1, 1];
+    },
+  );
+};
 function getBoosterLogBaseFromAccountFarms(accountfarms) {
   const farms = Object.values(accountfarms)?.[0];
   const farm = Object.values(farms || {})?.[0];
@@ -632,137 +714,216 @@ function getBoosterLogBaseFromAccountFarms(accountfarms) {
   }
   return "";
 }
-export const getWeightedNetLiquidity = createSelector(
-  (state: RootState) => state.assets,
-  (state: RootState) => state.account,
-  (assets, account) => {
-    if (!hasAssets(assets)) return 0;
-    const { borrows, collaterals } = account.portfolio || {};
-    const [, totalSupplied] = getGains(account.portfolio, assets, "supplied", true);
-    const [, totalCollateral] = collaterals
-      ? getGainsArr(account.portfolio.collaterals, assets, true)
-      : getGains(account.portfolio, assets, "collateral", true);
-    const [, totalBorrowed] = borrows
-      ? getGainsArr(account.portfolio.borrows, assets, true)
-      : getGains(account.portfolio, assets, "borrowed", true);
-
-    const netLiquidity = new Decimal(totalCollateral)
-      .plus(totalSupplied)
-      .minus(totalBorrowed)
-      .toNumber();
-    return netLiquidity;
-  },
-);
-
-export const getWeightedAssets = createSelector(
-  (state: RootState) => state.assets,
-  (assets) => {
-    if (!hasAssets(assets)) return [];
-    return Object.entries(assets.data)
-      .map(([, asset]) => (asset.config.net_tvl_multiplier < 10000 ? asset : undefined))
-      .filter(Boolean) as Asset[];
-  },
-);
-export const getAccountDailyRewards = createSelector(
-  (state: RootState) => state.assets,
-  (state: RootState) => state.account,
-  (state: RootState) => state.app,
-  (assets, account, app) => {
-    const accountDustProcess = dustProcess({
-      accountSource: account,
-      assets,
-      app,
-    });
-    const baseCollateralUsdDaily =
-      getGainsArr(accountDustProcess.portfolio.collaterals, assets)[0] / 365;
-    const baseSuppliedUsdDaily =
-      getGains(accountDustProcess.portfolio, assets, "supplied")[0] / 365;
-    const baseBorrowedUsdDaily = getGainsArr(accountDustProcess.portfolio.borrows, assets)[0] / 365;
-
-    const farmSuppliedUsdDaily = getGainsFromIncentive(account.portfolio, assets, "supplied");
-    const farmBorrowedUsdDaily = getGainsFromIncentive(account.portfolio, assets, "borrowed");
-    const farmNetTvlUsdDaily = getGainsFromIncentive(account.portfolio, assets, "netTvl");
-    const farmTokenNetUsdDaily = getGainsFromIncentive(
-      account.portfolio,
-      assets,
-      "tokennetbalance",
-    );
-
-    const baseSuppliedAmountDaily = getDailyAmount(
-      accountDustProcess.portfolio,
-      assets,
-      "supplies",
-    );
-    const baseCollateralAmountDaily = getDailyAmount(
-      accountDustProcess.portfolio,
-      assets,
-      "collaterals",
-    );
-    const baseBorrowedAmountDaily = getDailyAmount(accountDustProcess.portfolio, assets, "borrows");
-
-    const farmSuppliedAmountDaily = getIncentiveDailyAmount(account.portfolio, assets, "supplied");
-    const farmBorrowedAmountDaily = getIncentiveDailyAmount(account.portfolio, assets, "borrowed");
-    const farmCollateralAmountDaily = getIncentiveDailyAmount(account.portfolio, assets, "netTvl");
-    const farmTokenNetAmountDaily = getIncentiveDailyAmount(
-      account.portfolio,
-      assets,
-      "tokennetbalance",
-    );
-    const allGainRewards = [
-      ...baseSuppliedAmountDaily,
-      ...baseCollateralAmountDaily,
-      ...Object.entries(farmSuppliedAmountDaily).reduce(sumMap, []),
-      ...Object.entries(farmBorrowedAmountDaily).reduce(sumMap, []),
-      ...Object.entries(farmCollateralAmountDaily).reduce(sumMap, []),
-      ...Object.entries(farmTokenNetAmountDaily).reduce(sumMap, []),
-    ];
-    const mergedGainRewards = allGainRewards.reduce((acc, reward) => {
-      const [[rewardTokenId, rewardAmount]] = Object.entries(reward);
-      if (!acc[rewardTokenId]) return { ...acc, ...reward };
-      return { ...acc, [rewardTokenId]: acc[rewardTokenId] + rewardAmount };
-    }, {});
-    baseBorrowedAmountDaily.forEach((reward) => {
-      const [[rewardTokenId, rewardAmount]] = Object.entries(reward);
-      mergedGainRewards[rewardTokenId] = (mergedGainRewards[rewardTokenId] || 0) - rewardAmount;
-    });
-    const allRewards = Object.entries(mergedGainRewards).reduce((acc, [tokenId, amount]) => {
-      const assetCopy = JSON.parse(JSON.stringify(assets.data[tokenId] || {}));
-      standardizeAsset(assetCopy.metadata || {});
-      if (Number(amount) !== 0) {
-        return {
-          ...acc,
-          [tokenId]: {
-            amount,
-            asset: assetCopy,
-          },
-        };
+export const getWeightedNetLiquidity = (memeCategory?: boolean) => {
+  return createSelector(
+    (state: RootState) => state.assets,
+    (state: RootState) => state.assetsMEME,
+    (state: RootState) => state.account,
+    (state: RootState) => state.accountMEME,
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, category) => {
+      let isMeme: boolean;
+      if (typeof memeCategory !== "boolean") {
+        isMeme = category.activeCategory == "meme";
+      } else {
+        isMeme = memeCategory;
       }
-      return acc;
-    }, {});
-    return {
-      baseDepositUsdDaily: baseCollateralUsdDaily + baseSuppliedUsdDaily,
-      baseBorrowedUsdDaily,
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
+      if (isMeme) {
+        assets = assetsMEME;
+        account = accountMEME;
+      } else {
+        assets = assetsMain;
+        account = accountMain;
+      }
+      if (!hasAssets(assets)) return 0;
+      const { borrows, collaterals } = account.portfolio || {};
+      const [, totalSupplied] = getGains(account.portfolio, assets, "supplied", true);
+      const [, totalCollateral] = collaterals
+        ? getGainsArr(account.portfolio.collaterals, assets, true)
+        : getGains(account.portfolio, assets, "collateral", true);
+      const [, totalBorrowed] = borrows
+        ? getGainsArr(account.portfolio.borrows, assets, true)
+        : getGains(account.portfolio, assets, "borrowed", true);
 
-      farmSuppliedUsdDaily,
-      farmBorrowedUsdDaily,
-      farmNetTvlUsdDaily,
-      farmTokenNetUsdDaily,
-      farmTotalUsdDaily:
-        farmSuppliedUsdDaily + farmBorrowedUsdDaily + farmNetTvlUsdDaily + farmTokenNetUsdDaily,
+      const netLiquidity = new Decimal(totalCollateral)
+        .plus(totalSupplied)
+        .minus(totalBorrowed)
+        .toNumber();
+      return netLiquidity;
+    },
+  );
+};
 
-      totalUsdDaily:
-        baseCollateralUsdDaily +
-        baseSuppliedUsdDaily -
-        baseBorrowedUsdDaily +
-        farmSuppliedUsdDaily +
-        farmBorrowedUsdDaily +
-        farmNetTvlUsdDaily +
+export const getWeightedAssets = (memeCategory?: boolean) => {
+  return createSelector(
+    (state: RootState) => state.assets,
+    (state: RootState) => state.assetsMEME,
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, category) => {
+      let isMeme: boolean;
+      if (typeof memeCategory !== "boolean") {
+        isMeme = category.activeCategory == "meme";
+      } else {
+        isMeme = memeCategory;
+      }
+      let assets: typeof assetsMain;
+      if (isMeme) {
+        assets = assetsMEME;
+      } else {
+        assets = assetsMain;
+      }
+      if (!hasAssets(assets)) return [];
+      return Object.entries(assets.data)
+        .map(([, asset]) => (asset.config.net_tvl_multiplier < 10000 ? asset : undefined))
+        .filter(Boolean) as Asset[];
+    },
+  );
+};
+export const getAccountDailyRewards = (memeCategory?: boolean) => {
+  return createSelector(
+    (state: RootState) => state.assets,
+    (state: RootState) => state.assetsMEME,
+    (state: RootState) => state.account,
+    (state: RootState) => state.accountMEME,
+    (state: RootState) => state.app,
+    (state: RootState) => state.appMEME,
+    (state: RootState) => state.category,
+    (assetsMain, assetsMEME, accountMain, accountMEME, appMain, appMEME, category) => {
+      let isMeme: boolean;
+      if (typeof memeCategory !== "boolean") {
+        isMeme = category.activeCategory == "meme";
+      } else {
+        isMeme = memeCategory;
+      }
+
+      let app: typeof appMain;
+      let assets: typeof assetsMain;
+      let account: typeof accountMain;
+      if (isMeme) {
+        app = appMEME;
+        assets = assetsMEME;
+        account = accountMEME;
+      } else {
+        app = appMain;
+        assets = assetsMain;
+        account = accountMain;
+      }
+      const accountDustProcess = dustProcess({
+        accountSource: account,
+        assets,
+        showDust: category.showDust,
+      });
+      const baseCollateralUsdDaily =
+        getGainsArr(accountDustProcess.portfolio.collaterals, assets)[0] / 365;
+      const baseSuppliedUsdDaily =
+        getGains(accountDustProcess.portfolio, assets, "supplied")[0] / 365;
+      const baseBorrowedUsdDaily =
+        getGainsArr(accountDustProcess.portfolio.borrows, assets)[0] / 365;
+
+      const farmSuppliedUsdDaily = getGainsFromIncentive(account.portfolio, assets, "supplied");
+      const farmBorrowedUsdDaily = getGainsFromIncentive(account.portfolio, assets, "borrowed");
+      const farmNetTvlUsdDaily = getGainsFromIncentive(account.portfolio, assets, "netTvl");
+      const farmTokenNetUsdDaily = getGainsFromIncentive(
+        account.portfolio,
+        assets,
+        "tokennetbalance",
+      );
+
+      const baseSuppliedAmountDaily = getDailyAmount(
+        accountDustProcess.portfolio,
+        assets,
+        "supplies",
+      );
+      const baseCollateralAmountDaily = getDailyAmount(
+        accountDustProcess.portfolio,
+        assets,
+        "collaterals",
+      );
+      const baseBorrowedAmountDaily = getDailyAmount(
+        accountDustProcess.portfolio,
+        assets,
+        "borrows",
+      );
+
+      const farmSuppliedAmountDaily = getIncentiveDailyAmount(
+        account.portfolio,
+        assets,
+        "supplied",
+      );
+      const farmBorrowedAmountDaily = getIncentiveDailyAmount(
+        account.portfolio,
+        assets,
+        "borrowed",
+      );
+      const farmCollateralAmountDaily = getIncentiveDailyAmount(
+        account.portfolio,
+        assets,
+        "netTvl",
+      );
+      const farmTokenNetAmountDaily = getIncentiveDailyAmount(
+        account.portfolio,
+        assets,
+        "tokennetbalance",
+      );
+      const allGainRewards = [
+        ...baseSuppliedAmountDaily,
+        ...baseCollateralAmountDaily,
+        ...Object.entries(farmSuppliedAmountDaily).reduce(sumMap, []),
+        ...Object.entries(farmBorrowedAmountDaily).reduce(sumMap, []),
+        ...Object.entries(farmCollateralAmountDaily).reduce(sumMap, []),
+        ...Object.entries(farmTokenNetAmountDaily).reduce(sumMap, []),
+      ];
+      const mergedGainRewards = allGainRewards.reduce((acc, reward) => {
+        const [[rewardTokenId, rewardAmount]] = Object.entries(reward);
+        if (!acc[rewardTokenId]) return { ...acc, ...reward };
+        return { ...acc, [rewardTokenId]: acc[rewardTokenId] + rewardAmount };
+      }, {});
+      baseBorrowedAmountDaily.forEach((reward) => {
+        const [[rewardTokenId, rewardAmount]] = Object.entries(reward);
+        mergedGainRewards[rewardTokenId] = (mergedGainRewards[rewardTokenId] || 0) - rewardAmount;
+      });
+      const allRewards = Object.entries(mergedGainRewards).reduce((acc, [tokenId, amount]) => {
+        const assetCopy = JSON.parse(JSON.stringify(assets.data[tokenId] || {}));
+        standardizeAsset(assetCopy.metadata || {});
+        if (Number(amount) !== 0) {
+          return {
+            ...acc,
+            [tokenId]: {
+              amount,
+              asset: assetCopy,
+            },
+          };
+        }
+        return acc;
+      }, {});
+      return {
+        baseDepositUsdDaily: baseCollateralUsdDaily + baseSuppliedUsdDaily,
+        baseBorrowedUsdDaily,
+
+        farmSuppliedUsdDaily,
+        farmBorrowedUsdDaily,
+        farmNetTvlUsdDaily,
         farmTokenNetUsdDaily,
+        farmTotalUsdDaily:
+          farmSuppliedUsdDaily + farmBorrowedUsdDaily + farmNetTvlUsdDaily + farmTokenNetUsdDaily,
 
-      allRewards,
-    };
-  },
-);
+        totalUsdDaily:
+          baseCollateralUsdDaily +
+          baseSuppliedUsdDaily -
+          baseBorrowedUsdDaily +
+          farmSuppliedUsdDaily +
+          farmBorrowedUsdDaily +
+          farmNetTvlUsdDaily +
+          farmTokenNetUsdDaily,
+
+        allRewards,
+      };
+    },
+  );
+};
+
 export function filterAccountEndedFarms(userFarms, allFarms): IAccountFarms {
   const { supplied, borrowed, netTvl } = Copy(userFarms);
   const newSupplied = Object.entries(supplied)
@@ -798,11 +959,11 @@ export function filterAccountEndedFarms(userFarms, allFarms): IAccountFarms {
 function dustProcess({
   accountSource,
   assets,
-  app,
+  showDust,
 }: {
   accountSource: AccountState;
   assets: AssetsState;
-  app: AppState;
+  showDust: boolean;
 }) {
   const account = Copy(accountSource);
   const portfolioAssets = {
@@ -826,7 +987,7 @@ function dustProcess({
         supplied: suppliedToken,
       };
     })
-    .filter(app.showDust ? Boolean : emptySuppliedAsset)
+    .filter(showDust ? Boolean : emptySuppliedAsset)
     .reduce((acc, cur) => [...acc, cur.tokenId], [] as any);
 
   const borrowed = Object.keys(account.portfolio.borrowed)
@@ -841,7 +1002,7 @@ function dustProcess({
         borrowed: borrowedToken,
       };
     })
-    .filter(app.showDust ? Boolean : emptyBorrowedAsset)
+    .filter(showDust ? Boolean : emptyBorrowedAsset)
     .reduce((acc, cur) => [...acc, cur.tokenId], [] as any);
   const newSupplied = {};
   const newCollateral = {};

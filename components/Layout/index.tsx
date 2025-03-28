@@ -6,7 +6,6 @@ import { useTicker } from "../../hooks/useTicker";
 import CheckNewAppVersion from "../CheckNewAppVersion";
 import Footer from "../Footer";
 import Header from "../Header";
-import Ticker from "../Ticker";
 import Blocked from "../Blocked";
 import selectTheme from "../../utils/theme";
 

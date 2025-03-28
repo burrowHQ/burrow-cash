@@ -39,12 +39,13 @@ interface IBorrowedAsset {
   token_id: string;
   shares: string;
 }
-
-export interface IAsset {
-  token_id: string;
-  balance: string;
+export interface IAsset extends IMarginAsset {
   shares: string;
   apr: string;
+}
+export interface IMarginAsset {
+  token_id: string;
+  balance: string;
 }
 
 export interface IAccount {

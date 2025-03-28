@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import _ from "lodash";
 import Decimal from "decimal.js";
 import { DateTime } from "luxon";
@@ -10,7 +10,7 @@ import { useStaking } from "../../hooks/useStaking";
 import { trackMaxStaking, trackStaking } from "../../utils/telemetry";
 import { stake } from "../../store/actions/stake";
 import CustomModal from "../../components/CustomModal/CustomModal";
-import { APY_FORMAT, TOKEN_FORMAT } from "../../store";
+import { TOKEN_FORMAT } from "../../store";
 import CustomButton from "../../components/CustomButton/CustomButton";
 import { useRewards, useStakeRewardApy } from "../../hooks/useRewards";
 import { ContentTipBox } from "../../components/ContentBox/ContentBox";
@@ -21,13 +21,19 @@ import Booster from "./booster";
 import { format_apy } from "../../utils/uiNumber";
 import { getAccountBoostRatioData } from "../../redux/selectors/getAccountRewards";
 import { getMarketRewardsData } from "../../redux/selectors/getMarketRewards";
+import { getAppState } from "../../redux/appSelectors";
 
 const ModalStaking = ({ isOpen, onClose }) => {
-  const [total, totalUnclaim, totalToken] = useAppSelector(getTotalBRRR);
-  const app = useAppSelector((state) => state.app);
   const [monthPercent, setMonthPercent] = useState(0);
   const [loadingStake, setLoadingStake] = useState(false);
-  const { stakingTimestamp, amount, months, setAmount, setMonths } = useStaking();
+  const { stakingTimestamp, amount, months, setAmount, setMonths } = useStaking(false);
+  const app = useAppSelector(getAppState(false));
+  const [total, totalUnclaim, totalToken] = useAppSelector(getTotalBRRR(false));
+  const { avgStakeSupplyAPY, avgStakeBorrowAPY, avgStakeNetAPY, totalTokenNetMap } =
+    useStakeRewardApy(false);
+  const [, , multiplier] = useAppSelector(getAccountBoostRatioData(false));
+  const { tokenNetBalance } = useAppSelector(getMarketRewardsData(false));
+
   const [minMonth, maxMonth, monthList] = useMemo(() => {
     if (app?.config) {
       const { minimum_staking_duration_sec, maximum_staking_duration_sec } = app?.config || {};
@@ -46,11 +52,6 @@ const ModalStaking = ({ isOpen, onClose }) => {
   const invalidAmount = +amount > +total;
   const invalidMonths = months === maxMonth ? false : months < selectedMonths;
   const disabledStake = !amount || invalidAmount || invalidMonths || Number(amount) === 0;
-  const { avgStakeSupplyAPY, avgStakeBorrowAPY, avgStakeNetAPY, totalTokenNetMap } =
-    useStakeRewardApy();
-  const [, , multiplier] = useAppSelector(getAccountBoostRatioData);
-  const { tokenNetBalance } = useAppSelector(getMarketRewardsData);
-
   const inputAmount = `${amount}`
     .replace(/[^0-9.-]/g, "")
     .replace(/(?!^)-/g, "")
@@ -120,7 +121,7 @@ const ModalStaking = ({ isOpen, onClose }) => {
       onClose={handleModalClose}
       onOutsideClick={handleModalClose}
       className="modal-mobile-bottom"
-      style={{ width: "500px", height: "80vh", overflow: "auto" }}
+      style={{ width: "500px", maxHeight: "80vh", overflow: "auto" }}
       title="Stake BRRR"
     >
       <div className="px-2">
@@ -129,7 +130,7 @@ const ModalStaking = ({ isOpen, onClose }) => {
           <span className="h5 text-gray-300">{total.toLocaleString()}</span>
         </div>
         <StyledRow className="custom-input-wrap relative gap-2">
-          <BrrrLogo color="#00F7A5" />
+          <BrrrLogo />
           <input
             value={inputAmount}
             type="number"
@@ -170,7 +171,7 @@ const ModalStaking = ({ isOpen, onClose }) => {
         <StyledRow>
           <div className="flex mb-4 items-center">
             <div className="mr-2">Reward</div>
-            <div className="border-b border-solid flex-grow border-dark-700" />
+            <div className="border-b border-solid flex-grow border-dark-50" />
           </div>
           <div className={`flex justify-between mb-4 ${avgStakeSupplyAPY > 0 ? "" : "hidden"}`}>
             <div className="h5 text-gray-300">Avg. Supply Reward APY</div>

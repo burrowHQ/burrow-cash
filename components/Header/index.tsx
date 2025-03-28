@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useTheme, Box, Snackbar, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import LogoIcon from "../../public/logo.svg";
-import BrrrIcon from "../../public/brrr.svg";
 import WalletButton from "./WalletButton";
 import Bridge from "./Bridge";
 import Set from "./Set";
@@ -12,15 +10,22 @@ import { useAppSelector } from "../../redux/hooks";
 import { isAssetsFetching } from "../../redux/assetsSelectors";
 import { helpMenu, dexMenu, mainMenuList, Imenu } from "./menuData";
 import MenuMobile from "./MenuMobile";
-import { RefreshIcon } from "./svg";
+import { RefreshIcon, OutlinkIcon } from "./svg";
 import { DiscordIcon, MediumIcon, TwitterIcon } from "../Footer/svg";
-import { LinksWrapper } from "../Footer/style";
 import { isMobileDevice } from "../../helpers/helpers";
+import { RheaLogo } from "../Icons/IconsV2";
 
 const MenuItem = ({ item }: { item: Imenu }) => {
   const { title, link, allLinks } = item;
   const router = useRouter();
-  const isSelected = allLinks?.includes(router.route);
+  let isSelected;
+  if (item.title == "Markets" && router.route == "/") {
+    isSelected = true;
+  } else {
+    isSelected = !!allLinks?.find((link) => {
+      return router.route.includes(link) && link !== "/";
+    });
+  }
   const style = isSelected ? { color: "#00F7A5" } : {};
 
   return (
@@ -80,7 +85,21 @@ const DexMenuItem = () => {
 };
 const CommunityItem = () => {
   const [isHovered, setIsHovered] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
   const isMobile = isMobileDevice();
+
+  const handleMouseLeave = () => {
+    const id = setTimeout(() => setIsHovered(false), 300);
+    setTimeoutId(id);
+  };
+
+  const handleMouseEnter = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    setIsHovered(true);
+  };
+
   return (
     <div
       onMouseEnter={() => setIsHovered(true)}
@@ -103,13 +122,11 @@ const CommunityItem = () => {
       </svg>
       {isHovered && (
         <div className="absolute z-50 top-full left-0 pt-2">
-          <div className="w-48 p-2 bg-dark-100 shadow-lg border border-dark-300 rounded-md pt-4 pb-6 px-6">
-            <h1 className="text-sm text-gray-300 mb-4">Community</h1>
-            <LinksWrapper>
-              <Links />
-            </LinksWrapper>
-            <h1 className="text-sm text-gray-300 mt-4">Developer</h1>
-            <div>
+          <div className="w-48 bg-dark-100 shadow-lg border border-dark-50 rounded-md p-3.5">
+            <h1 className="text-sm text-gray-300 mb-2">Community</h1>
+            <Links />
+            <h1 className="text-sm text-gray-300 mt-4 mb-2">Developer</h1>
+            <div className="flex flex-col gap-1">
               <Github />
               <BugBounty />
             </div>
@@ -148,21 +165,10 @@ const Header = () => {
         <Wrapper style={{ position: "relative" }}>
           <Logo
             onClick={() => {
-              window.open("https://burrow.finance/");
+              window.open("https://www.rhea.finance");
             }}
           >
-            {/* <span className=" transform"><LogoIcon /></span> */}
-            {/* <img src="/public/logo.svg" width={30} height={30} /> */}
-            <img
-              src="/rheaLogo.png"
-              width={80}
-              height={30}
-              alt=""
-              className="cursor-pointer"
-              onClick={() => {
-                window.open("https://www.rhea.finance");
-              }}
-            />
+            <img src="/rheaLogo.png" width={80} height={30} alt="" className="cursor-pointer" />
           </Logo>
           <Menu>
             {mainMenuList.map((item) => {
@@ -183,7 +189,7 @@ const Header = () => {
             onClose={handleClose}
             anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           >
-            <div className="flex items-center justify-center border border-dark-300 text-sm text-white rounded-md bg-dark-100 px-4 py-3.5">
+            <div className="flex items-center justify-center border border-dark-50 text-sm text-white rounded-md bg-dark-100 px-4 py-3.5">
               <RefreshIcon className="mr-2.5 flex-shrink-0 animate-spin h-5 w-5" /> Refreshing
               assets data...
             </div>
@@ -198,7 +204,7 @@ const Header = () => {
               window.open("https://www.rhea.finance");
             }}
           >
-            <img src="/rheaLogo.png" width={80} height={30} alt="" className="cursor-pointer" />
+            <RheaLogo />
           </Logo>
           <Box className="flex items-center">
             <WalletButton />
@@ -214,14 +220,9 @@ export default Header;
 const Links = () => {
   const theme = useTheme();
   return (
-    <Box
-      display="grid"
-      gridTemplateColumns="repeat(3, 1fr)"
-      alignItems="center"
-      lineHeight="0"
-      sx={{ gap: "48px" }}
-    >
+    <div className="flex items-center justify-between gap-1">
       <a
+        className="flex items-center justify-center h-[34px] bg-gray-190 w-1 flex-grow rounded-md border border-gray-190 hover:border-primary"
         href="https://twitter.com/rhea_finance"
         title="Twitter"
         target="_blank"
@@ -231,6 +232,7 @@ const Links = () => {
         <TwitterIcon />
       </a>
       <a
+        className="flex items-center justify-center h-[34px] bg-gray-190 w-1 flex-grow rounded-md border border-gray-190 hover:border-primary"
         href="https://discord.gg/rheafinance"
         title="Discord"
         target="_blank"
@@ -240,6 +242,7 @@ const Links = () => {
         <DiscordIcon />
       </a>
       <a
+        className="flex items-center justify-center h-[34px] bg-gray-190 w-1 flex-grow rounded-md border border-gray-190 hover:border-primary"
         href="https://rhea-finance.medium.com/"
         title="Medium"
         target="_blank"
@@ -248,7 +251,7 @@ const Links = () => {
       >
         <MediumIcon />
       </a>
-    </Box>
+    </div>
   );
 };
 const BugBounty = () => {
@@ -259,14 +262,10 @@ const BugBounty = () => {
       title="Bug Bounty"
       target="_blank"
       rel="noopener noreferrer"
+      className="flex items-center justify-between h-[34px] rounded-lg bg-gray-190 w-full px-2 border border-gray-190 hover:border-primary"
     >
-      <Typography
-        fontSize="14px"
-        lineHeight="16px"
-        style={{ color: isMobile ? "#6F7188" : "#ffffff", letterSpacing: "1px" }}
-      >
-        Bug Bounty
-      </Typography>
+      Bug Bounty
+      <OutlinkIcon />
     </a>
   );
 };
@@ -274,14 +273,15 @@ const BugBounty = () => {
 const Github = () => {
   const isMobile = isMobileDevice();
   return (
-    <a href="https://github.com/burrowHQ/" title="Github" target="_blank" rel="noopener noreferrer">
-      <Typography
-        fontSize="14px"
-        lineHeight="46px"
-        style={{ color: isMobile ? "#6F7188" : "#ffffff", letterSpacing: "1px" }}
-      >
-        Github
-      </Typography>
+    <a
+      href="https://github.com/burrowHQ/"
+      title="Github"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center justify-between h-[34px] rounded-lg bg-gray-190 w-full px-2 border border-gray-190 hover:border-primary"
+    >
+      Github
+      <OutlinkIcon />
     </a>
   );
 };

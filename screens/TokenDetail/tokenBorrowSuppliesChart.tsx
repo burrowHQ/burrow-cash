@@ -121,8 +121,8 @@ const TokenBorrowSuppliesChart = ({
 
             <defs>
               <linearGradient id="colorPink" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#FF5500" stopOpacity={0.4} />
-                <stop offset="75%" stopColor="#FF5500" stopOpacity={0.05} />
+                <stop offset="0%" stopColor="#FF5E3A" stopOpacity={0.4} />
+                <stop offset="75%" stopColor="#FF5E3A" stopOpacity={0.05} />
               </linearGradient>
             </defs>
 
@@ -130,7 +130,7 @@ const TokenBorrowSuppliesChart = ({
               activeDot={<ActiveDot />}
               type="monotone"
               dataKey={yKey}
-              stroke={isBorrow ? "#FF5500" : "#00F7A5"}
+              stroke={isBorrow ? "#FF5E3A" : "#00F7A5"}
               fill={isBorrow ? "url(#colorPink)" : "url(#colorYellow)"}
             />
           </AreaChart>
@@ -157,7 +157,7 @@ const TabItem = ({ onClick, active, label, disable }) => {
       onClick={handleClick}
       className={twMerge(
         "px-2 rounded-md cursor-pointer select-none",
-        active && "active bg-dark-900",
+        active && "active bg-dark-900 bg-opacity-20",
         disable && "disable text-dark-800",
       )}
     >
@@ -202,7 +202,10 @@ const CustomTooltip = ({ active, isBorrow, payload, tokenRow }: any) => {
 
   if (isBorrow) {
     return (
-      <div className="px-3 py-2 rounded-md min-w-max" style={{ backgroundColor: "#32344B" }}>
+      <div
+        className="px-3 py-2 rounded-md min-w-max border border-gray-130"
+        style={{ backgroundColor: "#25252C" }}
+      >
         <div className="text-md text-primaryText">{dayDate}</div>
         <div className="text-white text-sm">{value?.toFixed(2)}%</div>
       </div>
@@ -210,10 +213,11 @@ const CustomTooltip = ({ active, isBorrow, payload, tokenRow }: any) => {
   }
 
   return (
-    <div className="px-3 py-2 rounded-md min-w-max" style={{ backgroundColor: "#32344B" }}>
+    <div
+      className="px-3 py-2 rounded-md min-w-max border border-gray-130"
+      style={{ backgroundColor: "#25252C" }}
+    >
       <div className="text-md text-primaryText">{dayDate}</div>
-      {/* <div className="text-white text-sm">{value}%</div> */}
-
       <LabelText left="Base APY" right={format_apy(baseApy)} />
       {netApy ? (
         <LabelText left="Net Liquidity APY&nbsp;&nbsp;" right={`${netApy?.toFixed(2)}%`} />

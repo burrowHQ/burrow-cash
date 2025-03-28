@@ -2,12 +2,12 @@
 import Decimal from "decimal.js";
 import { pick, omit } from "ramda";
 
-import { shrinkToken, USD_FORMAT, TOKEN_FORMAT } from "../store";
+import { shrinkToken, USD_FORMAT, TOKEN_FORMAT, TOKEN_FORMAT_BTC } from "../store";
 import type { Asset, Assets, AssetsState } from "./assetState";
 import type { AccountState } from "./accountState";
 import type { AppState } from "./appSlice";
 import { UIAsset } from "../interfaces";
-import { BRRR_TOKEN, defaultNetwork } from "../utils/config";
+import { BRRR_TOKEN, defaultNetwork, NBTCTokenId } from "../utils/config";
 import { standardizeAsset } from "../utils";
 
 export const sumReducer = (sum: number, a: number) => sum + a;
@@ -38,11 +38,14 @@ export const emptySuppliedAsset2 = (asset: { supplied: number; collateral: numbe
       (0).toLocaleString(undefined, TOKEN_FORMAT)
   );
 
-export const emptyBorrowedAsset = (asset: { borrowed: number }): boolean =>
-  !(
-    asset.borrowed.toLocaleString(undefined, TOKEN_FORMAT) ===
-    (0).toLocaleString(undefined, TOKEN_FORMAT)
+export const emptyBorrowedAsset = (asset: { borrowed: number }): boolean => {
+  return !(
+    asset.borrowed.toLocaleString(
+      undefined,
+      asset.tokenId === NBTCTokenId ? TOKEN_FORMAT_BTC : TOKEN_FORMAT,
+    ) === (0).toLocaleString(undefined, TOKEN_FORMAT)
   );
+};
 
 export const hasZeroSharesFarmRewards = (farms): boolean => {
   return farms.some((farm) => farm["rewards"].some((reward) => reward["boosted_shares"] === "0"));
@@ -67,7 +70,10 @@ export const transformAsset = (
     .plus(new Decimal(asset.reserved))
     .plus(asset.prot_fee)
     .toFixed();
-  const totalBorrowedD = new Decimal(asset.borrowed.balance).toFixed();
+  const totalBorrowedD = new Decimal(asset.borrowed.balance)
+    .plus(new Decimal(asset?.margin_debt?.balance || 0))
+    .plus(new Decimal(asset?.margin_pending_debt || 0))
+    .toFixed();
   const totalSupply = Number(
     shrinkToken(totalSupplyD, asset.metadata.decimals + asset.config.extra_decimals),
   );
@@ -78,7 +84,9 @@ export const transformAsset = (
   const temp1 = new Decimal(asset.supplied.balance)
     .plus(new Decimal(asset.reserved))
     .plus(asset.prot_fee)
-    .minus(new Decimal(asset.borrowed.balance));
+    .minus(new Decimal(asset.borrowed.balance))
+    .minus(new Decimal(asset?.margin_debt?.balance || 0))
+    .minus(new Decimal(asset?.margin_pending_debt || 0));
   const temp2 = temp1.minus(temp1.mul(0.001)).toFixed(0);
   const availableLiquidity = Number(
     shrinkToken(temp2, asset.metadata.decimals + asset.config.extra_decimals),
@@ -143,18 +151,22 @@ export const transformAsset = (
     collateralFactor: `${Number(asset.config.volatility_ratio / 100)}%`,
     canUseAsCollateral: asset.config.can_use_as_collateral,
     ...accountAttrs,
-    brrrBorrow: Number(
-      shrinkToken(
-        asset.farms.borrowed[brrrTokenId]?.["reward_per_day"] || "0",
-        assets[brrrTokenId].metadata.decimals,
-      ),
-    ),
-    brrrSupply: Number(
-      shrinkToken(
-        asset.farms.supplied[brrrTokenId]?.["reward_per_day"] || "0",
-        assets[brrrTokenId].metadata.decimals,
-      ),
-    ),
+    brrrBorrow: brrrTokenId
+      ? Number(
+          shrinkToken(
+            asset.farms.borrowed[brrrTokenId]?.["reward_per_day"] || "0",
+            assets[brrrTokenId]?.metadata?.decimals || 0,
+          ),
+        )
+      : 0,
+    brrrSupply: brrrTokenId
+      ? Number(
+          shrinkToken(
+            asset.farms.supplied[brrrTokenId]?.["reward_per_day"] || "0",
+            assets[brrrTokenId]?.metadata?.decimals || 0,
+          ),
+        )
+      : 0,
     depositRewards: getRewards("supplied", asset, assets),
     borrowRewards: getRewards("borrowed", asset, assets),
     can_borrow: asset.config.can_borrow,

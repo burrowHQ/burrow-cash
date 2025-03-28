@@ -3,7 +3,7 @@ import BN from "bn.js";
 import Decimal from "decimal.js";
 
 import { isEmpty } from "lodash";
-import getConfig, { defaultNetwork, LOGIC_CONTRACT_NAME } from "./config";
+import getConfig, { defaultNetwork, LOGIC_CONTRACT_NAME, LOGIC_MEMECONTRACT_NAME } from "./config";
 import { nearMetadata, wooMetadata, sfraxMetadata, fraxMetadata } from "../components/Assets";
 
 import {
@@ -15,8 +15,10 @@ import {
   ChangeMethodsREFV1,
   ViewMethodsPyth,
   ChangeMethodsPyth,
+  ViewMethodsDcl,
+  ChangeMethodsDcl,
 } from "../interfaces/contract-methods";
-import { IBurrow, IConfig } from "../interfaces/burrow";
+import { IBurrow, IViewReturnType } from "../interfaces/burrow";
 import { getContract } from "../store";
 
 import { getWalletSelector, getAccount, functionCall } from "./wallet-selector-compat";
@@ -24,6 +26,7 @@ import { IAssetFarmReward } from "../interfaces/asset";
 import { FarmData, Portfolio, Farm } from "../redux/accountState";
 // eslint-disable-next-line import/no-cycle
 import { IPortfolioReward } from "../redux/selectors/getAccountRewards";
+import { store } from "../redux/store";
 
 export const getViewAs = () => {
   if (window.location.href.includes("#instant-url")) {
@@ -92,7 +95,7 @@ export const getBurrow = async ({
     methodName: string,
     args: Record<string, unknown> = {},
     json = true,
-  ): Promise<Record<string, any> | string> => {
+  ): Promise<IViewReturnType> => {
     try {
       const viewAccount = await getAccount(getViewAs());
       return await viewAccount.viewFunction(contract.contractId, methodName, args, {
@@ -135,23 +138,25 @@ export const getBurrow = async ({
     ViewMethodsLogic,
     ChangeMethodsLogic,
   );
-  // get oracle address from
-  let oracle_account_id;
-  let ref_exchange_id;
-  if (process.env.NEXT_PUBLIC_DEFAULT_NETWORK === "mainnet") {
-    oracle_account_id = "priceoracle.near";
-    ref_exchange_id = "v2.ref-finance.near";
-  } else {
-    const config = (await view(
-      logicContract,
-      ViewMethodsLogic[ViewMethodsLogic.get_config],
-    )) as IConfig;
-    oracle_account_id = config.oracle_account_id;
-    ref_exchange_id = config.ref_exchange_id;
-  }
+
+  const logicMEMEContract: Contract = await getContract(
+    account,
+    LOGIC_MEMECONTRACT_NAME,
+    ViewMethodsLogic,
+    ChangeMethodsLogic,
+  );
+  const price_oracle_account_id = getConfig().PRICE_ORACLE_ID;
+  const meme_price_oracle_account_id = getConfig().MEME_PRICE_ORACLE_ID;
+  const ref_exchange_id = getConfig().REF_EXCHANGE_ID;
   const oracleContract: Contract = await getContract(
     account,
-    oracle_account_id,
+    price_oracle_account_id,
+    ViewMethodsOracle,
+    ChangeMethodsOracle,
+  );
+  const memeOracleContract: Contract = await getContract(
+    account,
+    meme_price_oracle_account_id,
     ViewMethodsOracle,
     ChangeMethodsOracle,
   );
@@ -163,9 +168,15 @@ export const getBurrow = async ({
   );
   const pythContract: Contract = await getContract(
     account,
-    getConfig().PYTH_ORACLE_CONTRACT_ID,
+    getConfig().PYTH_ORACLE_ID,
     ViewMethodsPyth,
     ChangeMethodsPyth,
+  );
+  const dclContract: Contract = await getContract(
+    account,
+    getConfig().DCL_EXCHANGE_ID,
+    ViewMethodsDcl,
+    ChangeMethodsDcl,
   );
 
   if (localStorage.getItem("near-wallet-selector:selectedWalletId") == null) {
@@ -186,9 +197,12 @@ export const getBurrow = async ({
     signIn,
     account,
     logicContract,
+    logicMEMEContract,
     oracleContract,
     refv1Contract,
     pythContract,
+    dclContract,
+    memeOracleContract,
     view,
     call,
   } as IBurrow;
@@ -233,20 +247,34 @@ export function decimalMin(a: string | number | Decimal, b: string | number | De
 }
 
 export function standardizeAsset(asset) {
-  if (asset.symbol === "wNEAR") {
-    asset.symbol = nearMetadata.symbol;
-    asset.icon = nearMetadata.icon;
+  const serializationAsset = JSON.parse(JSON.stringify(asset || {}));
+  if (serializationAsset.symbol === "wNEAR") {
+    serializationAsset.symbol = nearMetadata.symbol;
+    serializationAsset.icon = nearMetadata.icon;
   }
-  if (asset.symbol === "WOO") {
-    asset.icon = wooMetadata.icon;
+  if (serializationAsset.metadata?.symbol === "wNEAR") {
+    serializationAsset.metadata.symbol = nearMetadata.symbol;
+    serializationAsset.metadata.icon = nearMetadata.icon;
   }
-  if (asset.symbol === "sFRAX") {
-    asset.icon = sfraxMetadata.icon;
+  if (serializationAsset.symbol === "WOO") {
+    serializationAsset.icon = wooMetadata.icon;
   }
-  if (asset.symbol === "FRAX") {
-    asset.icon = fraxMetadata.icon;
+  if (serializationAsset.metadata?.symbol === "WOO") {
+    serializationAsset.metadata.icon = wooMetadata.icon;
   }
-  return asset;
+  if (serializationAsset.symbol === "sFRAX") {
+    serializationAsset.icon = sfraxMetadata.icon;
+  }
+  if (serializationAsset.metadata?.symbol === "sFRAX") {
+    serializationAsset.metadata.icon = sfraxMetadata.icon;
+  }
+  if (serializationAsset.symbol === "FRAX") {
+    serializationAsset.icon = fraxMetadata.icon;
+  }
+  if (serializationAsset.metadata?.symbol === "FRAX") {
+    serializationAsset.metadata.icon = fraxMetadata.icon;
+  }
+  return serializationAsset;
 }
 
 interface IAssetFarmRewards {

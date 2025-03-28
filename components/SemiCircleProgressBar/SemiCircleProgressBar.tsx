@@ -34,7 +34,7 @@ const SemiCircleProgressBar = ({
     node = children;
   } else {
     node = (
-      <span className={twMerge(isWarning && "text-warning", isUnderDivider && "text-danger")}>
+      <span className={twMerge(isWarning && "text-warning", isUnderDivider && "text-orange")}>
         {percent}%
       </span>
     );
@@ -45,7 +45,7 @@ const SemiCircleProgressBar = ({
       <div className="bar-wrapper">
         <div className="bar-container">
           <div
-            className={twMerge("bar", isWarning && "bar-warning", isUnderDivider && "bar-danger")}
+            className={twMerge("bar", isWarning && "bar-warning", isUnderDivider && "bar-orange")}
             style={{ transform: `rotate(${rotateDegree}deg)` }}
           />
           <div className={twMerge("bg-primary bar-divider hidden", "block")} />
@@ -110,11 +110,11 @@ const StyledWrapper = styled.div`
       opacity: 1;
 
       &.bar-warning {
-        border-bottom-color: #ffc34f;
-        border-right-color: #ffc34f;
+        border-bottom-color: #f3ba2f;
+        border-right-color: #f3ba2f;
       }
 
-      &.bar-danger {
+      &.bar-orange {
         border-bottom-color: #ff5500;
         border-right-color: #ff5500;
       }
@@ -133,29 +133,6 @@ const StyledWrapper = styled.div`
       right: 95px;
       transform: rotate(11deg);
     }
-  }
-
-  @media (max-width: 767px) {
-    //.bar-wrapper,
-    //.bar-container,
-    //.bar {
-    //  width: 160px !important;
-    //  height: 160px !important;
-    //}
-    //
-    //.bar-wrapper,
-    //.bar-container {
-    //  height: 80px !important;
-    //}
-    //
-    //.bar {
-    //  border-width: 6px !important;
-    //}
-    //
-    //.bar-divider {
-    //  top: 21px !important;
-    //  right: 19px !important;
-    //}
   }
 `;
 

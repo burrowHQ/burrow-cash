@@ -8,12 +8,18 @@ import { TOKEN_FORMAT, USD_FORMAT } from "../../store";
 import { useDegenMode } from "../../hooks/hooks";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { toggleUseAsCollateral, hideModal, showModal } from "../../redux/appSlice";
+import {
+  toggleUseAsCollateral as toggleUseAsCollateralMEME,
+  hideModal as hideModalMEME,
+  showModal as showModalMEME,
+} from "../../redux/appSliceMEME";
 import { isInvalid, formatWithCommas_usd } from "../../utils/uiNumber";
 import { YellowSolidSubmitButton, RedSolidSubmitButton } from "./button";
 import { getCollateralAmount } from "../../redux/selectors/getCollateralAmount";
 import { TipIcon, CloseIcon, WarnIcon, JumpTipIcon, ArrowRight } from "./svg";
 import ReactToolTip from "../ToolTip";
 import { IToken } from "../../interfaces/asset";
+import { isMemeCategory } from "../../redux/categorySelectors";
 
 export const USNInfo = () => (
   <Box mt="1rem">
@@ -112,7 +118,7 @@ export const RepayTab = ({ asset }) => {
   return (
     <div className="mb-[20px]">
       {isRepay && degenMode.enabled && (
-        <div className="flex items-center justify-between border border-dark-500 rounded-md bg-dark-600 h-12 mt-5 p-1.5">
+        <div className="flex items-center justify-between border border-dark-50 rounded-md bg-dark-600 h-12 mt-5 p-1.5">
           <span
             onClick={() => setRepayFromDeposits(false)}
             className={`flex items-center justify-center flex-grow w-1 h-full text-sm rounded-md cursor-pointer ${
@@ -148,7 +154,7 @@ export const HealthFactor = ({ value, title }: { value: number; title?: string }
     value === -1
       ? "text-primary"
       : value <= 100
-      ? "text-red-50"
+      ? "text-orange"
       : value <= 180
       ? "text-warning"
       : "text-primary";
@@ -177,24 +183,41 @@ export const BorrowLimit = ({ from, to }: { from: string | number; to: string | 
 export const CollateralSwitch = ({ action, canUseAsCollateral, tokenId }) => {
   const [collateralStatus, setCollateralStatus] = useState<boolean>(true);
   const dispatch = useAppDispatch();
+  const isMeme = useAppSelector(isMemeCategory);
   const showToggle = action === "Supply";
   useEffect(() => {
     if (!canUseAsCollateral) {
-      dispatch(toggleUseAsCollateral({ useAsCollateral: false }));
+      if (isMeme) {
+        dispatch(toggleUseAsCollateralMEME({ useAsCollateral: false }));
+      } else {
+        dispatch(toggleUseAsCollateral({ useAsCollateral: false }));
+      }
       setCollateralStatus(false);
     } else {
-      dispatch(toggleUseAsCollateral({ useAsCollateral: true }));
+      if (isMeme) {
+        dispatch(toggleUseAsCollateralMEME({ useAsCollateral: true }));
+      } else {
+        dispatch(toggleUseAsCollateral({ useAsCollateral: true }));
+      }
       setCollateralStatus(true);
     }
-  }, [tokenId]);
+  }, [tokenId, isMeme]);
   useEffect(() => {
     if (!canUseAsCollateral) {
-      dispatch(toggleUseAsCollateral({ useAsCollateral: false }));
+      if (isMeme) {
+        dispatch(toggleUseAsCollateralMEME({ useAsCollateral: false }));
+      } else {
+        dispatch(toggleUseAsCollateral({ useAsCollateral: false }));
+      }
       setCollateralStatus(false);
     } else {
-      dispatch(toggleUseAsCollateral({ useAsCollateral: collateralStatus }));
+      if (isMeme) {
+        dispatch(toggleUseAsCollateralMEME({ useAsCollateral: collateralStatus }));
+      } else {
+        dispatch(toggleUseAsCollateral({ useAsCollateral: collateralStatus }));
+      }
     }
-  }, [collateralStatus]);
+  }, [collateralStatus, isMeme]);
   const handleSwitchToggle = (checked: boolean) => {
     setCollateralStatus(checked);
   };
@@ -232,7 +255,7 @@ const Switch = ({ onChange, checked, disabled }) => {
         onClick={() => {
           onChange(false);
         }}
-        className="flex items-center justify-end w-[36px] h-5 rounded-xl border border-dark-500 bg-primary cursor-pointer p-0.5"
+        className="flex items-center justify-end w-[36px] h-5 rounded-xl border border-dark-50 bg-primary cursor-pointer p-0.5"
       >
         <span className="w-4 h-4 rounded-full bg-linear_gradient_dark shadow-100" />
       </div>
@@ -245,7 +268,7 @@ const Switch = ({ onChange, checked, disabled }) => {
             onChange(true);
           }
         }}
-        className="flex items-center w-[36px] h-5 rounded-xl border border-dark-500 bg-dark-600 cursor-pointer p-0.5"
+        className="flex items-center w-[36px] h-5 rounded-xl border border-dark-50 bg-dark-600 cursor-pointer p-0.5"
       >
         <span className="w-4 h-4 rounded-full bg-gray-300 shadow-100" />
       </div>
@@ -312,13 +335,13 @@ export const Alerts = ({ data, errorClassName }: any) => {
 };
 
 export const AlertWarning = ({ title, className }: { title: string; className?: string }) => {
-  return <div className={`text-yellow-50 text-sm ${className || ""}`}>{title}</div>;
+  return <div className={`text-warning text-sm ${className || ""}`}>{title}</div>;
 };
 
 export const AlertError = ({ title, className }: { title: string; className?: string }) => {
   return (
     <div
-      className={`flex items-start gap-2 text-red-50 text-sm bg-red-50 bg-opacity-10 rounded-md p-3 ${
+      className={`flex items-start gap-2 text-orange text-sm bg-orange bg-opacity-10 rounded-md p-3 ${
         className || ""
       }`}
     >
@@ -330,36 +353,76 @@ export const AlertError = ({ title, className }: { title: string; className?: st
 
 export function useWithdrawTrigger(tokenId: string) {
   const dispatch = useAppDispatch();
+  const isMeme = useAppSelector(isMemeCategory);
   return () => {
-    dispatch(showModal({ action: "Withdraw", tokenId, amount: "0" }));
+    if (isMeme) {
+      dispatch(showModalMEME({ action: "Withdraw", tokenId, amount: "0" }));
+    } else {
+      dispatch(showModal({ action: "Withdraw", tokenId, amount: "0" }));
+    }
   };
 }
 
-export function useAdjustTrigger(tokenId: string) {
+export function useAdjustTrigger(tokenId: string, memeCategory?: boolean) {
   const dispatch = useAppDispatch();
-  const amount = useAppSelector(getCollateralAmount(tokenId));
+  const isMemeCur = useAppSelector(isMemeCategory);
+  let isMeme: boolean;
+  if (typeof memeCategory !== "boolean") {
+    isMeme = isMemeCur;
+  } else {
+    isMeme = memeCategory;
+  }
+  const amount = useAppSelector(getCollateralAmount(tokenId, isMeme));
   return () => {
-    dispatch(showModal({ action: "Adjust", tokenId, amount }));
+    if (isMeme) {
+      dispatch(showModalMEME({ action: "Adjust", tokenId, amount }));
+    } else {
+      dispatch(showModal({ action: "Adjust", tokenId, amount }));
+    }
   };
 }
 
 export function useSupplyTrigger(tokenId: string) {
   const dispatch = useAppDispatch();
+  const isMeme = useAppSelector(isMemeCategory);
   return () => {
-    dispatch(showModal({ action: "Supply", tokenId, amount: "0" }));
+    if (isMeme) {
+      dispatch(showModalMEME({ action: "Supply", tokenId, amount: "0" }));
+    } else {
+      dispatch(showModal({ action: "Supply", tokenId, amount: "0" }));
+    }
   };
 }
 
 export function useBorrowTrigger(tokenId: string) {
   const dispatch = useAppDispatch();
+  const isMeme = useAppSelector(isMemeCategory);
   return () => {
-    dispatch(showModal({ action: "Borrow", tokenId, amount: "0" }));
+    if (isMeme) {
+      dispatch(showModalMEME({ action: "Borrow", tokenId, amount: "0" }));
+    } else {
+      dispatch(showModal({ action: "Borrow", tokenId, amount: "0" }));
+    }
   };
 }
 
 export function useRepayTrigger(tokenId: string, position?: string) {
   const dispatch = useAppDispatch();
+  const isMeme = useAppSelector(isMemeCategory);
   return () => {
-    dispatch(showModal({ action: "Repay", tokenId, amount: "0", position }));
+    if (isMeme) {
+      dispatch(showModalMEME({ action: "Repay", tokenId, amount: "0", position }));
+    } else {
+      dispatch(showModal({ action: "Repay", tokenId, amount: "0", position }));
+    }
   };
 }
+
+export const Receive = ({ value }: { value: string }) => {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-sm text-gray-300">Receive Amount</span>
+      <span className="text-sm">{value}</span>
+    </div>
+  );
+};

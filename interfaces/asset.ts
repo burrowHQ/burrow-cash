@@ -12,15 +12,22 @@ export interface IAssetConfig {
   can_use_as_collateral: boolean;
   can_borrow: boolean;
   net_tvl_multiplier: number;
+  holding_position_fee_rate: string;
+  min_borrowed_amount?: string;
 }
 
 export interface IAssetEntry {
   token_id: string;
-  supplied: { shares: string; string: string };
-  borrowed: { shares: string; string: string };
+  supplied: IPool;
+  borrowed: IPool;
+  margin_debt: IPool;
+  margin_pending_debt: string;
+  margin_position: string;
   reserved: string;
+  prot_fee: string;
   last_update_timestamp: string;
   config: IAssetConfig;
+  uahpi?: string;
 }
 
 export type AssetEntry = [string, IAssetEntry];
@@ -36,6 +43,7 @@ export interface IMetadata {
   name: string;
   symbol: string;
   decimals: number;
+  tokens?: any;
 }
 
 export interface IAssetFarmReward {
@@ -97,6 +105,10 @@ export interface IAssetDetailed {
   prot_fee: string;
   isLpToken: boolean;
   lptMetadata: IUnitLptAssetDetail;
+  margin_debt: IPool;
+  margin_pending_debt: string;
+  margin_position: string;
+  uahpi: string;
 }
 
 export interface AssetFarm {
