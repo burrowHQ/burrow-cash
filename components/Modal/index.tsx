@@ -33,6 +33,7 @@ import {
   HealthFactor,
   Rates,
   Alerts,
+  AlertWarning,
   CollateralSwitch,
   CollateralTip,
   BorrowLimit,
@@ -236,6 +237,12 @@ const Modal = () => {
               poolAsset={assets[tokenId]}
               isDisabled={alerts["btcWithdraw"]}
             />
+            {isMeme && action === "Supply" ? (
+              <AlertWarning
+                title="Extreme market conditions may cause a temporary inability to redeem funds."
+                className="mt-2 px-2"
+              />
+            ) : null}
           </Box>
         </ModalContext.Provider>
       </Wrapper>
