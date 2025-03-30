@@ -14,6 +14,7 @@ import { fetchMarginConfig } from "../../redux/marginConfigSlice";
 import { fetchMarginConfigMEME } from "../../redux/marginConfigSliceMEME";
 import { fetchAllPools } from "../../redux/poolSlice";
 import { getAccountId } from "../../redux/accountSelectors";
+import { getAppRefreshNumber } from "../../redux/appSelectors";
 
 ModalReact.defaultStyles = {
   overlay: {
@@ -46,7 +47,7 @@ const Init = () => {
   const isIdle = useIdle(IDLE_INTERVAL);
   const dispatch = useAppDispatch();
   const accountId = useAppSelector(getAccountId);
-
+  const appRefreshNumber = useAppSelector(getAppRefreshNumber);
   const fetchData = () => {
     dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
     dispatch(fetchAssetsMEME()).then(() => dispatch(fetchRefPricesMEME()));
@@ -71,7 +72,7 @@ const Init = () => {
     if (accountId) {
       fetchDataAccount();
     }
-  }, [accountId]);
+  }, [accountId, appRefreshNumber]);
   useInterval(fetchAllData, !isIdle ? REFETCH_INTERVAL : null);
 
   return null;

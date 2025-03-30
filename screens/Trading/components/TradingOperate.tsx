@@ -75,6 +75,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
   const [warnTip, setWarnTip] = useState<React.ReactElement | string>("");
   const [LiqPrice, setLiqPrice] = useState<string>("");
   const [forceUpdate, setForceUpdate] = useState<number>(0);
+  const [tradingLoading, setTradingLoading] = useState<boolean>(false);
   const customInputRef = useRef<HTMLInputElement>(null);
   const accountId = useAppSelector(getAccountId);
   const { filteredTokenTypeMap } = useRegisterTokenType();
@@ -261,7 +262,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
   // check to show tip
   useDebounce(
     () => {
-      if (!accountId) {
+      if (!accountId || tradingLoading) {
         setWarnTip("");
       } else if (Object.values(marginAccountList).length >= max_active_user_margin_position) {
         setWarnTip(tip_max_positions);
@@ -383,6 +384,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
       shortInput,
       config,
       estimateData,
+      tradingLoading,
     ],
   );
   const setMaxInputBanlance = (key: string) => {
@@ -926,6 +928,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                   if (onMobileClose) onMobileClose();
                 }}
                 action="Long"
+                setTradingLoading={setTradingLoading}
                 confirmInfo={{
                   longInput,
                   longInputUsd,
@@ -1064,6 +1067,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                   setIsShortConfirmModalOpen(false);
                   if (onMobileClose) onMobileClose();
                 }}
+                setTradingLoading={setTradingLoading}
                 action="Short"
                 confirmInfo={{
                   longInput: shortInput,

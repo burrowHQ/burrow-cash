@@ -2,7 +2,7 @@ import { useState, createContext, useEffect, useMemo, useRef } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
 import Decimal from "decimal.js";
-import { useAppSelector } from "../../../redux/hooks";
+import { useAppSelector, useAppDispatch } from "../../../redux/hooks";
 import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
 import { CloseIcon } from "../../../components/Modal/svg";
@@ -25,6 +25,8 @@ import { getMarginConfig, getMarginConfigMEME } from "../../../redux/marginConfi
 import { handleTransactionHash } from "../../../services/transaction";
 import { showPositionFailure } from "../../../components/HashResultModal";
 import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
+import { getAppRefreshNumber } from "../../../redux/appSelectors";
+import { setRefreshNumber } from "../../../redux/appSlice";
 
 export const ModalContext = createContext(null) as any;
 const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
@@ -45,7 +47,6 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   } = extraProps;
 
   const { filteredTokenTypeMap } = useRegisterTokenType();
-
   const [showFeeModal, setShowFeeModal] = useState<boolean>(false);
   const [selectedCollateralType, setSelectedCollateralType] = useState<string>(DEFAULT_POSITION);
   const [tokenInAmount, setTokenInAmount] = useState<string | null>(null);
@@ -94,6 +95,8 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
 
   const actionShowRedColor = positionType.label === "Long";
   const marginConfig = useAppSelector(isMainStream ? getMarginConfig : getMarginConfigMEME);
+  const appRefreshNumber = useAppSelector(getAppRefreshNumber);
+  const dispatch = useAppDispatch();
   // get estimate token in amount
   useEffect(() => {
     if (positionType.label === "Short") {
@@ -192,6 +195,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
           return item.transaction.hash;
         });
         await handleTransactionHash(transactionHashes);
+        dispatch(setRefreshNumber(appRefreshNumber + 1));
       }
     } catch (error) {
       showPositionFailure({

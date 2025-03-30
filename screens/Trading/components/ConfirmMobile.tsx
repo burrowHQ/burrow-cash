@@ -2,7 +2,7 @@ import React, { useState, createContext } from "react";
 import Decimal from "decimal.js";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
-import { useAppSelector } from "../../../redux/hooks";
+import { useAppSelector, useAppDispatch } from "../../../redux/hooks";
 import { Wrapper } from "../../../components/Modal/style";
 import { DEFAULT_POSITION } from "../../../utils/config";
 import { CloseIcon } from "../../../components/Modal/svg";
@@ -22,6 +22,8 @@ import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { IConfirmMobileProps } from "../comInterface";
 import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
 import { getAccountCategory } from "../../../redux/accountSelectors";
+import { setRefreshNumber } from "../../../redux/appSlice";
+import { getAppRefreshNumber } from "../../../redux/appSelectors";
 
 export const ModalContext = createContext(null) as any;
 const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
@@ -29,10 +31,12 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
   onClose,
   action,
   confirmInfo,
+  setTradingLoading,
 }) => {
   const theme = useTheme();
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
   const { ReduxcategoryAssets1, ReduxcategoryAssets2 } = useAppSelector((state) => state.category);
+  const appRefreshNumber = useAppSelector(getAppRefreshNumber);
   const actionShowRedColor = action === "Long";
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [isMinTokenPAmount, setIsMinTokenPAmount] = useState<boolean>(false);
@@ -56,6 +60,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
     listBaseTokenConfig[baseTokenId]?.min_safety_buffer || defaultBaseTokenConfig.min_safety_buffer;
   const account = useAppSelector(getAccountCategory(!isMainStream));
   const { getAssetDetails, getAssetById, getAssetByIdMEME } = useMarginAccount();
+  const dispatch = useAppDispatch();
   const assetP = isMainStream
     ? getAssetById(
         action === "Long"
@@ -120,6 +125,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
   };
   const confirmOpenPosition = async () => {
     setIsDisabled(true);
+    setTradingLoading(true);
     let hasError = false;
     try {
       // Swap Out Trial Calculation Result Verification
@@ -173,6 +179,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
           return item.transaction.hash;
         });
         await handleTransactionHash(transactionHashes);
+        dispatch(setRefreshNumber(appRefreshNumber + 1));
       }
     } catch (error) {
       showPositionFailure({
@@ -182,6 +189,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
       });
     } finally {
       setIsDisabled(false);
+      setTradingLoading(false);
       if (!hasError) {
         onClose(); // Only close the modal if there was no error
       }

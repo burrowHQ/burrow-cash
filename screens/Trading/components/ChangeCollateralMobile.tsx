@@ -413,7 +413,7 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
           <Box sx={{ p: ["20px", "20px"] }}>
             <div className="flex items-center justify-between">
               <div className="flex items-center justify-center">
-                <p className="text-lg mr-2">Change Collateral 2</p>
+                <p className="text-lg mr-2">Change Collateral</p>
                 <div
                   className={`bg-opacity-10  text-xs py-0.5 pl-2.5 pr-1.5 rounded ${
                     positionType.class

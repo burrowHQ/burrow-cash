@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useTheme, Box, Snackbar, Typography } from "@mui/material";
+import { useTheme, Box, Snackbar } from "@mui/material";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import WalletButton from "./WalletButton";

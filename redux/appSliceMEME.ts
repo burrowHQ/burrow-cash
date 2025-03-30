@@ -60,6 +60,7 @@ export interface AppState {
     count: number;
     unreadIds: [];
   };
+  refreshNumber: number;
 }
 
 export const initialState: AppState = {
@@ -133,6 +134,7 @@ export const initialState: AppState = {
     meme_oracle_account_id: "",
     meme_ref_exchange_id: "",
   },
+  refreshNumber: 0,
 };
 
 export const fetchConfig = createAsyncThunk("accountMEME/getConfig", async () => {
@@ -226,6 +228,9 @@ export const appSliceMEME = createSlice({
     setToastMessage(state, action) {
       state.toastMessage = action.payload;
     },
+    setRefreshNumber(state, action) {
+      state.refreshNumber = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchConfig.fulfilled, (state, action) => {
@@ -256,6 +261,7 @@ export const {
   setUnreadLiquidation,
   setToastMessage,
   updatePosition,
+  setRefreshNumber,
 } = appSliceMEME.actions;
 
 export default appSliceMEME.reducer;

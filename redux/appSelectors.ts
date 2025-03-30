@@ -262,3 +262,7 @@ export const getToastMessage = createSelector(
   (state: RootState) => state.app,
   (app) => app.toastMessage,
 );
+export const getAppRefreshNumber = createSelector(
+  (state: RootState) => state.app,
+  (app) => app.refreshNumber,
+);
