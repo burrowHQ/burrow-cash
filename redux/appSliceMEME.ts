@@ -61,6 +61,7 @@ export interface AppState {
     unreadIds: [];
   };
   refreshNumber: number;
+  openPositionLoading: boolean;
 }
 
 export const initialState: AppState = {
@@ -135,6 +136,7 @@ export const initialState: AppState = {
     meme_ref_exchange_id: "",
   },
   refreshNumber: 0,
+  openPositionLoading: false,
 };
 
 export const fetchConfig = createAsyncThunk("accountMEME/getConfig", async () => {
@@ -231,6 +233,9 @@ export const appSliceMEME = createSlice({
     setRefreshNumber(state, action) {
       state.refreshNumber = action.payload;
     },
+    setOpenPositionLoading(state, action) {
+      state.openPositionLoading = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchConfig.fulfilled, (state, action) => {
@@ -262,6 +267,7 @@ export const {
   setToastMessage,
   updatePosition,
   setRefreshNumber,
+  setOpenPositionLoading,
 } = appSliceMEME.actions;
 
 export default appSliceMEME.reducer;

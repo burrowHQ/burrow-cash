@@ -12,12 +12,14 @@ import {
 } from "../../redux/marginAccountSelectors";
 import { useMarginAccount } from "../../hooks/useMarginAccount";
 import { getAllAssetsData } from "../../redux/assetsSelectors";
+import { getOpenPositionLoading } from "../../redux/appSelectors";
 import { shrinkToken } from "../../store";
 
 const BalanceReminder = () => {
   const router = useRouter();
   const { getAssetById, getAssetByIdMEME } = useMarginAccount();
   const accountId = useAppSelector(getAccountId);
+  const positionLoading = useAppSelector(getOpenPositionLoading);
   const [shouldShow, setShouldShow] = useState(false);
   const accountSupplied = useAppSelector(getMarginAccountSupplied);
   const accountSuppliedMEME = useAppSelector(getMarginAccountSuppliedMEME);
@@ -51,12 +53,18 @@ const BalanceReminder = () => {
       const v = new Decimal(b || 0).mul(asset.price?.usd || 0);
       return acc.plus(v);
     }, new Decimal(0));
-    if (accountId && Unreminded && hasValidAccountSupplied && userWithdrawableUsd.gte(0.1)) {
+    if (
+      accountId &&
+      Unreminded &&
+      hasValidAccountSupplied &&
+      userWithdrawableUsd.gte(0.1) &&
+      !positionLoading
+    ) {
       setShouldShow(true);
     } else {
       setShouldShow(false);
     }
-  }, [accountId, router.pathname, Unreminded, combinedAccountSupplied]);
+  }, [accountId, router.pathname, Unreminded, combinedAccountSupplied, positionLoading]);
   const handleClaim = () => {
     dispatch(setSelectedTab("account"));
     dispatch(setAccountDetailsOpen(true));

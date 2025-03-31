@@ -266,3 +266,7 @@ export const getAppRefreshNumber = createSelector(
   (state: RootState) => state.app,
   (app) => app.refreshNumber,
 );
+export const getOpenPositionLoading = createSelector(
+  (state: RootState) => state.app,
+  (app) => app.openPositionLoading,
+);

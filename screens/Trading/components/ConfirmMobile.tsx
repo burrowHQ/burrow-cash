@@ -22,7 +22,7 @@ import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { IConfirmMobileProps } from "../comInterface";
 import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
 import { getAccountCategory } from "../../../redux/accountSelectors";
-import { setRefreshNumber } from "../../../redux/appSlice";
+import { setRefreshNumber, setOpenPositionLoading } from "../../../redux/appSlice";
 import { getAppRefreshNumber } from "../../../redux/appSelectors";
 
 export const ModalContext = createContext(null) as any;
@@ -126,6 +126,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
   const confirmOpenPosition = async () => {
     setIsDisabled(true);
     setTradingLoading(true);
+    dispatch(setOpenPositionLoading(true));
     let hasError = false;
     try {
       // Swap Out Trial Calculation Result Verification
@@ -190,6 +191,7 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
     } finally {
       setIsDisabled(false);
       setTradingLoading(false);
+      dispatch(setOpenPositionLoading(false));
       if (!hasError) {
         onClose(); // Only close the modal if there was no error
       }
