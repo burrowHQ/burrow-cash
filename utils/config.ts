@@ -144,7 +144,7 @@ const getConfig = (env: string = defaultNetwork) => {
         PYTH_ORACLE_ID: "pyth-oracle.testnet",
         PRICE_ORACLE_ID: "mock-priceoracle.testnet",
         MEME_PRICE_ORACLE_ID: "mock-priceoracle.testnet",
-        REF_EXCHANGE_ID: "exchange.ref-dev.testnet",
+        REF_EXCHANGE_ID: "ref-finance-101.testnet",
         findPathUrl: "smartrouterdev.refburrow.top",
         // findPathUrl: "smartrouter.ref.finance",
         indexUrl: "https://testnet-indexer.ref-finance.com",
