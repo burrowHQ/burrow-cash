@@ -1,0 +1,117 @@
+.bottom-ga {
+  background: #d2d8dd;
+  position: fixed;
+  bottom: 32px;
+  width: 100%;
+  padding: 12px 30px 12px 15px;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  z-index: -99;
+}
+
+.bottom-ga._show {
+  opacity: 1;
+  z-index: 999;
+}
+
+.modal-ga {
+  color: #91a2ae;
+  z-index: 999999;
+}
+
+.modal-ga h2 {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 20px;
+  margin-top: 20px;
+  color: #dce2e7;
+}
+
+.modal-ga br {
+  margin-bottom: 20px;
+}
+
+.ga-content {
+  overflow-y: scroll;
+  height: 70vh;
+  font-size: 12px;
+}
+
+.bottom-ga .btn-outline {
+  background: #fff;
+  border-color: #fff;
+  color: #000;
+  border: 1px solid #7e8a93;
+  border-radius: 8px;
+  padding: 5px 10px;
+}
+
+.bottom-ga .ga-reject {
+  color: #000;
+}
+
+@media (min-width: 769px) {
+  .bottom-ga {
+    background: #d2d8dd;
+    padding: 20px 30px;
+    bottom: 0;
+    color: #000 !important;
+  }
+  .bottom-ga .btn-outline {
+    background: #000;
+    border-color: #000;
+    color: #fff;
+  }
+}
+
+@media (max-width: 768px) {
+  .ga-content {
+    max-height: 60vh;
+  }
+
+  .modal-ga .btn-outline {
+    background: #fff;
+    color: #000;
+  }
+
+  .bottom-ga-close {
+    position: absolute;
+    top: 12px;
+    right: 10px;
+    font-size: 18px;
+    color: #000;
+  }
+
+  .ga-btns {
+    justify-content: space-around;
+    flex: 1;
+    display: flex;
+  }
+
+  .ga-btns button {
+    flex: 1;
+    color: #fff;
+  }
+}
+
+.thinGrayscrollBar::-webkit-scrollbar-thumb {
+  background: #566069;
+  border-radius: 2px;
+}
+.thinGrayscrollBar::-webkit-scrollbar {
+  width: 4px;
+  height: 0;
+  border-radius: 2px;
+}
+
+.thinGrayscrollBar::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0);
+  background: transparent;
+  border-radius: 2px;
+}
+
+.thinGrayscrollBar::-webkit-scrollbar-thumb {
+  background: #566069;
+  border-radius: 2px;
+}
