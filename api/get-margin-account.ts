@@ -4,6 +4,7 @@ import { IMarginAccountDetailedView } from "../interfaces";
 import { getAccount as getAccountWallet } from "../utils/wallet-selector-compat";
 
 const getMarginAccount = async () => {
+  // TODOXX main
   return null;
   // const account = await getAccountWallet();
   // const { accountId } = account;

@@ -3,6 +3,7 @@ import { ViewMethodsLogic } from "../interfaces/contract-methods";
 import { IMarginConfig } from "../interfaces";
 
 const getMarginConfig = async (): Promise<IMarginConfig> => {
+  // TODOXX
   return {
     max_leverage_rate: 0,
     pending_debt_scale: 0,

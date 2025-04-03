@@ -3,6 +3,7 @@ import { ViewMethodsLogic } from "../interfaces/contract-methods";
 import { IMarginBaseTokenConfig } from "../interfaces";
 
 const getDefaultMarginBaseTokenLimit = async (): Promise<IMarginBaseTokenConfig> => {
+  // TODOXX main
   return {
     min_safety_buffer: 0,
     max_leverage_rate: 0,
