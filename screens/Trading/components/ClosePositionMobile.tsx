@@ -381,7 +381,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
               <div className=" text-[#EA3F68] text-sm font-normal flex items-start mb-1">
                 <MaxPositionIcon />
                 <span className="ml-1">
-                  Unable to close order, Oracle is abnormal or Ref liquidity is insufficient.
+                  Unable to close order, Oracle is abnormal or dex liquidity is insufficient.
                 </span>
               </div>
             )}

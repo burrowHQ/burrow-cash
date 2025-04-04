@@ -25,7 +25,7 @@ export default function OnboardingBRRR() {
           <span style={{ fontWeight: "bold", color: theme.palette.primary.main }}>
             Earn $BRRR rewards
           </span>{" "}
-          by supplying and borrowing assets on Burrow.
+          by supplying and borrowing assets on Lending.
           <Box textAlign="left" pt="0.75rem">
             Up to 50% of the total supply will be distributed to users and supporters!
           </Box>

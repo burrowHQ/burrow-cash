@@ -90,7 +90,7 @@ const BalanceReminder = () => {
         <RemindIcon />
       </div>
       <div className="text-base ml-2 mr-2 text-gray-300">
-        You have assets remaining in Burrow account. Please
+        You have assets remaining in Rhea Lending account. Please
         <span
           className="text-primary inline-block cursor-pointer underline mx-1"
           onClick={handleClaim}

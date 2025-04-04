@@ -16,9 +16,9 @@ const configurationData: DatafeedConfiguration = {
   supported_resolutions,
   exchanges: [
     {
-      value: "Burrow",
-      name: "Burrow",
-      desc: "Burrow",
+      value: "Rhea Lending",
+      name: "Rhea Lending",
+      desc: "Rhea Lending",
     },
   ],
   supports_marks: true,
@@ -49,7 +49,7 @@ const getAllSymbols = async (isMeme?: boolean) => {
       const quoteSymbol = quoteMeta.symbol;
       supportPairs.push({
         description: `${baseSymbol}/${quoteSymbol}`,
-        exchange: "Burrow",
+        exchange: "Rhea Lending",
         full_name: `${baseSymbol}/${quoteSymbol}`,
         symbol: `${baseSymbol}_${quoteSymbol}`,
         type: "crypto",

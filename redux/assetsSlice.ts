@@ -67,7 +67,7 @@ export const assetSlice = createSlice({
     builder.addCase(fetchRefPrices.rejected, (state, action) => {
       state.status = action.meta.requestStatus;
       console.error(action.payload);
-      throw new Error("Failed to fetch REF prices");
+      throw new Error("Failed to fetch RHEA prices");
     });
   },
 });

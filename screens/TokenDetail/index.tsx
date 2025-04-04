@@ -482,7 +482,7 @@ function DetailPc({ tokenDetails, handlePeriodClick }) {
 
   return (
     <LayoutBox>
-      <Breadcrumb title="Burrow Markets" path="/markets" />
+      <Breadcrumb title="Lending Markets" path="/markets" />
       <div className="grid grid-cols-3/5">
         <div className="mr-6">
           <TokenOverview />
