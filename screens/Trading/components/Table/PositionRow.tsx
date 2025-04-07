@@ -112,8 +112,8 @@ const PositionRow = ({
   const pnl =
     entryPrice !== null && entryPrice !== 0
       ? positionType.label === "Long"
-        ? (indexPrice - entryPrice) * size * priceP
-        : (entryPrice - indexPrice) * size * priceD
+        ? (indexPrice - entryPrice) * size * priceC
+        : (entryPrice - indexPrice) * size * priceC
       : 0;
   let amplitude = 0;
   if (entryPrice !== null && entryPrice !== 0 && pnl !== 0) {
