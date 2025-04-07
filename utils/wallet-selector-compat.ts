@@ -237,7 +237,6 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
       "neth",
       "nightly",
       "ledger",
-      "wallet-connect",
       "keypom",
       "mintbase-wallet",
       "bitte-wallet",
