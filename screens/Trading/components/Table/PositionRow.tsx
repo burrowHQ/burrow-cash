@@ -25,8 +25,8 @@ const PositionRow = ({
   marginAccountList,
   marginAccountListMEME,
   filteredTokenTypeMap,
+  selected,
 }) => {
-  // console.log(itemKey, item, index);
   const isMobile = isMobileDevice();
   const [entryPrice, setEntryPrice] = useState<number | null>(null);
   useEffect(() => {
@@ -128,6 +128,28 @@ const PositionRow = ({
     marginConfigTokens,
     entryPrice,
   };
+  useEffect(() => {
+    if (selected) {
+      handleClosePositionButtonClick({
+        itemKey,
+        index,
+        item,
+        getAssetById,
+        getPositionType,
+        getAssetDetails,
+        parseTokenValue,
+        calculateLeverage,
+        LiqPrice,
+        entryPrice,
+        pnl,
+        isUpdate: true,
+      });
+      handleChangeCollateralButtonClick({
+        ...rowData,
+        isUpdate: true,
+      });
+    }
+  }, [selected, itemKey, index, item, LiqPrice, entryPrice, pnl]);
   return !isMobile ? (
     <tr className="text-base hover:bg-gray-500 font-normal align-text-top">
       <td className="py-5 pl-5">

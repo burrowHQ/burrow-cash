@@ -142,12 +142,12 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     const { debt_cap } = item;
     return {
       HPFee: +shrinkToken(debt_cap, decimalsD) * priceD * (uahpi - uahpi_at_open),
-      swapFee:
-        ((estimateData?.fee ?? 0) / 10000) *
-        +shrinkToken(tokenInAmount || "0", assetP.metadata.decimals) *
-        (assetP?.price?.usd || 0),
+      // swapFee:
+      //   ((estimateData?.fee ?? 0) / 10000) *
+      //   +shrinkToken(tokenInAmount || "0", assetP.metadata.decimals) *
+      //   (assetP?.price?.usd || 0),
     };
-  }, [collateral, ReduxcategoryAssets1, estimateData]);
+  }, [assets, isMainStream, item, marginAccountList, marginAccountListMEME]);
 
   // Methods
   const handleCloseOpsitionEvt = async () => {
@@ -356,14 +356,14 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
               <div className="text-gray-300">Fee</div>
               <div className="flex items-center justify-center relative">
                 <p
-                  className="border-b border-dashed border-dark-800 cursor-pointer"
-                  onMouseEnter={() => setShowFeeModal(true)}
-                  onMouseLeave={() => setShowFeeModal(false)}
+                // className="border-b border-dashed border-dark-800 cursor-pointer"
+                // onMouseEnter={() => setShowFeeModal(true)}
+                // onMouseLeave={() => setShowFeeModal(false)}
                 >
-                  ${beautifyPrice(Number(formatDecimal(Fee.swapFee + Fee.HPFee)))}
+                  ${beautifyPrice(Number(formatDecimal(Fee.HPFee)))}
                 </p>
 
-                {showFeeModal && (
+                {/* {showFeeModal && (
                   <div className="absolute bg-[#14162B] text-white h-[50px] p-2 rounded text-xs top-[30px] left-[-66px] flex flex-col items-start justify-between z-[1] w-auto">
                     <p>
                       <span className="mr-1 whitespace-nowrap">Hold Fee:</span>$
@@ -374,7 +374,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
                       {beautifyPrice(Fee.swapFee)}
                     </p>
                   </div>
-                )}
+                )} */}
               </div>
             </div>
             {swapUnSecurity && (

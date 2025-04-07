@@ -46,10 +46,10 @@ const TradingTable = ({
   const [selectedTab, setStateSelectedTab] = useState(filterTitle ? "positions" : storeSelectedTab);
   const [isClosePositionModalOpen, setIsClosePositionMobileOpen] = useState(false);
   const [isChangeCollateralMobileOpen, setIsChangeCollateralMobileOpen] = useState(false);
-  const [selectedRowData, setSelectedRowData] = useState(null);
+  const [selectedRowData, setSelectedRowData] = useState<any>(null);
   const assets = useAppSelector(getAssets);
   const assetsMEME = useAppSelector(getAssetsMEME);
-  const [closePositionModalProps, setClosePositionModalProps] = useState(null);
+  const [closePositionModalProps, setClosePositionModalProps] = useState<any>(null);
   const [totalCollateral, setTotalCollateral] = useState(0);
   const [positionHistory, setPositionHistory] = useState<any[]>([]);
   const [positionHistoryTotal, setPositionHistoryTotal] = useState(0);
@@ -97,13 +97,17 @@ const TradingTable = ({
     setPageNum(0);
   };
 
-  const handleClosePositionButtonClick = (key) => {
-    setClosePositionModalProps(key);
-    setIsClosePositionMobileOpen(true);
+  const handleClosePositionButtonClick = (rowData) => {
+    setClosePositionModalProps(rowData);
+    if (!rowData.isUpdate) {
+      setIsClosePositionMobileOpen(true);
+    }
   };
   const handleChangeCollateralButtonClick = (rowData) => {
     setSelectedRowData(rowData);
-    setIsChangeCollateralMobileOpen(true);
+    if (!rowData.isUpdate) {
+      setIsChangeCollateralMobileOpen(true);
+    }
   };
 
   useEffect(() => {
@@ -376,6 +380,11 @@ const TradingTable = ({
                       marginAccountList={marginAccountList}
                       marginAccountListMEME={marginAccountListMEME}
                       filteredTokenTypeMap={filteredTokenTypeMap}
+                      selected={
+                        (isClosePositionModalOpen &&
+                          item.itemKey == closePositionModalProps?.itemKey) ||
+                        (isChangeCollateralMobileOpen && item.itemKey == selectedRowData?.pos_id)
+                      }
                     />
                   ))
                 ) : (
@@ -641,6 +650,10 @@ const TradingTable = ({
                 marginAccountList={marginAccountList}
                 marginAccountListMEME={marginAccountListMEME}
                 filteredTokenTypeMap={filteredTokenTypeMap}
+                selected={
+                  (isClosePositionModalOpen && item.itemKey == closePositionModalProps?.itemKey) ||
+                  (isChangeCollateralMobileOpen && item.itemKey == selectedRowData?.pos_id)
+                }
               />
             ))
           ) : (
