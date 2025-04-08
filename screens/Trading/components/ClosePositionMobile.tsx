@@ -97,9 +97,11 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   const marginConfig = useAppSelector(isMainStream ? getMarginConfig : getMarginConfigMEME);
   const appRefreshNumber = useAppSelector(getAppRefreshNumber);
   const dispatch = useAppDispatch();
+
   // get estimate token in amount
   useEffect(() => {
     if (positionType.label === "Short") {
+      // TODOXX
       getMinRequiredPAmount().then((res) => {
         setTokenInAmount(res || "0");
       });
@@ -132,7 +134,6 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   useEffect(() => {
     setIsEstimating(!estimateData?.min_amount_out);
   }, [estimateData]);
-
   const Fee = useMemo(() => {
     const uahpi: any =
       shrinkToken((assets as any).data[item.token_d_info.token_id]?.uahpi, 18) ?? 0;
@@ -140,17 +141,55 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
       ? shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18)
       : shrinkToken(marginAccountListMEME[itemKey]?.uahpi_at_open ?? 0, 18);
     const { debt_cap } = item;
+    const HPFeeAmount = new Decimal(shrinkToken(debt_cap, decimalsD) || 0).mul(
+      uahpi - uahpi_at_open,
+    );
+    const HPFeeValue = HPFeeAmount.mul(priceD);
     return {
-      HPFee: +shrinkToken(debt_cap, decimalsD) * priceD * (uahpi - uahpi_at_open),
+      HPFee: HPFeeValue.toNumber(),
+      HPFeeAmount: HPFeeValue.toFixed(),
       // swapFee:
       //   ((estimateData?.fee ?? 0) / 10000) *
       //   +shrinkToken(tokenInAmount || "0", assetP.metadata.decimals) *
       //   (assetP?.price?.usd || 0),
     };
   }, [assets, isMainStream, item, marginAccountList, marginAccountListMEME]);
+  const pnlAfterSwap = useMemo(() => {
+    if (
+      new Decimal(estimateData?.min_amount_out || 0).gt(0) &&
+      new Decimal(tokenInAmount || 0).gt(0)
+    ) {
+      if (positionType.label == "Long") {
+        const d_balance = parseTokenValue(item.token_d_info.balance, decimalsD);
+        const due_amount = new Decimal(Fee.HPFeeAmount || 0).plus(d_balance);
+        const repay_amount = parseTokenValue(
+          estimateData?.min_amount_out || "0",
+          assetD.metadata.decimals,
+        );
+        const pnlAfterSwap = new Decimal(repay_amount || 0).minus(due_amount).mul(priceC);
+        return pnlAfterSwap.toFixed();
+      } else {
+        const repay_amount = shrinkToken(tokenInAmount || "0", assetP.metadata.decimals);
+        const p_amount = parseTokenValue(item.token_p_amount, decimalsP);
+        const pnlAfterSwap = new Decimal(p_amount || 0).minus(repay_amount || 0).mul(priceC);
+        return pnlAfterSwap.toFixed();
+      }
+    }
+  }, [
+    estimateData?.min_amount_out,
+    positionType.label,
+    tokenInAmount,
+    item,
+    Fee.HPFeeAmount,
+    assetP,
+    assetD,
+    decimalsP,
+    priceC,
+  ]);
 
   // Methods
   const handleCloseOpsitionEvt = async () => {
+    // TODOXX
     // Swap Out Trial Calculation Result Verification
     const regular_p_value = new Decimal(
       shrinkToken(tokenInAmount || "0", assetP.metadata.decimals),
@@ -237,10 +276,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     if (new Decimal(requiredPAmount || 0).eq(0)) {
       return balance_c_plus_p;
     }
-    const requiredPAmountOnShort = Decimal.min(
-      balance_c_plus_p,
-      Decimal.max(requiredPAmount, token_p_amount),
-    ).toFixed(0);
+    const requiredPAmountOnShort = Decimal.min(balance_c_plus_p, requiredPAmount).toFixed(0);
     return requiredPAmountOnShort;
   }
 
@@ -348,6 +384,19 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
                     {pnl > 0 ? `+$` : `-$`}
                     {beautifyPrice(Math.abs(pnl))}
                   </span>
+                )}
+                <RightArrow className="mx-2" />
+                {pnlAfterSwap ? (
+                  <span
+                    className={`text-sm ${
+                      new Decimal(pnlAfterSwap).gt(0) ? "text-primary" : "text-danger"
+                    }`}
+                  >
+                    {new Decimal(pnlAfterSwap).gt(0) ? `+$` : `-$`}
+                    {beautifyPrice(Math.abs(new Decimal(pnlAfterSwap).toNumber()))}
+                  </span>
+                ) : (
+                  <span className="text-sm text-gray-160">-</span>
                 )}
               </div>
             </div>
