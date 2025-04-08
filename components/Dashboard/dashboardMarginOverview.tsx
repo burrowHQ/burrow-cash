@@ -99,8 +99,8 @@ export default function DashboardMarginOverview({
         const pnl =
           entryPrice !== null && entryPrice !== 0
             ? positionType === "Long"
-              ? (indexPrice - entryPrice) * size * priceP
-              : (entryPrice - indexPrice) * size * priceD
+              ? (indexPrice - entryPrice) * size * priceC
+              : (entryPrice - indexPrice) * size * priceC
             : 0;
         const safePnl = Number.isNaN(pnl) ? 0 : pnl;
         pnlTotal += safePnl;
