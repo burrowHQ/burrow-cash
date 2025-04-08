@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import Decimal from "decimal.js";
+import { useEffect, useMemo, useState } from "react";
 import DataSource from "../../../../data/datasource";
 import { useLiqPrice } from "../../../../hooks/useLiqPrice";
 import { shrinkToken } from "../../../../store/helper";
@@ -108,13 +109,17 @@ const PositionRow = ({
     ? shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18)
     : shrinkToken(marginAccountListMEME[itemKey]?.uahpi_at_open ?? 0, 18);
   const holdingFee = +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi - uahpi_at_open);
-  const holding = +shrinkToken(item.debt_cap, decimalsD) * (uahpi - uahpi_at_open);
-  const pnl =
+  const holdingFeeAmount = +shrinkToken(item.debt_cap, decimalsD) * (uahpi - uahpi_at_open);
+  const pnlPending =
     entryPrice !== null && entryPrice !== 0
       ? positionType.label === "Long"
         ? (indexPrice - entryPrice) * size * priceC
         : (entryPrice - indexPrice) * size * priceC
       : 0;
+  const pnl = useMemo(() => {
+    if (!entryPrice) return 0;
+    return new Decimal(pnlPending || 0).minus(holdingFee || 0).toNumber();
+  }, [entryPrice, pnlPending, holdingFee]);
   let amplitude = 0;
   if (entryPrice !== null && entryPrice !== 0 && pnl !== 0) {
     amplitude =

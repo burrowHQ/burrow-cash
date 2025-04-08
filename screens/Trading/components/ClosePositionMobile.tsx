@@ -27,6 +27,7 @@ import { showPositionFailure } from "../../../components/HashResultModal";
 import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
 import { getAppRefreshNumber } from "../../../redux/appSelectors";
 import { setRefreshNumber } from "../../../redux/appSlice";
+import { TagToolTip } from "../../../components/ToolTip";
 
 export const ModalContext = createContext(null) as any;
 const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
@@ -154,18 +155,13 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
       //   (assetP?.price?.usd || 0),
     };
   }, [assets, isMainStream, item, marginAccountList, marginAccountListMEME]);
+  // TODOXX
   const pnlAfterSwap = useMemo(() => {
-    if (
-      new Decimal(estimateData?.min_amount_out || 0).gt(0) &&
-      new Decimal(tokenInAmount || 0).gt(0)
-    ) {
+    if (new Decimal(estimateData?.amount_out || 0).gt(0) && new Decimal(tokenInAmount || 0).gt(0)) {
       if (positionType.label == "Long") {
         const d_balance = parseTokenValue(item.token_d_info.balance, decimalsD);
         const due_amount = new Decimal(Fee.HPFeeAmount || 0).plus(d_balance);
-        const repay_amount = parseTokenValue(
-          estimateData?.min_amount_out || "0",
-          assetD.metadata.decimals,
-        );
+        const repay_amount = estimateData?.amount_out || "0";
         const pnlAfterSwap = new Decimal(repay_amount || 0).minus(due_amount).mul(priceC);
         return pnlAfterSwap.toFixed();
       } else {
@@ -176,7 +172,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
       }
     }
   }, [
-    estimateData?.min_amount_out,
+    estimateData?.amount_out,
     positionType.label,
     tokenInAmount,
     item,
@@ -375,7 +371,10 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
               </div>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
-              <div className="text-gray-300">Current Total PnL</div>
+              <div className="flex items-center gap-1  text-gray-300">
+                Current Total PnL
+                <TagToolTip title="Close Position requires a swap to repay debt, will incurs swap fee and price impact, and affects final PnL." />
+              </div>
               <div className="flex items-center justify-center">
                 {!pnl ? (
                   <span className="text-sm text-gray-160 ml-1.5">-</span>
