@@ -51,6 +51,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   const [showFeeModal, setShowFeeModal] = useState<boolean>(false);
   const [selectedCollateralType, setSelectedCollateralType] = useState<string>(DEFAULT_POSITION);
   const [tokenInAmount, setTokenInAmount] = useState<string | null>(null);
+  const [tokenInAmountPnl, setTokenInAmountPnl] = useState<string | null>(null);
   const [isProcessingTx, setIsProcessingTx] = useState<boolean>(false);
   const [isEstimating, setIsEstimating] = useState<boolean>(false);
   const [forceUpdate, setForceUpdate] = useState<number>(0);
@@ -103,8 +104,10 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   useEffect(() => {
     if (positionType.label === "Short") {
       // TODOXX
-      getMinRequiredPAmount().then((res) => {
-        setTokenInAmount(res || "0");
+      getMinRequiredPAmount().then((res: any) => {
+        const { requiredPAmountOnShort, requiredPAmountOnShort_pnl } = res;
+        setTokenInAmount(requiredPAmountOnShort || "0");
+        setTokenInAmountPnl(requiredPAmountOnShort_pnl || "0");
       });
     } else {
       setTokenInAmount(
@@ -165,7 +168,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
         const pnlAfterSwap = new Decimal(repay_amount || 0).minus(due_amount).mul(priceC);
         return pnlAfterSwap.toFixed();
       } else {
-        const repay_amount = shrinkToken(tokenInAmount || "0", assetP.metadata.decimals);
+        const repay_amount = shrinkToken(tokenInAmountPnl || "0", assetP.metadata.decimals);
         const p_amount = parseTokenValue(item.token_p_amount, decimalsP);
         const pnlAfterSwap = new Decimal(p_amount || 0).minus(repay_amount || 0).mul(priceC);
         return pnlAfterSwap.toFixed();
@@ -175,6 +178,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     estimateData?.amount_out,
     positionType.label,
     tokenInAmount,
+    tokenInAmountPnl,
     item,
     Fee.HPFeeAmount,
     assetP,
@@ -259,7 +263,14 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
       tokenOut: item.token_d_info.token_id,
       slippage: Number(ReduxSlippageTolerance) / 100,
     });
+    const res_pnl = await findPathReserve({
+      amountOut: min_amount_out.toFixed(0, Decimal.ROUND_UP),
+      tokenIn: item.token_p_id,
+      tokenOut: item.token_d_info.token_id,
+      slippage: 0,
+    });
     const requiredPAmount = res.result_data.amount_in;
+    const requiredPAmount_pnl = res_pnl.result_data.amount_in;
     const token_p_amount = shrinkTokenDecimal(
       item.token_p_amount,
       assetP.config.extra_decimals,
@@ -270,10 +281,19 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     ).toFixed(0, Decimal.ROUND_DOWN);
     // no path from findPathExactOut api
     if (new Decimal(requiredPAmount || 0).eq(0)) {
-      return balance_c_plus_p;
+      return {
+        requiredPAmountOnShort: balance_c_plus_p,
+        requiredPAmountOnShort_pnl: balance_c_plus_p,
+      };
     }
     const requiredPAmountOnShort = Decimal.min(balance_c_plus_p, requiredPAmount).toFixed(0);
-    return requiredPAmountOnShort;
+    const requiredPAmountOnShort_pnl = Decimal.min(balance_c_plus_p, requiredPAmount_pnl).toFixed(
+      0,
+    );
+    return {
+      requiredPAmountOnShort,
+      requiredPAmountOnShort_pnl,
+    };
   }
 
   function get_total_hp_fee() {
