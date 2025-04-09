@@ -393,7 +393,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="flex items-center gap-1  text-gray-300">
                 Current Total PnL
-                <TagToolTip title="Close Position requires a swap to repay debt, will incurs swap fee and price impact, and affects final PnL." />
+                <TagToolTip title="Closing a position requires a swap to repay debt, which will incur a swap fee and price impact, ultimately affecting the final P&L." />
               </div>
               <div className="flex items-center justify-center">
                 {!pnl ? (
