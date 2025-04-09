@@ -9,7 +9,7 @@ import { useTableSorting } from "../../hooks/useTableSorting";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 import { RefreshIcon } from "../../components/Header/svg";
 import { setActiveCategory } from "../../redux/marginTrading";
-import { WarnTipIcon } from "../../components/Icons/IconsV2";
+import { PointsIcon, WarnTipIcon } from "../../components/Icons/IconsV2";
 
 const Market = () => {
   const router = useRouter();
@@ -49,14 +49,36 @@ const Market = () => {
           </span>
         </div>
       </div>
-      <div className="flex items-center w-full mb-5 xsm:px-4 xsm:items-start">
-        <WarnTipIcon className="mr-1.5 xsm:mt-1.5 flex-shrink-0" />
-        <span>
-          <span className="text-sm text-white text-opacity-60 inline">
-            The positions of MainStream and Meme are independent.
+      <div className="flex items-center w-full gap-2.5 xsm:flex-col xsm:px-4">
+        <div className="bg-green-150 bg-opacity-20 rounded-[16px] py-1 px-2.5 flex items-center w-auto mb-5 xsm:px-4 xsm:items-start">
+          <PointsIcon className="mr-1.5 xsm:mt-1.5 flex-shrink-0" />
+          <span>
+            <span className="text-sm text-white inline">
+              All tokens currently participate in RHEA's
+            </span>
+            <span
+              className="text-base text-primary underline ml-1 cursor-pointer"
+              onClick={() => {
+                window.open(
+                  "https://guide.ref.finance/products/guides/rhea-point-system",
+                  "_blank",
+                );
+              }}
+            >
+              Reward Points
+            </span>
+            <span className="text-base text-white inline ml-1">🎉</span>
           </span>
-          <span className="text-base text-white inline">😬</span>
-        </span>
+        </div>
+        <div className="bg-yellow-100 bg-opacity-20 rounded-[16px] py-1 px-2.5 flex items-center w-auto mb-5 xsm:px-4 xsm:items-start">
+          <WarnTipIcon className="mr-1.5 xsm:mt-1.5 flex-shrink-0" />
+          <span>
+            <span className="text-sm text-white inline mr-1">
+              The positions of MainStream and Meme are independent.
+            </span>
+            <span className="text-base text-white inline">😬</span>
+          </span>
+        </div>
       </div>
       <MarketsTable
         rows={rows}
