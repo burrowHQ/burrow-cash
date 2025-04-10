@@ -4,7 +4,6 @@ import { getRpcList } from "../components/Rpc/tool";
 export const LOGIC_CONTRACT_NAME = process.env.NEXT_PUBLIC_CONTRACT_NAME as string;
 export const LOGIC_MEMECONTRACT_NAME = process.env.NEXT_PUBLIC_MEMECONTRACT_NAME as string;
 export const DUST_THRESHOLD = 0.001;
-
 export const hiddenAssets = [
   "meta-token.near",
   "usn",
@@ -23,7 +22,6 @@ export const hiddenAssetsMEME = [
 export const lpTokenPrefix = "shadow_ref_v1";
 export const blackAssets = ["shadow_ref_v1-0"];
 export const MARGIN_MIN_COLLATERAL_USD = 1;
-
 export const defaultNetwork = (process.env.NEXT_PUBLIC_DEFAULT_NETWORK ||
   process.env.NODE_ENV ||
   "development") as any;
@@ -81,6 +79,8 @@ export const topTokens: string[] = [
 
 export const NBTC_ENV = "mainnet";
 export const AWS_MEDIA_DOMAIN = "https://img.ref.finance";
+export const ETH_OLD_CONTRACT_ID = "aurora";
+export const ETH_CONTRACT_ID = "eth.bridge.near";
 const getConfig = (env: string = defaultNetwork) => {
   const RPC_LIST = getRpcList();
   let endPoint = "defaultRpc";

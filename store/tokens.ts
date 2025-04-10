@@ -31,10 +31,8 @@ import {
   Transaction,
 } from "./wallet";
 
-import getConfig from "../utils/config";
+import { ETH_CONTRACT_ID, ETH_OLD_CONTRACT_ID } from "../utils/config";
 import { store } from "../redux/store";
-
-const { SPECIAL_REGISTRATION_TOKEN_IDS } = getConfig() as any;
 
 Decimal.set({ precision: DEFAULT_PRECISION });
 
@@ -46,16 +44,9 @@ export const getTokenContract = async (tokenContractAddress: string): Promise<Co
 export const getMetadata = async (token_id: string): Promise<IMetadata | undefined> => {
   try {
     const { view } = await getBurrow();
-    const tokenContract: Contract = await getTokenContract(token_id);
-    if (token_id == "aurora") {
-      return {
-        decimals: 18,
-        icon: "https://ref-new-1.s3.amazonaws.com/token/2858af1f4d8b1654102e4f6af71c956d.png",
-        name: "Ether",
-        symbol: "ETH",
-        token_id,
-      };
-    }
+    const tokenContract: Contract = await getTokenContract(
+      token_id == ETH_OLD_CONTRACT_ID ? ETH_CONTRACT_ID : token_id,
+    );
     const metadata: IMetadata = (await view(
       tokenContract,
       ViewMethodsToken[ViewMethodsToken.ft_metadata],
@@ -75,7 +66,9 @@ export const getBalance = async (
   const { view } = await getBurrow();
 
   try {
-    const tokenContract: Contract = await getTokenContract(token_id);
+    const tokenContract: Contract = await getTokenContract(
+      token_id == ETH_OLD_CONTRACT_ID ? ETH_CONTRACT_ID : token_id,
+    );
 
     const balanceInYocto: string = (await view(
       tokenContract,

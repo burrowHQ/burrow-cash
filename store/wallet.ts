@@ -5,9 +5,7 @@ import { Transaction as SelectorTransaction } from "@near-wallet-selector/core";
 import { getBurrow } from "../utils";
 import { ViewMethodsLogic } from "../interfaces/contract-methods";
 import { getTokenContract } from "../api/get-balance";
-import getConfig from "../utils/config";
-
-const { SPECIAL_REGISTRATION_TOKEN_IDS } = getConfig() as any;
+import { ETH_CONTRACT_ID, ETH_OLD_CONTRACT_ID } from "../utils/config";
 
 export interface Transaction {
   receiverId: string;
@@ -76,7 +74,9 @@ export const executeMultipleTransactions = async (
 
 export const isRegistered = async (account_id: string, contractId: string): Promise<any> => {
   try {
-    const contract: Contract = await getTokenContract(contractId);
+    const contract: Contract = await getTokenContract(
+      contractId == ETH_OLD_CONTRACT_ID ? ETH_CONTRACT_ID : contractId,
+    );
     const { view } = await getBurrow();
     return await view(contract, ViewMethodsLogic[ViewMethodsLogic.storage_balance_of], {
       account_id,
