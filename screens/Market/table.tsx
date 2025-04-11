@@ -283,10 +283,10 @@ function TableRow({
   depositApyMap[row.tokenId] = depositAPY;
   borrowApyMap[row.tokenId] = borrowAPY;
   useEffect(() => {
-    setDepositApyMap(depositApyMap);
+    setDepositApyMap(JSON.parse(JSON.stringify(depositApyMap || {})));
   }, [Object.keys(depositApyMap).length]);
   useEffect(() => {
-    setBorrowApyMap(borrowApyMap);
+    setBorrowApyMap(JSON.parse(JSON.stringify(borrowApyMap || {})));
   }, [Object.keys(borrowApyMap).length]);
   const is_native = NATIVE_TOKENS?.includes(row.tokenId);
   const is_new = NEW_TOKENS?.includes(row.tokenId);
