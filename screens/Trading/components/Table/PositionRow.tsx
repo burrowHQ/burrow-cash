@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import Decimal from "decimal.js";
+import { useEffect, useMemo, useState } from "react";
 import DataSource from "../../../../data/datasource";
 import { useLiqPrice } from "../../../../hooks/useLiqPrice";
 import { shrinkToken } from "../../../../store/helper";
@@ -108,13 +109,17 @@ const PositionRow = ({
     ? shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18)
     : shrinkToken(marginAccountListMEME[itemKey]?.uahpi_at_open ?? 0, 18);
   const holdingFee = +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi - uahpi_at_open);
-  const holding = +shrinkToken(item.debt_cap, decimalsD) * (uahpi - uahpi_at_open);
-  const pnl =
+  const holdingFeeAmount = +shrinkToken(item.debt_cap, decimalsD) * (uahpi - uahpi_at_open);
+  const pnlPending =
     entryPrice !== null && entryPrice !== 0
       ? positionType.label === "Long"
         ? (indexPrice - entryPrice) * size * priceC
         : (entryPrice - indexPrice) * size * priceC
       : 0;
+  const pnl = useMemo(() => {
+    if (!entryPrice) return 0;
+    return new Decimal(pnlPending || 0).minus(holdingFee || 0).toNumber();
+  }, [entryPrice, pnlPending, holdingFee]);
   let amplitude = 0;
   if (entryPrice !== null && entryPrice !== 0 && pnl !== 0) {
     amplitude =
@@ -196,7 +201,7 @@ const PositionRow = ({
           {entryPrice !== null && entryPrice !== undefined ? (
             <span>{beautifyPrice(entryPrice)}</span>
           ) : (
-            <span className="text-gray-500">-</span>
+            <span>-</span>
           )}
         </div>
       </td>
@@ -205,9 +210,9 @@ const PositionRow = ({
       </td>
       <td>{beautifyPrice(LiqPrice)}</td>
       <td>
-        <p className={`${pnl > 0 ? "text-primary" : pnl < 0 ? "text-danger" : "text-primary"}`}>
+        <p className={`${pnl > 0 ? "text-primary" : pnl < 0 ? "text-danger" : ""}`}>
           {pnl === 0 ? "" : `${pnl > 0 ? `+$` : `-$`}`}
-          {beautifyPrice(Math.abs(pnl), false, 3, 3)}
+          {pnl === 0 ? "-" : beautifyPrice(Math.abs(pnl), false, 3, 3)}
         </p>
       </td>
       <td>
@@ -304,13 +309,7 @@ const PositionRow = ({
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Entry Price</p>
-          <p>
-            {entryPrice !== null ? (
-              <span>{beautifyPrice(entryPrice)}</span>
-            ) : (
-              <span className="text-gray-500">-</span>
-            )}
-          </p>
+          <p>{entryPrice ? <span>{beautifyPrice(entryPrice)}</span> : <span>-</span>}</p>
         </div>
         <div className="flex items-center justify-between text-sm mb-[18px]">
           <p className="text-gray-300">Index Price</p>
@@ -332,7 +331,7 @@ const PositionRow = ({
             }`}
           >
             {pnl === 0 ? "" : `${pnl > 0 ? `+$` : `-$`}`}
-            {beautifyPrice(Math.abs(pnl), false, 3, 3)}
+            {pnl === 0 ? "-" : beautifyPrice(Math.abs(pnl), false, 3, 3)}
             {/* <span className="text-gray-160 text-xs ml-0.5">
               {amplitude !== null && amplitude !== 0
                 ? `(${amplitude > 0 ? `+` : `-`}${toInternationalCurrencySystem_number(

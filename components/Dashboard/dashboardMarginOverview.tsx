@@ -1,3 +1,4 @@
+import Decimal from "decimal.js";
 import { useEffect, useState, useMemo, useRef, createContext, useContext } from "react";
 import { useRouter } from "next/router";
 import { useMarginAccount } from "../../hooks/useMarginAccount";
@@ -95,13 +96,14 @@ export default function DashboardMarginOverview({
           : shrinkToken(marginAccountListMEME[itemKey]?.uahpi_at_open ?? 0, 18);
         const holdingFee =
           +shrinkToken(item.debt_cap, decimalsD) * priceD * (uahpi - uahpi_at_open);
-        const holding = +shrinkToken(item.debt_cap, decimalsD) * (uahpi - uahpi_at_open);
-        const pnl =
+        const holdingFeeAmount = +shrinkToken(item.debt_cap, decimalsD) * (uahpi - uahpi_at_open);
+        const pnlPending =
           entryPrice !== null && entryPrice !== 0
             ? positionType === "Long"
               ? (indexPrice - entryPrice) * size * priceC
               : (entryPrice - indexPrice) * size * priceC
             : 0;
+        const pnl = entryPrice ? new Decimal(pnlPending).minus(holdingFee || 0).toNumber() : 0;
         const safePnl = Number.isNaN(pnl) ? 0 : pnl;
         pnlTotal += safePnl;
       }),
