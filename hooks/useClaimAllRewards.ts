@@ -23,7 +23,6 @@ export function useClaimAllRewards(isMemeCategory?: boolean) {
           dispatch(fetchAccountMEME());
         });
       } else {
-        // TODOXX withdraw
         claimAll({
           rewards,
           isMeme: true,
@@ -39,7 +38,6 @@ export function useClaimAllRewards(isMemeCategory?: boolean) {
           dispatch(fetchAccount());
         });
       } else {
-        // TODOXX withdraw
         claimAll({
           rewards,
           isMeme: false,

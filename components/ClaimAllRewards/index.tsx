@@ -16,7 +16,6 @@ interface Props {
 }
 
 function ClaimAllRewards({ Button, onDone, disabled = false, memeCategory }: Props) {
-  // TODOXX
   const { handleClaimAll } = useClaimAllRewards(memeCategory);
   const isLoading = useAppSelector(isClaiming(memeCategory));
   const rewardsObj = useRewards(memeCategory);

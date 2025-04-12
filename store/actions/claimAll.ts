@@ -12,7 +12,6 @@ interface Props {
   isMeme: boolean;
   changeClaimStatus: any;
 }
-// TODOXX
 export async function claimAll({ rewards, isMeme, changeClaimStatus }: Props) {
   const state = store.getState();
   const { logicContract, logicMEMEContract } = await getBurrow();
@@ -80,5 +79,5 @@ export async function claimAll({ rewards, isMeme, changeClaimStatus }: Props) {
     });
   }
   await prepareAndExecuteTransactions(transactions, isMeme).catch(() => ({}));
-  changeClaimStatus(undefined);
+  changeClaimStatus && changeClaimStatus(undefined);
 }

@@ -341,7 +341,6 @@ export const computeNetLiquidityDailyAmount = (
   return { dailyAmount, newDailyAmount, multiplier, totalBoostedShares, shares };
 };
 
-// TODOXX
 export const getAccountRewards = (memeCategory?: boolean) => {
   return createSelector(
     (state: RootState) => state.assets,

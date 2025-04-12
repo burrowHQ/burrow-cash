@@ -274,7 +274,6 @@ function AccountDetail({ onClose }: { onClose?: () => void }) {
     rewards,
     currentWallet,
   } = useContext(WalletContext) as any;
-  // TODOXX
   const changeWalletDisable = currentWallet?.id === "keypom";
   return (
     <div className="border border-dark-50 bg-dark-110 lg:rounded-md p-4 xsm:rounded-b-xl xsm:p-6">
@@ -359,7 +358,6 @@ function AccountDetail({ onClose }: { onClose?: () => void }) {
             {getUnClaimRewards()}
           </span>
         </div>
-        {/* TODOXX */}
         {Object.keys(rewards?.sumRewards || {}).length ? (
           <ClaimAllRewards Button={ClaimButtonInAccount} location="menu" />
         ) : null}
