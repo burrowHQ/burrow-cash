@@ -26,7 +26,7 @@ import {
 } from "../utils/pythOracleConfig";
 // eslint-disable-next-line import/no-cycle
 import { getTokenContract } from "./tokens";
-import getConfig from "../utils/config";
+import { ETH_CONTRACT_ID, ETH_OLD_CONTRACT_ID } from "../utils/config";
 import { getAuthenticationHeaders } from "../utils/signature";
 
 Decimal.set({ precision: DEFAULT_PRECISION });
@@ -316,7 +316,9 @@ export const registerAccountOnTokenWithQuery = async (accountId: string, tokenId
 
 export const getStorageBalanceBounds = async (tokenId: string) => {
   const { view } = await getBurrow();
-  const tokenContract: Contract = await getTokenContract(tokenId);
+  const tokenContract: Contract = await getTokenContract(
+    tokenId == ETH_OLD_CONTRACT_ID ? ETH_CONTRACT_ID : tokenId,
+  );
   const storage: any = await view(
     tokenContract,
     ViewMethodsToken[ViewMethodsToken.storage_balance_bounds],

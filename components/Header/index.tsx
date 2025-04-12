@@ -168,7 +168,7 @@ const Header = () => {
               window.open("https://www.rhea.finance");
             }}
           >
-            <img src="/rheaLogo.png" width={80} height={30} alt="" className="cursor-pointer" />
+            <img src="/rheaLogo.png" width={80} alt="" className="cursor-pointer" />
           </Logo>
           <Menu>
             {mainMenuList.map((item) => {

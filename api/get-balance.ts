@@ -9,7 +9,7 @@ import {
   ViewMethodsREFV1,
   IShadowRecordInfo,
 } from "../interfaces";
-import { lpTokenPrefix, NBTCTokenId } from "../utils/config";
+import { lpTokenPrefix, NBTCTokenId, ETH_CONTRACT_ID, ETH_OLD_CONTRACT_ID } from "../utils/config";
 
 export const getTokenContract = async (tokenContractAddress: string): Promise<Contract> => {
   const { account } = await getBurrow();
@@ -24,7 +24,9 @@ const getBalance = async (
   const { view, refv1Contract } = await getBurrow();
 
   try {
-    const tokenContract: Contract = await getTokenContract(tokenId);
+    const tokenContract: Contract = await getTokenContract(
+      tokenId == ETH_OLD_CONTRACT_ID ? ETH_CONTRACT_ID : tokenId,
+    );
     let balanceInYocto;
     const isLpToken = tokenId.indexOf(lpTokenPrefix) > -1;
     if (isLpToken) {
