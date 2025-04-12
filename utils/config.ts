@@ -142,11 +142,11 @@ const getConfig = (env: string = defaultNetwork) => {
         ],
         NATIVE_TOKENS: ["usdc.fakes.testnet"],
         NEW_TOKENS: ["usdc.fakes.testnet", "shadow_ref_v1-0", "shadow_ref_v1-2"],
-        DCL_EXCHANGE_ID: "refv2-dev.ref-dev.testnet", // dclv2.ref-dev.testnet
         PYTH_ORACLE_ID: "pyth-oracle.testnet",
-        PRICE_ORACLE_ID: "priceoracle.services.ref-labs.testnet",
+        PRICE_ORACLE_ID: "mock-priceoracle.testnet",
         MEME_PRICE_ORACLE_ID: "mock-priceoracle.testnet",
         REF_EXCHANGE_ID: "ref-finance-101.testnet",
+        DCL_EXCHANGE_ID: "refv2-dev.ref-dev.testnet",
         findPathUrl: "smartrouterdev.refburrow.top",
         // findPathUrl: "smartrouter.ref.finance",
         indexUrl: "https://testnet-indexer.ref-finance.com",
