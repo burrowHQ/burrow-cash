@@ -25,7 +25,7 @@ export const handleTransactionResult = (outcome) => {
 export const getTransactionResult = async (txhash: string) => {
   const near = await getNear();
   const txHashArray = base58.decode(txhash);
-  const result = await near.connection.provider.txStatusReceipts(txHashArray, "unnused");
+  const result = await near.connection.provider.txStatusReceipts(txHashArray, "unnused", "FINAL");
   return handleTransactionResult(result);
 };
 

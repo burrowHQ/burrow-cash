@@ -8,7 +8,7 @@ import { fetchAssetsMEME } from "../../redux/assetsSliceMEME";
 import { logoutAccount, fetchAccount, setAccountId } from "../../redux/accountSlice";
 import { logoutAccount as logoutAccountMEME, fetchAccountMEME } from "../../redux/accountSliceMEME";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
-import { getBurrow, accountTrim } from "../../utils";
+import { getBurrow, accountTrim, standardizeAsset } from "../../utils";
 import { hideModal as _hideModal } from "../../redux/appSlice";
 import { hideModal as _hideModalMEME } from "../../redux/appSliceMEME";
 import { getAccountBalance, getAccountId } from "../../redux/accountSelectors";
@@ -16,7 +16,7 @@ import { getAccountRewards } from "../../redux/selectors/getAccountRewards";
 import { trackConnectWallet, trackLogout } from "../../utils/telemetry";
 import Disclaimer from "../Disclaimer";
 import { useDisclaimer } from "../../hooks/useDisclaimer";
-import { NearSolidIcon, ArrowDownIcon, CloseIcon, ArrowRightTopIcon } from "./svg";
+import { NearSolidIcon, ArrowDownIcon, CloseIcon } from "./svg";
 import ClaimAllRewards from "../ClaimAllRewards";
 import { formatWithCommas_usd } from "../../utils/uiNumber";
 import { isMobileDevice } from "../../helpers/helpers";
@@ -119,7 +119,6 @@ const WalletButton = () => {
   };
   const handleSwitchWallet = async () => {
     await handleSignOut();
-    // window.modal.show();
   };
 
   const getUnClaimRewards = () => formatWithCommas_usd(rewards.totalUnClaimUSD);
@@ -270,25 +269,12 @@ function AccountDetail({ onClose }: { onClose?: () => void }) {
     balance,
     accountId,
     handleSwitchWallet,
-    handleSignOut,
     getUnClaimRewards,
     isMobile,
     rewards,
     currentWallet,
   } = useContext(WalletContext) as any;
-  const [showTip, setShowTip] = useState<boolean>(false);
-  const [copyButtonDisabled, setCopyButtonDisabled] = useState<boolean>(false);
-
-  function showToast() {
-    if (copyButtonDisabled) return;
-    setCopyButtonDisabled(true);
-    setShowTip(true);
-    setTimeout(() => {
-      setShowTip(false);
-      setCopyButtonDisabled(false);
-    }, 1000);
-  }
-
+  // TODOXX
   const changeWalletDisable = currentWallet?.id === "keypom";
   return (
     <div className="border border-dark-50 bg-dark-110 lg:rounded-md p-4 xsm:rounded-b-xl xsm:p-6">
@@ -373,6 +359,7 @@ function AccountDetail({ onClose }: { onClose?: () => void }) {
             {getUnClaimRewards()}
           </span>
         </div>
+        {/* TODOXX */}
         {Object.keys(rewards?.sumRewards || {}).length ? (
           <ClaimAllRewards Button={ClaimButtonInAccount} location="menu" />
         ) : null}

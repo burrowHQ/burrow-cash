@@ -1,23 +1,56 @@
-import { useAppSelector, useAppDispatch } from "../redux/hooks";
-import { isClaiming } from "../redux/accountSelectors";
-import { farmClaimAll, fetchAccount } from "../redux/accountSlice";
-import { farmClaimAllMEME, fetchAccountMEME } from "../redux/accountSliceMEME";
+import { useAppDispatch } from "../redux/hooks";
+import { farmClaimAll, fetchAccount, setIsClaiming } from "../redux/accountSlice";
+import {
+  farmClaimAllMEME,
+  fetchAccountMEME,
+  setIsClaiming as setIsClaimingMEME,
+} from "../redux/accountSliceMEME";
+import { claimAll } from "../store/actions/claimAll";
 
 export function useClaimAllRewards(isMemeCategory?: boolean) {
-  const isLoading = useAppSelector(isClaiming);
   const dispatch = useAppDispatch();
-
-  const handleClaimAll = () => {
+  function changeClaimStatus(status: boolean) {
     if (isMemeCategory) {
-      dispatch(farmClaimAllMEME()).then(() => {
-        dispatch(fetchAccountMEME());
-      });
+      dispatch(setIsClaimingMEME(status));
     } else {
-      dispatch(farmClaimAll()).then(() => {
-        dispatch(fetchAccount());
-      });
+      dispatch(setIsClaiming(status));
+    }
+  }
+  const handleClaimAll = ({ rewards, action }: { rewards?: any[]; action?: any }) => {
+    if (isMemeCategory) {
+      if (!rewards?.length) {
+        dispatch(farmClaimAllMEME()).then(() => {
+          dispatch(fetchAccountMEME());
+        });
+      } else {
+        // TODOXX withdraw
+        claimAll({
+          rewards,
+          isMeme: true,
+          changeClaimStatus,
+        }).then(() => {
+          dispatch(fetchAccountMEME());
+          action && action();
+        });
+      }
+    } else {
+      if (!rewards?.length) {
+        dispatch(farmClaimAll()).then(() => {
+          dispatch(fetchAccount());
+        });
+      } else {
+        // TODOXX withdraw
+        claimAll({
+          rewards,
+          isMeme: false,
+          changeClaimStatus,
+        }).then(() => {
+          dispatch(fetchAccount());
+          action && action();
+        });
+      }
     }
   };
 
-  return { handleClaimAll, isLoading };
+  return { handleClaimAll };
 }

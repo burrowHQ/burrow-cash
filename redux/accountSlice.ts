@@ -36,6 +36,9 @@ export const accountSlice = createSlice({
     setAccountId: (state, action) => {
       state.accountId = action.payload;
     },
+    setIsClaiming: (state, action) => {
+      state.isClaiming = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(farmClaimAll.pending, (state, action) => {
@@ -56,7 +59,7 @@ export const accountSlice = createSlice({
       throw new Error("Failed to fetch account");
     });
     builder.addCase(fetchAccount.fulfilled, (state, action) => {
-      state.isClaiming = undefined;
+      // state.isClaiming = undefined;
       state.status = action.meta.requestStatus;
       state.fetchedAt = new Date().toString();
 
@@ -76,5 +79,5 @@ export const accountSlice = createSlice({
   },
 });
 
-export const { logoutAccount, setAccountId } = accountSlice.actions;
+export const { logoutAccount, setAccountId, setIsClaiming } = accountSlice.actions;
 export default accountSlice.reducer;
