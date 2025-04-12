@@ -27,6 +27,7 @@ import { showPositionFailure } from "../../../components/HashResultModal";
 import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
 import { getAppRefreshNumber } from "../../../redux/appSelectors";
 import { setRefreshNumber } from "../../../redux/appSlice";
+import { TagToolTip } from "../../../components/ToolTip";
 
 export const ModalContext = createContext(null) as any;
 const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
@@ -50,6 +51,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   const [showFeeModal, setShowFeeModal] = useState<boolean>(false);
   const [selectedCollateralType, setSelectedCollateralType] = useState<string>(DEFAULT_POSITION);
   const [tokenInAmount, setTokenInAmount] = useState<string | null>(null);
+  const [tokenInAmountPnl, setTokenInAmountPnl] = useState<string | null>(null);
   const [isProcessingTx, setIsProcessingTx] = useState<boolean>(false);
   const [isEstimating, setIsEstimating] = useState<boolean>(false);
   const [forceUpdate, setForceUpdate] = useState<number>(0);
@@ -97,11 +99,15 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   const marginConfig = useAppSelector(isMainStream ? getMarginConfig : getMarginConfigMEME);
   const appRefreshNumber = useAppSelector(getAppRefreshNumber);
   const dispatch = useAppDispatch();
+
   // get estimate token in amount
   useEffect(() => {
     if (positionType.label === "Short") {
-      getMinRequiredPAmount().then((res) => {
-        setTokenInAmount(res || "0");
+      // TODOXX
+      getMinRequiredPAmount().then((res: any) => {
+        const { requiredPAmountOnShort, requiredPAmountOnShort_pnl } = res;
+        setTokenInAmount(requiredPAmountOnShort || "0");
+        setTokenInAmountPnl(requiredPAmountOnShort_pnl || "0");
       });
     } else {
       setTokenInAmount(
@@ -132,7 +138,6 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   useEffect(() => {
     setIsEstimating(!estimateData?.min_amount_out);
   }, [estimateData]);
-
   const Fee = useMemo(() => {
     const uahpi: any =
       shrinkToken((assets as any).data[item.token_d_info.token_id]?.uahpi, 18) ?? 0;
@@ -140,17 +145,51 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
       ? shrinkToken(marginAccountList[itemKey]?.uahpi_at_open ?? 0, 18)
       : shrinkToken(marginAccountListMEME[itemKey]?.uahpi_at_open ?? 0, 18);
     const { debt_cap } = item;
+    const HPFeeAmount = new Decimal(shrinkToken(debt_cap, decimalsD) || 0).mul(
+      uahpi - uahpi_at_open,
+    );
+    const HPFeeValue = HPFeeAmount.mul(priceD);
     return {
-      HPFee: +shrinkToken(debt_cap, decimalsD) * priceD * (uahpi - uahpi_at_open),
+      HPFee: HPFeeValue.toNumber(),
+      HPFeeAmount: HPFeeValue.toFixed(),
       // swapFee:
       //   ((estimateData?.fee ?? 0) / 10000) *
       //   +shrinkToken(tokenInAmount || "0", assetP.metadata.decimals) *
       //   (assetP?.price?.usd || 0),
     };
   }, [assets, isMainStream, item, marginAccountList, marginAccountListMEME]);
+  // TODOXX
+  const pnlAfterSwap = useMemo(() => {
+    if (new Decimal(estimateData?.amount_out || 0).gt(0) && new Decimal(tokenInAmount || 0).gt(0)) {
+      if (positionType.label == "Long") {
+        const d_balance = parseTokenValue(item.token_d_info.balance, decimalsD);
+        const due_amount = new Decimal(Fee.HPFeeAmount || 0).plus(d_balance);
+        const repay_amount = estimateData?.amount_out || "0";
+        const pnlAfterSwap = new Decimal(repay_amount || 0).minus(due_amount).mul(priceC);
+        return pnlAfterSwap.toFixed();
+      } else {
+        const repay_amount = shrinkToken(tokenInAmountPnl || "0", assetP.metadata.decimals);
+        const p_amount = parseTokenValue(item.token_p_amount, decimalsP);
+        const pnlAfterSwap = new Decimal(p_amount || 0).minus(repay_amount || 0).mul(priceC);
+        return pnlAfterSwap.toFixed();
+      }
+    }
+  }, [
+    estimateData?.amount_out,
+    positionType.label,
+    tokenInAmount,
+    tokenInAmountPnl,
+    item,
+    Fee.HPFeeAmount,
+    assetP,
+    assetD,
+    decimalsP,
+    priceC,
+  ]);
 
   // Methods
   const handleCloseOpsitionEvt = async () => {
+    // TODOXX
     // Swap Out Trial Calculation Result Verification
     const regular_p_value = new Decimal(
       shrinkToken(tokenInAmount || "0", assetP.metadata.decimals),
@@ -224,7 +263,14 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
       tokenOut: item.token_d_info.token_id,
       slippage: Number(ReduxSlippageTolerance) / 100,
     });
+    const res_pnl = await findPathReserve({
+      amountOut: min_amount_out.toFixed(0, Decimal.ROUND_UP),
+      tokenIn: item.token_p_id,
+      tokenOut: item.token_d_info.token_id,
+      slippage: 0,
+    });
     const requiredPAmount = res.result_data.amount_in;
+    const requiredPAmount_pnl = res_pnl.result_data.amount_in;
     const token_p_amount = shrinkTokenDecimal(
       item.token_p_amount,
       assetP.config.extra_decimals,
@@ -235,13 +281,19 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     ).toFixed(0, Decimal.ROUND_DOWN);
     // no path from findPathExactOut api
     if (new Decimal(requiredPAmount || 0).eq(0)) {
-      return balance_c_plus_p;
+      return {
+        requiredPAmountOnShort: balance_c_plus_p,
+        requiredPAmountOnShort_pnl: balance_c_plus_p,
+      };
     }
-    const requiredPAmountOnShort = Decimal.min(
-      balance_c_plus_p,
-      Decimal.max(requiredPAmount, token_p_amount),
-    ).toFixed(0);
-    return requiredPAmountOnShort;
+    const requiredPAmountOnShort = Decimal.min(balance_c_plus_p, requiredPAmount).toFixed(0);
+    const requiredPAmountOnShort_pnl = Decimal.min(balance_c_plus_p, requiredPAmount_pnl).toFixed(
+      0,
+    );
+    return {
+      requiredPAmountOnShort,
+      requiredPAmountOnShort_pnl,
+    };
   }
 
   function get_total_hp_fee() {
@@ -339,7 +391,10 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
               </div>
             </div>
             <div className="flex items-center justify-between text-sm mb-4">
-              <div className="text-gray-300">Current Total PnL</div>
+              <div className="flex items-center gap-1  text-gray-300">
+                Current Total PnL
+                <TagToolTip title="Closing a position requires a swap to repay debt, which will incur a swap fee and price impact, ultimately affecting the final P&L." />
+              </div>
               <div className="flex items-center justify-center">
                 {!pnl ? (
                   <span className="text-sm text-gray-160 ml-1.5">-</span>
@@ -348,6 +403,19 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
                     {pnl > 0 ? `+$` : `-$`}
                     {beautifyPrice(Math.abs(pnl))}
                   </span>
+                )}
+                <RightArrow className="mx-2" />
+                {pnlAfterSwap ? (
+                  <span
+                    className={`text-sm ${
+                      new Decimal(pnlAfterSwap).gt(0) ? "text-primary" : "text-danger"
+                    }`}
+                  >
+                    {new Decimal(pnlAfterSwap).gt(0) ? `+$` : `-$`}
+                    {beautifyPrice(Math.abs(new Decimal(pnlAfterSwap).toNumber()))}
+                  </span>
+                ) : (
+                  <span className="text-sm text-gray-160">-</span>
                 )}
               </div>
             </div>
