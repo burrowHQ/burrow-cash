@@ -266,6 +266,7 @@ export const getContract = async (
     changeMethods: Object.values(changeMethods)
       .filter((m) => typeof m === "string")
       .map((m) => m as string),
+    useLocalViewExecution: true,
   });
   return contract;
 };

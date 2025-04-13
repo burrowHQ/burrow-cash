@@ -105,15 +105,6 @@ const SupplyCarousel = () => {
             </div>
           </div>
         ) : null}
-        {status === 1 ? (
-          <div className="-mt-1.5">
-            <ClaimAllRewards
-              location="non-farmed-assets"
-              Button={ClaimButton}
-              disabled={hasNegativeNetLiquidity}
-            />
-          </div>
-        ) : null}
       </div>
     </div>
   );

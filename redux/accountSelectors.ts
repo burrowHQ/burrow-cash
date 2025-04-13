@@ -65,10 +65,23 @@ export const isAccountLoading = createSelector(
   (account) => account.status === "pending",
 );
 
-export const isClaiming = createSelector(
-  (state: RootState) => state.account,
-  (account) => account.isClaiming === "pending",
-);
+export const isClaiming = (memeCategory?: boolean) => {
+  return createSelector(
+    (state: RootState) => state.account,
+    (state: RootState) => state.accountMEME,
+    (accountMain, accountMeme) => {
+      const isMeme = !!memeCategory;
+      let account: typeof accountMain;
+      if (isMeme) {
+        account = accountMeme;
+      } else {
+        account = accountMain;
+      }
+      const status = account.isClaiming == "pending";
+      return status;
+    },
+  );
+};
 
 export const getHasNonFarmedAssets = (memeCategory?: boolean) => {
   return createSelector(

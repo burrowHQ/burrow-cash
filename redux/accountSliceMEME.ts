@@ -36,6 +36,9 @@ export const accountSliceMEME = createSlice({
     setAccountId: (state, action) => {
       state.accountId = action.payload;
     },
+    setIsClaiming: (state, action) => {
+      state.isClaiming = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(farmClaimAllMEME.pending, (state, action) => {
@@ -74,5 +77,5 @@ export const accountSliceMEME = createSlice({
   },
 });
 
-export const { logoutAccount, setAccountId } = accountSliceMEME.actions;
+export const { logoutAccount, setAccountId, setIsClaiming } = accountSliceMEME.actions;
 export default accountSliceMEME.reducer;
