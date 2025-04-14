@@ -103,7 +103,6 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   // get estimate token in amount
   useEffect(() => {
     if (positionType.label === "Short") {
-      // TODOXX
       getMinRequiredPAmount().then((res: any) => {
         const { requiredPAmountOnShort, requiredPAmountOnShort_pnl } = res;
         setTokenInAmount(requiredPAmountOnShort || "0");
@@ -158,7 +157,6 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
       //   (assetP?.price?.usd || 0),
     };
   }, [assets, isMainStream, item, marginAccountList, marginAccountListMEME]);
-  // TODOXX
   const pnlAfterSwap = useMemo(() => {
     if (new Decimal(estimateData?.amount_out || 0).gt(0) && new Decimal(tokenInAmount || 0).gt(0)) {
       if (positionType.label == "Long") {
@@ -189,7 +187,6 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
 
   // Methods
   const handleCloseOpsitionEvt = async () => {
-    // TODOXX
     // Swap Out Trial Calculation Result Verification
     const regular_p_value = new Decimal(
       shrinkToken(tokenInAmount || "0", assetP.metadata.decimals),
