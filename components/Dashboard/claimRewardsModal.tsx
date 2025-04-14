@@ -10,10 +10,12 @@ export default function ClaimRewardsModal({
   rewardsObj,
   isOpen,
   closeModal,
+  memeCategory,
 }: {
   rewardsObj: any;
   isOpen: boolean;
   closeModal: () => void;
+  memeCategory?: boolean;
 }) {
   const unclaimNodes = rewardsObj?.data?.array.map(({ data, tokenId }) => {
     return (
@@ -36,7 +38,12 @@ export default function ClaimRewardsModal({
             <CloseIcon onClick={closeModal} className="cursor-pointer" />
           </div>
           {unclaimNodes}
-          <ClaimAllRewards Button={ClaimButton} onDone={closeModal} location="dashboard" />
+          <ClaimAllRewards
+            Button={ClaimButton}
+            onDone={closeModal}
+            memeCategory={memeCategory}
+            location="dashboard"
+          />
           {/* <div className="flex items-center w-full mt-4 xsm:items-start">
             <WarnTipIcon className="mr-1.5 xsm:mt-1.5 flex-shrink-0" />
             <span className="text-sm text-white text-opacity-60 inline">

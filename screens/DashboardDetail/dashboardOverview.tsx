@@ -173,6 +173,7 @@ const DashboardOverview = ({ suppliedRows, borrowedRows, memeCategory }) => {
                           rewardsObj={rewardsObj}
                           isOpen={isModalOpen}
                           closeModal={closeModal}
+                          memeCategory={memeCategory}
                         />
                       </div>
                     )}
