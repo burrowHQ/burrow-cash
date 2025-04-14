@@ -145,7 +145,7 @@ export default function DashboardMarginOverview({
     e.preventDefault();
   };
   const PNL_REACT_ELEMENT = (
-    <span>
+    <span className={totalPLN > 0 ? "text-primary" : totalPLN == 0 ? "" : "text-danger"}>
       {`${totalPLN === 0 ? "" : totalPLN > 0 ? "+" : "-"}`}
       {beautifyPrice(Math.abs(totalPLN), true)}
     </span>
