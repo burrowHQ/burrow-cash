@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import getConfig from "next/config";
+import Modal from "react-modal";
 import { ArrowDownIcon, ArrowUpIcon, NearIcon, MarginTradingTextIcon } from "./Icon";
 import { useMarginConfigToken } from "../../../hooks/useMarginConfig";
 import { formatWithCommas_usd } from "../../../utils/uiNumber";
@@ -13,6 +14,9 @@ import { getSymbolById } from "../../../transformers/nearSymbolTrans";
 import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
 import { MemeTagIcon } from "../../Trading/components/TradingIcon";
 import { beautifyPrice } from "../../../utils/beautyNumber";
+import { getAccount as getAccountWallet } from "../../../utils/wallet-selector-compat";
+import { useAccountId } from "../../../hooks/hooks";
+import UserPnlModal from "./UserPnlModal";
 
 type TokenTypeMap = {
   mainStream: string[];
@@ -21,6 +25,7 @@ type TokenTypeMap = {
 
 const MarketMarginTrading = () => {
   const isMobile = isMobileDevice();
+  const accountId = useAccountId();
   const { filteredTokenTypeMap } = useRegisterTokenType();
   const { filterMarginConfigList } = useMarginConfigToken();
   const [totalLongUSD, setTotalLongUSD] = React.useState(0);
@@ -39,6 +44,10 @@ const MarketMarginTrading = () => {
     string,
     any
   > | null>(null);
+  const [pnlData, setPnlData] = useState<any[]>([]);
+  const [showPnlModal, setShowPnlModal] = useState(false);
+  const [currentPnlPage, setCurrentPnlPage] = useState(0);
+  const [totalPnlPages, setTotalPnlPages] = useState(0);
 
   useEffect(() => {
     const fetchVolumeStats = async () => {
@@ -86,6 +95,23 @@ const MarketMarginTrading = () => {
       }
     }
   }, [filterMarginConfigList, prevFilterMarginConfigList]);
+
+  useEffect(() => {
+    const fetchPnlData = async () => {
+      try {
+        const response = await DataSource.shared.getMarginTradingUserPnlList(accountId, 0, 10);
+        if (response?.data) {
+          setPnlData(response.data.position_records || []);
+          setTotalPnlPages(Math.ceil(response.data.total / 10));
+        }
+      } catch (error) {
+        console.error("Failed to fetch PNL data:", error);
+      }
+    };
+
+    fetchPnlData();
+  }, [accountId]);
+
   const handleSort = (field: string) => {
     if (isMobile) {
       setSortBy(field);
@@ -95,6 +121,7 @@ const MarketMarginTrading = () => {
       setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
     }
   };
+
   const sortedData = React.useMemo(() => {
     if (!sortBy || !sortDirection) {
       return Object.values(mergedData as Record<string, any>);
@@ -128,6 +155,38 @@ const MarketMarginTrading = () => {
       return sortDirection === "asc" ? valueA - valueB : valueB - valueA;
     });
   }, [mergedData, sortBy, sortDirection, filterMarginConfigList]);
+
+  const handlePnlPageChange = async (page: number) => {
+    try {
+      const response = await DataSource.shared.getMarginTradingUserPnlList(accountId, page, 10);
+      if (response?.data) {
+        setPnlData(response.data.position_records || []);
+        setCurrentPnlPage(page);
+      }
+    } catch (error) {
+      console.error("Failed to fetch PNL data:", error);
+    }
+  };
+
+  const topUser = pnlData.find((item) => item.rank === 1);
+
+  const formatAddress = (address: string) => {
+    if (address.length <= 10) return address;
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  const formatPnl = (pnl: string) => {
+    const num = parseFloat(pnl);
+    const formatted = Math.abs(num).toFixed(2);
+    return num >= 0 ? `+$${formatted}` : `-$${formatted}`;
+  };
+
+  const formatRoi = (roi: string) => {
+    const num = parseFloat(roi);
+    const sign = num >= 0 ? "+" : "-";
+    return `(${sign}${Math.abs(num).toFixed(2)}%)`;
+  };
+
   return (
     <div className="flex flex-col items-center justify-center w-full">
       {isMobile ? (
@@ -202,6 +261,50 @@ const MarketMarginTrading = () => {
               </div>
             </div>
           </div>
+          {topUser && (
+            <div className="w-full bg-green-150 bg-opacity-20 mb-4 h-8 rounded-lg flex items-center px-3 justify-between text-sm text-white">
+              <div className="flex items-center">
+                <p className="mr-[14px] jost-600-bold">Top 1</p>
+                <div className="flex items-center mr-2.5">
+                  <p className="text-gray-1450 mr-1">User: </p>
+                  <p>{formatAddress(topUser.address)}</p>
+                </div>
+                <div className="flex items-center mr-2.5">
+                  <p className="text-gray-1450 mr-1">Position Count: </p>
+                  <p>{topUser.position_count ? topUser.position_count : "-"}</p>
+                </div>
+                <div className="flex items-center mr-2.5">
+                  <p className="text-gray-1450 mr-1">Pnl/ROI: </p>
+                  <p>
+                    <span className={parseFloat(topUser.pnl) >= 0 ? "text-primary" : "text-orange"}>
+                      {formatPnl(topUser.pnl)}
+                    </span>
+                    {" / "}
+                    {formatRoi(topUser.roi)}
+                  </p>
+                </div>
+                <div className="flex items-center mr-2.5">
+                  <p className="text-gray-1450 mr-1">Long/short: </p>
+                  <p>
+                    ${beautifyPrice(topUser.long_value)} / ${beautifyPrice(topUser.short_value)}
+                  </p>
+                </div>
+                <div className="flex items-center mr-2.5">
+                  <p className="text-gray-1450 mr-1">Win Rate: </p>
+                  <p className="text-primary">
+                    {topUser.win_rate ? beautifyPrice(topUser.win_rate) : "-"}
+                  </p>
+                </div>
+                <div className="ml-1">🎉</div>
+              </div>
+              <div
+                onClick={() => setShowPnlModal(true)}
+                className="text-primary underline text-sm cursor-pointer hover:text-primary-dark"
+              >
+                Users PNL
+              </div>
+            </div>
+          )}
           <TableHead onSort={handleSort} sortDirection={sortDirection} sortBy={sortBy} />
           <TableBody
             data={sortedData}
@@ -211,6 +314,12 @@ const MarketMarginTrading = () => {
           />
         </>
       )}
+
+      <UserPnlModal
+        isOpen={showPnlModal}
+        onClose={() => setShowPnlModal(false)}
+        accountId={accountId}
+      />
     </div>
   );
 };
