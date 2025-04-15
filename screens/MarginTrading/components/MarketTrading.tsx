@@ -171,8 +171,25 @@ const MarketMarginTrading = () => {
   const topUser = pnlData.find((item) => item.rank === 1);
 
   const formatAddress = (address: string) => {
-    if (address.length <= 10) return address;
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+    const parts = address.split(".");
+    if (parts.length === 1) {
+      if (address.length <= 1) return "***";
+      if (address.length <= 6) {
+        const halfLength = Math.floor(address.length / 2);
+        return address.slice(0, halfLength) + "*".repeat(address.length - halfLength);
+      }
+      return `${address.slice(0, 6)}***`;
+    }
+
+    const account = parts[0];
+    const domain = parts[1];
+
+    if (account.length <= 1) return `***.${domain}`;
+    if (account.length <= 6) {
+      const halfLength = Math.floor(account.length / 2);
+      return `${account.slice(0, halfLength)}${"*".repeat(account.length - halfLength)}.${domain}`;
+    }
+    return `${account.slice(0, 6)}***.${domain}`;
   };
 
   const formatPnl = (pnl: string) => {
