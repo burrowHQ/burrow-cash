@@ -149,7 +149,7 @@ class DataSource {
     address,
     pageNumber = 0,
     pageSize = 10,
-    orderBy = "position_value",
+    orderBy = "total_pnl",
     order = "desc",
   ) {
     const qryObj = {
