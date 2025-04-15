@@ -207,7 +207,7 @@ const UserPnlModal: React.FC<UserPnlModalProps> = ({ isOpen, onClose, accountId 
             className="flex items-center p-4 cursor-pointer"
             onClick={() => toggleExpand(item.address)}
           >
-            <div className="w-[40%] flex items-center gap-2">
+            <div className="w-[50%] flex items-center gap-2">
               <div className="text-white">{item.rank}.</div>
               <div className="text-sm text-white truncate">
                 {formatAddress(item.address)}
@@ -258,7 +258,7 @@ const UserPnlModal: React.FC<UserPnlModalProps> = ({ isOpen, onClose, accountId 
                 <div className="text-white text-sm">{item.position_count || "-"}</div>
                 <div className="text-gray-300 text-xs mt-1">Position Count</div>
               </div>
-              <div className="-ml-[62px]">
+              <div className="-ml-[26px]">
                 <div
                   className={`text-sm ${
                     parseFloat(item.pnl) >= 0 ? "text-primary" : "text-orange"
@@ -276,7 +276,7 @@ const UserPnlModal: React.FC<UserPnlModalProps> = ({ isOpen, onClose, accountId 
                 </div>
                 <div className="text-gray-300 text-xs mt-1">Long/Short</div>
               </div>
-              <div>
+              <div className="ml-[36px]">
                 <div className="text-primary text-sm">
                   {item.win_rate ? beautifyPrice(item.win_rate * 100) : "-"}%
                 </div>
