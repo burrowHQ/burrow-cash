@@ -141,7 +141,7 @@ class DataSource {
       "GET",
       params,
       null,
-      "https://mainnet-indexer.ref-finance.com",
+      config?.indexUrl,
     );
   }
 
@@ -166,7 +166,7 @@ class DataSource {
       "GET",
       qryObj,
       null,
-      "https://mainnet-indexer.ref-finance.com",
+      config?.indexUrl,
     );
   }
 }
