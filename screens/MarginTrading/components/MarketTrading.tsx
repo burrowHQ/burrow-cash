@@ -182,7 +182,10 @@ const MarketMarginTrading = () => {
   };
 
   const formatRoi = (roi: string) => {
-    const num = parseFloat(roi);
+    const num = parseFloat(roi) * 100;
+    if (Number.isNaN(num)) {
+      return "-";
+    }
     const sign = num >= 0 ? "+" : "-";
     return `${sign}${Math.abs(num).toFixed(2)}%`;
   };
@@ -220,6 +223,40 @@ const MarketMarginTrading = () => {
               </div>
             </div>
           </div>
+          {topUser && (
+            <div className="w-full px-4">
+              <div className="w-full bg-green-150 bg-opacity-20 rounded-lg px-4 py-2.5 flex items-center justify-between text-sm text-white mt-5">
+                <div>
+                  <div className="flex items-center">
+                    <p className="mr-[14px] jost-600-bold">Top 1</p>
+                    <div className="flex items-center mr-2.5">
+                      <p className="text-gray-1450 mr-1">User: </p>
+                      <p>{formatAddress(topUser.address)}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center mr-2.5">
+                    <p className="text-gray-1450 mr-1">PnL/ROI: </p>
+                    <p className="flex items-center">
+                      <span
+                        className={parseFloat(topUser.pnl) >= 0 ? "text-primary" : "text-orange"}
+                      >
+                        {formatPnl(topUser.pnl)}
+                      </span>
+                      {" / "}
+                      {formatRoi(topUser.roi)}
+                      <div className="ml-1">🎉</div>
+                    </p>
+                  </div>
+                </div>
+                <div
+                  onClick={() => setShowPnlModal(true)}
+                  className="text-primary underline text-sm cursor-pointer hover:text-primary-dark"
+                >
+                  Users PnL
+                </div>
+              </div>
+            </div>
+          )}
           <TableHeadMobile onSort={handleSort} sortDirection={sortDirection} sortBy={sortBy} />
           <div className="px-4 w-full">
             <TableBodyMobile
@@ -292,7 +329,7 @@ const MarketMarginTrading = () => {
                 <div className="flex items-center mr-2.5">
                   <p className="text-gray-1450 mr-1">Win Rate: </p>
                   <p className="text-primary">
-                    {topUser.win_rate ? beautifyPrice(topUser.win_rate) : "-"}
+                    {topUser.win_rate ? beautifyPrice(topUser.win_rate * 100) : "-"}%
                   </p>
                 </div>
                 <div className="ml-1">🎉</div>
