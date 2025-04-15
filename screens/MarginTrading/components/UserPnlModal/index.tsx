@@ -212,7 +212,7 @@ const UserPnlModal: React.FC<UserPnlModalProps> = ({ isOpen, onClose, accountId 
               <div className="text-sm text-white truncate">
                 {formatAddress(item.address)}
                 {isCurrentUser && (
-                  <span className="ml-2 text-[10px] bg-primary bg-opacity-10 text-primary px-0.5 py-[1px] rounded">
+                  <span className="ml-2 text-[10px] bg-primary text-black px-0.5 py-[1px] rounded">
                     Mine
                   </span>
                 )}
@@ -242,7 +242,7 @@ const UserPnlModal: React.FC<UserPnlModalProps> = ({ isOpen, onClose, accountId 
                 <div className="text-sm text-white">
                   {formatAddress(item.address)}
                   {isCurrentUser && (
-                    <span className="ml-2 text-[10px] bg-primary bg-opacity-10 text-primary px-0.5 py-[1px] rounded">
+                    <span className="ml-2 text-[10px] bg-primary text-black px-0.5 py-[1px] rounded">
                       Mine
                     </span>
                   )}
