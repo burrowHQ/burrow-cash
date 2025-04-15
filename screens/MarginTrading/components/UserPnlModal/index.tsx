@@ -198,7 +198,7 @@ const UserPnlModal: React.FC<UserPnlModalProps> = ({ isOpen, onClose, accountId 
                     className="flex items-center text-left px-[10px] py-[12px] cursor-pointer"
                     onClick={() => handleSort("total_pnl")}
                   >
-                    PNL/ROI
+                    PnL/ROI
                     <div className="inline-flex flex-col ml-1">
                       <SortIcon
                         isActive={sortField === "total_pnl" && sortOrder === "desc"}
