@@ -338,9 +338,9 @@ const UserPnlModal: React.FC<UserPnlModalProps> = ({ isOpen, onClose, accountId 
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 0}
               >
-                <MarginPnlSortingLeft className="ml-1" />
+                <MarginPnlSortingLeft className="ml-3" />
               </PageButton>
-              <p className="text-gray-300 mx-3 text-xs">
+              <p className="text-gray-300 mx-5 text-xs">
                 <span className={currentPage === 0 ? "text-white" : "text-gray-300"}>
                   {currentPage + 1}
                 </span>
@@ -350,7 +350,7 @@ const UserPnlModal: React.FC<UserPnlModalProps> = ({ isOpen, onClose, accountId 
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages - 1}
               >
-                <MarginPnlSortingRight className="mr-1" />
+                <MarginPnlSortingRight className="mr-3" />
               </PageButton>
               <PageButton
                 onClick={() => handlePageChange(totalPages - 1)}
