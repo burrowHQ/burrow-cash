@@ -274,7 +274,7 @@ const MarketMarginTrading = () => {
                   <p>{topUser.position_count ? topUser.position_count : "-"}</p>
                 </div>
                 <div className="flex items-center mr-2.5">
-                  <p className="text-gray-1450 mr-1">Pnl/ROI: </p>
+                  <p className="text-gray-1450 mr-1">PnL/ROI: </p>
                   <p>
                     <span className={parseFloat(topUser.pnl) >= 0 ? "text-primary" : "text-orange"}>
                       {formatPnl(topUser.pnl)}
@@ -301,7 +301,7 @@ const MarketMarginTrading = () => {
                 onClick={() => setShowPnlModal(true)}
                 className="text-primary underline text-sm cursor-pointer hover:text-primary-dark"
               >
-                Users PNL
+                Users PnL
               </div>
             </div>
           )}
