@@ -141,7 +141,7 @@ class DataSource {
       "GET",
       params,
       null,
-      config?.indexUrl,
+      "https://mainnet-indexer.ref-finance.com",
     );
   }
 
