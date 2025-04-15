@@ -42,7 +42,7 @@ type SortField = "total_pnl" | "position_value";
 
 const PAGE_SIZE = 8;
 const INITIAL_PAGE = 0;
-const INITIAL_SORT_FIELD: SortField = "position_value";
+const INITIAL_SORT_FIELD: SortField = "total_pnl";
 const INITIAL_SORT_ORDER: SortOrder = "desc";
 
 const formatPnl = (pnl: string) => {
@@ -182,7 +182,7 @@ const UserPnlModal: React.FC<UserPnlModalProps> = ({ isOpen, onClose, accountId 
         className="outline-none bg-dark-100 border border-dark-50 overflow-auto rounded-2xl xsm:rounded-lg"
       >
         <div className="flex justify-between mb-4 pt-[27px] px-7">
-          <span className="text-white text-[16px] gotham_bold">Users PNL</span>
+          <span className="text-white text-[16px] gotham_bold">Users PnL</span>
           <CloseIcon className="cursor-pointer text-[#7E8A93] w-3 h-3" onClick={handleClose} />
         </div>
         <div>
@@ -200,12 +200,9 @@ const UserPnlModal: React.FC<UserPnlModalProps> = ({ isOpen, onClose, accountId 
                   >
                     PnL/ROI
                     <div className="inline-flex flex-col ml-1">
+                      <SortIcon isActive={sortField === "total_pnl" && sortOrder === "asc"} isTop />
                       <SortIcon
                         isActive={sortField === "total_pnl" && sortOrder === "desc"}
-                        isTop
-                      />
-                      <SortIcon
-                        isActive={sortField === "total_pnl" && sortOrder === "asc"}
                         isTop={false}
                       />
                     </div>

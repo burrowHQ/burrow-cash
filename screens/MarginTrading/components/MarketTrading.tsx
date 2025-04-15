@@ -184,7 +184,7 @@ const MarketMarginTrading = () => {
   const formatRoi = (roi: string) => {
     const num = parseFloat(roi);
     const sign = num >= 0 ? "+" : "-";
-    return `(${sign}${Math.abs(num).toFixed(2)}%)`;
+    return `${sign}${Math.abs(num).toFixed(2)}%`;
   };
 
   return (
