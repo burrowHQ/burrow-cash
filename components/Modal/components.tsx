@@ -1,17 +1,17 @@
-// @ts-nocheck
 import { useEffect, useState } from "react";
 import { Box, Typography, Stack, Alert, Link, useTheme } from "@mui/material";
 import { BeatLoader } from "react-spinners";
 import { twMerge } from "tailwind-merge";
 import { actionMapTitle } from "./utils";
-import { TOKEN_FORMAT, USD_FORMAT } from "../../store";
+import { TOKEN_FORMAT } from "../../store";
 import { useDegenMode } from "../../hooks/hooks";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
-import { toggleUseAsCollateral, hideModal, showModal } from "../../redux/appSlice";
+import { toggleUseAsCollateral, updateAmount, showModal } from "../../redux/appSlice";
 import {
   toggleUseAsCollateral as toggleUseAsCollateralMEME,
   hideModal as hideModalMEME,
   showModal as showModalMEME,
+  updateAmount as updateAmountMEME,
 } from "../../redux/appSliceMEME";
 import { isInvalid, formatWithCommas_usd } from "../../utils/uiNumber";
 import { YellowSolidSubmitButton, RedSolidSubmitButton } from "./button";
@@ -140,11 +140,11 @@ export const RepayTab = ({ asset }) => {
     </div>
   );
 };
-
 export const Available = ({ totalAvailable, available$ }) => (
   <Box mt="1rem" mb="0.5rem" display="flex" justifyContent="flex-end">
     <Typography fontSize="0.75rem" color="grey.500">
-      Available: {Number(totalAvailable).toLocaleString(undefined, TOKEN_FORMAT)} ({available$})
+      Available: {Number(totalAvailable).toLocaleString(undefined, TOKEN_FORMAT as any)} (
+      {available$})
     </Typography>
   </Box>
 );
@@ -319,7 +319,7 @@ export const Alerts = ({ data, errorClassName }: any) => {
         .sort(sort)
         .map(([alert]) => {
           if (data[alert].severity === "warning") {
-            return <AlertWarning className="-mt-2" key={alert} title={data[alert].title} />;
+            return <AlertWarning key={alert} title={data[alert].title} />;
           } else {
             return (
               <AlertError
@@ -372,7 +372,7 @@ export function useAdjustTrigger(tokenId: string, memeCategory?: boolean) {
   } else {
     isMeme = memeCategory;
   }
-  const amount = useAppSelector(getCollateralAmount(tokenId, isMeme));
+  const amount = useAppSelector(getCollateralAmount(tokenId, isMeme)) as string;
   return () => {
     if (isMeme) {
       dispatch(showModalMEME({ action: "Adjust", tokenId, amount }));
@@ -418,11 +418,45 @@ export function useRepayTrigger(tokenId: string, position?: string) {
   };
 }
 
-export const Receive = ({ value }: { value: string }) => {
+export const Receive = ({ value, loading }: { value: string; loading: boolean }) => {
   return (
     <div className="flex items-center justify-between">
       <span className="text-sm text-gray-300">Receive Amount</span>
-      <span className="text-sm">{value}</span>
+      {loading ? <BeatLoader size={5} color="#ffffff" /> : <span className="text-sm">{value}</span>}
+    </div>
+  );
+};
+
+export const BtcSupplyTab = ({ nbtcSupplyTab, setNbtcSupplyTab, isMeme }) => {
+  const dispatch = useAppDispatch();
+  function switchTab(chain: string) {
+    setNbtcSupplyTab(chain);
+    if (isMeme) {
+      dispatch(updateAmountMEME({ isMax: false, amount: "0" }));
+    } else {
+      dispatch(updateAmount({ isMax: false, amount: "0" }));
+    }
+  }
+  return (
+    <div className="mb-[20px]">
+      <div className="flex items-center justify-between border border-dark-50 rounded-md bg-dark-600 h-12 mt-5 p-1.5">
+        <span
+          onClick={() => switchTab("btc")}
+          className={`flex items-center justify-center flex-grow w-1 h-full text-sm rounded-md cursor-pointer ${
+            nbtcSupplyTab == "btc" ? "text-white bg-gray-300 bg-opacity-30" : "text-gray-300"
+          }`}
+        >
+          BTC Chain
+        </span>
+        <span
+          onClick={() => switchTab("near")}
+          className={`flex items-center justify-center flex-grow w-1 h-full text-sm rounded-md cursor-pointer ${
+            nbtcSupplyTab == "near" ? "text-white bg-gray-300 bg-opacity-30" : "text-gray-300"
+          }`}
+        >
+          NEAR Chain
+        </span>
+      </div>
     </div>
   );
 };

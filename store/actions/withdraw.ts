@@ -180,6 +180,7 @@ export async function withdraw({
         env: NBTC_ENV,
       });
     }
-    await prepareAndExecuteTransactions(transactions, isMeme, withdraw_to_btc);
+    const result = await prepareAndExecuteTransactions(transactions, isMeme, withdraw_to_btc);
+    return result;
   }
 }
