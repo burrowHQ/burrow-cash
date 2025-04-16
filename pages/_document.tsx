@@ -19,6 +19,7 @@ export default function Document() {
         />
         <link rel="icon" href="/favicon.png" />
         <link rel="apple-touch-icon" href="/favicon.png" />
+        <link rel="manifest" href="/manifest" />
       </Head>
       <body id="root">
         <Main />
