@@ -17,6 +17,7 @@ import { beautifyPrice } from "../../../utils/beautyNumber";
 import { getAccount as getAccountWallet } from "../../../utils/wallet-selector-compat";
 import { useAccountId } from "../../../hooks/hooks";
 import UserPnlModal from "./UserPnlModal";
+import { formatNumberWithTwoDecimals } from "../../../utils/formatNumberWithTwoDecimals";
 
 type TokenTypeMap = {
   mainStream: string[];
@@ -340,7 +341,8 @@ const MarketMarginTrading = () => {
                 <div className="flex items-center mr-2.5">
                   <p className="text-gray-1450 mr-1">Long/short: </p>
                   <p>
-                    ${beautifyPrice(topUser.long_value)} / ${beautifyPrice(topUser.short_value)}
+                    {formatNumberWithTwoDecimals(topUser.long_value)} /{" "}
+                    {formatNumberWithTwoDecimals(topUser.short_value)}
                   </p>
                 </div>
                 <div className="flex items-center mr-2.5">

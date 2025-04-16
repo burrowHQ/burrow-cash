@@ -161,13 +161,7 @@ class DataSource {
     if (address) {
       qryObj.address = address;
     }
-    return this.callAPI(
-      `/v3/margin-trading/user/pnl/list`,
-      "GET",
-      qryObj,
-      null,
-      config?.indexUrl,
-    );
+    return this.callAPI(`/v3/margin-trading/user/pnl/list`, "GET", qryObj, null, config?.indexUrl);
   }
 }
 
