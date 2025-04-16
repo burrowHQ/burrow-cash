@@ -12,6 +12,7 @@ import {
   MarginPnlSortBottom,
 } from "../Icon";
 import { isMobileDevice } from "../../../../helpers/helpers";
+import { formatNumberWithTwoDecimals } from "../../../../utils/formatNumberWithTwoDecimals";
 
 interface UserPnlModalProps {
   isOpen: boolean;
@@ -272,7 +273,8 @@ const UserPnlModal: React.FC<UserPnlModalProps> = ({ isOpen, onClose, accountId 
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <div className="text-white text-sm">
-                  ${beautifyPrice(item.long_value)} / ${beautifyPrice(item.short_value)}
+                  {formatNumberWithTwoDecimals(item.long_value, true)} /{" "}
+                  {formatNumberWithTwoDecimals(item.short_value, true)}
                 </div>
                 <div className="text-gray-300 text-xs mt-1">Long/Short</div>
               </div>
@@ -438,7 +440,8 @@ const UserPnlModal: React.FC<UserPnlModalProps> = ({ isOpen, onClose, accountId 
                       </div>
                     </td>
                     <td className="px-[10px] py-[12px] text-white text-sm">
-                      ${beautifyPrice(item.long_value)} / ${beautifyPrice(item.short_value)}
+                      {formatNumberWithTwoDecimals(item.long_value, true)} /{" "}
+                      {formatNumberWithTwoDecimals(item.short_value, true)}
                     </td>
                     <td className="px-[10px] py-[12px] text-primary text-sm">
                       {item.win_rate ? beautifyPrice(item.win_rate * 100) : "-"}%
