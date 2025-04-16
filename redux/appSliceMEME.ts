@@ -62,6 +62,8 @@ export interface AppState {
   };
   refreshNumber: number;
   openPositionLoading: boolean;
+  showOneClickBtcModal: boolean;
+  oneClickBtcStatus: string;
 }
 
 export const initialState: AppState = {
@@ -137,6 +139,8 @@ export const initialState: AppState = {
   },
   refreshNumber: 0,
   openPositionLoading: false,
+  showOneClickBtcModal: false,
+  oneClickBtcStatus: "",
 };
 
 export const fetchConfig = createAsyncThunk("accountMEME/getConfig", async () => {
@@ -162,6 +166,15 @@ export const appSliceMEME = createSlice({
     ) {
       state.selected = { ...state.selected, isMax: false, ...action.payload };
       state.showModal = true;
+    },
+    showOneClickBtcModal(state) {
+      state.showOneClickBtcModal = true;
+    },
+    hideOneClickBtcModal(state) {
+      state.showOneClickBtcModal = false;
+    },
+    setOneClickBtcStatus(state, action: PayloadAction<{ status: string }>) {
+      state.oneClickBtcStatus = action.payload.status;
     },
     updateAmount(state, action: PayloadAction<{ amount: string; isMax: boolean }>) {
       state.selected.amount = action.payload.amount;
@@ -268,6 +281,9 @@ export const {
   updatePosition,
   setRefreshNumber,
   setOpenPositionLoading,
+  showOneClickBtcModal,
+  hideOneClickBtcModal,
+  setOneClickBtcStatus,
 } = appSliceMEME.actions;
 
 export default appSliceMEME.reducer;

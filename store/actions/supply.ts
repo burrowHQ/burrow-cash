@@ -14,6 +14,7 @@ export async function supply({
   amount,
   isMax,
   isMeme,
+  isOneDeposit,
 }: {
   tokenId: string;
   extraDecimals: number;
@@ -21,8 +22,9 @@ export async function supply({
   amount: string;
   isMax: boolean;
   isMeme: boolean;
-}): Promise<void> {
-  const { account, logicContract, logicMEMEContract, hideModal, selector } = await getBurrow();
+  isOneDeposit: boolean;
+}): Promise<any> {
+  const { account, logicContract, logicMEMEContract, hideModal } = await getBurrow();
   const { decimals } = (await getMetadata(tokenId))!;
   const tokenContract = await getTokenContract(tokenId);
   const burrowContractId = isMeme ? logicMEMEContract.contractId : logicContract.contractId;
@@ -46,10 +48,9 @@ export async function supply({
       },
     ],
   };
-  const wallet = await selector.wallet();
-  if (wallet.id == "btc-wallet" && tokenId === NBTCTokenId) {
+  if (isOneDeposit) {
     try {
-      await executeBTCDepositAndAction({
+      const result = await executeBTCDepositAndAction({
         action: {
           receiver_id: burrowContractId,
           amount: expandedAmount.toFixed(0),
@@ -58,8 +59,11 @@ export async function supply({
         env: NBTC_ENV,
         registerDeposit: "100000000000000000000000",
       });
+      if (hideModal) hideModal();
+      return "success";
     } catch (error) {
       if (hideModal) hideModal();
+      return "error";
     }
   } else {
     await prepareAndExecuteTokenTransactions(tokenContract, {

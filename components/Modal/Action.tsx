@@ -2,7 +2,12 @@ import { useState, useMemo, useEffect } from "react";
 import Decimal from "decimal.js";
 import { useBtcWalletSelector } from "btc-wallet";
 import { nearTokenId } from "../../utils";
-import { toggleUseAsCollateral, hideModal } from "../../redux/appSlice";
+import {
+  toggleUseAsCollateral,
+  hideModal,
+  showOneClickBtcModal,
+  setOneClickBtcStatus,
+} from "../../redux/appSlice";
 import {
   toggleUseAsCollateral as toggleUseAsCollateralMEME,
   hideModal as hideModalMEME,
@@ -17,15 +22,13 @@ import { withdraw } from "../../store/actions/withdraw";
 import { shadow_action_supply } from "../../store/actions/shadow";
 import { adjustCollateral } from "../../store/actions/adjustCollateral";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
-import { getSelectedValues, getAssetData, getConfig } from "../../redux/appSelectors";
+import { getSelectedValues, getAssetData } from "../../redux/appSelectors";
 import { isMemeCategory } from "../../redux/categorySelectors";
 import { trackActionButton } from "../../utils/telemetry";
 import { useDegenMode } from "../../hooks/hooks";
 import { SubmitButton } from "./components";
 import getShadowRecords from "../../api/get-shadows";
 import { expandToken, shrinkToken } from "../../store";
-import { getAssets as getAssetSelector } from "../../redux/assetsSelectors";
-import { getAccountPortfolio, getAccountId } from "../../redux/accountSelectors";
 
 export default function Action({
   maxBorrowAmount,
@@ -34,10 +37,11 @@ export default function Action({
   poolAsset,
   isDisabled,
   maxWithdrawAmount,
+  isOneDeposit,
+  isNBTC,
 }) {
   const [loading, setLoading] = useState(false);
   const { amount, useAsCollateral, isMax } = useAppSelector(getSelectedValues);
-  const { enable_pyth_oracle } = useAppSelector(getConfig); // TODO33 need query from api？
   const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
   const dispatch = useAppDispatch();
   const asset = useAppSelector(getAssetData);
@@ -107,6 +111,12 @@ export default function Action({
             amount,
             isMax,
             isMeme,
+            isOneDeposit,
+          }).then((status) => {
+            if (isOneDeposit) {
+              dispatch(showOneClickBtcModal());
+              dispatch(setOneClickBtcStatus(status));
+            }
           });
         }
         break;
@@ -122,6 +132,11 @@ export default function Action({
           isMax,
           isMeme,
           available,
+        }).then((result) => {
+          if (isNBTC) {
+            dispatch(showOneClickBtcModal());
+            dispatch(setOneClickBtcStatus({ status: result ? "success" : "error" }));
+          }
         });
         break;
       }

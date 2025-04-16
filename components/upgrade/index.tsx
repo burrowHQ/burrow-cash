@@ -14,6 +14,7 @@ import Popup from "../popup";
 import { ToastMessage } from "../ToastMessage";
 import BalanceReminder from "../BalanceReminder";
 import PubTestModal from "../PubTestModal";
+import OneClickBtcResultModal from "../Modal/oneClickBtcResultModal";
 import Init from "../appInit";
 import { RefreshIcon } from "../Header/svg";
 
@@ -78,6 +79,7 @@ export default function Upgrade({ Component, pageProps }) {
           <BalanceReminder />
           <RpcList />
           <PubTestModal />
+          <OneClickBtcResultModal />
         </Layout>
       )}
     </div>
