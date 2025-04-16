@@ -42,7 +42,7 @@ interface PnlResponse {
 type SortOrder = "asc" | "desc";
 type SortField = "total_pnl" | "position_value";
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 10;
 const INITIAL_PAGE = 0;
 const INITIAL_SORT_FIELD: SortField = "total_pnl";
 const INITIAL_SORT_ORDER: SortOrder = "desc";
@@ -319,7 +319,7 @@ const UserPnlModal: React.FC<UserPnlModalProps> = ({ isOpen, onClose, accountId 
       }}
     >
       <div
-        style={{ width: cardWidth, maxHeight: "76vh" }}
+        style={{ width: cardWidth, maxHeight: "78vh" }}
         className="outline-none bg-dark-100 border border-dark-50 overflow-auto rounded-2xl xsm:rounded-none"
       >
         <div className="flex justify-between mb-4 pt-[27px] px-7 xsm:mb-0 xsm:px-4 xsm:pt-6 xsm:pb-4">
