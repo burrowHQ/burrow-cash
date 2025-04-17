@@ -155,6 +155,7 @@ const Modal = () => {
   const isBtcSupply = action === "Supply" && isBtcToken;
   const isBtcWithdraw = action === "Withdraw" && isBtcToken;
   const isBtcChainSupply = isBtcSupply && nbtcTab == "btc";
+  const isBtcChainWithdraw = isBtcWithdraw && nbtcTab == "btc";
   const isOneClickAction = (isBtcSupply || isBtcWithdraw) && nbtcTab == "btc";
   const { availableBalance: btcAvailableBalance, availableBalance$: btcAvailableBalance$ } =
     useBtcAction({
@@ -178,7 +179,7 @@ const Modal = () => {
     amount,
   });
   // withdraw oneClick min
-  if (isBtcWithdraw && nbtcTab == "btc") {
+  if (isBtcChainWithdraw) {
     const min_withdraw_amount = 0.000054;
     if (new Decimal(amount || 0).lt(min_withdraw_amount)) {
       alerts["btcWithdrawMinLimit"] = {
@@ -215,8 +216,8 @@ const Modal = () => {
   const actionButtonDisabled =
     alerts["btcWithdrawMinLimit"] ||
     alerts["btcDepositMinLimit"] ||
-    (isBtcChainSupply && nbtcTab == "btc" && cacuDepositLoading) ||
-    (isBtcWithdraw && nbtcTab == "btc" && cacuWithdrawLoading);
+    (isBtcChainSupply && cacuDepositLoading) ||
+    (isBtcChainWithdraw && cacuWithdrawLoading);
   // NBTC end
   return (
     <MUIModal open={isOpen} onClose={handleClose}>
@@ -265,7 +266,7 @@ const Modal = () => {
               available$={isBtcChainSupply ? btcAvailableBalance$ : available$}
             />
             <div className="flex flex-col gap-4 mt-6">
-              {isBtcWithdraw ? (
+              {isBtcChainWithdraw ? (
                 <Receive
                   value={beautifyPrice(withdrawReceiveAmount) as string}
                   loading={cacuWithdrawLoading}
