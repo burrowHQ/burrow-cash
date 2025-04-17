@@ -40,7 +40,7 @@ interface PnlResponse {
 }
 
 type SortOrder = "asc" | "desc";
-type SortField = "total_pnl" | "position_value";
+type SortField = "total_pnl" | "position_value" | "win_rate";
 
 const PAGE_SIZE = 10;
 const INITIAL_PAGE = 0;
@@ -390,7 +390,24 @@ const UserPnlModal: React.FC<UserPnlModalProps> = ({ isOpen, onClose, accountId 
                     </div>
                   </th>
                   <th className="text-left px-[10px] py-[12px]">Long/Short</th>
-                  <th className="text-left px-[10px] py-[12px]">Win Rate</th>
+                  <th>
+                    <div
+                      className="flex items-center text-left px-[10px] py-[12px] cursor-pointer"
+                      onClick={() => handleSort("win_rate")}
+                    >
+                      Win Rate
+                      <div className="inline-flex flex-col ml-1">
+                        <SortIcon
+                          isActive={sortField === "win_rate" && sortOrder === "asc"}
+                          isTop
+                        />
+                        <SortIcon
+                          isActive={sortField === "win_rate" && sortOrder === "desc"}
+                          isTop={false}
+                        />
+                      </div>
+                    </div>
+                  </th>
                   <th className="text-left px-[10px] py-[12px] pr-[16px]">Start Time</th>
                 </tr>
               </thead>
