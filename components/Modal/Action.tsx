@@ -38,7 +38,6 @@ export default function Action({
   isDisabled,
   maxWithdrawAmount,
   isOneDeposit,
-  isNBTC,
 }) {
   const [loading, setLoading] = useState(false);
   const { amount, useAsCollateral, isMax } = useAppSelector(getSelectedValues);
@@ -132,8 +131,9 @@ export default function Action({
           isMax,
           isMeme,
           available,
+          isOneDeposit,
         }).then((result) => {
-          if (isNBTC) {
+          if (isOneDeposit) {
             dispatch(showOneClickBtcModal());
             dispatch(setOneClickBtcStatus({ status: result ? "success" : "error" }));
           }

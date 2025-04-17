@@ -14,12 +14,10 @@ import { getOneClickBtcResultStatus } from "../redux/appSelectors";
 
 export function useBtcAction({
   tokenId,
-  decimals,
   updaterCounter,
   price,
 }: {
   tokenId: string;
-  decimals: number;
   price: string | number;
   updaterCounter?: number;
 }) {
@@ -35,29 +33,8 @@ export function useBtcAction({
     () => {
       if (btcSelector?.account && isBtcTokenId && price) {
         getBtcBalance().then(async (res) => {
-          // TODOXXX
-          // interface DepositAmountResult {
-          //   depositAmount: number;            // Original deposit amount to be sent
-          //   receiveAmount: number;            // Amount to be received after deducting fees and repayments
-          //   protocolFee: number;              // Protocol fee
-          //   repayAmount: number;              // Amount to repay if there's debt
-          //   newAccountMinDepositAmount: number; // Minimum deposit amount for new accounts
-          // }
-          // const expandAvailableBalance = expandToken(btcAvailableBalance, decimals);
-          // const { protocolFee, repayAmount, receiveAmount } = await getDepositAmount(
-          //   expandAvailableBalance,
-          //   {
-          //     env,
-          //   },
-          // );
-          // const totalFeeAmount = shrinkToken(
-          //   new Decimal(protocolFee || 0).plus(repayAmount).toFixed(),
-          //   decimals,
-          // );
-          // const avaBalance = Decimal.max(
-          //   0,
-          //   new Decimal(btcAvailableBalance).minus(totalFeeAmount).toFixed(),
-          // ).toFixed();
+          // btcBalance: total balance on BTC chain
+          // btcAvailableBalance: After deducting network fee
           const { balance: btcBalance, availableBalance: btcAvailableBalance } = res;
           const avaBalance = btcAvailableBalance;
           const avaBalance$ = new Decimal(avaBalance).mul(price || 0).toFixed(2);
@@ -109,6 +86,59 @@ export function useCalculateWithdraw({
   }
   return {
     receiveAmount,
+    loading,
+  };
+}
+
+export function useCalculateDeposit({
+  amount,
+  isBtcDeposit,
+  decimals,
+}: {
+  amount: string;
+  isBtcDeposit: boolean;
+  decimals: number;
+}) {
+  // interface DepositAmountResult {
+  //   depositAmount: number;            // Original deposit amount to be sent
+  //   receiveAmount: number;            // Amount to be received after deducting fees and repayments
+  //   protocolFee: number;              // Protocol fee
+  //   repayAmount: number;              // Amount to repay if there's debt
+  //   newAccountMinDepositAmount: number; // Minimum deposit amount for new accounts
+  // }
+  const [receiveAmount, setReceiveAmount] = useState<string>();
+  const [fee, setFee] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  useEffect(() => {
+    if (isBtcDeposit && amount && decimals) {
+      setLoading(true);
+      getReceiveAmount();
+    }
+  }, [amount, isBtcDeposit, decimals]);
+  async function getReceiveAmount() {
+    const env = NBTC_ENV;
+    const expandAmount = new Decimal(expandToken(amount, decimals)).toFixed(0);
+    const { protocolFee, repayAmount } = await getDepositAmount(expandAmount, {
+      env,
+    });
+    const totalFeeAmount = shrinkToken(
+      new Decimal(protocolFee || 0).plus(repayAmount).toFixed(),
+      decimals,
+    );
+    const receiveAmount = shrinkToken(
+      Decimal.max(
+        new Decimal(expandAmount || 0).minus(protocolFee || 0).minus(repayAmount || 0),
+        0,
+      ).toFixed(0),
+      decimals,
+    );
+    setReceiveAmount(receiveAmount);
+    setFee(new Decimal(amount || 0).gt(0) ? totalFeeAmount : "0");
+    setLoading(false);
+  }
+  return {
+    receiveAmount,
+    fee,
     loading,
   };
 }

@@ -426,11 +426,19 @@ export const Receive = ({ value, loading }: { value: string; loading: boolean })
     </div>
   );
 };
+export const Fee = ({ value, loading }: { value: string; loading: boolean }) => {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-sm text-gray-300">Fee</span>
+      {loading ? <BeatLoader size={5} color="#ffffff" /> : <span className="text-sm">{value}</span>}
+    </div>
+  );
+};
 
-export const BtcSupplyTab = ({ nbtcSupplyTab, setNbtcSupplyTab, isMeme }) => {
+export const BtcOneClickTab = ({ nbtcTab, setNbtcTab, isMeme }) => {
   const dispatch = useAppDispatch();
   function switchTab(chain: string) {
-    setNbtcSupplyTab(chain);
+    setNbtcTab(chain);
     if (isMeme) {
       dispatch(updateAmountMEME({ isMax: false, amount: "0" }));
     } else {
@@ -443,7 +451,7 @@ export const BtcSupplyTab = ({ nbtcSupplyTab, setNbtcSupplyTab, isMeme }) => {
         <span
           onClick={() => switchTab("btc")}
           className={`flex items-center justify-center flex-grow w-1 h-full text-sm rounded-md cursor-pointer ${
-            nbtcSupplyTab == "btc" ? "text-white bg-gray-300 bg-opacity-30" : "text-gray-300"
+            nbtcTab == "btc" ? "text-white bg-gray-300 bg-opacity-30" : "text-gray-300"
           }`}
         >
           BTC Chain
@@ -451,7 +459,7 @@ export const BtcSupplyTab = ({ nbtcSupplyTab, setNbtcSupplyTab, isMeme }) => {
         <span
           onClick={() => switchTab("near")}
           className={`flex items-center justify-center flex-grow w-1 h-full text-sm rounded-md cursor-pointer ${
-            nbtcSupplyTab == "near" ? "text-white bg-gray-300 bg-opacity-30" : "text-gray-300"
+            nbtcTab == "near" ? "text-white bg-gray-300 bg-opacity-30" : "text-gray-300"
           }`}
         >
           NEAR Chain

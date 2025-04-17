@@ -949,7 +949,6 @@ function TokenUserInfo() {
   }, [isNBTC]);
   const { balance: btcBalance, loading: btcBalanceLoading } = useBtcAction({
     tokenId: tokenRow?.tokenId || "",
-    decimals: tokenRow?.decimals || 0,
     price: tokenRow?.price || 0,
     updaterCounter,
   });
