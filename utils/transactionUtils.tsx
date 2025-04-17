@@ -1,3 +1,5 @@
+import type { FinalExecutionOutcome } from "@near-wallet-selector/core";
+
 export const ERROR_PATTERN = {
   slippageErrorPattern: /ERR_MIN_AMOUNT|slippage error/i,
   invaliParamsErrorPattern: /invalid params/i,
@@ -94,3 +96,9 @@ export const getErrorMessage = (receipts_outcome: any) => {
     return null;
   }
 };
+
+export function isFailureExecution(transtions: FinalExecutionOutcome[]) {
+  return !!transtions.find((t) =>
+    t.receipts_outcome.some((receipt_outcome: any) => receipt_outcome?.outcome?.status?.Failure),
+  );
+}

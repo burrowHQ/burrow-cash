@@ -32,7 +32,7 @@ interface Props {
   isMax: boolean;
   isMeme: boolean;
   available: number;
-  isOneDeposit: boolean;
+  isOneClickAction: boolean;
 }
 
 export async function withdraw({
@@ -42,7 +42,7 @@ export async function withdraw({
   isMax,
   isMeme,
   available,
-  isOneDeposit,
+  isOneClickAction,
 }: Props) {
   const state = store.getState();
   const { oracleContract, logicContract, memeOracleContract, logicMEMEContract, selector } =
@@ -172,7 +172,7 @@ export async function withdraw({
       });
     }
     let withdraw_to_btc;
-    if (isOneDeposit) {
+    if (isOneClickAction) {
       const withdrawAmount = shrinkTokenDecimal(expandedAmount.toFixed(0), extraDecimals).toFixed(
         0,
       );

@@ -107,6 +107,8 @@ export function useCalculateDeposit({
   //   newAccountMinDepositAmount: number; // Minimum deposit amount for new accounts
   // }
   const [receiveAmount, setReceiveAmount] = useState<string>();
+  const [receiveAmountExpand, setRreceiveAmountExpand] = useState<string>();
+  const [minDepositAmount, setMinDepositAmount] = useState<string>();
   const [fee, setFee] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   useEffect(() => {
@@ -118,21 +120,26 @@ export function useCalculateDeposit({
   async function getReceiveAmount() {
     const env = NBTC_ENV;
     const expandAmount = new Decimal(expandToken(amount, decimals)).toFixed(0);
-    const { protocolFee, repayAmount } = await getDepositAmount(expandAmount, {
-      env,
-    });
+    const { protocolFee, repayAmount, receiveAmount, minDepositAmount } = await getDepositAmount(
+      expandAmount,
+      {
+        env,
+      },
+    );
     const totalFeeAmount = shrinkToken(
       new Decimal(protocolFee || 0).plus(repayAmount).toFixed(),
       decimals,
     );
-    const receiveAmount = shrinkToken(
+    const minDepositAmountReadable = shrinkToken(minDepositAmount, decimals);
+    const receiveAmountReadable = shrinkToken(
       Decimal.max(
         new Decimal(expandAmount || 0).minus(protocolFee || 0).minus(repayAmount || 0),
         0,
       ).toFixed(0),
       decimals,
     );
-    setReceiveAmount(receiveAmount);
+    setReceiveAmount(receiveAmountReadable);
+    setMinDepositAmount(minDepositAmountReadable);
     setFee(new Decimal(amount || 0).gt(0) ? totalFeeAmount : "0");
     setLoading(false);
   }
@@ -140,5 +147,6 @@ export function useCalculateDeposit({
     receiveAmount,
     fee,
     loading,
+    minDepositAmount,
   };
 }
