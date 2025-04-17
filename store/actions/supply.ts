@@ -15,6 +15,7 @@ export async function supply({
   isMax,
   isMeme,
   isOneClickAction,
+  receiveAmount,
 }: {
   tokenId: string;
   extraDecimals: number;
@@ -23,14 +24,17 @@ export async function supply({
   isMax: boolean;
   isMeme: boolean;
   isOneClickAction: boolean;
+  receiveAmount: string;
 }): Promise<any> {
   const { account, logicContract, logicMEMEContract, hideModal, fetchData } = await getBurrow();
   const { decimals } = (await getMetadata(tokenId))!;
   const tokenContract = await getTokenContract(tokenId);
   const burrowContractId = isMeme ? logicMEMEContract.contractId : logicContract.contractId;
   let expandedAmount;
+  let expandedReceiveAmount;
   if (tokenId === NBTCTokenId) {
     expandedAmount = expandTokenDecimal(amount, decimals);
+    expandedReceiveAmount = expandTokenDecimal(receiveAmount, decimals);
   } else {
     const tokenBalance = new Decimal(await getBalance(tokenId, account.accountId));
     expandedAmount = isMax
@@ -53,9 +57,10 @@ export async function supply({
       const result = await executeBTCDepositAndAction({
         action: {
           receiver_id: burrowContractId,
-          amount: expandedAmount.toFixed(0),
+          amount: expandedReceiveAmount.toFixed(0),
           msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
         },
+        amount: expandedAmount,
         env: NBTC_ENV,
         registerDeposit: "100000000000000000000000",
       });

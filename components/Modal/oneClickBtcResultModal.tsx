@@ -16,6 +16,14 @@ export default function OneClickBtcResultModal() {
     dispatch(setOneClickBtcStatus({ status: "" }));
   }
   const cardWidth = mobile ? "95vw" : "430px";
+  let tip = "";
+  if (status == "wait") {
+    tip = "It will take about 20 minutes to complete";
+  } else if (status == "error") {
+    tip = "the BTC operation failed!";
+  } else {
+    tip = "the BTC operation was successful!";
+  }
   return (
     <Modal
       isOpen={isOpen}
@@ -42,9 +50,7 @@ export default function OneClickBtcResultModal() {
           <span className="text-white text-2xl gotham_bold xsm:text-xl">BTC</span>
           <CloseIcon className="cursor-pointer" onClick={closeModal} />
         </div>
-        <span className="text-base  text-gray-300">
-          {status == "success" ? "the BTC operation was successful!" : "the BTC operation failed!"}
-        </span>
+        <span className="text-base  text-gray-300">{tip}</span>
       </div>
     </Modal>
   );

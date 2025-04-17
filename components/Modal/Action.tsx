@@ -109,7 +109,8 @@ export default function Action({
             tokenId,
             extraDecimals,
             useAsCollateral,
-            amount: isOneClickAction ? oneClickActionDepositAmount : amount,
+            amount,
+            receiveAmount: isOneClickAction ? oneClickActionDepositAmount : 0,
             isMax,
             isMeme,
             isOneClickAction,
@@ -146,7 +147,7 @@ export default function Action({
             dispatch(showOneClickBtcModal());
             dispatch(
               setOneClickBtcStatus({
-                status: result && isFailureExecution(result) ? "error" : "success",
+                status: result && isFailureExecution(result) ? "error" : "wait",
               }),
             );
           }
