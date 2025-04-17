@@ -64,7 +64,6 @@ const Modal = () => {
   // const isMeme = useAppSelector(isMemeCategory);
   const pageType = getPageTypeFromUrl();
   const isMeme = pageType == "meme";
-
   const isOpen = useAppSelector(getModalStatus);
   const accountId = useAppSelector(getAccountId);
   const asset = useAppSelector(getAssetData);
@@ -92,33 +91,6 @@ const Modal = () => {
   const maxBorrowAmountPositions = useAppSelector(getBorrowMaxAmount(tokenId));
   const maxWithdrawAmount = useAppSelector(getWithdrawMaxAmount(tokenId));
   const repayPositions = useAppSelector(getRepayPositions(tokenId));
-  // NBTC logic start
-  const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
-  const isBtcToken = asset.tokenId === NBTCTokenId && selectedWalletId === "btc-wallet";
-  const isBtcSupply = action === "Supply" && isBtcToken;
-  const isBtcWithdraw = action === "Withdraw" && isBtcToken;
-  const isBtcChainSupply = isBtcSupply && nbtcTab == "btc";
-  const { availableBalance: btcAvailableBalance, availableBalance$: btcAvailableBalance$ } =
-    useBtcAction({
-      tokenId: asset?.tokenId || "",
-      price: asset?.price || 0,
-    });
-  // TODOXXX
-  const { receiveAmount, loading: cacuReceiveLoading } = useCalculateWithdraw({
-    isBtcWithdraw,
-    decimals: asset?.decimals || 0,
-    amount,
-  });
-  const {
-    fee: depositFee,
-    loading: cacuDepositLoading,
-    receiveAmount: depositReceiveAmount,
-  } = useCalculateDeposit({
-    isBtcDeposit: isBtcChainSupply,
-    decimals: asset?.decimals || 0,
-    amount,
-  });
-  // NBTC logic end
   const activePosition =
     action === "Repay" || action === "Borrow"
       ? selectedCollateralType
@@ -177,28 +149,74 @@ const Modal = () => {
   const repay_to_lp =
     action === "Repay" && isRepayFromDeposits && selectedCollateralType !== DEFAULT_POSITION;
   // NBTC start
-  if (isBtcWithdraw) {
+  // TODOXXX
+  const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
+  const isBtcToken = asset.tokenId === NBTCTokenId && selectedWalletId === "btc-wallet";
+  const isBtcSupply = action === "Supply" && isBtcToken;
+  const isBtcWithdraw = action === "Withdraw" && isBtcToken;
+  const isBtcChainSupply = isBtcSupply && nbtcTab == "btc";
+  const isOneClickAction = (isBtcSupply || isBtcWithdraw) && nbtcTab == "btc";
+  const { availableBalance: btcAvailableBalance, availableBalance$: btcAvailableBalance$ } =
+    useBtcAction({
+      tokenId: asset?.tokenId || "",
+      price: asset?.price || 0,
+    });
+  const { receiveAmount: withdrawReceiveAmount, loading: cacuWithdrawLoading } =
+    useCalculateWithdraw({
+      isBtcWithdraw,
+      decimals: asset?.decimals || 0,
+      amount,
+    });
+  const {
+    fee: depositFee,
+    loading: cacuDepositLoading,
+    receiveAmount: depositReceiveAmount,
+    minDepositAmount: depositMinDepositAmount,
+  } = useCalculateDeposit({
+    isBtcDeposit: isBtcChainSupply,
+    decimals: asset?.decimals || 0,
+    amount,
+  });
+  // withdraw oneClick min
+  if (isBtcWithdraw && nbtcTab == "btc") {
     const min_withdraw_amount = 0.000054;
     if (new Decimal(amount || 0).lt(min_withdraw_amount)) {
-      alerts["btcWithdraw"] = {
+      alerts["btcWithdrawMinLimit"] = {
         title: `You must withdraw at least ${min_withdraw_amount} NBTC`,
         severity: "error",
       };
     } else {
-      delete alerts.btcWithdraw;
+      delete alerts.btcWithdrawMinLimit;
     }
-  } else if ((isBtcSupply && nbtcTab == "btc") || isBtcWithdraw) {
-    // TODOXXX
-    alerts["btcSupplyOrWithdraw"] = {
+  }
+  // deposit oneClick min
+  if (isBtcChainSupply && nbtcTab == "btc") {
+    if (
+      new Decimal(depositReceiveAmount || 0).gt(0) &&
+      new Decimal(depositReceiveAmount || 0).lt(depositMinDepositAmount || 0)
+    ) {
+      alerts["btcDepositMinLimit"] = {
+        title: `You must deposit at least ${depositMinDepositAmount} NBTC`,
+        severity: "error",
+      };
+    } else {
+      delete alerts.btcDepositMinLimit;
+    }
+  }
+  // oneClick time
+  if (isOneClickAction) {
+    alerts["oneClickActionTime"] = {
       title: "It will take about 20 minutes to complete.",
       severity: "warning",
     };
   } else {
-    delete alerts.btcSupplyOrWithdraw;
-    delete alerts.btcWithdraw;
+    delete alerts.oneClickActionTime;
   }
-  const isOneDeposit = (isBtcSupply || isBtcWithdraw) && nbtcTab == "btc";
-  const isOneDepositDisabled = isOneDeposit && +(depositReceiveAmount || 0) <= 0;
+  const actionButtonDisabled =
+    alerts["btcWithdrawMinLimit"] ||
+    alerts["btcDepositMinLimit"] ||
+    (isBtcChainSupply && nbtcTab == "btc" && cacuDepositLoading) ||
+    (isBtcWithdraw && nbtcTab == "btc" && cacuWithdrawLoading);
   // NBTC end
   return (
     <MUIModal open={isOpen} onClose={handleClose}>
@@ -249,8 +267,8 @@ const Modal = () => {
             <div className="flex flex-col gap-4 mt-6">
               {isBtcWithdraw ? (
                 <Receive
-                  value={beautifyPrice(receiveAmount) as string}
-                  loading={cacuReceiveLoading}
+                  value={beautifyPrice(withdrawReceiveAmount) as string}
+                  loading={cacuWithdrawLoading}
                 />
               ) : null}
               {isBtcChainSupply ? (
@@ -285,8 +303,9 @@ const Modal = () => {
               healthFactor={healthFactor}
               collateralType={selectedCollateralType}
               poolAsset={assets[tokenId]}
-              isDisabled={alerts["btcWithdraw"] || isOneDepositDisabled}
-              isOneDeposit={isOneDeposit}
+              oneClickActionDepositAmount={depositReceiveAmount}
+              isDisabled={actionButtonDisabled}
+              isOneClickAction={isOneClickAction}
             />
             {isMeme && action === "Supply" ? (
               <AlertWarning

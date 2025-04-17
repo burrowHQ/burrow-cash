@@ -481,7 +481,6 @@ function TableBodyMobile({
   setTotalShortUSD: (value: number) => void;
   filteredTokenTypeMap: TokenTypeMap;
 }) {
-  // console.log(data);
   const { NATIVE_TOKENS, NEW_TOKENS } = getConfig() as any;
   useEffect(() => {
     let totalLongUSD = 0;

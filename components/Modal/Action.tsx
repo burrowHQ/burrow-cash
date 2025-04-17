@@ -29,6 +29,7 @@ import { useDegenMode } from "../../hooks/hooks";
 import { SubmitButton } from "./components";
 import getShadowRecords from "../../api/get-shadows";
 import { expandToken, shrinkToken } from "../../store";
+import { isFailureExecution } from "../../utils/transactionUtils";
 
 export default function Action({
   maxBorrowAmount,
@@ -37,7 +38,8 @@ export default function Action({
   poolAsset,
   isDisabled,
   maxWithdrawAmount,
-  isOneDeposit,
+  isOneClickAction,
+  oneClickActionDepositAmount,
 }) {
   const [loading, setLoading] = useState(false);
   const { amount, useAsCollateral, isMax } = useAppSelector(getSelectedValues);
@@ -107,14 +109,21 @@ export default function Action({
             tokenId,
             extraDecimals,
             useAsCollateral,
-            amount,
+            amount: isOneClickAction ? oneClickActionDepositAmount : amount,
             isMax,
             isMeme,
-            isOneDeposit,
-          }).then((status) => {
-            if (isOneDeposit) {
+            isOneClickAction,
+          }).then((result) => {
+            if (isOneClickAction) {
               dispatch(showOneClickBtcModal());
-              dispatch(setOneClickBtcStatus(status));
+              dispatch(
+                setOneClickBtcStatus({
+                  status:
+                    result == "error" || (result && isFailureExecution(result))
+                      ? "error"
+                      : "success",
+                }),
+              );
             }
           });
         }
@@ -131,11 +140,15 @@ export default function Action({
           isMax,
           isMeme,
           available,
-          isOneDeposit,
+          isOneClickAction,
         }).then((result) => {
-          if (isOneDeposit) {
+          if (isOneClickAction) {
             dispatch(showOneClickBtcModal());
-            dispatch(setOneClickBtcStatus({ status: result ? "success" : "error" }));
+            dispatch(
+              setOneClickBtcStatus({
+                status: result && isFailureExecution(result) ? "error" : "success",
+              }),
+            );
           }
         });
         break;

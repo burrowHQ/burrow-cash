@@ -14,7 +14,7 @@ export async function supply({
   amount,
   isMax,
   isMeme,
-  isOneDeposit,
+  isOneClickAction,
 }: {
   tokenId: string;
   extraDecimals: number;
@@ -22,9 +22,9 @@ export async function supply({
   amount: string;
   isMax: boolean;
   isMeme: boolean;
-  isOneDeposit: boolean;
+  isOneClickAction: boolean;
 }): Promise<any> {
-  const { account, logicContract, logicMEMEContract, hideModal } = await getBurrow();
+  const { account, logicContract, logicMEMEContract, hideModal, fetchData } = await getBurrow();
   const { decimals } = (await getMetadata(tokenId))!;
   const tokenContract = await getTokenContract(tokenId);
   const burrowContractId = isMeme ? logicMEMEContract.contractId : logicContract.contractId;
@@ -48,7 +48,7 @@ export async function supply({
       },
     ],
   };
-  if (isOneDeposit) {
+  if (isOneClickAction) {
     try {
       const result = await executeBTCDepositAndAction({
         action: {
@@ -59,14 +59,15 @@ export async function supply({
         env: NBTC_ENV,
         registerDeposit: "100000000000000000000000",
       });
+      if (fetchData) fetchData(account.accountId);
       if (hideModal) hideModal();
-      return "success";
+      return result;
     } catch (error) {
       if (hideModal) hideModal();
       return "error";
     }
   } else {
-    await prepareAndExecuteTokenTransactions(tokenContract, {
+    const result = await prepareAndExecuteTokenTransactions(tokenContract, {
       methodName: ChangeMethodsToken[ChangeMethodsToken.ft_transfer_call],
       args: {
         receiver_id: burrowContractId,
@@ -74,5 +75,6 @@ export async function supply({
         msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
       },
     });
+    return result;
   }
 }
