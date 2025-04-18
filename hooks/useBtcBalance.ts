@@ -66,13 +66,30 @@ export function useCalculateWithdraw({
   isBtcWithdraw: boolean;
   decimals: number;
 }) {
-  const [receiveAmount, setReceiveAmount] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const [withdrawData, setWithdrawData] = useState<{
+    loading: boolean;
+    receiveAmount: string;
+    amount: string;
+  }>({
+    loading: false,
+    receiveAmount: "0",
+    amount: "0",
+  });
   useDebounce(
     () => {
-      if (isBtcWithdraw && isBtcWithdraw && decimals) {
-        setLoading(true);
+      if (isBtcWithdraw && isBtcWithdraw && decimals && new Decimal(amount || 0).gt(0)) {
+        setWithdrawData({
+          loading: true,
+          receiveAmount: "0",
+          amount,
+        });
         getReceiveAmount();
+      } else {
+        setWithdrawData({
+          loading: false,
+          receiveAmount: "0",
+          amount,
+        });
       }
     },
     500,
@@ -85,13 +102,13 @@ export function useCalculateWithdraw({
       amount: expandAmount,
       env,
     });
-    setReceiveAmount(shrinkToken(result?.receiveAmount || "0", decimals));
-    setLoading(false);
+    setWithdrawData({
+      loading: false,
+      receiveAmount: shrinkToken(result?.receiveAmount || "0", decimals),
+      amount,
+    });
   }
-  return {
-    receiveAmount,
-    loading,
-  };
+  return withdrawData;
 }
 
 export function useCalculateDeposit({
@@ -110,21 +127,38 @@ export function useCalculateDeposit({
   //   repayAmount: number;              // Amount to repay if there's debt
   //   newAccountMinDepositAmount: number; // Minimum deposit amount for new accounts
   // }
-  const [receiveAmount, setReceiveAmount] = useState<string>();
-  const [receiveAmountExpand, setRreceiveAmountExpand] = useState<string>();
-  const [minDepositAmount, setMinDepositAmount] = useState<string>();
-  const [fee, setFee] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const [depositData, setDepositData] = useState<{
+    loading: boolean;
+    amount: string;
+    receiveAmount: string;
+    minDepositAmount: string;
+    fee: string;
+  }>({
+    loading: false,
+    amount: "0",
+    receiveAmount: "0",
+    minDepositAmount: "0",
+    fee: "0",
+  });
   useDebounce(
     () => {
       if (isBtcDeposit && new Decimal(amount || 0).gt(0) && decimals) {
-        setLoading(true);
+        setDepositData({
+          loading: true,
+          amount,
+          receiveAmount: "0",
+          minDepositAmount: "0",
+          fee: "0",
+        });
         getReceiveAmount();
       } else {
-        setReceiveAmount("0");
-        setMinDepositAmount("0");
-        setFee("0");
-        setLoading(false);
+        setDepositData({
+          loading: false,
+          amount,
+          receiveAmount: "0",
+          minDepositAmount: "0",
+          fee: "0",
+        });
       }
     },
     500,
@@ -151,16 +185,13 @@ export function useCalculateDeposit({
       ).toFixed(0),
       decimals,
     );
-    setReceiveAmount(receiveAmountReadable);
-    setMinDepositAmount(minDepositAmountReadable);
-    setFee(new Decimal(amount || 0).gt(0) ? totalFeeAmount : "0");
-    setLoading(false);
+    setDepositData({
+      loading: false,
+      amount,
+      receiveAmount: receiveAmountReadable,
+      minDepositAmount: minDepositAmountReadable,
+      fee: totalFeeAmount,
+    });
   }
-  return {
-    receiveAmount,
-    fee,
-    loading,
-    minDepositAmount,
-    tag: amount,
-  };
+  return depositData;
 }
