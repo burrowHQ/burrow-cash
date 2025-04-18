@@ -193,7 +193,7 @@ const Modal = () => {
   // deposit oneClick min
   if (isBtcChainSupply && nbtcTab == "btc") {
     if (
-      new Decimal(depositReceiveAmount || 0).gt(0) &&
+      new Decimal(amount || 0).gt(0) &&
       new Decimal(depositReceiveAmount || 0).lt(depositMinDepositAmount || 0)
     ) {
       alerts["btcDepositMinLimit"] = {
