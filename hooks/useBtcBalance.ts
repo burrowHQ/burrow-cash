@@ -68,12 +68,16 @@ export function useCalculateWithdraw({
 }) {
   const [receiveAmount, setReceiveAmount] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  useEffect(() => {
-    if (isBtcWithdraw && isBtcWithdraw && decimals) {
-      setLoading(true);
-      getReceiveAmount();
-    }
-  }, [amount, isBtcWithdraw, decimals]);
+  useDebounce(
+    () => {
+      if (isBtcWithdraw && isBtcWithdraw && decimals) {
+        setLoading(true);
+        getReceiveAmount();
+      }
+    },
+    500,
+    [amount, isBtcWithdraw, decimals],
+  );
   async function getReceiveAmount() {
     const env = NBTC_ENV;
     const expandAmount = new Decimal(expandToken(amount, decimals)).toFixed(0);
@@ -111,12 +115,16 @@ export function useCalculateDeposit({
   const [minDepositAmount, setMinDepositAmount] = useState<string>();
   const [fee, setFee] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  useEffect(() => {
-    if (isBtcDeposit && amount && decimals) {
-      setLoading(true);
-      getReceiveAmount();
-    }
-  }, [amount, isBtcDeposit, decimals]);
+  useDebounce(
+    () => {
+      if (isBtcDeposit && amount && decimals) {
+        setLoading(true);
+        getReceiveAmount();
+      }
+    },
+    500,
+    [amount, isBtcDeposit, decimals],
+  );
   async function getReceiveAmount() {
     const env = NBTC_ENV;
     const expandAmount = new Decimal(expandToken(amount, decimals)).toFixed(0);
@@ -125,6 +133,14 @@ export function useCalculateDeposit({
       {
         env,
       },
+    );
+    console.log(
+      "-------------3333-amount, protocolFee, repayAmount,receiveAmount,minDepositAmount",
+      amount,
+      protocolFee,
+      repayAmount,
+      receiveAmount,
+      minDepositAmount,
     );
     const totalFeeAmount = shrinkToken(
       new Decimal(protocolFee || 0).plus(repayAmount).toFixed(),
@@ -148,5 +164,6 @@ export function useCalculateDeposit({
     fee,
     loading,
     minDepositAmount,
+    tag: amount,
   };
 }
