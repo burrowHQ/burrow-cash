@@ -169,21 +169,35 @@ const Modal = () => {
       amount,
     });
   const {
-    fee: depositFee,
-    loading: cacuDepositLoading,
-    receiveAmount: depositReceiveAmount,
-    minDepositAmount: depositMinDepositAmount,
+    fee: depositFeePending,
+    loading: cacuDepositLoadingPending,
+    receiveAmount: depositReceiveAmountPending,
+    minDepositAmount: depositMinDepositAmountPending,
+    tag: depositTag,
   } = useCalculateDeposit({
     isBtcDeposit: isBtcChainSupply,
     decimals: asset?.decimals || 0,
     amount,
   });
-  console.log(
-    "------------------depositFee, cacuDepositLoading, depositMinDepositAmount",
-    depositFee,
-    cacuDepositLoading,
-    depositMinDepositAmount,
-  );
+  const [depositFee, cacuDepositLoading, depositReceiveAmount, depositMinDepositAmount] =
+    useMemo(() => {
+      if (amount == depositTag) {
+        return [
+          depositFeePending,
+          cacuDepositLoadingPending,
+          depositReceiveAmountPending,
+          depositMinDepositAmountPending,
+        ];
+      }
+      return [0, true, 0, 0];
+    }, [
+      depositFeePending,
+      cacuDepositLoadingPending,
+      depositReceiveAmountPending,
+      depositMinDepositAmountPending,
+      depositTag,
+      amount,
+    ]);
   // withdraw oneClick min
   if (isBtcChainWithdraw) {
     const min_withdraw_amount = 0.000054;
@@ -198,10 +212,7 @@ const Modal = () => {
   }
   // deposit oneClick min
   if (isBtcChainSupply && nbtcTab == "btc") {
-    if (
-      new Decimal(amount || 0).gt(0) &&
-      new Decimal(depositReceiveAmount || 0).lt(depositMinDepositAmount || 0)
-    ) {
+    if (new Decimal(amount || 0).gt(0) && new Decimal(amount).lt(depositMinDepositAmount || 0)) {
       alerts["btcDepositMinLimit"] = {
         title: `You must deposit at least ${depositMinDepositAmount} NBTC`,
         severity: "error",
