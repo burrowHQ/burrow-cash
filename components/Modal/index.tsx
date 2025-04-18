@@ -70,6 +70,24 @@ const Modal = () => {
   const assets = useAppSelector(getAssetsCategory());
   const { amount } = useAppSelector(getSelectedValues);
   const { isRepayFromDeposits } = useDegenMode();
+  const [withdrawData, setWithdrawData] = useState<{
+    withdrawReceiveAmount: string;
+    cacuWithdrawLoading: boolean;
+  }>({
+    withdrawReceiveAmount: "0",
+    cacuWithdrawLoading: false,
+  });
+  const [depositData, setDepositData] = useState<{
+    depositFee: string;
+    cacuDepositLoading: boolean;
+    depositReceiveAmount: string;
+    depositMinDepositAmount: string;
+  }>({
+    depositFee: "0",
+    cacuDepositLoading: false,
+    depositReceiveAmount: "0",
+    depositMinDepositAmount: "0",
+  });
   const theme = useTheme();
   const { action = "Deposit", tokenId, position } = asset;
   const { healthFactor, maxBorrowValue: adjustedMaxBorrowValue } = useAppSelector(
@@ -149,7 +167,6 @@ const Modal = () => {
   const repay_to_lp =
     action === "Repay" && isRepayFromDeposits && selectedCollateralType !== DEFAULT_POSITION;
   // NBTC start
-  // TODOXXX
   const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
   const isBtcToken = asset.tokenId === NBTCTokenId && selectedWalletId === "btc-wallet";
   const isBtcSupply = action === "Supply" && isBtcToken;
@@ -162,46 +179,59 @@ const Modal = () => {
       tokenId: asset?.tokenId || "",
       price: asset?.price || 0,
     });
-  const { receiveAmount: withdrawReceiveAmount, loading: cacuWithdrawLoading } =
-    useCalculateWithdraw({
-      isBtcWithdraw,
-      decimals: asset?.decimals || 0,
-      amount,
-    });
+  const {
+    receiveAmount: withdrawReceiveAmountPending,
+    loading: cacuWithdrawLoadingPending,
+    amount: withdrawAmountPending,
+  } = useCalculateWithdraw({
+    isBtcWithdraw,
+    decimals: asset?.decimals || 0,
+    amount,
+  });
+
   const {
     fee: depositFeePending,
     loading: cacuDepositLoadingPending,
     receiveAmount: depositReceiveAmountPending,
     minDepositAmount: depositMinDepositAmountPending,
-    tag: depositTag,
+    amount: depositAmountPending,
   } = useCalculateDeposit({
     isBtcDeposit: isBtcChainSupply,
     decimals: asset?.decimals || 0,
     amount,
   });
-  const [depositFee, cacuDepositLoading, depositReceiveAmount, depositMinDepositAmount] =
-    useMemo(() => {
-      if (amount == depositTag) {
-        return [
-          depositFeePending,
-          cacuDepositLoadingPending,
-          depositReceiveAmountPending,
-          depositMinDepositAmountPending,
-        ];
-      }
-      return [0, true, 0, 0];
-    }, [
-      depositFeePending,
-      cacuDepositLoadingPending,
-      depositReceiveAmountPending,
-      depositMinDepositAmountPending,
-      depositTag,
-      amount,
-    ]);
+  useEffect(() => {
+    if (amount == withdrawAmountPending) {
+      setWithdrawData({
+        withdrawReceiveAmount: withdrawReceiveAmountPending,
+        cacuWithdrawLoading: cacuWithdrawLoadingPending,
+      });
+    }
+  }, [withdrawReceiveAmountPending, cacuWithdrawLoadingPending, withdrawAmountPending, amount]);
+  useEffect(() => {
+    if (amount == depositAmountPending) {
+      setDepositData({
+        depositFee: depositFeePending,
+        cacuDepositLoading: cacuDepositLoadingPending,
+        depositReceiveAmount: depositReceiveAmountPending,
+        depositMinDepositAmount: depositMinDepositAmountPending,
+      });
+    }
+  }, [
+    depositFeePending,
+    cacuDepositLoadingPending,
+    depositReceiveAmountPending,
+    depositMinDepositAmountPending,
+    depositAmountPending,
+    amount,
+  ]);
+  const { depositFee, cacuDepositLoading, depositReceiveAmount, depositMinDepositAmount } =
+    depositData;
+  const { withdrawReceiveAmount, cacuWithdrawLoading } = withdrawData;
   // withdraw oneClick min
   if (isBtcChainWithdraw) {
     const min_withdraw_amount = 0.000054;
-    if (new Decimal(amount || 0).lt(min_withdraw_amount)) {
+    if (new Decimal(amount || 0).gt(0) && new Decimal(amount || 0).lt(min_withdraw_amount)) {
       alerts["btcWithdrawMinLimit"] = {
         title: `You must withdraw at least ${min_withdraw_amount} NBTC`,
         severity: "error",
