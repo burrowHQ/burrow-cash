@@ -1022,14 +1022,7 @@ function TokenUserInfo() {
             </span>
           </div>
           <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
-            <span className="text-gray-300">NEAR Chain</span>
-            <span className="flex items-center">
-              <span className="mr-[6px] text-sm">{accountId ? supplyBalance : "-"}</span>
-              <img src={tokenRow?.icon} className="w-4 h-4 rounded-full" alt="" />
-            </span>
-          </div>
-          <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
-            <span className="text-gray-300">BTC Chain</span>
+            <span className="text-gray-300">BTC Chain Balance</span>
             <span className="flex items-center">
               <span className="mr-[6px] text-sm">
                 {accountId ? (
@@ -1043,6 +1036,13 @@ function TokenUserInfo() {
                 )}
               </span>
               <BtcChainIcon />
+            </span>
+          </div>
+          <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
+            <span className="text-gray-300">NEAR Chain Balance</span>
+            <span className="flex items-center">
+              <span className="mr-[6px] text-sm">{accountId ? supplyBalance : "-"}</span>
+              <img src={tokenRow?.icon} className="w-4 h-4 rounded-full" alt="" />
             </span>
           </div>
         </div>
