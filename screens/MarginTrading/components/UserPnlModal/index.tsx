@@ -13,6 +13,7 @@ import {
 } from "../Icon";
 import { isMobileDevice } from "../../../../helpers/helpers";
 import { formatNumberWithTwoDecimals } from "../../../../utils/formatNumberWithTwoDecimals";
+import { CheckIcon } from "../../../Market/svg";
 
 interface UserPnlModalProps {
   isOpen: boolean;
@@ -130,6 +131,13 @@ const UserPnlModal: React.FC<UserPnlModalProps> = ({ isOpen, onClose, accountId 
   const [sortField, setSortField] = useState<SortField>(INITIAL_SORT_FIELD);
   const [sortOrder, setSortOrder] = useState<SortOrder>(INITIAL_SORT_ORDER);
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  const [showSortSelect, setShowSortSelect] = useState(false);
+
+  const sortList = {
+    total_pnl: "PnL/ROI",
+    // position_value: "Position Value",
+    win_rate: "Win Rate",
+  };
 
   const handleSort = (field: SortField) => {
     if (field === sortField) {
@@ -138,6 +146,16 @@ const UserPnlModal: React.FC<UserPnlModalProps> = ({ isOpen, onClose, accountId 
       setSortField(field);
       setSortOrder("desc");
     }
+    setCurrentPage(INITIAL_PAGE);
+  };
+
+  const handleSortSelect = (field: SortField) => {
+    handleSort(field);
+    setShowSortSelect(false);
+  };
+
+  const closeSortSelect = () => {
+    setShowSortSelect(false);
   };
 
   const fetchPnlData = async (page: number) => {
@@ -322,12 +340,53 @@ const UserPnlModal: React.FC<UserPnlModalProps> = ({ isOpen, onClose, accountId 
         style={{ width: cardWidth, maxHeight: "78vh" }}
         className="outline-none bg-dark-100 border border-dark-50 overflow-auto rounded-2xl xsm:rounded-none"
       >
-        <div className="flex justify-between mb-4 pt-[27px] px-7 xsm:mb-0 xsm:px-4 xsm:pt-6 xsm:pb-4">
+        <div className="flex justify-between w-full mb-4 pt-[27px] px-7 xsm:mb-0 xsm:px-4 xsm:pt-6 xsm:pb-4">
           <span className="text-white text-[16px] gotham_bold">Users PnL</span>
-          <CloseIcon
-            className="cursor-pointer text-[#7E8A93] w-3 h-3 xsm:hidden"
-            onClick={handleClose}
-          />
+          <div className="flex items-center gap-4">
+            {mobile && (
+              <div className="flex items-center">
+                <span className="text-gray-300 h4 mr-2.5">Sort by</span>
+                <div className="relative z-10" onBlur={closeSortSelect} tabIndex={0}>
+                  <div
+                    onClick={() => setShowSortSelect(!showSortSelect)}
+                    className="flex gap-2.5 items-center justify-center bg-gray-800 border border-dark-50 rounded-md px-2.5 py-1.5 text-sm text-white"
+                  >
+                    {sortList[sortField]}
+                    <ChevronDownIcon
+                      className={`transition-transform ${
+                        showSortSelect ? "transform rotate-180" : ""
+                      }`}
+                    />
+                  </div>
+                  <div
+                    className={`border border-dark-50 rounded-md px-4 py-1 bg-dark-100 absolute right-0 w-[180px] top-[40px] ${
+                      showSortSelect ? "" : "hidden"
+                    }`}
+                  >
+                    {Object.entries(sortList).map(([key, name]) => {
+                      const isSelected = sortField === key;
+                      return (
+                        <div
+                          key={key}
+                          className="flex items-center justify-between py-3 cursor-pointer"
+                          onClick={() => handleSortSelect(key as SortField)}
+                        >
+                          <span className={`text-sm ${isSelected ? "text-primary" : "text-white"}`}>
+                            {name}
+                          </span>
+                          <CheckIcon className={`${isSelected ? "" : "hidden"}`} />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+            <CloseIcon
+              className="cursor-pointer text-[#7E8A93] w-3 h-3 xsm:hidden"
+              onClick={handleClose}
+            />
+          </div>
         </div>
         {mobile ? (
           <div className="px-2.5">
