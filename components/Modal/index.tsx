@@ -178,6 +178,12 @@ const Modal = () => {
     decimals: asset?.decimals || 0,
     amount,
   });
+  console.log(
+    "------------------depositFee, cacuDepositLoading, depositMinDepositAmount",
+    depositFee,
+    cacuDepositLoading,
+    depositMinDepositAmount,
+  );
   // withdraw oneClick min
   if (isBtcChainWithdraw) {
     const min_withdraw_amount = 0.000054;
