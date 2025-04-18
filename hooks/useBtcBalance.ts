@@ -117,9 +117,14 @@ export function useCalculateDeposit({
   const [loading, setLoading] = useState<boolean>(false);
   useDebounce(
     () => {
-      if (isBtcDeposit && amount && decimals) {
+      if (isBtcDeposit && new Decimal(amount || 0).gt(0) && decimals) {
         setLoading(true);
         getReceiveAmount();
+      } else {
+        setReceiveAmount("0");
+        setMinDepositAmount("0");
+        setFee("0");
+        setLoading(false);
       }
     },
     500,
@@ -133,14 +138,6 @@ export function useCalculateDeposit({
       {
         env,
       },
-    );
-    console.log(
-      "-------------3333-amount, protocolFee, repayAmount,receiveAmount,minDepositAmount",
-      amount,
-      protocolFee,
-      repayAmount,
-      receiveAmount,
-      minDepositAmount,
     );
     const totalFeeAmount = shrinkToken(
       new Decimal(protocolFee || 0).plus(repayAmount).toFixed(),
