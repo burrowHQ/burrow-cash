@@ -45,7 +45,7 @@ export async function withdraw({
   isOneClickAction,
 }: Props) {
   const state = store.getState();
-  const { oracleContract, logicContract, memeOracleContract, logicMEMEContract, selector } =
+  const { oracleContract, logicContract, memeOracleContract, logicMEMEContract } =
     await getBurrow();
   let assets: typeof state.assets.data;
   let account: typeof state.account;

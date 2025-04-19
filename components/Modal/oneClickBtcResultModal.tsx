@@ -13,17 +13,9 @@ export default function OneClickBtcResultModal() {
   const mobile = isMobileDevice();
   function closeModal() {
     dispatch(hideOneClickBtcModal());
-    dispatch(setOneClickBtcStatus({ status: "" }));
+    dispatch(setOneClickBtcStatus({ status: {} }));
   }
   const cardWidth = mobile ? "95vw" : "430px";
-  let tip = "";
-  if (status == "wait") {
-    tip = "It will take about 20 minutes to complete";
-  } else if (status == "error") {
-    tip = "the BTC operation failed!";
-  } else {
-    tip = "the BTC operation was successful!";
-  }
   return (
     <Modal
       isOpen={isOpen}
@@ -47,10 +39,20 @@ export default function OneClickBtcResultModal() {
         className="outline-none  bg-dark-100 border border-dark-50 overflow-auto rounded-2xl  xsm:rounded-lg p-5"
       >
         <div className="flex justify-between mb-4">
-          <span className="text-white text-2xl gotham_bold xsm:text-xl">BTC</span>
+          <span className="text-white text-2xl gotham_bold xsm:text-xl">
+            {status?.title || "BTC"}
+          </span>
           <CloseIcon className="cursor-pointer" onClick={closeModal} />
         </div>
-        <span className="text-base  text-gray-300">{tip}</span>
+        <span className="text-base  text-gray-300">
+          {status?.content || "BTC operation was successful!"}
+        </span>
+        <div
+          onClick={closeModal}
+          className="flex items-center justify-center h-[36px] w-[100px] rounded-md text-base font-bold hover:opacity-80 outline-none bg-primary text-dark-200 cursor-pointer mx-auto mt-6"
+        >
+          Confirm
+        </div>
       </div>
     </Modal>
   );

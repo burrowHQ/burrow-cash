@@ -73,9 +73,11 @@ const Modal = () => {
   const [withdrawData, setWithdrawData] = useState<{
     withdrawReceiveAmount: string;
     cacuWithdrawLoading: boolean;
+    withdrawFee: string;
   }>({
     withdrawReceiveAmount: "0",
     cacuWithdrawLoading: false,
+    withdrawFee: "0",
   });
   const [depositData, setDepositData] = useState<{
     depositFee: string;
@@ -183,6 +185,7 @@ const Modal = () => {
     receiveAmount: withdrawReceiveAmountPending,
     loading: cacuWithdrawLoadingPending,
     amount: withdrawAmountPending,
+    fee: withdrawFeePending,
   } = useCalculateWithdraw({
     isBtcWithdraw,
     decimals: asset?.decimals || 0,
@@ -205,6 +208,7 @@ const Modal = () => {
       setWithdrawData({
         withdrawReceiveAmount: withdrawReceiveAmountPending,
         cacuWithdrawLoading: cacuWithdrawLoadingPending,
+        withdrawFee: withdrawFeePending,
       });
     }
   }, [withdrawReceiveAmountPending, cacuWithdrawLoadingPending, withdrawAmountPending, amount]);
@@ -227,7 +231,7 @@ const Modal = () => {
   ]);
   const { depositFee, cacuDepositLoading, depositReceiveAmount, depositMinDepositAmount } =
     depositData;
-  const { withdrawReceiveAmount, cacuWithdrawLoading } = withdrawData;
+  const { withdrawReceiveAmount, cacuWithdrawLoading, withdrawFee } = withdrawData;
   // withdraw oneClick min
   if (isBtcChainWithdraw) {
     const min_withdraw_amount = 0.000054;
@@ -314,10 +318,13 @@ const Modal = () => {
             />
             <div className="flex flex-col gap-4 mt-6">
               {isBtcChainWithdraw ? (
-                <Receive
-                  value={beautifyPrice(withdrawReceiveAmount) as string}
-                  loading={cacuWithdrawLoading}
-                />
+                <>
+                  <Receive
+                    value={beautifyPrice(withdrawReceiveAmount) as string}
+                    loading={cacuWithdrawLoading}
+                  />
+                  <Fee value={beautifyPrice(withdrawFee) as string} loading={cacuWithdrawLoading} />
+                </>
               ) : null}
               {isBtcChainSupply ? (
                 <>

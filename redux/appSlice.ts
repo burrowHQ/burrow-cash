@@ -63,7 +63,7 @@ export interface AppState {
   refreshNumber: number;
   openPositionLoading: boolean;
   showOneClickBtcModal: boolean;
-  oneClickBtcStatus: string;
+  oneClickBtcStatus: Record<string, string>;
 }
 
 export const initialState: AppState = {
@@ -140,7 +140,7 @@ export const initialState: AppState = {
   refreshNumber: 0,
   openPositionLoading: false,
   showOneClickBtcModal: false,
-  oneClickBtcStatus: "",
+  oneClickBtcStatus: {},
 };
 
 export const fetchConfig = createAsyncThunk("account/getConfig", async () => {
@@ -173,7 +173,7 @@ export const appSlice = createSlice({
     hideOneClickBtcModal(state) {
       state.showOneClickBtcModal = false;
     },
-    setOneClickBtcStatus(state, action: PayloadAction<{ status: string }>) {
+    setOneClickBtcStatus(state, action: PayloadAction<{ status: Record<string, string> }>) {
       state.oneClickBtcStatus = action.payload.status;
     },
     updateAmount(state, action: PayloadAction<{ amount: string; isMax: boolean }>) {
