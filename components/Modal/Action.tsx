@@ -159,6 +159,7 @@ export default function Action({
                   fromChain: "NEAR",
                   env: NBTC_ENV,
                 });
+                dispatch(hideModal());
                 dispatch(showOneClickBtcModal());
                 dispatch(
                   setOneClickBtcStatus({
@@ -169,6 +170,7 @@ export default function Action({
                   }),
                 );
               } catch (error) {
+                dispatch(hideModal());
                 dispatch(showOneClickBtcModal());
                 dispatch(
                   setOneClickBtcStatus({
