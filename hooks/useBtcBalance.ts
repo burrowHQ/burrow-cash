@@ -70,10 +70,12 @@ export function useCalculateWithdraw({
     loading: boolean;
     receiveAmount: string;
     amount: string;
+    fee: string;
   }>({
     loading: false,
     receiveAmount: "0",
     amount: "0",
+    fee: "0",
   });
   useDebounce(
     () => {
@@ -81,6 +83,7 @@ export function useCalculateWithdraw({
         setWithdrawData({
           loading: true,
           receiveAmount: "0",
+          fee: "0",
           amount,
         });
         getReceiveAmount();
@@ -88,6 +91,7 @@ export function useCalculateWithdraw({
         setWithdrawData({
           loading: false,
           receiveAmount: "0",
+          fee: "0",
           amount,
         });
       }
@@ -102,9 +106,11 @@ export function useCalculateWithdraw({
       amount: expandAmount,
       env,
     });
+    const receiveAmount = shrinkToken(result?.receiveAmount || "0", decimals);
     setWithdrawData({
       loading: false,
-      receiveAmount: shrinkToken(result?.receiveAmount || "0", decimals),
+      receiveAmount,
+      fee: Decimal.max(new Decimal(amount || 0).minus(receiveAmount), 0).toFixed(),
       amount,
     });
   }

@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import Decimal from "decimal.js";
-import { useBtcWalletSelector } from "btc-wallet";
+import { useBtcWalletSelector, checkBridgeTransactionStatus } from "btc-wallet";
 import { nearTokenId } from "../../utils";
 import {
   toggleUseAsCollateral,
@@ -30,6 +30,7 @@ import { SubmitButton } from "./components";
 import getShadowRecords from "../../api/get-shadows";
 import { expandToken, shrinkToken } from "../../store";
 import { isFailureExecution } from "../../utils/transactionUtils";
+import { NBTC_ENV } from "../../utils/config";
 
 export default function Action({
   maxBorrowAmount,
@@ -116,13 +117,18 @@ export default function Action({
             isOneClickAction,
           }).then((result) => {
             if (isOneClickAction) {
+              const status =
+                result == "error" || (result && isFailureExecution(result)) ? "error" : "success";
               dispatch(showOneClickBtcModal());
               dispatch(
                 setOneClickBtcStatus({
-                  status:
-                    result == "error" || (result && isFailureExecution(result))
-                      ? "error"
-                      : "success",
+                  status: {
+                    title: "Supply Confirm",
+                    content:
+                      status == "success"
+                        ? "BTC Supply has been completed. Please check your supply balance."
+                        : "BTC Supply has been failed.",
+                  },
                 }),
               );
             }
@@ -142,14 +148,38 @@ export default function Action({
           isMeme,
           available,
           isOneClickAction,
-        }).then((result) => {
+        }).then(async (result) => {
           if (isOneClickAction) {
-            dispatch(showOneClickBtcModal());
-            dispatch(
-              setOneClickBtcStatus({
-                status: result && isFailureExecution(result) ? "error" : "wait",
-              }),
-            );
+            const transtion_outcome = (result as any[]).at(-1);
+            const hash = transtion_outcome?.transaction?.hash;
+            if (hash) {
+              try {
+                await checkBridgeTransactionStatus({
+                  txHash: hash,
+                  fromChain: "NEAR",
+                  env: NBTC_ENV,
+                });
+                dispatch(showOneClickBtcModal());
+                dispatch(
+                  setOneClickBtcStatus({
+                    status: {
+                      title: "Withdraw Confirm",
+                      content: "BTC Withdraw has been completed. Please check your BTC balance.",
+                    },
+                  }),
+                );
+              } catch (error) {
+                dispatch(showOneClickBtcModal());
+                dispatch(
+                  setOneClickBtcStatus({
+                    status: {
+                      title: "Withdraw Confirm",
+                      content: "BTC Withdraw has been failed.",
+                    },
+                  }),
+                );
+              }
+            }
           }
         });
         break;
