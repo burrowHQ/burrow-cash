@@ -421,7 +421,7 @@ export function useRepayTrigger(tokenId: string, position?: string) {
 export const Receive = ({ value, loading }: { value: string; loading: boolean }) => {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-sm text-gray-300">Receive Amount</span>
+      <span className="text-sm text-gray-300">Received Amount</span>
       {loading ? <BeatLoader size={5} color="#ffffff" /> : <span className="text-sm">{value}</span>}
     </div>
   );
