@@ -144,6 +144,25 @@ class DataSource {
       config?.indexUrl,
     );
   }
+
+  getMarginTradingUserPnlList(
+    address,
+    pageNumber = 0,
+    pageSize = 10,
+    orderBy = "total_pnl",
+    order = "desc",
+  ) {
+    const qryObj = {
+      page_num: pageNumber,
+      page_size: pageSize,
+      order_by: orderBy,
+      order,
+    };
+    if (address) {
+      qryObj.address = address;
+    }
+    return this.callAPI(`/v3/margin-trading/user/pnl/list`, "GET", qryObj, null, config?.indexUrl);
+  }
 }
 
 export default DataSource;
