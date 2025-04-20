@@ -71,11 +71,13 @@ export function useCalculateWithdraw({
     receiveAmount: string;
     amount: string;
     fee: string;
+    errorMsg: string;
   }>({
     loading: false,
     receiveAmount: "0",
     amount: "0",
     fee: "0",
+    errorMsg: "",
   });
   useDebounce(
     () => {
@@ -85,6 +87,7 @@ export function useCalculateWithdraw({
           receiveAmount: "0",
           fee: "0",
           amount,
+          errorMsg: "",
         });
         getReceiveAmount();
       } else {
@@ -93,6 +96,7 @@ export function useCalculateWithdraw({
           receiveAmount: "0",
           fee: "0",
           amount,
+          errorMsg: "",
         });
       }
     },
@@ -110,6 +114,7 @@ export function useCalculateWithdraw({
     setWithdrawData({
       loading: false,
       receiveAmount,
+      errorMsg: result?.errorMsg || "",
       fee: Decimal.max(new Decimal(amount || 0).minus(receiveAmount), 0).toFixed(),
       amount,
     });
@@ -121,18 +126,13 @@ export function useCalculateDeposit({
   amount,
   isBtcDeposit,
   decimals,
+  newUserOnNearChain,
 }: {
   amount: string;
   isBtcDeposit: boolean;
   decimals: number;
+  newUserOnNearChain: boolean;
 }) {
-  // interface DepositAmountResult {
-  //   depositAmount: number;            // Original deposit amount to be sent
-  //   receiveAmount: number;            // Amount to be received after deducting fees and repayments
-  //   protocolFee: number;              // Protocol fee
-  //   repayAmount: number;              // Amount to repay if there's debt
-  //   newAccountMinDepositAmount: number; // Minimum deposit amount for new accounts
-  // }
   const [depositData, setDepositData] = useState<{
     loading: boolean;
     amount: string;
@@ -168,7 +168,7 @@ export function useCalculateDeposit({
       }
     },
     500,
-    [amount, isBtcDeposit, decimals],
+    [amount, isBtcDeposit, decimals, newUserOnNearChain],
   );
   async function getReceiveAmount() {
     const env = NBTC_ENV;
@@ -186,7 +186,10 @@ export function useCalculateDeposit({
     const minDepositAmountReadable = shrinkToken(minDepositAmount, decimals);
     const receiveAmountReadable = shrinkToken(
       Decimal.max(
-        new Decimal(expandAmount || 0).minus(protocolFee || 0).minus(repayAmount || 0),
+        new Decimal(expandAmount || 0)
+          .minus(protocolFee || 0)
+          .minus(repayAmount || 0)
+          .minus(newUserOnNearChain ? 800 : 0),
         0,
       ).toFixed(0),
       decimals,

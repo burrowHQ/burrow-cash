@@ -54,6 +54,7 @@ import {
 import { useBtcAction, useCalculateWithdraw, useCalculateDeposit } from "../../hooks/useBtcBalance";
 import { beautifyPrice } from "../../utils/beautyNumber";
 import { getPageTypeFromUrl } from "../../utils/commonUtils";
+import { useUserBalance } from "../../hooks/useUserBalance";
 
 export const ModalContext = createContext(null) as any;
 const Modal = () => {
@@ -74,10 +75,12 @@ const Modal = () => {
     withdrawReceiveAmount: string;
     cacuWithdrawLoading: boolean;
     withdrawFee: string;
+    errorMsg: string;
   }>({
     withdrawReceiveAmount: "0",
     cacuWithdrawLoading: false,
     withdrawFee: "0",
+    errorMsg: "",
   });
   const [depositData, setDepositData] = useState<{
     depositFee: string;
@@ -92,6 +95,7 @@ const Modal = () => {
   });
   const theme = useTheme();
   const { action = "Deposit", tokenId, position } = asset;
+  const { supplyBalance } = useUserBalance(tokenId, false);
   const { healthFactor, maxBorrowValue: adjustedMaxBorrowValue } = useAppSelector(
     action === "Withdraw"
       ? recomputeHealthFactorWithdraw(tokenId, +amount)
@@ -186,6 +190,7 @@ const Modal = () => {
     loading: cacuWithdrawLoadingPending,
     amount: withdrawAmountPending,
     fee: withdrawFeePending,
+    errorMsg: withdrawErrorMsgPending,
   } = useCalculateWithdraw({
     isBtcWithdraw,
     decimals: asset?.decimals || 0,
@@ -202,6 +207,7 @@ const Modal = () => {
     isBtcDeposit: isBtcChainSupply,
     decimals: asset?.decimals || 0,
     amount,
+    newUserOnNearChain: new Decimal(supplyBalance || 0).lte(0),
   });
   useEffect(() => {
     if (amount == withdrawAmountPending) {
@@ -209,6 +215,7 @@ const Modal = () => {
         withdrawReceiveAmount: withdrawReceiveAmountPending,
         cacuWithdrawLoading: cacuWithdrawLoadingPending,
         withdrawFee: withdrawFeePending,
+        errorMsg: withdrawErrorMsgPending,
       });
     }
   }, [withdrawReceiveAmountPending, cacuWithdrawLoadingPending, withdrawAmountPending, amount]);
@@ -234,14 +241,13 @@ const Modal = () => {
   const { withdrawReceiveAmount, cacuWithdrawLoading, withdrawFee } = withdrawData;
   // withdraw oneClick min
   if (isBtcChainWithdraw) {
-    const min_withdraw_amount = 0.000054;
-    if (new Decimal(amount || 0).gt(0) && new Decimal(amount || 0).lt(min_withdraw_amount)) {
-      alerts["btcWithdrawMinLimit"] = {
-        title: `You must withdraw at least ${min_withdraw_amount} NBTC`,
+    if (withdrawData.errorMsg) {
+      alerts["btcWithdrawErrorMsg"] = {
+        title: withdrawData.errorMsg,
         severity: "error",
       };
     } else {
-      delete alerts.btcWithdrawMinLimit;
+      delete alerts.btcWithdrawErrorMsg;
     }
   }
   // deposit oneClick min
@@ -265,7 +271,7 @@ const Modal = () => {
     delete alerts.oneClickActionTime;
   }
   const actionButtonDisabled =
-    alerts["btcWithdrawMinLimit"] ||
+    alerts["btcWithdrawErrorMsg"] ||
     alerts["btcDepositMinLimit"] ||
     (isBtcChainSupply && cacuDepositLoading) ||
     (isBtcChainWithdraw && cacuWithdrawLoading);
