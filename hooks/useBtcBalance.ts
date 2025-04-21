@@ -172,7 +172,7 @@ export function useCalculateDeposit({
   );
   async function getReceiveAmount() {
     const env = NBTC_ENV;
-    const expandAmount = new Decimal(expandToken(amount, decimals)).toFixed(0);
+    const expandAmount = new Decimal(expandToken(amount, decimals)).toFixed(0, Decimal.ROUND_DOWN);
     const { protocolFee, repayAmount, receiveAmount, minDepositAmount } = await getDepositAmount(
       expandAmount,
       {
@@ -191,7 +191,7 @@ export function useCalculateDeposit({
           .minus(repayAmount || 0)
           .minus(newUserOnNearChain ? 800 : 0),
         0,
-      ).toFixed(0),
+      ).toFixed(0, Decimal.ROUND_DOWN),
       decimals,
     );
     setDepositData({
