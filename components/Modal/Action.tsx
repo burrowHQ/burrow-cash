@@ -1,8 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
 import Decimal from "decimal.js";
-import { useBtcWalletSelector } from "btc-wallet";
+import { useBtcWalletSelector, checkBridgeTransactionStatus } from "btc-wallet";
 import { nearTokenId } from "../../utils";
-import { toggleUseAsCollateral, hideModal } from "../../redux/appSlice";
+import {
+  toggleUseAsCollateral,
+  hideModal,
+  showOneClickBtcModal,
+  setOneClickBtcStatus,
+} from "../../redux/appSlice";
 import {
   toggleUseAsCollateral as toggleUseAsCollateralMEME,
   hideModal as hideModalMEME,
@@ -17,15 +22,15 @@ import { withdraw } from "../../store/actions/withdraw";
 import { shadow_action_supply } from "../../store/actions/shadow";
 import { adjustCollateral } from "../../store/actions/adjustCollateral";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
-import { getSelectedValues, getAssetData, getConfig } from "../../redux/appSelectors";
+import { getSelectedValues, getAssetData } from "../../redux/appSelectors";
 import { isMemeCategory } from "../../redux/categorySelectors";
 import { trackActionButton } from "../../utils/telemetry";
 import { useDegenMode } from "../../hooks/hooks";
 import { SubmitButton } from "./components";
 import getShadowRecords from "../../api/get-shadows";
 import { expandToken, shrinkToken } from "../../store";
-import { getAssets as getAssetSelector } from "../../redux/assetsSelectors";
-import { getAccountPortfolio, getAccountId } from "../../redux/accountSelectors";
+import { isFailureExecution } from "../../utils/transactionUtils";
+import { NBTC_ENV } from "../../utils/config";
 
 export default function Action({
   maxBorrowAmount,
@@ -34,10 +39,11 @@ export default function Action({
   poolAsset,
   isDisabled,
   maxWithdrawAmount,
+  isOneClickAction,
+  oneClickActionDepositAmount,
 }) {
   const [loading, setLoading] = useState(false);
   const { amount, useAsCollateral, isMax } = useAppSelector(getSelectedValues);
-  const { enable_pyth_oracle } = useAppSelector(getConfig); // TODO33 need query from api？
   const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
   const dispatch = useAppDispatch();
   const asset = useAppSelector(getAssetData);
@@ -105,8 +111,27 @@ export default function Action({
             extraDecimals,
             useAsCollateral,
             amount,
+            receiveAmount: isOneClickAction ? oneClickActionDepositAmount : 0,
             isMax,
             isMeme,
+            isOneClickAction,
+          }).then((result) => {
+            if (isOneClickAction) {
+              const status =
+                result == "error" || (result && isFailureExecution(result)) ? "error" : "success";
+              dispatch(showOneClickBtcModal());
+              dispatch(
+                setOneClickBtcStatus({
+                  status: {
+                    title: "Supply Confirm",
+                    content:
+                      status == "success"
+                        ? "BTC Supply has been completed. Please check your supply balance."
+                        : "BTC Supply has been failed.",
+                  },
+                }),
+              );
+            }
           });
         }
         break;
@@ -122,6 +147,42 @@ export default function Action({
           isMax,
           isMeme,
           available,
+          isOneClickAction,
+        }).then(async (result) => {
+          if (isOneClickAction) {
+            const transtion_outcome = (result as any[]).at(-1);
+            const hash = transtion_outcome?.transaction?.hash;
+            if (hash) {
+              try {
+                await checkBridgeTransactionStatus({
+                  txHash: hash,
+                  fromChain: "NEAR",
+                  env: NBTC_ENV,
+                });
+                dispatch(hideModal());
+                dispatch(showOneClickBtcModal());
+                dispatch(
+                  setOneClickBtcStatus({
+                    status: {
+                      title: "Withdraw Confirm",
+                      content: "BTC Withdraw has been completed. Please check your BTC balance.",
+                    },
+                  }),
+                );
+              } catch (error) {
+                dispatch(hideModal());
+                dispatch(showOneClickBtcModal());
+                dispatch(
+                  setOneClickBtcStatus({
+                    status: {
+                      title: "Withdraw Confirm",
+                      content: "BTC Withdraw has been failed.",
+                    },
+                  }),
+                );
+              }
+            }
+          }
         });
         break;
       }

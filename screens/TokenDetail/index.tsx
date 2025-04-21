@@ -4,6 +4,7 @@ import { useEffect, useState, createContext, useContext, useMemo } from "react";
 import { Modal as MUIModal } from "@mui/material";
 import { twMerge } from "tailwind-merge";
 import { useBtcWalletSelector } from "btc-wallet";
+import { BeatLoader } from "react-spinners";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 import { updatePosition } from "../../redux/appSlice";
 import { updatePosition as updatePositionMEME } from "../../redux/appSliceMEME";
@@ -81,26 +82,12 @@ const TokenDetail = () => {
   const rows = useAvailableAssets();
   const { account, autoConnect } = useBtcWalletSelector();
   const { id } = router.query;
-  const [updaterCounter, setUpDaterCounter] = useState(1);
   const tokenRow = rows.find((row: UIAsset) => {
     return row.tokenId === id;
   });
   const accountId = useAccountId();
   const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
   const isNBTC = NBTCTokenId === id && selectedWalletId === "btc-wallet";
-  useEffect(() => {
-    const t = setInterval(() => {
-      setUpDaterCounter((pre) => {
-        return pre + 1;
-      });
-    }, 60000);
-    if (!id || !isNBTC) {
-      clearInterval(t);
-    }
-    return () => {
-      clearInterval(t);
-    };
-  }, [isNBTC]);
   // connect btc wallet to get btc balance;
   useEffect(() => {
     if (accountId && isNBTC && !account) {
@@ -935,7 +922,6 @@ function TokenRateModeChart({
       <HrLine />
       <div className="flex items-center justify-center h-[300px] xsm2:-ml-4">
         <InterestRateChart data={interestRates} />
-        {/* <span className="text-sm text-gray-300 text-opacity-50">Chart is coming soon</span> */}
       </div>
     </div>
   );
@@ -943,11 +929,29 @@ function TokenRateModeChart({
 
 function TokenUserInfo() {
   const { tokenRow } = useContext(DetailData) as any;
-  const { availableBalance: btcAvailableBalance } = useBtcAction({
-    tokenId: tokenRow?.tokenId || "",
-    decimals: tokenRow?.decimals || 0,
-  });
+  const [updaterCounter, setUpDaterCounter] = useState(1);
   const { tokenId, tokens, isLpToken, price } = tokenRow;
+  const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
+  const isNBTC = NBTCTokenId === tokenId && selectedWalletId === "btc-wallet";
+  // TODOXXX
+  useEffect(() => {
+    const t = setInterval(() => {
+      setUpDaterCounter((pre) => {
+        return pre + 1;
+      });
+    }, 60000);
+    if (!isNBTC) {
+      clearInterval(t);
+    }
+    return () => {
+      clearInterval(t);
+    };
+  }, [isNBTC]);
+  const { balance: btcBalance, loading: btcBalanceLoading } = useBtcAction({
+    tokenId: tokenRow?.tokenId || "",
+    price: tokenRow?.price || 0,
+    updaterCounter,
+  });
   const accountId = useAccountId();
   const isMeme = useAppSelector(isMemeCategory);
   const isWrappedNear = tokenRow.symbol === "NEAR";
@@ -955,7 +959,6 @@ function TokenUserInfo() {
   const handleSupplyClick = useSupplyTrigger(tokenId);
   const handleBorrowClick = useBorrowTrigger(tokenId);
   const dispatch = useAppDispatch();
-  const isBtc = tokenId === NBTCTokenId;
   function getIcons() {
     return (
       <div className="flex items-center justify-center flex-wrap flex-shrink-0">
@@ -985,8 +988,6 @@ function TokenUserInfo() {
     (acc, { maxBorrowAmount }) => acc + maxBorrowAmount,
     0,
   );
-  const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
-  const isNBTC = NBTCTokenId === tokenId && selectedWalletId === "btc-wallet";
   return (
     <UserBox className="mb-[29px] xsm:mb-2.5">
       <div className="flex justify-between items-center">
@@ -1020,20 +1021,28 @@ function TokenUserInfo() {
               <SatoshiIcon />
             </span>
           </div>
-          {/* <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
-            <span className="text-gray-300">NEAR Chain</span>
-            <span className="flex items-center">
-              <span className="mr-[6px] text-sm">{accountId ? supplyBalance : "-"}</span>
-              <BtcChainIcon />
-            </span>
-          </div> */}
           <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
-            <span className="text-gray-300">BTC Chain</span>
+            <span className="text-gray-300">BTC Chain Balance</span>
             <span className="flex items-center">
               <span className="mr-[6px] text-sm">
-                {accountId ? digitalProcess(btcAvailableBalance || 0, 8) : "-"}
+                {accountId ? (
+                  btcBalanceLoading ? (
+                    <BeatLoader size={5} color="#ffffff" />
+                  ) : (
+                    digitalProcess(btcBalance || 0, 8)
+                  )
+                ) : (
+                  "-"
+                )}
               </span>
               <BtcChainIcon />
+            </span>
+          </div>
+          <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
+            <span className="text-gray-300">NEAR Chain Balance</span>
+            <span className="flex items-center">
+              <span className="mr-[6px] text-sm">{accountId ? supplyBalance : "-"}</span>
+              <img src={tokenRow?.icon} className="w-4 h-4 rounded-full" alt="" />
             </span>
           </div>
         </div>
@@ -1078,7 +1087,7 @@ function TokenUserInfo() {
         {accountId ? (
           <>
             <YellowSolidButton
-              disabled={isBtc ? !+btcAvailableBalance : !+supplyBalance}
+              disabled={isNBTC ? !+btcBalance && !+supplyBalance : !+supplyBalance}
               className="w-1 flex-grow"
               onClick={handleSupplyClick}
             >

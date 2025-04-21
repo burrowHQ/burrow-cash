@@ -32,6 +32,7 @@ interface Props {
   isMax: boolean;
   isMeme: boolean;
   available: number;
+  isOneClickAction: boolean;
 }
 
 export async function withdraw({
@@ -41,9 +42,10 @@ export async function withdraw({
   isMax,
   isMeme,
   available,
+  isOneClickAction,
 }: Props) {
   const state = store.getState();
-  const { oracleContract, logicContract, memeOracleContract, logicMEMEContract, selector } =
+  const { oracleContract, logicContract, memeOracleContract, logicMEMEContract } =
     await getBurrow();
   let assets: typeof state.assets.data;
   let account: typeof state.account;
@@ -169,9 +171,8 @@ export async function withdraw({
         ],
       });
     }
-    const wallet = await selector.wallet();
     let withdraw_to_btc;
-    if (wallet.id == "btc-wallet" && tokenId === NBTCTokenId) {
+    if (isOneClickAction) {
       const withdrawAmount = shrinkTokenDecimal(expandedAmount.toFixed(0), extraDecimals).toFixed(
         0,
       );
@@ -180,6 +181,7 @@ export async function withdraw({
         env: NBTC_ENV,
       });
     }
-    await prepareAndExecuteTransactions(transactions, isMeme, withdraw_to_btc);
+    const result = await prepareAndExecuteTransactions(transactions, isMeme, withdraw_to_btc);
+    return result;
   }
 }

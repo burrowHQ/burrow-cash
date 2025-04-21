@@ -50,7 +50,10 @@ export const executeMultipleTransactions = async (
       transactions: selectorTransactions,
     });
     if (fetchData) fetchData(account.accountId);
-    if (hideModal) hideModal();
+    if (!extraTranstion) {
+      // nbtc withdraw btc
+      if (hideModal) hideModal();
+    }
     return result;
   } catch (e: any) {
     if (hideModal) hideModal();

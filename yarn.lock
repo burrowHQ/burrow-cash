@@ -3131,13 +3131,13 @@
     "@near-wallet-selector/core" "8.9.10"
     bn.js "5.2.1"
 
-"@near-wallet-selector/hot-wallet@8.10.1":
-  version "8.10.1"
-  resolved "https://registry.yarnpkg.com/@near-wallet-selector/hot-wallet/-/hot-wallet-8.10.1.tgz#276254727c3f0b86eb4943778cb250442482322c"
-  integrity sha512-lOjXlUsCevSybXijZ8vY2BQJ+CfQZDeiS9+GXZw30jP9Kvd6tn1hQhxHsC2FFbFEvd4PxNVvSd88H93+WvX3uw==
+"@near-wallet-selector/hot-wallet@8.10.0":
+  version "8.10.0"
+  resolved "https://registry.yarnpkg.com/@near-wallet-selector/hot-wallet/-/hot-wallet-8.10.0.tgz#090da885d4503287ffecf8f1837bab714dbace06"
+  integrity sha512-92ib0ADc283WGZkotxfUui391i/o3h2LIVZZwUuZHGAYDWfWQ+oA9kEmkjhkL+rP8niPM3vCNSIkPM2h6P5E/w==
   dependencies:
     "@hot-wallet/sdk" "1.0.8"
-    "@near-wallet-selector/core" "8.10.1"
+    "@near-wallet-selector/core" "8.10.0"
 
 "@near-wallet-selector/ledger@8.9.10":
   version "8.9.10"
@@ -6998,10 +6998,10 @@ bser@2.1.1:
   dependencies:
     node-int64 "^0.4.0"
 
-btc-wallet@^0.5.30-beta:
-  version "0.5.30-beta"
-  resolved "https://registry.yarnpkg.com/btc-wallet/-/btc-wallet-0.5.30-beta.tgz#980f99830ebaf63313063a4a468edd1b82150f3f"
-  integrity sha512-K9WgeBg1Sj/lbYw1evNTS8OzSDAR2zOSCL5NrLcwIZZHEhFc6y03PWiGUv+gyOCo0El7iM6lb5z4LuT9TtRVxA==
+btc-wallet@^0.5.53-beta:
+  version "0.5.53-beta"
+  resolved "https://registry.yarnpkg.com/btc-wallet/-/btc-wallet-0.5.53-beta.tgz#7cbed0314ed30dcf0313e0eecec2e61b0cb30b4d"
+  integrity sha512-CkYI3WApR2yaj9qToY5seuAKB+PpoMfRmOFejZUHxJViRtUD2fusiGZbXOtg50oqI31MtrbeL6lHaErGtxKA7Q==
   dependencies:
     "@bitcoinerlab/secp256k1" "^1.2.0"
     "@ethereumjs/util" "^9.0.1"
