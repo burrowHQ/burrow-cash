@@ -115,22 +115,49 @@ export default function Action({
             isMax,
             isMeme,
             isOneClickAction,
-          }).then((result) => {
-            if (isOneClickAction) {
-              const status =
-                result == "error" || (result && isFailureExecution(result)) ? "error" : "success";
+          }).then(async (result: any) => {
+            if (isOneClickAction && result !== "error") {
+              const { txHash: btcTxHash, fetchData } = result;
+              dispatch(hideModal());
               dispatch(showOneClickBtcModal());
-              dispatch(
-                setOneClickBtcStatus({
-                  status: {
-                    title: "Supply Confirm",
-                    content:
-                      status == "success"
-                        ? "BTC Supply has been completed. Please check your supply balance."
-                        : "BTC Supply has been failed.",
-                  },
-                }),
-              );
+              try {
+                dispatch(
+                  setOneClickBtcStatus({
+                    status: {
+                      fromChain: "BTC",
+                      toChain: "NEAR",
+                      fromChainHash: btcTxHash,
+                    },
+                  }),
+                );
+                const res = await checkBridgeTransactionStatus({
+                  txHash: btcTxHash,
+                  fromChain: "BTC",
+                  env: NBTC_ENV,
+                });
+                const nearTxHash = res.ToTxHash;
+                dispatch(
+                  setOneClickBtcStatus({
+                    status: {
+                      fromChain: "BTC",
+                      toChain: "NEAR",
+                      fromChainHash: btcTxHash,
+                      toChainHash: nearTxHash,
+                      successText:
+                        "BTC Supply has been completed. Please check your supply balance.",
+                    },
+                  }),
+                );
+                if (fetchData) fetchData(account);
+              } catch (error) {
+                dispatch(
+                  setOneClickBtcStatus({
+                    status: {
+                      failedText: "BTC Supply has been failed.",
+                    },
+                  }),
+                );
+              }
             }
           });
         }
@@ -148,39 +175,45 @@ export default function Action({
           isMeme,
           available,
           isOneClickAction,
-        }).then(async (result) => {
+        }).then(async (result: any) => {
           if (isOneClickAction) {
             const transtion_outcome = (result as any[]).at(-1);
-            const hash = transtion_outcome?.transaction?.hash;
-            if (hash) {
-              try {
-                await checkBridgeTransactionStatus({
-                  txHash: hash,
+            const nearTxHash = transtion_outcome?.transaction?.hash;
+            dispatch(hideModal());
+            dispatch(showOneClickBtcModal());
+            try {
+              dispatch(
+                setOneClickBtcStatus({
+                  status: {
+                    fromChain: "NEAR",
+                    toChain: "BTC",
+                    fromChainHash: nearTxHash,
+                  },
+                }),
+              );
+              const res = await checkBridgeTransactionStatus({
+                txHash: nearTxHash,
+                fromChain: "NEAR",
+                env: NBTC_ENV,
+              });
+              const btcTxHash = res.ToTxHash;
+              setOneClickBtcStatus({
+                status: {
                   fromChain: "NEAR",
-                  env: NBTC_ENV,
-                });
-                dispatch(hideModal());
-                dispatch(showOneClickBtcModal());
-                dispatch(
-                  setOneClickBtcStatus({
-                    status: {
-                      title: "Withdraw Confirm",
-                      content: "BTC Withdraw has been completed. Please check your BTC balance.",
-                    },
-                  }),
-                );
-              } catch (error) {
-                dispatch(hideModal());
-                dispatch(showOneClickBtcModal());
-                dispatch(
-                  setOneClickBtcStatus({
-                    status: {
-                      title: "Withdraw Confirm",
-                      content: "BTC Withdraw has been failed.",
-                    },
-                  }),
-                );
-              }
+                  toChain: "BTC",
+                  fromChainHash: nearTxHash,
+                  toChainHash: btcTxHash,
+                  successText: "BTC Withdraw has been completed. Please check your BTC balance.",
+                },
+              });
+            } catch (error) {
+              dispatch(
+                setOneClickBtcStatus({
+                  status: {
+                    failedText: "BTC Withdraw has been failed.",
+                  },
+                }),
+              );
             }
           }
         });
