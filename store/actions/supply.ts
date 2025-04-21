@@ -14,6 +14,8 @@ export async function supply({
   amount,
   isMax,
   isMeme,
+  isOneClickAction,
+  receiveAmount,
 }: {
   tokenId: string;
   extraDecimals: number;
@@ -21,14 +23,18 @@ export async function supply({
   amount: string;
   isMax: boolean;
   isMeme: boolean;
-}): Promise<void> {
-  const { account, logicContract, logicMEMEContract, hideModal, selector } = await getBurrow();
+  isOneClickAction: boolean;
+  receiveAmount: string;
+}): Promise<any> {
+  const { account, logicContract, logicMEMEContract, hideModal, fetchData } = await getBurrow();
   const { decimals } = (await getMetadata(tokenId))!;
   const tokenContract = await getTokenContract(tokenId);
   const burrowContractId = isMeme ? logicMEMEContract.contractId : logicContract.contractId;
   let expandedAmount;
+  let expandedReceiveAmount;
   if (tokenId === NBTCTokenId) {
     expandedAmount = expandTokenDecimal(amount, decimals);
+    expandedReceiveAmount = expandTokenDecimal(receiveAmount, decimals);
   } else {
     const tokenBalance = new Decimal(await getBalance(tokenId, account.accountId));
     expandedAmount = isMax
@@ -46,23 +52,27 @@ export async function supply({
       },
     ],
   };
-  const wallet = await selector.wallet();
-  if (wallet.id == "btc-wallet" && tokenId === NBTCTokenId) {
+  if (isOneClickAction) {
     try {
-      await executeBTCDepositAndAction({
+      const result = await executeBTCDepositAndAction({
         action: {
           receiver_id: burrowContractId,
-          amount: expandedAmount.toFixed(0),
+          amount: expandedReceiveAmount.toFixed(0),
           msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
         },
+        amount: expandedAmount,
         env: NBTC_ENV,
         registerDeposit: "100000000000000000000000",
       });
+      if (fetchData) fetchData(account.accountId);
+      if (hideModal) hideModal();
+      return result;
     } catch (error) {
       if (hideModal) hideModal();
+      return "error";
     }
   } else {
-    await prepareAndExecuteTokenTransactions(tokenContract, {
+    const result = await prepareAndExecuteTokenTransactions(tokenContract, {
       methodName: ChangeMethodsToken[ChangeMethodsToken.ft_transfer_call],
       args: {
         receiver_id: burrowContractId,
@@ -70,5 +80,6 @@ export async function supply({
         msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
       },
     });
+    return result;
   }
 }
