@@ -6998,10 +6998,10 @@ bser@2.1.1:
   dependencies:
     node-int64 "^0.4.0"
 
-btc-wallet@^0.5.51-beta:
-  version "0.5.51-beta"
-  resolved "https://registry.yarnpkg.com/btc-wallet/-/btc-wallet-0.5.51-beta.tgz#7fbd860b89363b5d23280d8bf9fe060bab961fae"
-  integrity sha512-yh+NNoqcoXnClir4noe9HZu8a+wLYZZn3noiGCXBpIyjPF5Ugky57X9YAJ7buy0PpEpYRlIOBXuXFsgOq02p6Q==
+btc-wallet@^0.5.53-beta:
+  version "0.5.53-beta"
+  resolved "https://registry.yarnpkg.com/btc-wallet/-/btc-wallet-0.5.53-beta.tgz#7cbed0314ed30dcf0313e0eecec2e61b0cb30b4d"
+  integrity sha512-CkYI3WApR2yaj9qToY5seuAKB+PpoMfRmOFejZUHxJViRtUD2fusiGZbXOtg50oqI31MtrbeL6lHaErGtxKA7Q==
   dependencies:
     "@bitcoinerlab/secp256k1" "^1.2.0"
     "@ethereumjs/util" "^9.0.1"
