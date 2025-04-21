@@ -57,10 +57,10 @@ export async function supply({
       const result = await executeBTCDepositAndAction({
         action: {
           receiver_id: burrowContractId,
-          amount: expandedReceiveAmount.toFixed(0),
+          amount: expandedReceiveAmount.toFixed(0, Decimal.ROUND_DOWN),
           msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
         },
-        amount: expandedAmount,
+        amount: expandedAmount.toFixed(0, Decimal.ROUND_DOWN),
         env: NBTC_ENV,
         registerDeposit: "100000000000000000000000",
       });
