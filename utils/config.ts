@@ -143,7 +143,7 @@ const getConfig = (env: string = defaultNetwork) => {
         NATIVE_TOKENS: ["usdc.fakes.testnet"],
         NEW_TOKENS: ["usdc.fakes.testnet", "shadow_ref_v1-0", "shadow_ref_v1-2"],
         PYTH_ORACLE_ID: "pyth-oracle.testnet",
-        PRICE_ORACLE_ID: "mock-priceoracle.testnet",
+        PRICE_ORACLE_ID: "priceoracle.services.ref-labs.testnet",
         MEME_PRICE_ORACLE_ID: "mock-priceoracle.testnet",
         REF_EXCHANGE_ID: "ref-finance-101.testnet",
         DCL_EXCHANGE_ID: "refv2-dev.ref-dev.testnet",
