@@ -262,14 +262,14 @@ const Modal = () => {
     }
   }
   // oneClick time
-  if (isOneClickAction) {
-    alerts["oneClickActionTime"] = {
-      title: "It will take about 20 minutes to complete.",
-      severity: "warning",
-    };
-  } else {
-    delete alerts.oneClickActionTime;
-  }
+  // if (isOneClickAction) {
+  //   alerts["oneClickActionTime"] = {
+  //     title: "It will take about 20 minutes to complete.",
+  //     severity: "warning",
+  //   };
+  // } else {
+  //   delete alerts.oneClickActionTime;
+  // }
   const actionButtonDisabled =
     alerts["btcWithdrawErrorMsg"] ||
     alerts["btcDepositMinLimit"] ||
