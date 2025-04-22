@@ -210,23 +210,7 @@ export function Star(props: any) {
 }
 
 export function BTCChainIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      width="26"
-      height="26"
-      viewBox="0 0 26 26"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect x="0.5" y="0.5" width="25" height="25" rx="5.5" fill="#516DFF" stroke="#D1DAE1" />
-      <path
-        d="M13.0027 3.72998V16.6843L18.6953 13.2718L13.0027 3.72998ZM13.0027 22.2702L18.6953 14.097L13.0027 17.5399V22.2702ZM13.0027 3.72998V16.6843L7.30762 13.2718L13.0027 3.72998Z"
-        fill="white"
-      />
-      <path d="M13.0027 17.5396V22.2699L7.30762 14.0967L13.0027 17.5396Z" fill="white" />
-    </svg>
-  );
+  return <img {...props} src="https://assets.deltatrade.ai/assets/chain/btc.svg" alt="" />;
 }
 
 export function NEARChainIcon(props: any) {

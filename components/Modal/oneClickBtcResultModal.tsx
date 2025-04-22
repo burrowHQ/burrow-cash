@@ -17,8 +17,7 @@ import { hideOneClickBtcModal, setOneClickBtcStatus } from "../../redux/appSlice
 
 export default function OneClickBtcResultModal() {
   const dispatch = useAppDispatch();
-  // const isOpen = useAppSelector(getOneClickBtcModalOpen);
-  const isOpen = true;
+  const isOpen = useAppSelector(getOneClickBtcModalOpen);
   const status = useAppSelector(getOneClickBtcResultStatus);
   const mobile = isMobileDevice();
   function closeModal() {
@@ -62,7 +61,7 @@ export default function OneClickBtcResultModal() {
         {status?.fromChainHash ? (
           <div className="flex items-center justify-between w-[150px] mx-auto my-5">
             {status?.fromChain == "BTC" ? (
-              <BTCChainIcon className="flex-shrink-0" />
+              <BTCChainIcon className="flex-shrink-0 w-[28px] h-[28px]" />
             ) : (
               <NEARChainIcon className="flex-shrink-0" />
             )}
@@ -74,7 +73,7 @@ export default function OneClickBtcResultModal() {
             )}
             <LineRight className="flex-shrink-0" />
             {status?.toChain == "BTC" ? (
-              <BTCChainIcon className="flex-shrink-0" />
+              <BTCChainIcon className="flex-shrink-0 w-[28px] h-[28px]" />
             ) : (
               <NEARChainIcon className="flex-shrink-0" />
             )}
