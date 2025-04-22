@@ -17,7 +17,8 @@ import { hideOneClickBtcModal, setOneClickBtcStatus } from "../../redux/appSlice
 
 export default function OneClickBtcResultModal() {
   const dispatch = useAppDispatch();
-  const isOpen = useAppSelector(getOneClickBtcModalOpen);
+  // const isOpen = useAppSelector(getOneClickBtcModalOpen);
+  const isOpen = true;
   const status = useAppSelector(getOneClickBtcResultStatus);
   const mobile = isMobileDevice();
   function closeModal() {
@@ -80,33 +81,36 @@ export default function OneClickBtcResultModal() {
           </div>
         ) : null}
 
-        <div className="text-sm text-gray-300 text-center">
+        <div className="text-base text-gray-300">
           {!status?.fromChainHash && !status?.toChainHash
             ? status?.failedText
             : status?.toChainHash
             ? status?.successText
-            : "Your transaction require 2-3 Bitcoin block confirmation base on the size you deposit /ramp-ed Track your transaction here."}
+            : "Your transaction require 2-3 Bitcoin block confirmation base on the size you deposit /ramp-ed."}
         </div>
         {status?.fromChainHash ? (
-          <div className="flex items-center justify-center mt-6 gap-2">
-            <div
-              onClick={() => {
-                goExplore(status?.fromChain, status?.fromChainHash);
-              }}
-              className="flex items-center justify-center cursor-pointer bg-orange bg-opacity-10 rounded-lg text-xs text-orange py-1.5 gap-1.5 w-[85px]"
-            >
-              SRC TX <LinkIcon />
-            </div>
-            {status?.toChainHash ? (
+          <div className="flex flex-col mt-6 text-sm text-gray-300">
+            <p>Track your transaction here:</p>
+            <div className="flex items-center justify-center gap-2 mt-2">
               <div
                 onClick={() => {
-                  goExplore(status?.toChain, status?.toChainHash);
+                  goExplore(status?.fromChain, status?.fromChainHash);
                 }}
-                className="flex items-center justify-center cursor-pointer bg-orange bg-opacity-10 rounded-lg text-xs text-orange py-1.5 gap-1.5  w-[85px]"
+                className="flex items-center justify-center cursor-pointer bg-white bg-opacity-10 rounded-lg text-xs text-gray-300 py-1.5 gap-1.5 w-[85px]"
               >
-                TARGET TX <LinkIcon />
+                SRC TX <LinkIcon />
               </div>
-            ) : null}
+              {status?.toChainHash ? (
+                <div
+                  onClick={() => {
+                    goExplore(status?.toChain, status?.toChainHash);
+                  }}
+                  className="flex items-center justify-center cursor-pointer bg-white bg-opacity-10 rounded-lg text-xs text-gray-300 py-1.5 gap-1.5  w-[85px]"
+                >
+                  TARGET TX <LinkIcon />
+                </div>
+              ) : null}
+            </div>
           </div>
         ) : null}
 
