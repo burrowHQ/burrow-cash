@@ -54,7 +54,7 @@ export async function supply({
   };
   if (isOneClickAction) {
     try {
-      const result = await executeBTCDepositAndAction({
+      const txHash = await executeBTCDepositAndAction({
         action: {
           receiver_id: burrowContractId,
           amount: expandedReceiveAmount.toFixed(0, Decimal.ROUND_DOWN),
@@ -63,10 +63,12 @@ export async function supply({
         amount: expandedAmount.toFixed(0, Decimal.ROUND_DOWN),
         env: NBTC_ENV,
         registerDeposit: "100000000000000000000000",
+        pollResult: false,
       });
-      if (fetchData) fetchData(account.accountId);
-      if (hideModal) hideModal();
-      return result;
+      return {
+        txHash,
+        fetchData,
+      };
     } catch (error) {
       if (hideModal) hideModal();
       return "error";
