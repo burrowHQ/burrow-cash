@@ -18,6 +18,7 @@ import { beautifyPrice } from "../../utils/beautyNumber";
 import { getPageTypeFromUrl } from "../../utils/commonUtils";
 import Breadcrumb from "../../components/common/breadcrumb";
 import UnLoginUi from "../../components/Dashboard/unLoginBox";
+import HtmlTooltip from "../../components/common/html-tooltip";
 
 const Index = () => {
   const accountId = useAccountId();
@@ -82,7 +83,7 @@ const yourSuppliedColumns = (memeCategory?: boolean) => [
     header: "Assets",
     size: 120,
     cell: ({ originalData }) => {
-      const { symbol: standardizeSymbol, metadata, icon } = originalData || {};
+      const { symbol: standardizeSymbol, metadata, icon, tokenId } = originalData || {};
       const { tokens, symbol } = metadata || {};
       let iconImg;
       let symbolNode = standardizeSymbol || symbol;
@@ -125,14 +126,20 @@ const yourSuppliedColumns = (memeCategory?: boolean) => [
       return (
         <div className="flex gap-2 items-center">
           {iconImg}
-          <div
-            title={symbolNode}
-            style={{
-              whiteSpace: "normal",
-            }}
-          >
-            {symbolNode}
-          </div>
+          {tokenId === "aurora" ? (
+            <HtmlTooltip title="This ETH has been deprecated. Please withdraw it.">
+              <div style={{ whiteSpace: "normal" }}>{symbolNode}</div>
+            </HtmlTooltip>
+          ) : (
+            <div
+              title={symbolNode}
+              style={{
+                whiteSpace: "normal",
+              }}
+            >
+              {symbolNode}
+            </div>
+          )}
         </div>
       );
     },
@@ -309,6 +316,7 @@ const yourBorrowedColumns = (memeCategory?: boolean) => [
     header: "Assets",
     size: 120,
     cell: ({ originalData }) => {
+      const { tokenId } = originalData || {};
       return (
         <div className="flex gap-2 items-center">
           <img
@@ -318,7 +326,13 @@ const yourBorrowedColumns = (memeCategory?: boolean) => [
             alt="token"
             className="rounded-full w-[26px] h-[26px]"
           />
-          <div className="truncate">{originalData?.symbol}</div>
+          {tokenId === "aurora" ? (
+            <HtmlTooltip title="This ETH has been deprecated. Please withdraw it.">
+              <div className="truncate">{originalData?.symbol}</div>
+            </HtmlTooltip>
+          ) : (
+            <div className="truncate">{originalData?.symbol}</div>
+          )}
         </div>
       );
     },
