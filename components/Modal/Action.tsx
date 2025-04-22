@@ -197,15 +197,17 @@ export default function Action({
                 env: NBTC_ENV,
               });
               const btcTxHash = res.ToTxHash;
-              setOneClickBtcStatus({
-                status: {
-                  fromChain: "NEAR",
-                  toChain: "BTC",
-                  fromChainHash: nearTxHash,
-                  toChainHash: btcTxHash,
-                  successText: "BTC Withdraw has been completed. Please check your BTC balance.",
-                },
-              });
+              dispatch(
+                setOneClickBtcStatus({
+                  status: {
+                    fromChain: "NEAR",
+                    toChain: "BTC",
+                    fromChainHash: nearTxHash,
+                    toChainHash: btcTxHash,
+                    successText: "BTC Withdraw has been completed. Please check your BTC balance.",
+                  },
+                }),
+              );
             } catch (error) {
               dispatch(
                 setOneClickBtcStatus({
