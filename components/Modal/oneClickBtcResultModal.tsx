@@ -85,7 +85,7 @@ export default function OneClickBtcResultModal() {
             ? status?.failedText
             : status?.toChainHash
             ? status?.successText
-            : "Your transaction require 2-3 Bitcoin block confirmation base on the size you deposit /ramp-ed."}
+            : "Your transaction requires 2-3 Bitcoin block confirmations based on the amount you deposited/ramp-ed."}
         </div>
         {status?.fromChainHash ? (
           <div className="flex flex-col mt-6 text-sm text-gray-300">
