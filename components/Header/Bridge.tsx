@@ -61,11 +61,11 @@ export const bridgeList: IBridge[] = [
     subTitle: "Arbitrum | Ethereum | Base Optimism | Scroll",
     link: "https://dex.rhea.finance/bridge",
   },
-  {
-    title: "Token Bridge",
-    subTitle: "Ethereum | Near | Solana",
-    link: "https://tokenbridge.app",
-  },
+  // {
+  //   title: "Token Bridge",
+  //   subTitle: "Ethereum | Near | Solana",
+  //   link: "https://tokenbridge.app",
+  // },
   // {
   //   title: "Electron Labs",
   //   subTitle: "Ethereum",
