@@ -36,12 +36,15 @@ export async function supply({
   if (tokenId === NBTCTokenId) {
     expandedAmount = expandTokenDecimal(amount, decimals);
     expandedReceiveAmount = expandTokenDecimal(receiveAmount, decimals);
-    collateralAmount = expandTokenDecimal(expandedReceiveAmount, extraDecimals);
   } else {
     const tokenBalance = new Decimal(await getBalance(tokenId, account.accountId));
     expandedAmount = isMax
       ? tokenBalance
       : decimalMin(expandTokenDecimal(amount, decimals), tokenBalance);
+  }
+  if (isOneClickAction) {
+    collateralAmount = expandTokenDecimal(expandedReceiveAmount, extraDecimals);
+  } else {
     collateralAmount = expandTokenDecimal(expandedAmount, extraDecimals);
   }
   const collateralActions = {
