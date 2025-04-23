@@ -3,7 +3,6 @@ import { useAppSelector } from "../redux/hooks";
 import { getAssetDataByTokenId } from "../redux/appSelectors";
 import { getBorrowMaxAmount } from "../redux/selectors/getBorrowMaxAmount";
 import { NEAR_STORAGE_DEPOSIT } from "../store";
-import { useBtcAction } from "./useBtcBalance";
 
 export function useUserBalance(tokenId: string, isWrappedNear: boolean) {
   const asset = useAppSelector(getAssetDataByTokenId(tokenId));

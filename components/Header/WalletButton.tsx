@@ -45,21 +45,6 @@ const WalletButton = () => {
     dispatch(_hideModalMEME());
   };
   const fetchData = (id?: string) => {
-    // TODOXX
-    // if (
-    //   id &&
-    //   accountId &&
-    //   accountId !== id &&
-    //   (window.localStorage.getItem("near-wallet-selector:selectedWalletId") == '"btc-wallet"' ||
-    //     accountId.startsWith("bc1"))
-    // ) {
-    //   // for btc wallet to switch accountId
-    //   dispatch(setAccountId(id));
-    //   setTimeout(() => {
-    //     window.location.reload();
-    //   }, 500);
-    //   return;
-    // }
     dispatch(setAccountId(id));
     dispatch(fetchAccount());
     dispatch(fetchAccountMEME());
