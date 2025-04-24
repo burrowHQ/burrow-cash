@@ -10,7 +10,7 @@
     "start": "serve out",
     "clean": "rm -rf public && rm -rf dist && rm -rf .parcel-cache",
     "prettier": "prettier --write ./*",
-    "lint": "prettier --check \"./**/*.{ts,tsx}\" && eslint \"./**/*.{ts,tsx}\" && yarn type-check",
+    "lint": "prettier --check \"./**/*.{ts,tsx}\" && eslint \"./**/*.{ts,tsx}\" && pnpm type-check",
     "type-check": "tsc --pretty --noEmit",
     "sentry-upload": "sentry-cli releases files v1 -o burrow-fdn -p burrow upload-sourcemaps public",
     "postinstall": "husky install",
