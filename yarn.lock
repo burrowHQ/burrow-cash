@@ -14136,6 +14136,34 @@ reusify@^1.0.4:
   resolved "https://registry.npmjs.org/reusify/-/reusify-1.0.4.tgz"
   integrity sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==
 
+rhea-dex-core@7.9.1:
+  version "7.9.1"
+  resolved "https://registry.yarnpkg.com/rhea-dex-core/-/rhea-dex-core-7.9.1.tgz#5f79047ec6b963dd899762fda86998992855b0d4"
+  integrity sha512-hLs40yn2zfHOscs/3QrrJAXmXxfEdFWWIWCovGvFMhy2jS7ar3iWjAbODe+nsWiGbbnO/kNcwd5mY5PPM9wnjw==
+  dependencies:
+    near-api-js "0.44.2"
+    rxjs "^7.8.0"
+
+rhea-dex-wallet-utils@7.9.2:
+  version "7.9.2"
+  resolved "https://registry.yarnpkg.com/rhea-dex-wallet-utils/-/rhea-dex-wallet-utils-7.9.2.tgz#6fb65f0ea2be5aa6f1e54b7872887bf8c9912255"
+  integrity sha512-Jq4tSuchNAMpu+LyrzYJ3ClaIwzfQgmbsCEsrays16fGx9cnucES9jm92+PKPeXnJpw8AfCCm8ph11rg7tqYNg==
+  dependencies:
+    bn.js "^5.2.0"
+    near-api-js "0.44.2"
+    rhea-dex-core "7.9.1"
+
+rhea-wallet-connect@^7.9.8:
+  version "7.9.8"
+  resolved "https://registry.yarnpkg.com/rhea-wallet-connect/-/rhea-wallet-connect-7.9.8.tgz#3de37e69b1a736629ec999d77f1896760bf3f38c"
+  integrity sha512-hncvzHQRD1gqa1Z0J2Y+HF1po6wL9ftbumJkuxF0DoENe15qYV9QNYHt2YCzwTkHTjQd7dBkSFkOKXTSuQ5kaA==
+  dependencies:
+    "@walletconnect/qrcode-modal" "2.0.0-alpha.20"
+    "@walletconnect/sign-client" "2.1.4"
+    near-api-js "0.44.2"
+    rhea-dex-core "7.9.1"
+    rhea-dex-wallet-utils "7.9.2"
+
 rimraf@^3.0.0, rimraf@^3.0.2:
   version "3.0.2"
   resolved "https://registry.npmjs.org/rimraf/-/rimraf-3.0.2.tgz"

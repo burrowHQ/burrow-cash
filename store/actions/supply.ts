@@ -32,6 +32,7 @@ export async function supply({
   const burrowContractId = isMeme ? logicMEMEContract.contractId : logicContract.contractId;
   let expandedAmount;
   let expandedReceiveAmount;
+  let collateralAmount;
   if (tokenId === NBTCTokenId) {
     expandedAmount = expandTokenDecimal(amount, decimals);
     expandedReceiveAmount = expandTokenDecimal(receiveAmount, decimals);
@@ -41,13 +42,17 @@ export async function supply({
       ? tokenBalance
       : decimalMin(expandTokenDecimal(amount, decimals), tokenBalance);
   }
-  const collateralAmount = expandTokenDecimal(expandedAmount, extraDecimals);
+  if (isOneClickAction) {
+    collateralAmount = expandTokenDecimal(expandedReceiveAmount, extraDecimals);
+  } else {
+    collateralAmount = expandTokenDecimal(expandedAmount, extraDecimals);
+  }
   const collateralActions = {
     actions: [
       {
         IncreaseCollateral: {
           token_id: tokenId,
-          max_amount: collateralAmount.toFixed(0),
+          max_amount: collateralAmount.toFixed(0, Decimal.ROUND_DOWN),
         },
       },
     ],

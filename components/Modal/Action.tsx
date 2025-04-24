@@ -25,11 +25,10 @@ import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { getSelectedValues, getAssetData } from "../../redux/appSelectors";
 import { isMemeCategory } from "../../redux/categorySelectors";
 import { trackActionButton } from "../../utils/telemetry";
-import { useDegenMode } from "../../hooks/hooks";
+import { useDegenMode, useAccountId } from "../../hooks/hooks";
 import { SubmitButton } from "./components";
 import getShadowRecords from "../../api/get-shadows";
 import { expandToken, shrinkToken } from "../../store";
-import { isFailureExecution } from "../../utils/transactionUtils";
 import { NBTC_ENV } from "../../utils/config";
 
 export default function Action({
@@ -48,6 +47,7 @@ export default function Action({
   const dispatch = useAppDispatch();
   const asset = useAppSelector(getAssetData);
   const { account, autoConnect } = useBtcWalletSelector();
+  const accountId = useAccountId();
   const { action = "Deposit", tokenId, borrowApy, price, portfolio, isLpToken, position } = asset;
   const { isRepayFromDeposits } = useDegenMode();
   const isMeme = useAppSelector(isMemeCategory);
@@ -148,7 +148,7 @@ export default function Action({
                     },
                   }),
                 );
-                if (fetchData) fetchData(account);
+                if (fetchData) fetchData(accountId);
               } catch (error) {
                 dispatch(
                   setOneClickBtcStatus({
