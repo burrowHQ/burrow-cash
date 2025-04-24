@@ -115,7 +115,7 @@ const web3Modal = createWeb3Modal({
 const walletConnect2 = setupWalletConnect({
   projectId: WALLET_CONNECT_ID,
   metadata: {
-    name: "REHA Finance",
+    name: "RHEA Finance",
     description: "RHEA with NEAR Wallet Selector",
     url: "https://github.com/near/wallet-selector",
     icons: ["https://avatars.githubusercontent.com/u/37784886"],
