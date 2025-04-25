@@ -447,7 +447,10 @@ export const BtcOneClickTab = ({ nbtcTab, setNbtcTab, isMeme }) => {
   }
   return (
     <div className="mb-[20px]">
-      <div className="flex items-center justify-between border border-dark-50 rounded-md bg-dark-600 h-12 mt-5 p-1.5">
+      <div
+        className="flex items-center justify-between border border-dark-50 rounded-md bg-dark-600 h-12 mt-5 p-1.5"
+        data-tour="modal-tabs"
+      >
         <span
           onClick={() => switchTab("btc")}
           className={`flex items-center justify-center flex-grow w-1 h-full text-sm rounded-md cursor-pointer ${
@@ -461,6 +464,7 @@ export const BtcOneClickTab = ({ nbtcTab, setNbtcTab, isMeme }) => {
           className={`flex items-center justify-center flex-grow w-1 h-full text-sm rounded-md cursor-pointer ${
             nbtcTab == "near" ? "text-white bg-gray-300 bg-opacity-30" : "text-gray-300"
           }`}
+          data-tour="modal-near-tab"
         >
           NEAR Chain
         </span>

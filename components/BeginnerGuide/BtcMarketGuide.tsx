@@ -7,7 +7,7 @@ import { NBTCTokenId } from "../../utils/config";
 import { useGuide } from "./GuideContext";
 
 const GUIDE_STORAGE_KEY = "btc_market_guide";
-
+const GUIDE_STATE_KEY = "btc_market_guide_state";
 interface BtcMarketGuideProps {
   isBtcWallet: boolean;
 }
@@ -18,7 +18,7 @@ const BtcMarketGuide: React.FC<BtcMarketGuideProps> = ({ isBtcWallet }) => {
   const router = useRouter();
   const accountId = useAppSelector(getAccountId);
 
-  const { isBtcGuideOpen, setIsBtcGuideOpen } = useGuide();
+  const { isBtcGuideOpen, setIsBtcGuideOpen, setNbtcDetailGuideActive } = useGuide();
 
   const findNbtcElement = (retryCount = 0) => {
     const element = document.querySelector(`[data-token-id="${NBTCTokenId}"]`);
@@ -48,6 +48,8 @@ const BtcMarketGuide: React.FC<BtcMarketGuideProps> = ({ isBtcWallet }) => {
     localStorage.setItem(GUIDE_STORAGE_KEY, "true");
     cleanupElement();
     setIsBtcGuideOpen(false);
+    localStorage.removeItem(GUIDE_STATE_KEY);
+    setNbtcDetailGuideActive(true);
   };
 
   const cleanupElement = (element?: Element) => {
@@ -64,13 +66,14 @@ const BtcMarketGuide: React.FC<BtcMarketGuideProps> = ({ isBtcWallet }) => {
   };
 
   const isMarketPage = () => {
-    return router.pathname === "/markets" || router.pathname === "/market";
+    return router.pathname === "/" || router.pathname === "/markets";
   };
 
   useEffect(() => {
     if (isMarketPage() && isBtcWallet && accountId) {
       const hasSeenGuide = localStorage.getItem(GUIDE_STORAGE_KEY) === "true";
-      if (!hasSeenGuide) {
+      const savedState = localStorage.getItem(GUIDE_STATE_KEY);
+      if (!hasSeenGuide || savedState === "active") {
         setIsBtcGuideOpen(true);
         const timer = setTimeout(() => {
           findNbtcElement();
@@ -79,8 +82,6 @@ const BtcMarketGuide: React.FC<BtcMarketGuideProps> = ({ isBtcWallet }) => {
       } else {
         setIsBtcGuideOpen(false);
       }
-    } else {
-      setIsBtcGuideOpen(false);
     }
   }, [router.pathname, isBtcWallet, accountId, setIsBtcGuideOpen]);
 

@@ -53,7 +53,10 @@ export default function Controls({ amount, available, action, asset, totalAvaila
   return (
     <div>
       {/* balance field */}
-      <div className="flex items-center justify-between text-sm text-gray-300 mb-3 px-1">
+      <div
+        className="flex items-center justify-between text-sm text-gray-300 mb-3 px-1"
+        data-tour="modal-available"
+      >
         <span className="text-sm text-gray-300">Available</span>
         <span className="flex items-center text-sm text-white">
           {/* {formatWithCommas_number(totalAvailable)} */}

@@ -5,6 +5,10 @@ interface GuideContextType {
   setIsBtcGuideOpen: (isOpen: boolean) => void;
   isWalletGuideCompleted: boolean;
   markWalletGuideCompleted: () => void;
+  isNbtcDetailGuideActive: boolean;
+  setNbtcDetailGuideActive: (isActive: boolean) => void;
+  nbtcDetailGuideStep: number;
+  setNbtcDetailGuideStep: (step: number) => void;
 }
 
 const GuideContext = createContext<GuideContextType>({
@@ -16,6 +20,14 @@ const GuideContext = createContext<GuideContextType>({
   markWalletGuideCompleted: () => {
     console.warn("markWalletGuideCompleted called on default context");
   },
+  isNbtcDetailGuideActive: false,
+  setNbtcDetailGuideActive: (isActive: boolean) => {
+    console.warn("setNbtcDetailGuideActive called on default context");
+  },
+  nbtcDetailGuideStep: 1,
+  setNbtcDetailGuideStep: (step: number) => {
+    console.warn("setNbtcDetailGuideStep called on default context");
+  },
 });
 
 export const GuideProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -23,6 +35,8 @@ export const GuideProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [isWalletGuideCompleted, setIsWalletGuideCompleted] = useState<boolean>(
     () => localStorage.getItem("btc_guide") === "true",
   );
+  const [isNbtcDetailGuideActive, setNbtcDetailGuideActive] = useState<boolean>(false);
+  const [nbtcDetailGuideStep, setNbtcDetailGuideStep] = useState<number>(1);
 
   const markWalletGuideCompleted = useCallback(() => {
     setIsWalletGuideCompleted(true);
@@ -34,6 +48,10 @@ export const GuideProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setIsBtcGuideOpen,
     isWalletGuideCompleted,
     markWalletGuideCompleted,
+    isNbtcDetailGuideActive,
+    setNbtcDetailGuideActive,
+    nbtcDetailGuideStep,
+    setNbtcDetailGuideStep,
   };
 
   return <GuideContext.Provider value={value}>{children}</GuideContext.Provider>;
