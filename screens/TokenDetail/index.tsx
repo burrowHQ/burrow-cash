@@ -73,6 +73,7 @@ import { getPageTypeFromUrl } from "../../utils/commonUtils";
 import Breadcrumb from "../../components/common/breadcrumb";
 import { beautifyPrice } from "../../utils/beautyNumber";
 import NbtcDetailGuide from "../../components/BeginnerGuide/NbtcDetailGuide";
+import { useGuide } from "../../components/BeginnerGuide/GuideContext";
 
 const DetailData = createContext(null) as any;
 const TokenDetail = () => {
@@ -314,7 +315,14 @@ function TokenDetailView({
 function DetailMobile({ tokenDetails, handlePeriodClick }) {
   const { router, is_new, tokenRow, getIcons, getSymbols } = useContext(DetailData) as any;
   const [activeTab, setActiveTab] = useState<"market" | "your">("market");
-  const [open, setOpen] = useState<boolean>(false);
+  const { mobileTab, isNbtcDetailGuideActive } = useGuide();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (isNbtcDetailGuideActive) {
+      setActiveTab("your");
+    }
+  }, [isNbtcDetailGuideActive]);
 
   function switchTab(tab) {
     setActiveTab(tab);

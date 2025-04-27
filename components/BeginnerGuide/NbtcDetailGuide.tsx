@@ -6,11 +6,17 @@ import { NBTCTokenId } from "../../utils/config";
 import { useGuide } from "./GuideContext";
 import {
   ChainBalanceIcon,
+  ChainBalanceMobileIcon,
   ChainSupplyIcon,
   ChainSupplyMobile1Icon,
   ChainSupplyMobile2Icon,
   ChainSupplyMobile3Icon,
+  ChainSupplyMobileIcon,
+  ChainSupplyMobileMove1Icon,
+  ChainSupplyMobileMove2Icon,
 } from "./icon";
+import FinalStepGuide from "./FinalStepGuide";
+import { isMobileDevice } from "../../helpers/helpers";
 
 const GUIDE_STORAGE_KEY = "btc_market_details_guide";
 interface BorderPosition {
@@ -64,19 +70,52 @@ const CustomBorder = ({ position }: { position: BorderPosition }) => {
 interface NbtcDetailGuideProps {
   isNbtcToken: boolean;
 }
+
+const preventScroll = (e: Event) => {
+  e.preventDefault();
+  e.stopPropagation();
+  return false;
+};
+
+const addNoScroll = () => {
+  window.addEventListener("wheel", preventScroll, { passive: false });
+  window.addEventListener("touchmove", preventScroll, { passive: false });
+  document.body.style.overflow = "hidden";
+};
+
+const removeNoScroll = () => {
+  window.removeEventListener("wheel", preventScroll);
+  window.removeEventListener("touchmove", preventScroll);
+  document.body.style.overflow = "";
+};
+
 const NbtcDetailGuide: React.FC<NbtcDetailGuideProps> = ({ isNbtcToken }) => {
   const router = useRouter();
-  const { isNbtcDetailGuideActive, setNbtcDetailGuideActive, setNbtcDetailGuideStep } = useGuide();
+  const isMobile = isMobileDevice();
+  const {
+    isNbtcDetailGuideActive,
+    setNbtcDetailGuideActive,
+    setNbtcDetailGuideStep,
+    setMobileTab,
+  } = useGuide();
 
   const [run, setRun] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [borderPosition, setBorderPosition] = useState<BorderPosition | null>(null);
 
+  const handleFinishGuide = () => {
+    setRun(false);
+    localStorage.setItem(GUIDE_STORAGE_KEY, "true");
+    setNbtcDetailGuideActive(false);
+    setNbtcDetailGuideStep(1);
+    removeNoScroll();
+  };
+
   const steps = [
     {
       target: '[data-tour="chain-balances"]',
-      content: <ChainBalanceIcon />,
-      placement: "left" as Placement,
+      content: isMobile ? <ChainBalanceMobileIcon className="mt-[72px]" /> : <ChainBalanceIcon />,
+      placement: isMobile ? ("top" as Placement) : ("left" as Placement),
       disableBeacon: true,
       styles: {
         options: {
@@ -86,8 +125,8 @@ const NbtcDetailGuide: React.FC<NbtcDetailGuideProps> = ({ isNbtcToken }) => {
     },
     {
       target: '[data-tour="supply-button"]',
-      content: <ChainSupplyIcon />,
-      placement: "left" as Placement,
+      content: isMobile ? <ChainSupplyMobileIcon className="mt-[34px]" /> : <ChainSupplyIcon />,
+      placement: isMobile ? ("top" as Placement) : ("left" as Placement),
       disableBeacon: true,
       spotlightClicks: true,
       styles: {
@@ -98,8 +137,12 @@ const NbtcDetailGuide: React.FC<NbtcDetailGuideProps> = ({ isNbtcToken }) => {
     },
     {
       target: '[data-tour="modal-tabs"]',
-      content: <ChainSupplyMobile1Icon />,
-      placement: "left" as Placement,
+      content: isMobile ? (
+        <ChainSupplyMobileMove1Icon className="mt-[-70px]" />
+      ) : (
+        <ChainSupplyMobile1Icon />
+      ),
+      placement: isMobile ? ("bottom" as Placement) : ("left" as Placement),
       disableBeacon: true,
       styles: {
         options: {
@@ -109,8 +152,12 @@ const NbtcDetailGuide: React.FC<NbtcDetailGuideProps> = ({ isNbtcToken }) => {
     },
     {
       target: '[data-tour="modal-available"]',
-      content: <ChainSupplyMobile2Icon />,
-      placement: "left" as Placement,
+      content: isMobile ? (
+        <ChainSupplyMobileMove2Icon className="mt-[-70px]" />
+      ) : (
+        <ChainSupplyMobile2Icon />
+      ),
+      placement: isMobile ? ("bottom" as Placement) : ("left" as Placement),
       disableBeacon: true,
       styles: {
         options: {
@@ -120,9 +167,11 @@ const NbtcDetailGuide: React.FC<NbtcDetailGuideProps> = ({ isNbtcToken }) => {
     },
     {
       target: '[data-tour="modal-near-tab"]',
-      content: <ChainSupplyMobile3Icon />,
+      content: <FinalStepGuide onFinish={handleFinishGuide} />,
       placement: "bottom" as Placement,
       disableBeacon: true,
+      hideFooter: true,
+      hideCloseButton: true,
       styles: {
         options: {
           zIndex: 30000,
@@ -138,7 +187,7 @@ const NbtcDetailGuide: React.FC<NbtcDetailGuideProps> = ({ isNbtcToken }) => {
       localStorage.setItem(GUIDE_STORAGE_KEY, "true");
       setNbtcDetailGuideActive(false);
       setNbtcDetailGuideStep(1);
-      document.body.style.overflow = "";
+      removeNoScroll();
     } else if (type === "step:after" && action === "next") {
       if (index === 1) {
         const supplyButton = document.querySelector('[data-tour="supply-button"]');
@@ -168,6 +217,15 @@ const NbtcDetailGuide: React.FC<NbtcDetailGuideProps> = ({ isNbtcToken }) => {
       setStepIndex(index + 1);
     } else if (type === "step:before") {
       setNbtcDetailGuideStep(index + 1);
+      if (index === steps.length - 1) {
+        const nearTab = document.querySelector('[data-tour="modal-near-tab"]');
+        if (nearTab) {
+          (nearTab as HTMLElement).click();
+        }
+      }
+      if (isMobile && index === 2 && setMobileTab) {
+        setMobileTab("your");
+      }
     }
   };
   useEffect(() => {
@@ -180,17 +238,17 @@ const NbtcDetailGuide: React.FC<NbtcDetailGuideProps> = ({ isNbtcToken }) => {
         setNbtcDetailGuideActive(true);
         setStepIndex(0);
         setRun(true);
-        document.body.style.overflow = "hidden";
+        addNoScroll();
       }
     };
     document.addEventListener("keydown", handleKeyActivate);
     if (isDetailPage && isCorrectToken && !hasCompletedGuide && isNbtcDetailGuideActive) {
       setRun(true);
-      document.body.style.overflow = "hidden";
+      addNoScroll();
     }
     return () => {
       document.removeEventListener("keydown", handleKeyActivate);
-      document.body.style.overflow = "";
+      removeNoScroll();
     };
   }, [router.pathname, router.query.id, isNbtcDetailGuideActive, setNbtcDetailGuideActive]);
   useEffect(() => {
@@ -216,18 +274,13 @@ const NbtcDetailGuide: React.FC<NbtcDetailGuideProps> = ({ isNbtcToken }) => {
   }, [run, stepIndex]);
   useEffect(() => {
     if (run) {
-      const preventScroll = (e: Event) => {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      };
-      window.addEventListener("wheel", preventScroll, { passive: false });
-      window.addEventListener("touchmove", preventScroll, { passive: false });
-      return () => {
-        window.removeEventListener("wheel", preventScroll);
-        window.removeEventListener("touchmove", preventScroll);
-      };
+      addNoScroll();
+    } else {
+      removeNoScroll();
     }
+    return () => {
+      removeNoScroll();
+    };
   }, [run]);
   useEffect(() => {
     if (run) {

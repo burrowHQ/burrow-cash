@@ -9,6 +9,8 @@ interface GuideContextType {
   setNbtcDetailGuideActive: (isActive: boolean) => void;
   nbtcDetailGuideStep: number;
   setNbtcDetailGuideStep: (step: number) => void;
+  setMobileTab?: (tab: "market" | "your") => void;
+  mobileTab?: "market" | "your";
 }
 
 const GuideContext = createContext<GuideContextType>({
@@ -37,6 +39,7 @@ export const GuideProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   );
   const [isNbtcDetailGuideActive, setNbtcDetailGuideActive] = useState<boolean>(false);
   const [nbtcDetailGuideStep, setNbtcDetailGuideStep] = useState<number>(1);
+  const [mobileTab, setMobileTab] = useState<"market" | "your">("market");
 
   const markWalletGuideCompleted = useCallback(() => {
     setIsWalletGuideCompleted(true);
@@ -52,6 +55,8 @@ export const GuideProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setNbtcDetailGuideActive,
     nbtcDetailGuideStep,
     setNbtcDetailGuideStep,
+    setMobileTab,
+    mobileTab,
   };
 
   return <GuideContext.Provider value={value}>{children}</GuideContext.Provider>;
