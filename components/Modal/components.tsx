@@ -106,7 +106,7 @@ export const ModalTitle = ({ asset, onClose }) => {
         >
           {actionMapTitle[action]} <span>{getSymbols()}</span>
         </div>
-        <CloseIcon onClick={onClose} />
+        <CloseIcon onClick={onClose} className="cursor-pointer" />
       </div>
     </div>
   );
