@@ -321,6 +321,22 @@ const NbtcDetailGuide: React.FC<NbtcDetailGuideProps> = ({ isNbtcToken }) => {
       removeNoScroll();
     };
   }, [run]);
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      if (
+        document.body.style.overflow === "hidden" ||
+        document.body.style.overflowX === "hidden" ||
+        document.body.style.overflowY === "hidden"
+      ) {
+        document.body.style.overflow = "";
+        document.body.style.overflowX = "";
+        document.body.style.overflowY = "";
+        document.body.classList.remove("modal-open");
+      }
+    });
+    observer.observe(document.body, { attributes: true, attributeFilter: ["style", "class"] });
+    return () => observer.disconnect();
+  }, []);
   if (!isNbtcToken || !isNbtcDetailGuideActive || router.query.id !== NBTCTokenId) {
     return null;
   }
