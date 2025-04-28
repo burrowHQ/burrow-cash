@@ -921,7 +921,7 @@ options-list::-webkit-scrollbar {
   }
 }
 
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .react-joyride__tooltip {
     align-items: center;
     max-width: 90vw !important;
@@ -953,4 +953,4 @@ options-list::-webkit-scrollbar {
     margin: 0 !important;
     white-space: nowrap;
   }
-}
+} */

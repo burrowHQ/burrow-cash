@@ -39,6 +39,8 @@ const CustomBorder = ({ position }: { position: BorderPosition }) => {
         height: `${height}px`,
         pointerEvents: "none",
         zIndex: 30000,
+        transform: "translateZ(0)",
+        willChange: "transform",
       }}
     >
       <svg
@@ -87,6 +89,10 @@ const removeNoScroll = () => {
   window.removeEventListener("wheel", preventScroll);
   window.removeEventListener("touchmove", preventScroll);
   document.body.style.overflow = "";
+  document.body.style.overflowX = "";
+  document.body.style.overflowY = "";
+  document.body.classList.remove("modal-open");
+  document.body.style.maxHeight = "";
 };
 
 const NbtcDetailGuide: React.FC<NbtcDetailGuideProps> = ({ isNbtcToken }) => {
@@ -108,14 +114,13 @@ const NbtcDetailGuide: React.FC<NbtcDetailGuideProps> = ({ isNbtcToken }) => {
     localStorage.setItem(GUIDE_STORAGE_KEY, "true");
     setNbtcDetailGuideActive(false);
     setNbtcDetailGuideStep(1);
-    removeNoScroll();
   };
 
   const steps = [
     {
       target: '[data-tour="chain-balances"]',
-      content: isMobile ? <ChainBalanceMobileIcon className="mt-[72px]" /> : <ChainBalanceIcon />,
-      placement: isMobile ? ("top" as Placement) : ("left" as Placement),
+      content: isMobile ? <ChainBalanceMobileIcon className="mt-[-72px]" /> : <ChainBalanceIcon />,
+      placement: isMobile ? ("bottom" as Placement) : ("left" as Placement),
       disableBeacon: true,
       styles: {
         options: {
@@ -125,8 +130,8 @@ const NbtcDetailGuide: React.FC<NbtcDetailGuideProps> = ({ isNbtcToken }) => {
     },
     {
       target: '[data-tour="supply-button"]',
-      content: isMobile ? <ChainSupplyMobileIcon className="mt-[34px]" /> : <ChainSupplyIcon />,
-      placement: isMobile ? ("top" as Placement) : ("left" as Placement),
+      content: isMobile ? <ChainSupplyMobileIcon className="mt-[-74px]" /> : <ChainSupplyIcon />,
+      placement: isMobile ? ("bottom" as Placement) : ("left" as Placement),
       disableBeacon: true,
       spotlightClicks: true,
       styles: {
@@ -238,17 +243,14 @@ const NbtcDetailGuide: React.FC<NbtcDetailGuideProps> = ({ isNbtcToken }) => {
         setNbtcDetailGuideActive(true);
         setStepIndex(0);
         setRun(true);
-        addNoScroll();
       }
     };
     document.addEventListener("keydown", handleKeyActivate);
     if (isDetailPage && isCorrectToken && !hasCompletedGuide && isNbtcDetailGuideActive) {
       setRun(true);
-      addNoScroll();
     }
     return () => {
       document.removeEventListener("keydown", handleKeyActivate);
-      removeNoScroll();
     };
   }, [router.pathname, router.query.id, isNbtcDetailGuideActive, setNbtcDetailGuideActive]);
   useEffect(() => {
@@ -274,6 +276,43 @@ const NbtcDetailGuide: React.FC<NbtcDetailGuideProps> = ({ isNbtcToken }) => {
   }, [run, stepIndex]);
   useEffect(() => {
     if (run) {
+      const findAndUpdateSpotlight = () => {
+        const spotlightElement = document.querySelector(".react-joyride__spotlight");
+        if (spotlightElement) {
+          const rect = spotlightElement.getBoundingClientRect();
+          setBorderPosition({
+            left: rect.left,
+            top: rect.top,
+            width: rect.width,
+            height: rect.height,
+          });
+        }
+      };
+
+      let animationFrameId: number;
+      const updatePosition = () => {
+        findAndUpdateSpotlight();
+        animationFrameId = requestAnimationFrame(updatePosition);
+      };
+      animationFrameId = requestAnimationFrame(updatePosition);
+
+      const observer = new MutationObserver(() => {
+        findAndUpdateSpotlight();
+      });
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
+
+      return () => {
+        cancelAnimationFrame(animationFrameId);
+        observer.disconnect();
+        setBorderPosition(null);
+      };
+    }
+  }, [run, stepIndex]);
+  useEffect(() => {
+    if (run) {
       addNoScroll();
     } else {
       removeNoScroll();
@@ -282,39 +321,6 @@ const NbtcDetailGuide: React.FC<NbtcDetailGuideProps> = ({ isNbtcToken }) => {
       removeNoScroll();
     };
   }, [run]);
-  useEffect(() => {
-    if (run) {
-      const findAndUpdateSpotlight = () => {
-        setTimeout(() => {
-          const spotlightElement = document.querySelector(".react-joyride__spotlight");
-          if (spotlightElement) {
-            const rect = spotlightElement.getBoundingClientRect();
-            setBorderPosition({
-              left: rect.left,
-              top: rect.top,
-              width: rect.width,
-              height: rect.height,
-            });
-          }
-        }, 100);
-      };
-      const observer = new MutationObserver(findAndUpdateSpotlight);
-      findAndUpdateSpotlight();
-      observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-      });
-      const handleResize = () => findAndUpdateSpotlight();
-      window.addEventListener("resize", handleResize);
-      window.addEventListener("scroll", handleResize);
-      return () => {
-        observer.disconnect();
-        window.removeEventListener("resize", handleResize);
-        window.removeEventListener("scroll", handleResize);
-        setBorderPosition(null);
-      };
-    }
-  }, [run, stepIndex]);
   if (!isNbtcToken || !isNbtcDetailGuideActive || router.query.id !== NBTCTokenId) {
     return null;
   }

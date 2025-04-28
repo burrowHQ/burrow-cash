@@ -134,7 +134,7 @@ const WalletButton = () => {
           display: "flex",
           alignItems: "center",
           position: "relative",
-          zIndex: 10001,
+          zIndex: 999,
         }}
       >
         {accountId ? (
