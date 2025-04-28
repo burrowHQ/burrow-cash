@@ -15,7 +15,7 @@ const FinalStepGuide: React.FC<{ onFinish?: () => void }> = ({ onFinish }) => {
           <ul className="mt-4 space-y-2">
             <li
               className="cursor-pointer text-primary text-sm font-medium flex items-center"
-              onClick={() => handleJump("https://rhea.example.com")}
+              onClick={() => handleJump("https://dex.rhea.finance/")}
             >
               <span className="before:content-['•'] before:mr-2 before:text-primary" />
               <span className="underline">Rhea</span>
@@ -23,7 +23,7 @@ const FinalStepGuide: React.FC<{ onFinish?: () => void }> = ({ onFinish }) => {
             </li>
             <li
               className="cursor-pointer text-primary text-sm font-medium flex items-center"
-              onClick={() => handleJump("https://satoshiramp.example.com")}
+              onClick={() => handleJump("https://ramp.satos.network/")}
             >
               <span className="before:content-['•'] before:mr-2 before:text-primary" />
               <span className="underline">Satoshi Ramp</span>
