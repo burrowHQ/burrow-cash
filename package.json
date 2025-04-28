@@ -14,7 +14,8 @@
     "type-check": "tsc --pretty --noEmit",
     "sentry-upload": "sentry-cli releases files v1 -o burrow-fdn -p burrow upload-sourcemaps public",
     "postinstall": "husky install",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
     "@emotion/react": "^11.10.4",
@@ -82,6 +83,7 @@
     "near-api-js": "4.0.3",
     "neth": "^0.5.8",
     "next": "latest",
+    "only-allow": "^1.2.1",
     "pluralize": "^8.0.0",
     "postcss": "^8.4.28",
     "ramda": "^0.28.0",
@@ -90,6 +92,7 @@
     "react-dom": "^18.2.0",
     "react-ga4": "^2.1.0",
     "react-icons": "^4.4.0",
+    "react-joyride": "^2.9.3",
     "react-markdown": "^8.0.3",
     "react-modal": "^3.13.1",
     "react-redux": "^8.0.4",

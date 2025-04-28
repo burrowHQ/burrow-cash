@@ -16,7 +16,7 @@ import { getAccountRewards } from "../../redux/selectors/getAccountRewards";
 import { trackConnectWallet, trackLogout } from "../../utils/telemetry";
 import Disclaimer from "../Disclaimer";
 import { useDisclaimer } from "../../hooks/useDisclaimer";
-import { NearSolidIcon, ArrowDownIcon, CloseIcon } from "./svg";
+import { NearSolidIcon, ArrowDownIcon, CloseIcon, GuideIcon, GuideCloseIcon } from "./svg";
 import ClaimAllRewards from "../ClaimAllRewards";
 import { formatWithCommas_usd } from "../../utils/uiNumber";
 import { isMobileDevice } from "../../helpers/helpers";
@@ -24,6 +24,8 @@ import CopyToClipboardComponent from "./CopyToClipboardComponent";
 import CustomButton from "../CustomButton/CustomButton";
 import { fetchMarginAccount } from "../../redux/marginAccountSlice";
 import { fetchMarginAccountMEME } from "../../redux/marginAccountSliceMEME";
+import BeginnerGuideWrapper from "../BeginnerGuide/BeginnerGuideWrapper";
+import { useGuide } from "../BeginnerGuide/GuideContext";
 
 const WalletContext = createContext(null) as any;
 const WalletButton = () => {
@@ -35,6 +37,7 @@ const WalletButton = () => {
   const [isDisclaimerOpen, setDisclaimer] = useState(false);
   const { getDisclaimer: hasAgreedDisclaimer } = useDisclaimer();
   const [show_account_detail, set_show_account_detail] = useState(false);
+  const { markWalletGuideCompleted } = useGuide();
 
   const selectorRef = useRef<WalletSelector>();
   const [selector, setSelector] = useState<WalletSelector | null>(null);
@@ -86,6 +89,7 @@ const WalletButton = () => {
   );
 
   const onWalletButtonClick = async () => {
+    markWalletGuideCompleted();
     if (!hasAgreedDisclaimer) {
       setDisclaimer(true);
       return;
@@ -129,40 +133,49 @@ const WalletButton = () => {
           marginRight: 0,
           display: "flex",
           alignItems: "center",
+          position: "relative",
+          zIndex: 999,
         }}
       >
         {accountId ? (
           <Account />
         ) : (
-          <Button
-            size="small"
-            sx={{
-              justifySelf: "end",
-              alignItems: "center",
-              cursor: accountId ? "default" : "pointer",
-              color: "#000",
-              textTransform: "none",
-              padding: "0 20px",
-              borderRadius: "6px",
-              ":hover": {
-                backgroundColor: "#00F7A5",
-                opacity: "0.8",
-              },
-              [theme.breakpoints.down("lg")]: {
-                height: "30px",
-                fontSize: "14px",
-              },
-              [theme.breakpoints.up("lg")]: {
-                height: "40px",
-                fontSize: "16px",
-              },
-            }}
-            variant={accountId ? "outlined" : "contained"}
-            onClick={onWalletButtonClick}
-            disableRipple={!!accountId}
-          >
-            Connect Wallet
-          </Button>
+          <BeginnerGuideWrapper>
+            {() => (
+              <div className="relative">
+                <Button
+                  size="small"
+                  sx={{
+                    justifySelf: "end",
+                    alignItems: "center",
+                    cursor: accountId ? "default" : "pointer",
+                    color: "#000",
+                    textTransform: "none",
+                    padding: "0 20px",
+                    borderRadius: "6px",
+                    opacity: 1,
+                    ":hover": {
+                      backgroundColor: "#00F7A5",
+                      opacity: 0.8,
+                    },
+                    [theme.breakpoints.down("lg")]: {
+                      height: "30px",
+                      fontSize: "14px",
+                    },
+                    [theme.breakpoints.up("lg")]: {
+                      height: "40px",
+                      fontSize: "16px",
+                    },
+                  }}
+                  variant={accountId ? "outlined" : "contained"}
+                  onClick={onWalletButtonClick}
+                  disableRipple={!!accountId}
+                >
+                  Connect Wallet
+                </Button>
+              </div>
+            )}
+          </BeginnerGuideWrapper>
         )}
         <Disclaimer isOpen={isDisclaimerOpen} onClose={() => setDisclaimer(false)} />
       </Box>

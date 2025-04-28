@@ -560,7 +560,7 @@ function TableBody({
         const formattedMarginBalance = shrinkToken(item.margin_debt.balance, assetDecimals);
         const isMainStream = filteredTokenTypeMap.mainStream.includes(item.token_id);
         return (
-          <Link href={`/trading/${item.token_id}`} key={item.token_id}>
+          <Link href={`/trading/${item.token_id}`} key={item.token_id} className="w-full">
             <div className="w-full grid grid-cols-5 bg-dark-110 hover:bg-gray-500 cursor-pointer mt-0.5 h-[60px]">
               <div className="relative col-span-1 flex items-center justify-self-start pl-14">
                 {item.token_id == nearTokenId ? (

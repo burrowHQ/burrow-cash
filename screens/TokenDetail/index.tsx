@@ -72,6 +72,8 @@ import { SatoshiIcon, BtcChainIcon } from "../../components/Icons/Icons";
 import { getPageTypeFromUrl } from "../../utils/commonUtils";
 import Breadcrumb from "../../components/common/breadcrumb";
 import { beautifyPrice } from "../../utils/beautyNumber";
+import NbtcDetailGuide from "../../components/BeginnerGuide/NbtcDetailGuide";
+import { useGuide } from "../../components/BeginnerGuide/GuideContext";
 
 const DetailData = createContext(null) as any;
 const TokenDetail = () => {
@@ -180,6 +182,8 @@ function TokenDetailView({
     }
     return acc;
   }, {});
+
+  const isNbtcToken = tokenRow.tokenId === NBTCTokenId;
 
   useEffect(() => {
     fetchTokenDetails(tokenRow.tokenId, 365).catch();
@@ -303,6 +307,7 @@ function TokenDetailView({
       ) : (
         <DetailPc tokenDetails={tokenDetails} handlePeriodClick={handlePeriodClick} />
       )}
+      <NbtcDetailGuide isNbtcToken={isNbtcToken} />
     </DetailData.Provider>
   );
 }
@@ -310,7 +315,14 @@ function TokenDetailView({
 function DetailMobile({ tokenDetails, handlePeriodClick }) {
   const { router, is_new, tokenRow, getIcons, getSymbols } = useContext(DetailData) as any;
   const [activeTab, setActiveTab] = useState<"market" | "your">("market");
-  const [open, setOpen] = useState<boolean>(false);
+  const { mobileTab, isNbtcDetailGuideActive } = useGuide();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (isNbtcDetailGuideActive) {
+      setActiveTab("your");
+    }
+  }, [isNbtcDetailGuideActive]);
 
   function switchTab(tab) {
     setActiveTab(tab);
@@ -1021,29 +1033,31 @@ function TokenUserInfo() {
               <SatoshiIcon />
             </span>
           </div>
-          <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
-            <span className="text-gray-300">BTC Chain Balance</span>
-            <span className="flex items-center">
-              <span className="mr-[6px] text-sm">
-                {accountId ? (
-                  btcBalanceLoading ? (
-                    <BeatLoader size={5} color="#ffffff" />
+          <div data-tour="chain-balances">
+            <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
+              <span className="text-gray-300">BTC Chain Balance</span>
+              <span className="flex items-center">
+                <span className="mr-[6px] text-sm">
+                  {accountId ? (
+                    btcBalanceLoading ? (
+                      <BeatLoader size={5} color="#ffffff" />
+                    ) : (
+                      digitalProcess(btcBalance || 0, 8)
+                    )
                   ) : (
-                    digitalProcess(btcBalance || 0, 8)
-                  )
-                ) : (
-                  "-"
-                )}
+                    "-"
+                  )}
+                </span>
+                <BtcChainIcon />
               </span>
-              <BtcChainIcon />
-            </span>
-          </div>
-          <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
-            <span className="text-gray-300">NEAR Chain Balance</span>
-            <span className="flex items-center">
-              <span className="mr-[6px] text-sm">{accountId ? supplyBalance : "-"}</span>
-              <img src={tokenRow?.icon} className="w-4 h-4 rounded-full" alt="" />
-            </span>
+            </div>
+            <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
+              <span className="text-gray-300">NEAR Chain Balance</span>
+              <span className="flex items-center">
+                <span className="mr-[6px] text-sm">{accountId ? supplyBalance : "-"}</span>
+                <img src={tokenRow?.icon} className="w-4 h-4 rounded-full" alt="" />
+              </span>
+            </div>
           </div>
         </div>
       )}
@@ -1090,6 +1104,7 @@ function TokenUserInfo() {
               disabled={isNBTC ? !+btcBalance && !+supplyBalance : !+supplyBalance}
               className="w-1 flex-grow"
               onClick={handleSupplyClick}
+              data-tour="supply-button"
             >
               Supply
             </YellowSolidButton>
