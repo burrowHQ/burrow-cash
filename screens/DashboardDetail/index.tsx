@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ContentBox } from "../../components/ContentBox/ContentBox";
 import LayoutContainer from "../../components/LayoutContainer/LayoutContainer";
 import SupplyTokenSvg from "../../public/svg/Group 24791.svg";
@@ -19,13 +19,32 @@ import { getPageTypeFromUrl } from "../../utils/commonUtils";
 import Breadcrumb from "../../components/common/breadcrumb";
 import UnLoginUi from "../../components/Dashboard/unLoginBox";
 import HtmlTooltip from "../../components/common/html-tooltip";
+import { useAppSelector, useAppDispatch } from "../../redux/hooks";
+import { getActiveCategory } from "../../redux/categorySelectors";
+import { setActiveCategory } from "../../redux/marginTrading";
 
 const Index = () => {
+  const dispatch = useAppDispatch();
   const accountId = useAccountId();
   const pageType = getPageTypeFromUrl();
   const isMemeCategory = pageType == "meme";
   const [suppliedRows, borrowedRows, totalSuppliedUSD, totalBorrowedUSD, , borrowedAll] =
     usePortfolioAssets(isMemeCategory);
+  const activeCategory = useAppSelector(getActiveCategory);
+  // update activeCategory if pageType do not match with cache
+  useEffect(() => {
+    if (pageType && activeCategory) {
+      if (pageType !== activeCategory) {
+        if (pageType == "meme") {
+          dispatch(setActiveCategory("meme"));
+        } else if (pageType == "main") {
+          dispatch(setActiveCategory("main"));
+        } else {
+          dispatch(setActiveCategory("main"));
+        }
+      }
+    }
+  }, [activeCategory, pageType]);
   const isMobile = isMobileDevice();
   let overviewNode;
   if (accountId) {
