@@ -7,6 +7,28 @@ export const getRpcList = () => {
   const RPCLIST = Object.assign(RPCLIST_system, RPCLIST_custom);
   return RPCLIST;
 };
+export function getSelectedRpc() {
+  const RPC_LIST = getRpcList();
+  let endPoint = "defaultRpc";
+  try {
+    endPoint = window.localStorage.getItem("endPoint") || endPoint;
+    if (!RPC_LIST[endPoint]) {
+      endPoint = "defaultRpc";
+      localStorage.removeItem("endPoint");
+    }
+  } catch (error) {}
+  const urlList = Object.values(RPC_LIST).map((rpc) => rpc.url);
+  const selectedUrl = RPC_LIST[endPoint].url;
+  urlList.sort((a, b) => {
+    if (a == selectedUrl) return -1;
+    if (b == selectedUrl) return 1;
+    return 0;
+  });
+  return {
+    selectedRpc: selectedUrl,
+    rpcListSorted: urlList,
+  };
+}
 export function getCustomConfig() {
   let customRpcMapStr;
   try {
