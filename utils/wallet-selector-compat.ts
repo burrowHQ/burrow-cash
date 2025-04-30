@@ -200,7 +200,7 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
     ],
     network: {
       networkId: defaultNetwork,
-      // nodeUrl: selectedRpc,
+      nodeUrl: selectedRpc,
     } as Network,
     fallbackRpcUrls: rpcListSorted,
     debug: !!isTestnet,
