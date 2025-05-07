@@ -94,6 +94,8 @@ const BtcMarketGuide: React.FC<BtcMarketGuideProps> = ({ isBtcWallet }) => {
   const handleClose = () => {
     setIsBtcGuideOpen(false);
     cleanupElement();
+    localStorage.setItem(GUIDE_STORAGE_KEY, "true");
+    localStorage.removeItem(GUIDE_STATE_KEY);
   };
 
   if (!isBtcGuideOpen || !isMarketPage()) {
