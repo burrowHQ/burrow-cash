@@ -35,7 +35,7 @@ import { setupEthereumWallets } from "@near-wallet-selector/ethereum-wallets";
 // @ts-nocheck
 import { createWeb3Modal } from "@web3modal/wagmi";
 // @ts-nocheck
-import { getRpcList } from "../components/Rpc/tool";
+import { getRpcList, getSelectedRpc } from "../components/Rpc/tool";
 
 import getConfig, {
   defaultNetwork,
@@ -145,15 +145,7 @@ const KEYPOM_OPTIONS = {
 export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorArgs) => {
   if (init) return selector;
   init = true;
-  const RPC_LIST = getRpcList();
-  let endPoint = "defaultRpc";
-  try {
-    endPoint = window.localStorage.getItem("endPoint") || endPoint;
-    if (!RPC_LIST[endPoint]) {
-      endPoint = "defaultRpc";
-      localStorage.removeItem("endPoint");
-    }
-  } catch (error) {}
+  const { selectedRpc, rpcListSorted } = getSelectedRpc();
   selector = await setupWalletSelector({
     modules: [
       setupMeteorWallet(),
@@ -208,8 +200,9 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
     ],
     network: {
       networkId: defaultNetwork,
-      nodeUrl: RPC_LIST[endPoint].url,
+      nodeUrl: selectedRpc,
     } as Network,
+    fallbackRpcUrls: rpcListSorted,
     debug: !!isTestnet,
     optimizeWalletOrder: false,
   });

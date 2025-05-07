@@ -32,5 +32,5 @@ export const mainMenuList: Imenu[] = [
     icon: <StakeIcon />,
   },
 ];
-export const helpMenu: Imenu = { title: "Docs", link: "https://docs.burrow.finance/" };
+export const helpMenu: Imenu = { title: "Docs", link: "https://guide.rhea.finance/" };
 export const dexMenu: Imenu = { title: "Dex", link: "https://dex.rhea.finance/" };
