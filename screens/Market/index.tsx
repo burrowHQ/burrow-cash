@@ -88,7 +88,7 @@ const Market = () => {
   const loading = !rows.length;
   return (
     <LayoutBox className="flex flex-col items-center justify-center">
-      <BtcMarketGuide isBtcWallet={isBtcWallet} />
+      {activeTab === "main" && <BtcMarketGuide isBtcWallet={isBtcWallet} />}
       <MarketsOverview />
       <div className="  h-[48px] rounded-lg lg:bg-gray-110 p-0.5 text-base text-gray-300 my-[46px] xsm:w-screen xsm:px-4">
         <div className="flex items-center h-full xsm:bg-gray-110 rounded-lg">
