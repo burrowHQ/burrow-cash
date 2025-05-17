@@ -5,7 +5,6 @@ import { setupHereWallet } from "@near-wallet-selector/here-wallet";
 import { setupNightly } from "@near-wallet-selector/nightly";
 import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
 import { setupMeteorWallet } from "@near-wallet-selector/meteor-wallet";
-// import { setupWalletConnect } from "@near-wallet-selector/wallet-connect";
 import { setupWalletConnect } from "rhea-wallet-connect";
 import { setupNearMobileWallet } from "@near-wallet-selector/near-mobile-wallet";
 import { setupModal } from "ref-modal-ui";
@@ -23,7 +22,7 @@ import { setupKeypom } from "@keypom/selector";
 import { setupOKXWallet } from "@near-wallet-selector/okx-wallet";
 import { setupHotWallet } from "@near-wallet-selector/hot-wallet";
 import { setupMeteorWalletApp } from "@near-wallet-selector/meteor-wallet-app";
-import { setupBTCWallet } from "btc-wallet";
+import { setupBTCWallet, setupWalletSelectorModal } from "btc-wallet";
 // @ts-nocheck
 import type { Config } from "@wagmi/core";
 // @ts-nocheck
@@ -222,7 +221,7 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
       }
     });
 
-  const modal = setupModal(selector as any, {
+  const modal = setupWalletSelectorModal(selector as any, {
     contractId: LOGIC_CONTRACT_NAME,
     blockFunctionKeyWallets: [
       "okx-wallet",
