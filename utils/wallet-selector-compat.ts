@@ -5,7 +5,6 @@ import { setupHereWallet } from "@near-wallet-selector/here-wallet";
 import { setupNightly } from "@near-wallet-selector/nightly";
 import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
 import { setupMeteorWallet } from "@near-wallet-selector/meteor-wallet";
-// import { setupWalletConnect } from "@near-wallet-selector/wallet-connect";
 import { setupWalletConnect } from "rhea-wallet-connect";
 import { setupNearMobileWallet } from "@near-wallet-selector/near-mobile-wallet";
 import { setupModal } from "ref-modal-ui";
@@ -23,7 +22,7 @@ import { setupKeypom } from "@keypom/selector";
 import { setupOKXWallet } from "@near-wallet-selector/okx-wallet";
 import { setupHotWallet } from "@near-wallet-selector/hot-wallet";
 import { setupMeteorWalletApp } from "@near-wallet-selector/meteor-wallet-app";
-import { setupBTCWallet } from "btc-wallet";
+import { setupBTCWallet, setupWalletSelectorModal } from "btc-wallet";
 // @ts-nocheck
 import type { Config } from "@wagmi/core";
 // @ts-nocheck
@@ -35,7 +34,7 @@ import { setupEthereumWallets } from "@near-wallet-selector/ethereum-wallets";
 // @ts-nocheck
 import { createWeb3Modal } from "@web3modal/wagmi";
 // @ts-nocheck
-import { getRpcList } from "../components/Rpc/tool";
+import { getRpcList, getSelectedRpc } from "../components/Rpc/tool";
 
 import getConfig, {
   defaultNetwork,
@@ -145,17 +144,12 @@ const KEYPOM_OPTIONS = {
 export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorArgs) => {
   if (init) return selector;
   init = true;
-  const RPC_LIST = getRpcList();
-  let endPoint = "defaultRpc";
-  try {
-    endPoint = window.localStorage.getItem("endPoint") || endPoint;
-    if (!RPC_LIST[endPoint]) {
-      endPoint = "defaultRpc";
-      localStorage.removeItem("endPoint");
-    }
-  } catch (error) {}
+  const { selectedRpc, rpcListSorted } = getSelectedRpc();
   selector = await setupWalletSelector({
     modules: [
+      setupHotWallet(),
+      setupHereWallet(),
+      setupOKXWallet({}),
       setupMeteorWallet(),
       setupEthereumWallets({
         wagmiConfig,
@@ -167,7 +161,6 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         env: NBTC_ENV,
       }) as any,
       myNearWallet,
-      setupOKXWallet({}),
       setupSender() as any,
       walletConnect2,
       setupNearMobileWallet({
@@ -176,7 +169,6 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
           name: "NEAR Wallet Selector",
         },
       }),
-      setupHereWallet(),
       setupNightly(),
       setupKeypom({
         networkId: defaultNetwork,
@@ -201,15 +193,15 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         deprecated: false,
       }),
       setupCoin98Wallet(),
-      setupHotWallet(),
       setupMeteorWalletApp({
         contractId: LOGIC_CONTRACT_NAME,
       }),
     ],
     network: {
       networkId: defaultNetwork,
-      nodeUrl: RPC_LIST[endPoint].url,
+      nodeUrl: selectedRpc,
     } as Network,
+    fallbackRpcUrls: rpcListSorted,
     debug: !!isTestnet,
     optimizeWalletOrder: false,
   });
@@ -229,7 +221,7 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
       }
     });
 
-  const modal = setupModal(selector as any, {
+  const modal = setupWalletSelectorModal(selector as any, {
     contractId: LOGIC_CONTRACT_NAME,
     blockFunctionKeyWallets: [
       "okx-wallet",

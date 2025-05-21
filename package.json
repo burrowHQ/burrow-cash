@@ -67,7 +67,7 @@
     "big.js": "^6.2.2",
     "bn.js": "^5.2.1",
     "borsh": "^0.7.0",
-    "btc-wallet": "^0.5.53-beta",
+    "btc-wallet": "0.5.63-beta",
     "crypto-browserify": "3.12.0",
     "dayjs": "1.11.10",
     "decimal.js": "^10.4.1",

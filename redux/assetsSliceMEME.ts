@@ -14,11 +14,8 @@ export const fetchAssetsMEME = createAsyncThunk("assetsMEME/fetchAssets", async 
 });
 
 export const fetchRefPricesMEME = createAsyncThunk("assetsMEME/fetchRefPrices", async () => {
-  const prices = await fetch(
-    "https://raw.githubusercontent.com/NearDeFi/token-prices/main/ref-prices.json",
-  ).then((r) => r.json());
-
-  return prices;
+  // const prices = await fetch("https://api.ref.finance/list-token-price").then((r) => r.json());
+  return {};
 });
 export const assetSliceMEME = createSlice({
   name: "assetsMEME",
@@ -43,7 +40,11 @@ export const assetSliceMEME = createSlice({
     builder.addCase(fetchRefPricesMEME.fulfilled, (state, action) => {
       missingPriceTokens.forEach((missingToken) => {
         const missingTokenId = missingToken[defaultNetwork];
-        if (missingTokenId && state.data[missingTokenId] && !state.data[missingTokenId]["price"]) {
+        if (
+          missingTokenId &&
+          state.data[missingTokenId] &&
+          !+(state.data[missingTokenId]["price"]?.usd || 0)
+        ) {
           if (missingTokenId === "brrr.ft.ref-labs.testnet") {
             // for pubtestnet env
             state.data[missingTokenId]["price"] = {

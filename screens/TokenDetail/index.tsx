@@ -74,6 +74,7 @@ import Breadcrumb from "../../components/common/breadcrumb";
 import { beautifyPrice } from "../../utils/beautyNumber";
 import NbtcDetailGuide from "../../components/BeginnerGuide/NbtcDetailGuide";
 import { useGuide } from "../../components/BeginnerGuide/GuideContext";
+import MaintenanceModal from "../../components/maintenanceModal";
 
 const DetailData = createContext(null) as any;
 const TokenDetail = () => {
@@ -940,12 +941,12 @@ function TokenRateModeChart({
 }
 
 function TokenUserInfo() {
-  const { tokenRow } = useContext(DetailData) as any;
   const [updaterCounter, setUpDaterCounter] = useState(1);
+  const [maintenanceModalOpen, setMaintenanceModalOpen] = useState<boolean>(false);
+  const { tokenRow } = useContext(DetailData) as any;
   const { tokenId, tokens, isLpToken, price } = tokenRow;
   const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
   const isNBTC = NBTCTokenId === tokenId && selectedWalletId === "btc-wallet";
-  // TODOXXX
   useEffect(() => {
     const t = setInterval(() => {
       setUpDaterCounter((pre) => {
@@ -1000,6 +1001,12 @@ function TokenUserInfo() {
     (acc, { maxBorrowAmount }) => acc + maxBorrowAmount,
     0,
   );
+  function closeMaintenanceModalOpen() {
+    setMaintenanceModalOpen(false);
+  }
+  function openMaintenanceModalOpen() {
+    setMaintenanceModalOpen(true);
+  }
   return (
     <UserBox className="mb-[29px] xsm:mb-2.5">
       <div className="flex justify-between items-center">
@@ -1103,7 +1110,7 @@ function TokenUserInfo() {
             <YellowSolidButton
               disabled={isNBTC ? !+btcBalance && !+supplyBalance : !+supplyBalance}
               className="w-1 flex-grow"
-              onClick={handleSupplyClick}
+              onClick={isNBTC ? openMaintenanceModalOpen : handleSupplyClick}
               data-tour="supply-button"
             >
               Supply
@@ -1129,6 +1136,7 @@ function TokenUserInfo() {
           <ConnectWalletButton accountId={accountId} className="w-full" />
         )}
       </div>
+      <MaintenanceModal isOpen={maintenanceModalOpen} onRequestClose={closeMaintenanceModalOpen} />
     </UserBox>
   );
 }

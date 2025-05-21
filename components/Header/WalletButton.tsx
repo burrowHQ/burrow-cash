@@ -188,12 +188,20 @@ function Account() {
     WalletContext,
   ) as any;
 
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   function handleOpen() {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
     set_show_account_detail(true);
   }
 
   function handleClose() {
-    set_show_account_detail(false);
+    closeTimeoutRef.current = setTimeout(() => {
+      set_show_account_detail(false);
+    }, 150);
   }
 
   function handleSwitch() {
@@ -245,7 +253,9 @@ function Account() {
         {!isMobile && (
           <div
             style={{ zIndex: 9999 }}
-            className={`absolute top-12 pt-4 ${show_account_detail ? "" : "hidden"}`}
+            className={`absolute top-12 pt-1 ${show_account_detail ? "" : "hidden"}`}
+            onMouseEnter={handleOpen}
+            onMouseLeave={handleClose}
           >
             <AccountDetail />
           </div>
