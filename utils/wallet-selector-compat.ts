@@ -147,6 +147,9 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
   const { selectedRpc, rpcListSorted } = getSelectedRpc();
   selector = await setupWalletSelector({
     modules: [
+      setupHotWallet(),
+      setupHereWallet(),
+      setupOKXWallet({}),
       setupMeteorWallet(),
       setupEthereumWallets({
         wagmiConfig,
@@ -158,7 +161,6 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         env: NBTC_ENV,
       }) as any,
       myNearWallet,
-      setupOKXWallet({}),
       setupSender() as any,
       walletConnect2,
       setupNearMobileWallet({
@@ -167,7 +169,6 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
           name: "NEAR Wallet Selector",
         },
       }),
-      setupHereWallet(),
       setupNightly(),
       setupKeypom({
         networkId: defaultNetwork,
@@ -192,7 +193,6 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         deprecated: false,
       }),
       setupCoin98Wallet(),
-      setupHotWallet(),
       setupMeteorWalletApp({
         contractId: LOGIC_CONTRACT_NAME,
       }),
