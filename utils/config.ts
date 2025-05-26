@@ -80,7 +80,7 @@ export const topTokens: string[] = [
 ];
 
 export const NBTC_ENV = "mainnet";
-export const AWS_MEDIA_DOMAIN = "https://img.ref.finance";
+export const AWS_MEDIA_DOMAIN = "https://img.rhea.finance";
 export const ETH_OLD_CONTRACT_ID = "aurora";
 export const ETH_CONTRACT_ID = "eth.bridge.near";
 const getConfig = (env: string = defaultNetwork) => {
