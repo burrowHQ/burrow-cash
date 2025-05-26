@@ -7,7 +7,6 @@ import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
 import { setupMeteorWallet } from "@near-wallet-selector/meteor-wallet";
 import { setupWalletConnect } from "rhea-wallet-connect";
 import { setupNearMobileWallet } from "@near-wallet-selector/near-mobile-wallet";
-import { setupModal } from "ref-modal-ui";
 import { setupLedger } from "@near-wallet-selector/ledger";
 import { setupMintbaseWallet } from "@near-wallet-selector/mintbase-wallet";
 import { setupBitteWallet } from "@near-wallet-selector/bitte-wallet";
@@ -98,10 +97,10 @@ const wagmiConfig: Config = createConfig({
     [nearBlock.id]: http(),
   },
   connectors: [
-    walletConnect({
-      projectId: WALLET_CONNECT_ID,
-      showQrModal: false,
-    }),
+    // walletConnect({
+    //   projectId: WALLET_CONNECT_ID,
+    //   showQrModal: false,
+    // }),
     injected({ shimDisconnect: true }),
   ],
 });
