@@ -149,7 +149,7 @@ const getConfig = (env: string = defaultNetwork) => {
         PYTH_ORACLE_ID: "pyth-oracle.testnet",
         PRICE_ORACLE_ID: "priceoracle.services.ref-labs.testnet", // mock-priceoracle.testnet
         MEME_PRICE_ORACLE_ID: "mock-priceoracle.testnet",
-        findPathUrl: "smartrouterdev.refburrow.top", // findPathUrl: "smartrouter.ref.finance"
+        findPathUrl: "smartroutertest.refburrow.top", // findPathUrl: "smartrouterdev.refburrow.top"
         indexUrl: "https://testnet-indexer.ref-finance.com", // indexUrl: "https://api.ref.finance",
       } as unknown as ConnectConfig & IAppConfig;
     case "betanet":
