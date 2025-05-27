@@ -10,6 +10,7 @@ export const hiddenAssets = [
   "a663b02cf0a4b149d2ad41910cb81e23e1c41c32.factory.bridge.near",
   "4691937a7508860f876c9c0a2a617e7d9e945d4b.factory.bridge.near",
   "v2-nearx.stader-labs.near",
+  "aurora",
 ];
 export const hiddenAssetsMEME = [
   "wrap.near",
@@ -20,7 +21,7 @@ export const hiddenAssetsMEME = [
   "abg-966.meme-cooking.near",
 ];
 export const lpTokenPrefix = "shadow_ref_v1";
-export const blackAssets = ["shadow_ref_v1-0"];
+export const blackAssets = ["shadow_ref_v1-0", "shadow_ref_v1-711"];
 export const MARGIN_MIN_COLLATERAL_USD = 1;
 export const defaultNetwork = (process.env.NEXT_PUBLIC_DEFAULT_NETWORK ||
   process.env.NODE_ENV ||
@@ -66,7 +67,8 @@ export const NBTCTokenId = {
 export const WALLET_CONNECT_ID =
   process.env.NEXT_PUBLIC_WALLET_CONNECT_ID || ("87e549918631f833447b56c15354e450" as string);
 
-export const missingPriceTokens = [REF_TOKEN, META_TOKEN, BRRR_TOKEN, BRRR_LABS_TOKEN];
+// export const missingPriceTokens = [REF_TOKEN, META_TOKEN, BRRR_TOKEN, BRRR_LABS_TOKEN];
+export const missingPriceTokens = [BRRR_TOKEN];
 export const incentiveTokens: string[] = [
   // "853d955acef822db058eb8505911ed77f175b99e.factory.bridge.near",
   // "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
@@ -78,7 +80,7 @@ export const topTokens: string[] = [
 ];
 
 export const NBTC_ENV = "mainnet";
-export const AWS_MEDIA_DOMAIN = "https://img.ref.finance";
+export const AWS_MEDIA_DOMAIN = "https://img.rhea.finance";
 export const ETH_OLD_CONTRACT_ID = "aurora";
 export const ETH_CONTRACT_ID = "eth.bridge.near";
 const getConfig = (env: string = defaultNetwork) => {
@@ -142,15 +144,13 @@ const getConfig = (env: string = defaultNetwork) => {
         ],
         NATIVE_TOKENS: ["usdc.fakes.testnet"],
         NEW_TOKENS: ["usdc.fakes.testnet", "shadow_ref_v1-0", "shadow_ref_v1-2"],
+        DCL_EXCHANGE_ID: "dclv2.ref-dev.testnet", // refv2-dev.ref-dev.testnet
+        REF_EXCHANGE_ID: "ref-finance-101.testnet", // exchange.ref-dev.testnet
         PYTH_ORACLE_ID: "pyth-oracle.testnet",
-        PRICE_ORACLE_ID: "priceoracle.services.ref-labs.testnet",
+        PRICE_ORACLE_ID: "priceoracle.services.ref-labs.testnet", // mock-priceoracle.testnet
         MEME_PRICE_ORACLE_ID: "mock-priceoracle.testnet",
-        REF_EXCHANGE_ID: "ref-finance-101.testnet",
-        DCL_EXCHANGE_ID: "refv2-dev.ref-dev.testnet",
-        findPathUrl: "smartrouterdev.refburrow.top",
-        // findPathUrl: "smartrouter.ref.finance",
-        indexUrl: "https://testnet-indexer.ref-finance.com",
-        // indexUrl: "https://api.ref.finance",
+        findPathUrl: "smartrouterdev.refburrow.top", // findPathUrl: "smartrouter.ref.finance"
+        indexUrl: "https://testnet-indexer.ref-finance.com", // indexUrl: "https://api.ref.finance",
       } as unknown as ConnectConfig & IAppConfig;
     case "betanet":
       return {

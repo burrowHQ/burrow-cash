@@ -103,7 +103,8 @@ const Staking = () => {
                 placement="top"
                 onOpen={() => setShowTooltip(true)}
                 onClose={() => setShowTooltip(false)}
-                title={!total ? "Must supply first" : ""}
+                // title={!total ? "Must supply first" : ""}
+                title=""
               >
                 <span
                   onClick={(e) => {
@@ -115,6 +116,7 @@ const Staking = () => {
                     onClick={() => setModal({ name: "staking" })}
                     className="w-full"
                     // disabled={!total}
+                    disabled
                   >
                     Stake
                   </CustomButton>

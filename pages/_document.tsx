@@ -3,7 +3,7 @@ import { Html, Head, Main, NextScript } from "next/document";
 export default function Document() {
   const SITE_META = {
     title: "RHEA Finance",
-    image: "https://img.ref.finance/images/rhea-twitter-share2.jpg",
+    image: "https://img.rhea.finance/images/rhea-twitter-share2.jpg",
     url: "http://lending.rhea.finance",
   };
   return (

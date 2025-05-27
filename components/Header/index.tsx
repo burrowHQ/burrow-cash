@@ -27,7 +27,6 @@ const MenuItem = ({ item }: { item: Imenu }) => {
     });
   }
   const style = isSelected ? { color: "#00F7A5" } : {};
-
   return (
     <Link href={link}>
       <LinkStyled sx={{ ...style }}>{title}</LinkStyled>

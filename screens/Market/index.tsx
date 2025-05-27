@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import MarketsTable from "./table";
 import MarketsOverview from "./overview";
@@ -10,6 +10,8 @@ import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 import { RefreshIcon } from "../../components/Header/svg";
 import { setActiveCategory } from "../../redux/marginTrading";
 import { PointsIcon, WarnTipIcon } from "../../components/Icons/IconsV2";
+import BtcMarketGuide from "../../components/BeginnerGuide/BtcMarketGuide";
+import { getAccountId } from "../../redux/accountSelectors";
 
 const Market = () => {
   const router = useRouter();
@@ -17,6 +19,64 @@ const Market = () => {
   const { activeCategory: activeTab = "main" } = useAppSelector((state) => state.category);
   const rows = useAvailableAssets();
   const { sorting, setSorting } = useTableSorting();
+  const accountId = useAppSelector(getAccountId);
+  const [isBtcWallet, setIsBtcWallet] = useState(false);
+
+  useEffect(() => {
+    const checkWalletType = () => {
+      if (window.selector) {
+        try {
+          const walletId = window.selector?.store?.getState()?.selectedWalletId;
+          setIsBtcWallet(walletId === "btc-wallet");
+        } catch (err) {
+          setIsBtcWallet(false);
+        }
+      } else {
+        setIsBtcWallet(false);
+      }
+    };
+    checkWalletType();
+    const nearPromise = (window as any).nearInitPromise;
+    if (nearPromise) {
+      nearPromise
+        .then(() => {
+          checkWalletType();
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    }
+
+    const intervalId = setInterval(() => {
+      if (window.selector) {
+        checkWalletType();
+        clearInterval(intervalId);
+      }
+    }, 500);
+
+    if (accountId) {
+      checkWalletType();
+    }
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [accountId]);
+
+  useEffect(() => {
+    const handleWalletLoaded = () => {
+      if (window.selector) {
+        const walletId = window.selector?.store?.getState()?.selectedWalletId;
+        setIsBtcWallet(walletId === "btc-wallet");
+      }
+    };
+    window.addEventListener("walletLoaded", handleWalletLoaded);
+    window.addEventListener("walletSelected", handleWalletLoaded);
+    return () => {
+      window.removeEventListener("walletLoaded", handleWalletLoaded);
+      window.removeEventListener("walletSelected", handleWalletLoaded);
+    };
+  }, []);
+
   useEffect(() => {
     if (router?.query?.vault === "true") {
       setSorting("market", "depositApy", "desc");
@@ -28,6 +88,7 @@ const Market = () => {
   const loading = !rows.length;
   return (
     <LayoutBox className="flex flex-col items-center justify-center">
+      {activeTab === "main" && <BtcMarketGuide isBtcWallet={isBtcWallet} />}
       <MarketsOverview />
       <div className="  h-[48px] rounded-lg lg:bg-gray-110 p-0.5 text-base text-gray-300 my-[46px] xsm:w-screen xsm:px-4">
         <div className="flex items-center h-full xsm:bg-gray-110 rounded-lg">

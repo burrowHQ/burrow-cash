@@ -1,4 +1,4 @@
-import { useEffect, useState, createContext, useMemo } from "react";
+import { useEffect, useState, createContext } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 
 import Decimal from "decimal.js";
@@ -53,7 +53,6 @@ import {
 } from "./CollateralTypeSelector";
 import { useBtcAction, useCalculateWithdraw, useCalculateDeposit } from "../../hooks/useBtcBalance";
 import { beautifyPrice } from "../../utils/beautyNumber";
-import { getPageTypeFromUrl } from "../../utils/commonUtils";
 import { useUserBalance } from "../../hooks/useUserBalance";
 
 export const ModalContext = createContext(null) as any;
@@ -61,10 +60,7 @@ const Modal = () => {
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
   const [nbtcTab, setNbtcTab] = useState<"btc" | "near">("btc");
   const dispatch = useAppDispatch();
-  // TODOXXX
-  // const isMeme = useAppSelector(isMemeCategory);
-  const pageType = getPageTypeFromUrl();
-  const isMeme = pageType == "meme";
+  const isMeme = useAppSelector(isMemeCategory);
   const isOpen = useAppSelector(getModalStatus);
   const accountId = useAppSelector(getAccountId);
   const asset = useAppSelector(getAssetData);
@@ -262,14 +258,14 @@ const Modal = () => {
     }
   }
   // oneClick time
-  if (isOneClickAction) {
-    alerts["oneClickActionTime"] = {
-      title: "It will take about 20 minutes to complete.",
-      severity: "warning",
-    };
-  } else {
-    delete alerts.oneClickActionTime;
-  }
+  // if (isOneClickAction) {
+  //   alerts["oneClickActionTime"] = {
+  //     title: "It will take about 20 minutes to complete.",
+  //     severity: "warning",
+  //   };
+  // } else {
+  //   delete alerts.oneClickActionTime;
+  // }
   const actionButtonDisabled =
     alerts["btcWithdrawErrorMsg"] ||
     alerts["btcDepositMinLimit"] ||

@@ -401,6 +401,7 @@ function TableRowPc({
       href={`/tokenDetail/${row.tokenId}?pageType=${isMeme ? "meme" : "main"}`}
     >
       <div
+        data-token-id={row.tokenId}
         className={`grid grid-cols-6 bg-gray-800 hover:bg-gray-500 cursor-pointer mt-0.5 h-[60px] ${
           lastRow ? "rounded-b-md" : ""
         }`}
@@ -528,6 +529,7 @@ function TableRowMobile({
       href={`/tokenDetail/${row.tokenId}?pageType=${isMeme ? "meme" : "main"}`}
     >
       <div
+        data-token-id={row.tokenId}
         className={`border border-dark-50 bg-dark-110 rounded-xl p-3.5 ${lastRow ? "" : "mb-4"}`}
       >
         <div className="flex items-center pb-4  -ml-1 relative">
