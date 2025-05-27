@@ -5,7 +5,7 @@ import { IPoolDcl, IQuoteResult } from "../interfaces/pool";
 import getConfig, { isTestnet } from "../utils/config";
 import { expandToken } from "../store/helper";
 
-init_env(isTestnet ? "dev" : "mainnet");
+init_env(isTestnet ? "testnet" : "mainnet");
 export async function getDclPools() {
   const { view, dclContract } = await getBurrow();
   const allDclPools: IPoolDcl[] = (await view(
