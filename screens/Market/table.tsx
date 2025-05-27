@@ -498,7 +498,7 @@ function TableRowPc({
               "-"
             )}
           </span>
-          <span className="mt-2">{isPointToken && <PointTag multiple="2x" />}</span>
+          <span className="mt-2">{isPointToken && <PointTag multiple="3x" />}</span>
         </div>
         <div className="col-span-1 flex flex-col justify-center pl-4 xl:pl-8 whitespace-nowrap">
           {row.can_borrow ? (
@@ -595,7 +595,7 @@ function TableRowMobile({
           <TemplateMobile
             title="Borrow APY"
             value={row.can_borrow ? format_apy(borrowAPY) : "-"}
-            extra={isPointToken && <PointTag multiple="2x" />}
+            extra={isPointToken && <PointTag multiple="3x" />}
           />
           <TemplateMobile
             title="Available Liquidity"
