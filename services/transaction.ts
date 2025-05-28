@@ -23,6 +23,7 @@ export const handleTransactionHash = async (
 ): Promise<ITransactionResult[]> => {
   if (transactionHashes) {
     try {
+      console.log("----------------processing margin");
       // Parsing transactions
       const txhash = Array.isArray(transactionHashes)
         ? transactionHashes
