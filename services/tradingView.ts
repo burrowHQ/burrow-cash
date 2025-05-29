@@ -38,9 +38,17 @@ export const pairServices = {
   },
   async queryDeltaKline(params: { pair_id: string; start: number; end: number; limit: number }) {
     const { pair_id, start, end, limit } = params;
+    const pair_id_replace1 = pair_id.replace(
+      "usdt.tether-token.near",
+      "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
+    );
+    const pair_id_replace2 = pair_id_replace1.replace(
+      "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
+      "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
+    );
     if (!pair_id) return [];
     const res = await fetch(
-      `${apiDomain}/klines?pair_id=${pair_id}&start=${start}&end=${end}&limit=${limit}`,
+      `${apiDomain}/klines?pair_id=${pair_id_replace2}&start=${start}&end=${end}&limit=${limit}`,
     );
     const data = await res.json();
     return data.data || [];
