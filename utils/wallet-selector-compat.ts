@@ -96,10 +96,10 @@ const wagmiConfig: Config = createConfig({
     [nearBlock.id]: http(),
   },
   connectors: [
-    // walletConnect({
-    //   projectId: WALLET_CONNECT_ID,
-    //   showQrModal: false,
-    // }),
+    walletConnect({
+      projectId: WALLET_CONNECT_ID,
+      showQrModal: false,
+    }),
     injected({ shimDisconnect: true }),
   ],
 });
