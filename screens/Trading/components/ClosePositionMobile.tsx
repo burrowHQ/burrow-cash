@@ -151,10 +151,6 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     return {
       HPFee: HPFeeValue.toNumber(),
       HPFeeAmount: HPFeeValue.toFixed(),
-      // swapFee:
-      //   ((estimateData?.fee ?? 0) / 10000) *
-      //   +shrinkToken(tokenInAmount || "0", assetP.metadata.decimals) *
-      //   (assetP?.price?.usd || 0),
     };
   }, [assets, isMainStream, item, marginAccountList, marginAccountListMEME]);
   const pnlAfterSwap = useMemo(() => {
@@ -420,26 +416,7 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Fee</div>
               <div className="flex items-center justify-center relative">
-                <p
-                // className="border-b border-dashed border-dark-800 cursor-pointer"
-                // onMouseEnter={() => setShowFeeModal(true)}
-                // onMouseLeave={() => setShowFeeModal(false)}
-                >
-                  ${beautifyPrice(Number(formatDecimal(Fee.HPFee)))}
-                </p>
-
-                {/* {showFeeModal && (
-                  <div className="absolute bg-[#14162B] text-white h-[50px] p-2 rounded text-xs top-[30px] left-[-66px] flex flex-col items-start justify-between z-[1] w-auto">
-                    <p>
-                      <span className="mr-1 whitespace-nowrap">Hold Fee:</span>$
-                      {beautifyPrice(Fee.HPFee)}
-                    </p>
-                    <p>
-                      <span className="mr-1 whitespace-nowrap">Trade Fee:</span>$
-                      {beautifyPrice(Fee.swapFee)}
-                    </p>
-                  </div>
-                )} */}
+                <p>${beautifyPrice(Number(formatDecimal(Fee.HPFee)))}</p>
               </div>
             </div>
             {swapUnSecurity && (

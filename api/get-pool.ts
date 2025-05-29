@@ -5,7 +5,7 @@ import { IPoolDcl, IQuoteResult } from "../interfaces/pool";
 import getConfig, { isTestnet } from "../utils/config";
 import { expandToken } from "../store/helper";
 
-init_env(isTestnet ? "dev" : "mainnet");
+init_env(isTestnet ? "testnet" : "mainnet");
 export async function getDclPools() {
   const { view, dclContract } = await getBurrow();
   const allDclPools: IPoolDcl[] = (await view(
@@ -70,13 +70,13 @@ async function get_stable_pool_details(pool_ids: string[]) {
     StablePoolInfo: "STABLE_SWAP",
     DegenPoolInfo: "DEGEN_SWAP",
   };
-  const stablePools = allStablePools.map((poolDetail, index) => {
+  const stablePools = allStablePools?.map((poolDetail, index) => {
     const [key, pool_info] = Object.entries(poolDetail)[0] as any[];
     return {
       ...pool_info,
       pool_kind: poolKindMap[key],
       id: pool_ids[index],
-      rates: pool_info.rates || pool_info.c_amounts.map(() => expandToken(1, 18)),
+      rates: pool_info.rates || pool_info?.c_amounts?.map(() => expandToken(1, 18)),
     };
   });
   return stablePools;

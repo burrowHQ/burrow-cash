@@ -21,7 +21,7 @@ export const hiddenAssetsMEME = [
   "abg-966.meme-cooking.near",
 ];
 export const lpTokenPrefix = "shadow_ref_v1";
-export const blackAssets = ["shadow_ref_v1-0"];
+export const blackAssets = ["shadow_ref_v1-0", "shadow_ref_v1-711"];
 export const MARGIN_MIN_COLLATERAL_USD = 1;
 export const defaultNetwork = (process.env.NEXT_PUBLIC_DEFAULT_NETWORK ||
   process.env.NODE_ENV ||
@@ -144,15 +144,13 @@ const getConfig = (env: string = defaultNetwork) => {
         ],
         NATIVE_TOKENS: ["usdc.fakes.testnet"],
         NEW_TOKENS: ["usdc.fakes.testnet", "shadow_ref_v1-0", "shadow_ref_v1-2"],
-        DCL_EXCHANGE_ID: "refv2-dev.ref-dev.testnet", // dclv2.ref-dev.testnet
+        DCL_EXCHANGE_ID: "dclv2.ref-dev.testnet", // refv2-dev.ref-dev.testnet
+        REF_EXCHANGE_ID: "ref-finance-101.testnet", // exchange.ref-dev.testnet
         PYTH_ORACLE_ID: "pyth-oracle.testnet",
-        PRICE_ORACLE_ID: "priceoracle.services.ref-labs.testnet",
+        PRICE_ORACLE_ID: "priceoracle.services.ref-labs.testnet", // mock-priceoracle.testnet
         MEME_PRICE_ORACLE_ID: "mock-priceoracle.testnet",
-        REF_EXCHANGE_ID: "ref-finance-101.testnet",
-        findPathUrl: "smartrouterdev.refburrow.top",
-        // findPathUrl: "smartrouter.ref.finance",
-        indexUrl: "https://testnet-indexer.ref-finance.com",
-        // indexUrl: "https://api.ref.finance",
+        findPathUrl: "smartroutertest.refburrow.top", // findPathUrl: "smartrouterdev.refburrow.top"
+        indexUrl: "https://testnet-indexer.ref-finance.com", // indexUrl: "https://api.ref.finance",
       } as unknown as ConnectConfig & IAppConfig;
     case "betanet":
       return {
