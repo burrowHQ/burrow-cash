@@ -961,7 +961,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                       {beautifyPrice(Fee.swapFee)}
                     </p>
                     <p className="whitespace-nowrap">
-                      <span className="mr-1 whitespace-nowrap">Holding Fee:</span>$
+                      <span className="mr-1 whitespace-nowrap">Funding Fee:</span>≈$
                       {beautifyPrice(Fee.holdFee)}/day
                     </p>
                   </div>
@@ -1113,7 +1113,7 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                       {beautifyPrice(Fee.swapFee)}
                     </p>
                     <p>
-                      <span className="mr-1 whitespace-nowrap">Holding Fee:</span>$
+                      <span className="mr-1 whitespace-nowrap">Funding Fee:</span>≈$
                       {beautifyPrice(Fee.holdFee)}/day
                     </p>
                   </div>
