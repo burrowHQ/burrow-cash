@@ -115,7 +115,7 @@ const Market = () => {
           <PointsIcon className="mr-1.5 xsm:mt-1.5 flex-shrink-0" />
           <span>
             <span className="text-sm text-white inline">
-              All tokens currently participate in RHEA's
+              Some designated tokens are participating in RHEA's
             </span>
             <span
               className="text-base text-primary underline ml-1 cursor-pointer"
@@ -128,7 +128,7 @@ const Market = () => {
             >
               Reward Points
             </span>
-            <span className="text-base text-white inline ml-1">🎉</span>
+            <span className="text-base text-white inline ml-1"> program. 🎉</span>
           </span>
         </div>
         <div className="bg-yellow-100 bg-opacity-20 rounded-[16px] py-1 px-2.5 flex items-center w-auto mb-5 xsm:px-4 xsm:items-start">
