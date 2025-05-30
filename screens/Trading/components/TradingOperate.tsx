@@ -246,7 +246,18 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
     }
   }, [selectedSetUpOption]);
   const Fee = useMemo(() => {
+    const debt_asset = activeTab == "long" ? ReduxcategoryAssets2 : ReduxcategoryAssets1;
     return {
+      holdFee: calculateHodingFee({
+        debt_asset,
+        debt_amount: tokenInAmount,
+        burrow_apy: new Decimal(debt_asset?.borrow_apr || 0)
+          .mul(config?.margin_debt_discount_rate)
+          .div(10000)
+          .toFixed(),
+        holding_position_fee_rate: debt_asset?.config.holding_position_fee_rate,
+        debt_token_price: debt_asset?.price?.usd || 0,
+      }),
       openPFee:
         ((Number(longInput || shortInput) * config.open_position_fee_rate) / 10000) *
         (ReduxcategoryAssets2?.price?.usd || 1),
@@ -258,7 +269,58 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
           : getAssetPrice(ReduxcategoryAssets1) || 0),
       price: getAssetPrice(ReduxcategoryAssets1),
     };
-  }, [longInput, shortInput, ReduxcategoryAssets1, estimateData, tokenInAmount]);
+  }, [
+    longInput,
+    shortInput,
+    JSON.stringify(ReduxcategoryAssets1 || {}),
+    estimateData,
+    tokenInAmount,
+    activeTab,
+    config.margin_debt_discount_rate,
+  ]);
+  // Estimated hoding fee
+  function calculateHodingFee({
+    debt_asset,
+    debt_amount,
+    burrow_apy,
+    holding_position_fee_rate,
+    debt_token_price,
+  }: {
+    debt_asset: any;
+    debt_amount: string | number;
+    burrow_apy: string;
+    holding_position_fee_rate: string;
+    debt_token_price: string;
+  }) {
+    if (new Decimal(debt_amount || 0).lte(0) || new Decimal(debt_token_price || 0).lte(0)) {
+      return "0";
+    }
+    const borrow$ = new Decimal(debt_amount)
+      .mul(burrow_apy)
+      .div(365)
+      .mul(debt_token_price || 0);
+    const oneDay = 24 * 60 * 60 * 1000;
+    const base = new Decimal(holding_position_fee_rate).div(new Decimal(10).pow(27));
+    const hode$ = base
+      .pow(oneDay)
+      .minus(1)
+      .mul(debt_amount)
+      .mul(debt_token_price || 0);
+    console.log("-------------trading fee params", {
+      debt_asset,
+      debt_amount: tokenInAmount,
+      burrow_apy: new Decimal(debt_asset?.borrow_apr || 0)
+        .mul(config?.margin_debt_discount_rate)
+        .div(10000)
+        .toFixed(),
+      holding_position_fee_rate: debt_asset?.config.holding_position_fee_rate,
+      debt_token_price: debt_asset?.price?.usd || 0,
+      hode$: hode$.toFixed(),
+      borrow$: borrow$.toFixed(),
+    });
+    const total = borrow$.plus(hode$).toFixed();
+    return total;
+  }
   // check to show tip
   useDebounce(
     () => {
@@ -871,12 +933,21 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Fee</div>
               <div className="flex items-center justify-center relative">
+                {/* TODOXXX Long */}
                 <p
                   className="border-b border-dashed border-dark-800 cursor-pointer"
                   onMouseEnter={() => setShowFeeModal(true)}
                   onMouseLeave={() => setShowFeeModal(false)}
                 >
-                  ${beautifyPrice(Number(formatDecimal(Fee.swapFee + Fee.openPFee)))}
+                  $
+                  {beautifyPrice(
+                    Number(
+                      new Decimal(Fee.swapFee || 0)
+                        .plus(Fee.openPFee || 0)
+                        .plus(Fee.holdFee || 0)
+                        .toNumber(),
+                    ),
+                  )}
                 </p>
 
                 {showFeeModal && (
@@ -888,6 +959,10 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                     <p>
                       <span className="mr-1 whitespace-nowrap">Trade Fee:</span>$
                       {beautifyPrice(Fee.swapFee)}
+                    </p>
+                    <p className="whitespace-nowrap">
+                      <span className="mr-1 whitespace-nowrap">Holding Fee:</span>$
+                      {beautifyPrice(Fee.holdFee)}/day
                     </p>
                   </div>
                 )}
@@ -1011,15 +1086,24 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Fee</div>
               <div className="flex items-center justify-center relative">
+                {/* TODOXXX Short */}
                 <p
                   className="border-b border-dashed border-dark-800 cursor-pointer"
                   onMouseEnter={() => setShowFeeModal(true)}
                   onMouseLeave={() => setShowFeeModal(false)}
                 >
-                  ${beautifyPrice(Number(formatDecimal(Fee.swapFee + Fee.openPFee)))}
+                  $
+                  {beautifyPrice(
+                    Number(
+                      new Decimal(Fee.swapFee || 0)
+                        .plus(Fee.openPFee || 0)
+                        .plus(Fee.holdFee || 0)
+                        .toNumber(),
+                    ),
+                  )}
                 </p>
                 {showFeeModal && (
-                  <div className="absolute bg-[#14162B] text-white h-[50px] p-2 rounded text-xs top-[30px] left-[-60px] flex flex-col items-start justify-between z-[1] w-auto">
+                  <div className="absolute bg-[#14162B] text-white min-h-[50px] p-2 rounded text-xs top-[30px] left-[-60px] flex flex-col items-start justify-between z-[1] w-auto">
                     <p>
                       <span className="mr-1 whitespace-nowrap">Open Fee:</span>$
                       {beautifyPrice(Fee.openPFee)}
@@ -1027,6 +1111,10 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
                     <p>
                       <span className="mr-1 whitespace-nowrap">Trade Fee:</span>$
                       {beautifyPrice(Fee.swapFee)}
+                    </p>
+                    <p>
+                      <span className="mr-1 whitespace-nowrap">Holding Fee:</span>$
+                      {beautifyPrice(Fee.holdFee)}/day
                     </p>
                   </div>
                 )}
