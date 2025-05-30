@@ -8,7 +8,6 @@ export function useMarginConfigToken() {
   const assetsMEME = useAppSelector(getAssetsMEME);
   const marginConfigTokens = useAppSelector(getMarginConfig);
   const marginConfigTokensMEME = useAppSelector(getMarginConfigMEME);
-  const combinedAssetsData = { ...assets.data, ...assetsMEME.data };
 
   const categoryAssets1: Asset[] = [];
   const categoryAssets2: Asset[] = [];
@@ -33,12 +32,14 @@ export function useMarginConfigToken() {
       }
       return item;
     }, {});
-  const filterMarginConfigList = createFilteredMarginConfigList(
+  // get category 1 assets Array and Map
+  const categoryAssets1Map = createFilteredMarginConfigList(
     filteredMarginConfigTokens1,
     categoryAssets1,
     assets.data,
   );
-  const filterMarginConfigListMEME =
+  // get category 1 assets MEME Array and Map
+  const categoryAssets1MEMEMap =
     Object.entries(assetsMEME.data).length > 0
       ? createFilteredMarginConfigList(
           filteredMarginConfigTokens1MEME,
@@ -47,16 +48,24 @@ export function useMarginConfigToken() {
         )
       : null;
 
-  const processTokens = (tokens, categoryAssets) => {
+  const processTokens = (tokens, categoryAssets, isMEME?: boolean) => {
     tokens.forEach((item: string) => {
-      if (combinedAssetsData[item]?.metadata) {
-        categoryAssets.push({ ...combinedAssetsData[item] });
+      let assetsData;
+      if (isMEME) {
+        assetsData = assetsMEME.data;
+      } else {
+        assetsData = assets.data;
+      }
+      if (assetsData[item]?.metadata) {
+        categoryAssets.push({ ...assetsData[item] });
       }
     });
+    return categoryAssets;
   };
-
-  processTokens(filteredMarginConfigTokens2, categoryAssets2);
-  processTokens(filteredMarginConfigTokens2MEME, categoryAssets2MEME);
+  // get category 2 assets
+  processTokens(filteredMarginConfigTokens2, categoryAssets2, false);
+  processTokens(filteredMarginConfigTokens2MEME, categoryAssets2MEME, true);
+  // get category 2 assets MEME
   const getPositionType = (token_c_id: string, token_d_id: string) => {
     if (token_c_id == token_d_id) {
       return {
@@ -70,9 +79,8 @@ export function useMarginConfigToken() {
       };
     }
   };
-
   return {
-    filterMarginConfigList: { ...filterMarginConfigList, ...filterMarginConfigListMEME },
+    filterMarginConfigList: { ...categoryAssets1Map, ...categoryAssets1MEMEMap },
     marginConfigTokens,
     marginConfigTokensMEME,
     categoryAssets1,
