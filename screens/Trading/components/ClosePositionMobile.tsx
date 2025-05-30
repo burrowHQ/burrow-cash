@@ -246,7 +246,11 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
       assetD.config.extra_decimals,
     ).toFixed(0, Decimal.ROUND_UP);
     const accruedInterest = new Decimal(assetD.borrow_apr).mul(dAmount).div(365 * 24 * 60 * mins);
-    const totalHpFee = get_total_hp_fee();
+    const totalHpFeePending = get_total_hp_fee();
+    const totalHpFee = shrinkTokenDecimal(totalHpFeePending, assetD.config.extra_decimals).toFixed(
+      0,
+      Decimal.ROUND_UP,
+    );
     const slippage = Number(ReduxSlippageTolerance) / 100;
     const min_amount_out = accruedInterest.plus(totalHpFee).plus(dAmount);
     const amountOut = min_amount_out.div(1 - slippage);
