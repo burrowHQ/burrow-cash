@@ -83,9 +83,20 @@ const Trading = () => {
   // init selected category 2
   useEffect(() => {
     if (id) {
-      dispatch(setCategoryAssets2(categoryAssets2Current[0]));
+      if (ReduxcategoryAssets2?.token_id) {
+        const t = categoryAssets2Current?.find(
+          (item) => item.token_id == ReduxcategoryAssets2?.token_id,
+        );
+        if (t) {
+          dispatch(setCategoryAssets2(t));
+        } else {
+          dispatch(setCategoryAssets2(categoryAssets2Current[0]));
+        }
+      } else {
+        dispatch(setCategoryAssets2(categoryAssets2Current[0]));
+      }
     }
-  }, [id]);
+  }, [id, ReduxcategoryAssets2?.token_id]);
   // mouseenter and leave inter
   const handlePopupToggle = () => {
     setShowPopup2(!showPopupCate2);
