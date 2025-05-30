@@ -23,7 +23,7 @@ export async function findPath({
     `https://${
       config.findPathUrl
     }/findPath?amountIn=${amountIn}&tokenIn=${tokenIn}&tokenOut=${tokenOut}&pathDeep=${
-      supportLedger ? 1 : 3
+      supportLedger ? 1 : 2
     }&slippage=${Number(slippage)}`,
     {
       signal: controller.signal,
@@ -61,7 +61,7 @@ export async function findPathReserve({
     `https://${
       config.findPathUrl
     }/findPathExactOut?amountOut=${amountOut}&tokenIn=${tokenIn}&tokenOut=${tokenOut}&pathDeep=${
-      supportLedger ? 1 : 3
+      supportLedger ? 1 : 2
     }&slippage=${Number(slippage)}`,
     {
       signal: controller.signal,
