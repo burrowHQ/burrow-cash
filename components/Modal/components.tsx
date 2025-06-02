@@ -516,7 +516,7 @@ export function FeeContainer({
   );
 }
 
-export const FeeDetail = ({
+const FeeDetail = ({
   transactionsNumOnNear,
   transactionsGasOnNear,
   bridgeGasOnBtc,
