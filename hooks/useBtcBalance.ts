@@ -6,6 +6,7 @@ import {
   getBtcBalance,
   getDepositAmount,
   calculateWithdraw,
+  calculateGasFee,
 } from "btc-wallet";
 import { expandToken, shrinkToken } from "../store/helper";
 import { NBTCTokenId, NBTC_ENV } from "../utils/config";
@@ -28,7 +29,6 @@ export function useBtcAction({
   const btcSelector = useBtcWalletSelector();
   const isBtcTokenId = tokenId == NBTCTokenId;
   const status = useAppSelector(getOneClickBtcResultStatus);
-  const env = NBTC_ENV;
   useDebounce(
     () => {
       if (btcSelector?.account && isBtcTokenId && price) {
@@ -71,12 +71,14 @@ export function useCalculateWithdraw({
     receiveAmount: string;
     amount: string;
     fee: string;
+    btcGasFee: string;
     errorMsg: string;
   }>({
     loading: false,
     receiveAmount: "0",
     amount: "0",
     fee: "0",
+    btcGasFee: "0",
     errorMsg: "",
   });
   useDebounce(
@@ -86,6 +88,7 @@ export function useCalculateWithdraw({
           loading: true,
           receiveAmount: "0",
           fee: "0",
+          btcGasFee: "0",
           amount,
           errorMsg: "",
         });
@@ -95,6 +98,7 @@ export function useCalculateWithdraw({
           loading: false,
           receiveAmount: "0",
           fee: "0",
+          btcGasFee: "0",
           amount,
           errorMsg: "",
         });
@@ -111,11 +115,13 @@ export function useCalculateWithdraw({
       env,
     });
     const receiveAmount = shrinkToken(result?.receiveAmount || "0", decimals);
+    const btcGasFee = shrinkToken(result?.gasFee || "0", decimals);
     setWithdrawData({
       loading: false,
       receiveAmount,
       errorMsg: result?.errorMsg || "",
       fee: Decimal.max(new Decimal(amount || 0).minus(receiveAmount), 0).toFixed(),
+      btcGasFee,
       amount,
     });
   }
@@ -139,13 +145,17 @@ export function useCalculateDeposit({
     receiveAmount: string;
     minDepositAmount: string;
     fee: string;
+    btcGasFee: string;
   }>({
     loading: false,
     amount: "0",
     receiveAmount: "0",
     minDepositAmount: "0",
     fee: "0",
+    btcGasFee: "0",
   });
+  const btcSelector = useBtcWalletSelector();
+  const btcAccountId = btcSelector.account;
   useDebounce(
     () => {
       if (isBtcDeposit && new Decimal(amount || 0).gt(0) && decimals) {
@@ -155,6 +165,7 @@ export function useCalculateDeposit({
           receiveAmount: "0",
           minDepositAmount: "0",
           fee: "0",
+          btcGasFee: "0",
         });
         getReceiveAmount();
       } else {
@@ -164,6 +175,7 @@ export function useCalculateDeposit({
           receiveAmount: "0",
           minDepositAmount: "0",
           fee: "0",
+          btcGasFee: "0",
         });
       }
     },
@@ -179,6 +191,7 @@ export function useCalculateDeposit({
         env,
       },
     );
+    const BTCGasFee = await calculateGasFee(btcAccountId, Number(expandAmount));
     const totalFeeAmount = shrinkToken(
       new Decimal(protocolFee || 0).plus(repayAmount).toFixed(),
       decimals,
@@ -194,12 +207,14 @@ export function useCalculateDeposit({
       ).toFixed(0, Decimal.ROUND_DOWN),
       decimals,
     );
+    const _BTCGasFee = shrinkToken(BTCGasFee, decimals);
     setDepositData({
       loading: false,
       amount,
       receiveAmount: receiveAmountReadable,
       minDepositAmount: minDepositAmountReadable,
       fee: totalFeeAmount,
+      btcGasFee: _BTCGasFee,
     });
   }
   return depositData;

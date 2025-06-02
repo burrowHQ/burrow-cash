@@ -13,14 +13,17 @@ const getAccount = async () => {
     const tokenIds = assets.map((asset) => asset.token_id);
     const shadowRecords = await getShadowRecords();
     let accountBalance = "0";
+    let totalAccountBalance = "0";
     try {
-      accountBalance = (await account.getAccountBalance()).available;
+      const { available, total } = await account.getAccountBalance();
+      accountBalance = available;
+      totalAccountBalance = total;
     } catch (error) {}
     const balances = await Promise.all(
       tokenIds.map((id) => getBalance(id, accountId, shadowRecords)),
     );
     const portfolio = await getPortfolio(accountId);
-    return { accountId, accountBalance, balances, portfolio, tokenIds };
+    return { accountId, accountBalance, totalAccountBalance, balances, portfolio, tokenIds };
   }
 
   return undefined;

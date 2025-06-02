@@ -28,6 +28,7 @@ import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
 import { getAppRefreshNumber } from "../../../redux/appSelectors";
 import { setRefreshNumber } from "../../../redux/appSlice";
 import { TagToolTip } from "../../../components/ToolTip";
+import { FeeContainer } from "../../../components/Modal/components";
 
 export const ModalContext = createContext(null) as any;
 const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
@@ -423,6 +424,12 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
                 <p>${beautifyPrice(Number(formatDecimal(Fee.HPFee)))}</p>
               </div>
             </div>
+            <FeeContainer
+              loading={false}
+              transactionsGasOnNear={positionType.label === "Long" ? 650 : 950}
+              transactionsNumOnNear={positionType.label === "Long" ? 3 : 4}
+              className="my-3"
+            />
             {swapUnSecurity && (
               <div className=" text-[#EA3F68] text-sm font-normal flex items-start mb-1">
                 <MaxPositionIcon />
