@@ -5,7 +5,7 @@ import { IMarginBaseTokenConfigList } from "../interfaces";
 const getListMarginBaseTokenLimit = async (
   token_ids: string[],
 ): Promise<IMarginBaseTokenConfigList> => {
-  // TODOXX main
+  // main
   const { view, logicContract } = await getBurrow();
   try {
     const config = (await view(

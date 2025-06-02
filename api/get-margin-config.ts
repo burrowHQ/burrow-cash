@@ -3,7 +3,7 @@ import { ViewMethodsLogic } from "../interfaces/contract-methods";
 import { IMarginConfig } from "../interfaces";
 
 const getMarginConfig = async (): Promise<IMarginConfig> => {
-  // TODOXX main
+  // main
   const { view, logicContract } = await getBurrow();
   try {
     const config = (await view(

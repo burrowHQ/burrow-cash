@@ -64,6 +64,17 @@ export const NBTCTokenId = {
   testnet: "nbtc-dev.testnet",
   mainnet: "nbtc.bridge.near",
 }[defaultNetwork];
+
+export const WBTCTokenId = {
+  testnet: "wbtc.fakes.testnet",
+  mainnet: "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
+}[defaultNetwork];
+
+export const WNEARTokenId = {
+  testnet: "wrap.testnet",
+  mainnet: "wrap.near",
+}[defaultNetwork];
+
 export const WALLET_CONNECT_ID =
   process.env.NEXT_PUBLIC_WALLET_CONNECT_ID || ("87e549918631f833447b56c15354e450" as string);
 

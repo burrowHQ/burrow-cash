@@ -60,6 +60,13 @@ export const getAccountBalance = createSelector(
   },
 );
 
+export const getTotalAccountBalance = createSelector(
+  (state: RootState) => state.account.balances,
+  (balances) => {
+    return shrinkToken(balances?.totalNear || 0, NEAR_DECIMALS);
+  },
+);
+
 export const isAccountLoading = createSelector(
   (state: RootState) => state.account,
   (account) => account.status === "pending",

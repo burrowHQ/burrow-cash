@@ -1,4 +1,4 @@
-import { useEffect, useState, createContext } from "react";
+import { useEffect, useState, createContext, useMemo } from "react";
 import { Modal as MUIModal, Box, useTheme } from "@mui/material";
 
 import Decimal from "decimal.js";
@@ -23,7 +23,6 @@ import { recomputeHealthFactorRepay } from "../../redux/selectors/recomputeHealt
 import { getAssetsCategory } from "../../redux/assetsSelectors";
 import { recomputeHealthFactorRepayFromDeposits } from "../../redux/selectors/recomputeHealthFactorRepayFromDeposits";
 import { formatWithCommas_number } from "../../utils/uiNumber";
-import { DEFAULT_POSITION, lpTokenPrefix, NBTCTokenId } from "../../utils/config";
 import { Wrapper } from "./style";
 import { getModalData } from "./utils";
 import {
@@ -38,8 +37,8 @@ import {
   CollateralTip,
   BorrowLimit,
   Receive,
-  Fee,
   BtcOneClickTab,
+  FeeContainer,
 } from "./components";
 import Controls from "./Controls";
 import Action from "./Action";
@@ -54,6 +53,13 @@ import {
 import { useBtcAction, useCalculateWithdraw, useCalculateDeposit } from "../../hooks/useBtcBalance";
 import { beautifyPrice } from "../../utils/beautyNumber";
 import { useUserBalance } from "../../hooks/useUserBalance";
+import {
+  DEFAULT_POSITION,
+  lpTokenPrefix,
+  NBTCTokenId,
+  WNEARTokenId,
+  WBTCTokenId,
+} from "../../utils/config";
 
 export const ModalContext = createContext(null) as any;
 const Modal = () => {
@@ -71,20 +77,24 @@ const Modal = () => {
     withdrawReceiveAmount: string;
     cacuWithdrawLoading: boolean;
     withdrawFee: string;
+    withdrawGasFee: string;
     errorMsg: string;
   }>({
     withdrawReceiveAmount: "0",
     cacuWithdrawLoading: false,
     withdrawFee: "0",
+    withdrawGasFee: "0",
     errorMsg: "",
   });
   const [depositData, setDepositData] = useState<{
     depositFee: string;
+    depositGasFee: string;
     cacuDepositLoading: boolean;
     depositReceiveAmount: string;
     depositMinDepositAmount: string;
   }>({
     depositFee: "0",
+    depositGasFee: "0",
     cacuDepositLoading: false,
     depositReceiveAmount: "0",
     depositMinDepositAmount: "0",
@@ -170,6 +180,7 @@ const Modal = () => {
     action === "Repay" && isRepayFromDeposits && selectedCollateralType !== DEFAULT_POSITION;
   // NBTC start
   const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
+  const isBtcWallet = selectedWalletId === "btc-wallet";
   const isBtcToken = asset.tokenId === NBTCTokenId && selectedWalletId === "btc-wallet";
   const isBtcSupply = action === "Supply" && isBtcToken;
   const isBtcWithdraw = action === "Withdraw" && isBtcToken;
@@ -186,6 +197,7 @@ const Modal = () => {
     loading: cacuWithdrawLoadingPending,
     amount: withdrawAmountPending,
     fee: withdrawFeePending,
+    btcGasFee: withdrawBtcGasFeePending,
     errorMsg: withdrawErrorMsgPending,
   } = useCalculateWithdraw({
     isBtcWithdraw,
@@ -195,6 +207,7 @@ const Modal = () => {
 
   const {
     fee: depositFeePending,
+    btcGasFee: depositBtcGasFeePending,
     loading: cacuDepositLoadingPending,
     receiveAmount: depositReceiveAmountPending,
     minDepositAmount: depositMinDepositAmountPending,
@@ -211,14 +224,23 @@ const Modal = () => {
         withdrawReceiveAmount: withdrawReceiveAmountPending,
         cacuWithdrawLoading: cacuWithdrawLoadingPending,
         withdrawFee: withdrawFeePending,
+        withdrawGasFee: withdrawBtcGasFeePending,
         errorMsg: withdrawErrorMsgPending,
       });
     }
-  }, [withdrawReceiveAmountPending, cacuWithdrawLoadingPending, withdrawAmountPending, amount]);
+  }, [
+    withdrawReceiveAmountPending,
+    cacuWithdrawLoadingPending,
+    withdrawAmountPending,
+    withdrawFeePending,
+    withdrawBtcGasFeePending,
+    amount,
+  ]);
   useEffect(() => {
     if (amount == depositAmountPending) {
       setDepositData({
         depositFee: depositFeePending,
+        depositGasFee: depositBtcGasFeePending,
         cacuDepositLoading: cacuDepositLoadingPending,
         depositReceiveAmount: depositReceiveAmountPending,
         depositMinDepositAmount: depositMinDepositAmountPending,
@@ -230,11 +252,17 @@ const Modal = () => {
     depositReceiveAmountPending,
     depositMinDepositAmountPending,
     depositAmountPending,
+    depositBtcGasFeePending,
     amount,
   ]);
-  const { depositFee, cacuDepositLoading, depositReceiveAmount, depositMinDepositAmount } =
-    depositData;
-  const { withdrawReceiveAmount, cacuWithdrawLoading, withdrawFee } = withdrawData;
+  const {
+    depositFee,
+    depositGasFee,
+    cacuDepositLoading,
+    depositReceiveAmount,
+    depositMinDepositAmount,
+  } = depositData;
+  const { withdrawReceiveAmount, cacuWithdrawLoading, withdrawFee, withdrawGasFee } = withdrawData;
   // withdraw oneClick min
   if (isBtcChainWithdraw) {
     if (withdrawData.errorMsg) {
@@ -257,20 +285,50 @@ const Modal = () => {
       delete alerts.btcDepositMinLimit;
     }
   }
-  // oneClick time
-  // if (isOneClickAction) {
-  //   alerts["oneClickActionTime"] = {
-  //     title: "It will take about 20 minutes to complete.",
-  //     severity: "warning",
-  //   };
-  // } else {
-  //   delete alerts.oneClickActionTime;
-  // }
   const actionButtonDisabled =
     alerts["btcWithdrawErrorMsg"] ||
     alerts["btcDepositMinLimit"] ||
     (isBtcChainSupply && cacuDepositLoading) ||
     (isBtcChainWithdraw && cacuWithdrawLoading);
+
+  const { transactionsNumOnNear, transactionsGasOnNear } = useMemo(() => {
+    if (!isBtcWallet || new Decimal(amount || 0).lte(0)) {
+      return {
+        transactionsNumOnNear: "0",
+        transactionsGasOnNear: "0",
+      };
+    } else if (action == "Supply") {
+      return {
+        transactionsNumOnNear: tokenId == WNEARTokenId ? "3" : "2",
+        transactionsGasOnNear: tokenId == WNEARTokenId ? "250" : "150",
+      };
+    } else if (action == "Withdraw") {
+      return {
+        transactionsNumOnNear: "3",
+        transactionsGasOnNear: "450",
+      };
+    } else if (action == "Borrow") {
+      return {
+        transactionsNumOnNear: "2",
+        transactionsGasOnNear: "350",
+      };
+    } else if (action == "Adjust") {
+      return {
+        transactionsNumOnNear: "2",
+        transactionsGasOnNear: "350",
+      };
+    } else if (action == "Repay") {
+      return {
+        transactionsNumOnNear: "2",
+        transactionsGasOnNear: "350",
+      };
+    } else {
+      return {
+        transactionsNumOnNear: "0",
+        transactionsGasOnNear: "0",
+      };
+    }
+  }, [action, amount, isBtcWallet]);
   // NBTC end
   return (
     <MUIModal open={isOpen} onClose={handleClose}>
@@ -325,7 +383,12 @@ const Modal = () => {
                     value={beautifyPrice(withdrawReceiveAmount) as string}
                     loading={cacuWithdrawLoading}
                   />
-                  <Fee value={beautifyPrice(withdrawFee) as string} loading={cacuWithdrawLoading} />
+                  {/* <Fee value={beautifyPrice(withdrawFee) as string} loading={cacuWithdrawLoading} /> */}
+                  <FeeContainer
+                    loading={cacuWithdrawLoading}
+                    bridgeProtocolFee={withdrawFee}
+                    bridgeGasOnBtc={withdrawGasFee}
+                  />
                 </>
               ) : null}
               {isBtcChainSupply ? (
@@ -334,9 +397,22 @@ const Modal = () => {
                     value={beautifyPrice(depositReceiveAmount) as string}
                     loading={cacuDepositLoading}
                   />
-                  <Fee value={beautifyPrice(depositFee) as string} loading={cacuDepositLoading} />
+                  {/* <Fee value={beautifyPrice(depositFee) as string} loading={cacuDepositLoading} /> */}
+                  <FeeContainer
+                    loading={cacuDepositLoading}
+                    bridgeProtocolFee={depositFee}
+                    bridgeGasOnBtc={depositGasFee}
+                  />
                 </>
               ) : null}
+              {!isBtcChainWithdraw && !isBtcChainSupply && isBtcWallet ? (
+                <FeeContainer
+                  loading={false}
+                  transactionsGasOnNear={transactionsGasOnNear}
+                  transactionsNumOnNear={transactionsNumOnNear}
+                />
+              ) : null}
+
               <HealthFactor value={healthFactor} />
               {repay_to_lp ? (
                 <HealthFactor value={single_healthFactor} title="Health Factor(Single)" />

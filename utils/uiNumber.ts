@@ -1,6 +1,5 @@
 import Decimal from "decimal.js";
 import { formatWithCommas, toInternationalCurrencySystem } from "./number";
-import { beautifyPrice } from "./beautyNumber";
 
 export const formatWithCommas_usd = (v) => {
   if (isInvalid(v)) return "$-";
