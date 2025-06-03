@@ -553,15 +553,17 @@ const FeeDetail = ({
     let near_near_num = new Decimal(0);
     let bridge_btc_num = new Decimal(0);
     let bridge_nbtc_num = new Decimal(0);
-    if (new Decimal(bridgeGasOnBtc || 0).gt(0)) {
-      const v = new Decimal(bridgeGasOnBtc || 0).mul(prices[WBTCTokenId] || 0);
+    const bridgeGasOnBtcDecimals = new Decimal(bridgeGasOnBtc || 0).toFixed(8);
+    const bridgeProtocolFeeDecimals = new Decimal(bridgeProtocolFee || 0).toFixed(8);
+    if (new Decimal(bridgeGasOnBtcDecimals || 0).gt(0)) {
+      const v = new Decimal(bridgeGasOnBtcDecimals || 0).mul(prices[WBTCTokenId] || 0);
       totalValue = totalValue.plus(v);
-      bridge_btc_num = bridge_btc_num.plus(bridgeGasOnBtc || 0);
+      bridge_btc_num = bridge_btc_num.plus(bridgeGasOnBtcDecimals || 0);
     }
-    if (new Decimal(bridgeProtocolFee || 0).gt(0)) {
-      const v = new Decimal(bridgeProtocolFee || 0).mul(prices[NBTCTokenId] || 0);
+    if (new Decimal(bridgeProtocolFeeDecimals || 0).gt(0)) {
+      const v = new Decimal(bridgeProtocolFeeDecimals || 0).mul(prices[NBTCTokenId] || 0);
       totalValue = totalValue.plus(v);
-      bridge_nbtc_num = bridge_nbtc_num.plus(bridgeProtocolFee || 0);
+      bridge_nbtc_num = bridge_nbtc_num.plus(bridgeProtocolFeeDecimals || 0);
     }
     if (new Decimal(transactionsNumOnNear || 0).gt(0)) {
       const signatureFee = new Decimal(transactionsNumOnNear || 0).mul(signatureFeePertTx);
