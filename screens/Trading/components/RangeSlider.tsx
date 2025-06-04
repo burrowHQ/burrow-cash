@@ -21,6 +21,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
 }) => {
   const [value, setValue] = useState(defaultValue);
   const [splitList, setSplitList] = useState<number[]>([]);
+  const [splitListLabel, setSplitListLabel] = useState<number[]>([]);
   const [matchValue, setMatchValue] = useState(value);
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -32,11 +33,12 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
   const marginConfigTokensCombined = isMainStream ? marginConfigTokens : marginConfigTokensMEME;
 
   useEffect(() => {
-    const newAllowedValues = generateArithmeticSequence(
+    const { sequenceLabel, sequence } = generateArithmeticSequence(
       marginConfigTokensCombined.listBaseTokenConfig[baseTokenId]?.max_leverage_rate ||
         marginConfigTokensCombined.defaultBaseTokenConfig.max_leverage_rate,
     );
-    setSplitList(newAllowedValues);
+    setSplitList(sequence);
+    setSplitListLabel(sequenceLabel);
   }, [marginConfigTokensCombined]);
   // init value
   useEffect(() => {
@@ -70,14 +72,22 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
     dispatch(setReduxRangeMount(nearestValue));
   }
   const generateArithmeticSequence = (value: number) => {
-    const increment = (value - 1) / 4;
+    const incrementLabel = (value - 1) / 4;
+    const increment = Number(value - 1) / 0.05;
     const sequence: number[] = [];
+    const sequenceLabel: number[] = [];
 
     for (let i = 0; i <= 4; i++) {
-      sequence.push(+(1 + i * increment).toFixed(2));
+      sequenceLabel.push(+(1 + i * incrementLabel).toFixed(2));
+    }
+    for (let i = 0; i <= increment; i++) {
+      sequence.push(+(1 + i * 0.05).toFixed(2));
     }
 
-    return sequence;
+    return {
+      sequence,
+      sequenceLabel,
+    };
   };
   const actionShowRedColor = action === "Long";
   return (
@@ -97,7 +107,7 @@ const RangeSlider: React.FC<RangeSliderProps> = ({
         />
       </div>
       <div className={twMerge("flex justify-between items-center mt-2")}>
-        {splitList.map((p) => (
+        {splitListLabel.map((p) => (
           <div
             key={p}
             className="flex flex-col items-center cursor-pointer"
