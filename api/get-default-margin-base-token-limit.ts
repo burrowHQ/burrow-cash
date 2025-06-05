@@ -3,7 +3,7 @@ import { ViewMethodsLogic } from "../interfaces/contract-methods";
 import { IMarginBaseTokenConfig } from "../interfaces";
 
 const getDefaultMarginBaseTokenLimit = async (): Promise<IMarginBaseTokenConfig> => {
-  // TODOXX main
+  // TODOXX main2
   const { view, logicContract } = await getBurrow();
   try {
     const config = (await view(
