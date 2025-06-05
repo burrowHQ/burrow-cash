@@ -62,7 +62,7 @@ export const BRRR_LABS_TOKEN = {
 };
 export const NBTCTokenId = {
   testnet: "nbtc-dev.testnet",
-  mainnet: "nbtc.bridge.near",
+  mainnet: "nbtc.toalice.near",
 }[defaultNetwork];
 export const WALLET_CONNECT_ID =
   process.env.NEXT_PUBLIC_WALLET_CONNECT_ID || ("87e549918631f833447b56c15354e450" as string);
