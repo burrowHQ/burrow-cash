@@ -79,7 +79,7 @@ export const topTokens: string[] = [
   // "shadow_ref_v1-4179"
 ];
 
-export const NBTC_ENV = "mainnet";
+export const NBTC_ENV = "private_mainnet";
 export const AWS_MEDIA_DOMAIN = "https://img.rhea.finance";
 export const ETH_OLD_CONTRACT_ID = "aurora";
 export const ETH_CONTRACT_ID = "eth.bridge.near";
