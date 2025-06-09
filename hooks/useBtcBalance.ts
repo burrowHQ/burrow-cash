@@ -191,6 +191,7 @@ export function useCalculateDeposit({
         env,
       },
     );
+    console.log("--------------------repayAmount", repayAmount);
     const BTCGasFee = await calculateGasFee(btcAccountId, Number(expandAmount));
     const totalFeeAmount = shrinkToken(
       new Decimal(protocolFee || 0).plus(repayAmount).toFixed(),

@@ -291,7 +291,7 @@ const Modal = () => {
     (isBtcChainSupply && cacuDepositLoading) ||
     (isBtcChainWithdraw && cacuWithdrawLoading);
 
-  const { transactionsNumOnNear, transactionsGasOnNear } = useMemo(() => {
+  const { transactionsNumOnNear, transactionsGasOnNear, storage } = useMemo(() => {
     if (!isBtcWallet || new Decimal(amount || 0).lte(0)) {
       return {
         transactionsNumOnNear: "0",
@@ -301,16 +301,30 @@ const Modal = () => {
       return {
         transactionsNumOnNear: tokenId == WNEARTokenId ? "3" : "2",
         transactionsGasOnNear: tokenId == WNEARTokenId ? "250" : "150",
+        storage: {
+          contractId: isMeme
+            ? process.env.NEXT_PUBLIC_MEMECONTRACT_NAME
+            : process.env.NEXT_PUBLIC_CONTRACT_NAME,
+          amount: "0.1",
+        },
       };
     } else if (action == "Withdraw") {
       return {
         transactionsNumOnNear: "3",
         transactionsGasOnNear: "450",
+        storage: {
+          contractId: tokenId,
+          amount: "0.00125",
+        },
       };
     } else if (action == "Borrow") {
       return {
         transactionsNumOnNear: "2",
         transactionsGasOnNear: "350",
+        storage: {
+          contractId: tokenId,
+          amount: "0.00125",
+        },
       };
     } else if (action == "Adjust") {
       return {
@@ -383,7 +397,6 @@ const Modal = () => {
                     value={beautifyPrice(withdrawReceiveAmount) as string}
                     loading={cacuWithdrawLoading}
                   />
-                  {/* <Fee value={beautifyPrice(withdrawFee) as string} loading={cacuWithdrawLoading} /> */}
                   <FeeContainer
                     loading={cacuWithdrawLoading}
                     bridgeProtocolFee={withdrawFee}
@@ -397,7 +410,6 @@ const Modal = () => {
                     value={beautifyPrice(depositReceiveAmount) as string}
                     loading={cacuDepositLoading}
                   />
-                  {/* <Fee value={beautifyPrice(depositFee) as string} loading={cacuDepositLoading} /> */}
                   <FeeContainer
                     loading={cacuDepositLoading}
                     bridgeProtocolFee={depositFee}
@@ -410,6 +422,7 @@ const Modal = () => {
                   loading={false}
                   transactionsGasOnNear={transactionsGasOnNear}
                   transactionsNumOnNear={transactionsNumOnNear}
+                  storage={storage}
                 />
               ) : null}
 

@@ -38,6 +38,7 @@ interface IAppConfig {
   indexUrl: string;
   findPathUrl: string;
   explorerUrl: string;
+  BURROW_API_URL: string;
 }
 export const STABLE_POOL_IDS = [
   "4179",
@@ -138,6 +139,7 @@ const getConfig = (env: string = defaultNetwork) => {
         REF_EXCHANGE_ID: "v2.ref-finance.near",
         DCL_EXCHANGE_ID: "dclv2.ref-labs.near",
         findPathUrl: "smartrouter.ref.finance",
+        BURROW_API_URL: "https://api.burrow.finance",
       } as unknown as ConnectConfig & IAppConfig;
 
     case "development":

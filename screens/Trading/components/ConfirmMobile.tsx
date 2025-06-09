@@ -310,6 +310,12 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
               transactionsGasOnNear={550}
               transactionsNumOnNear={4}
               className="my-3"
+              storage={{
+                contractId: isMemeStream
+                  ? process.env.NEXT_PUBLIC_MEMECONTRACT_NAME
+                  : process.env.NEXT_PUBLIC_CONTRACT_NAME,
+                amount: "0.1",
+              }}
             />
             {isMinTokenPAmount && (
               <div className=" text-[#EA3F68] text-sm font-normal flex items-start mb-1">
