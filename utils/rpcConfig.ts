@@ -24,7 +24,7 @@ export function getExtendConfig(
       return {
         RPC_LIST: {
           defaultRpc: {
-            url: "https://free.rpc.fastnear.com",
+            url: "https://rpc.mainnet.fastnear.com?apiKey=d17d0e02e6ed9582b1c9d100bda7038e2dac7945099804fadafc430884f6b54a",
             simpleName: "fastnear rpc",
           },
           lavaRpc: {

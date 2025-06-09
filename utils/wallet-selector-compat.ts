@@ -21,6 +21,7 @@ import { setupOKXWallet } from "@near-wallet-selector/okx-wallet";
 import { setupHotWallet } from "@near-wallet-selector/hot-wallet";
 import { setupMeteorWalletApp } from "@near-wallet-selector/meteor-wallet-app";
 import { setupBTCWallet, setupWalletSelectorModal } from "btc-wallet";
+import { setupIntearWallet } from "@near-wallet-selector/intear-wallet";
 // @ts-nocheck
 import type { Config } from "@wagmi/core";
 // @ts-nocheck
@@ -189,6 +190,7 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
       setupMeteorWalletApp({
         contractId: LOGIC_CONTRACT_NAME,
       }),
+      setupIntearWallet(),
     ],
     network: {
       networkId: defaultNetwork,
@@ -220,7 +222,6 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
       "okx-wallet",
       "my-near-wallet",
       "meteor-wallet",
-      "neth",
       "nightly",
       "ledger",
       "keypom",
