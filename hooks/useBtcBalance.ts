@@ -185,13 +185,9 @@ export function useCalculateDeposit({
   async function getReceiveAmount() {
     const env = NBTC_ENV;
     const expandAmount = new Decimal(expandToken(amount, decimals)).toFixed(0, Decimal.ROUND_DOWN);
-    const { protocolFee, repayAmount, receiveAmount, minDepositAmount } = await getDepositAmount(
-      expandAmount,
-      {
-        env,
-      },
-    );
-    console.log("--------------------repayAmount", repayAmount);
+    const { protocolFee, repayAmount, minDepositAmount } = await getDepositAmount(expandAmount, {
+      env,
+    });
     const BTCGasFee = await calculateGasFee(btcAccountId, Number(expandAmount));
     const totalFeeAmount = shrinkToken(
       new Decimal(protocolFee || 0).plus(repayAmount).toFixed(),

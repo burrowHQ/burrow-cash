@@ -19,7 +19,7 @@ import { isInvalid, formatWithCommas_usd } from "../../utils/uiNumber";
 import { YellowSolidSubmitButton, RedSolidSubmitButton } from "./button";
 import { getCollateralAmount } from "../../redux/selectors/getCollateralAmount";
 import { TipIcon, CloseIcon, WarnIcon, JumpTipIcon, ArrowRight } from "./svg";
-import ReactToolTip from "../ToolTip";
+import ReactToolTip, { TagToolTip } from "../ToolTip";
 import { IToken } from "../../interfaces/asset";
 import { isMemeCategory } from "../../redux/categorySelectors";
 import HtmlTooltip from "../common/html-tooltip";
@@ -533,7 +533,20 @@ export function FeeContainer({
   if (!isBtcWallet) return null;
   return (
     <div className={twMerge(`flex items-center justify-between`, className || "")}>
-      <span className="text-sm text-gray-300">Fee</span>
+      <span className="flex items-center gap-1.5 text-sm text-gray-300">
+        Fee{" "}
+        <TagToolTip
+          title={
+            <div className="flex flex-col gap-1">
+              <p>1. Near{">"}0.5, Estimated amount, final deduction may vary.</p>
+              <p>
+                2. Near{"<"} 0.5, Estimated amount, final deduction may vary. NEAR shortage will
+                trigger nBTC swap, possibly increasing NEAR balance after completion.
+              </p>
+            </div>
+          }
+        />
+      </span>
       {loading || extraFeeLoading ? (
         <BeatLoader size={5} color="#ffffff" />
       ) : (
