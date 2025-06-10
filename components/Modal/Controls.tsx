@@ -2,11 +2,10 @@ import Decimal from "decimal.js";
 import { updateAmount } from "../../redux/appSlice";
 import { updateAmount as updateAmountMEME } from "../../redux/appSliceMEME";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { formatWithCommas_number } from "../../utils/uiNumber";
 import RangeSlider from "./RangeSlider";
 import TokenBox from "./TokenBox";
 import { isMemeCategory } from "../../redux/categorySelectors";
-import { beautifyPrice } from "../../utils/beautyNumber";
+import { beautifyPrice, beautifyNumber } from "../../utils/beautyNumber";
 
 export default function Controls({ amount, available, action, asset, totalAvailable, available$ }) {
   const dispatch = useAppDispatch();
@@ -59,7 +58,6 @@ export default function Controls({ amount, available, action, asset, totalAvaila
       >
         <span className="text-sm text-gray-300">Available</span>
         <span className="flex items-center text-sm text-white">
-          {/* {formatWithCommas_number(totalAvailable)} */}
           {beautifyPrice(totalAvailable || 0)}
           <span className="text-xs text-gray-300 ml-2">({available$})</span>
         </span>

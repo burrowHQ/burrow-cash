@@ -429,6 +429,10 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
               transactionsGasOnNear={positionType.label === "Long" ? 650 : 950}
               transactionsNumOnNear={positionType.label === "Long" ? 3 : 4}
               className="my-3"
+              storage={{
+                contractId: positionType.label === "Short" ? assetD.token_id : "",
+                amount: "0.00125",
+              }}
             />
             {swapUnSecurity && (
               <div className=" text-[#EA3F68] text-sm font-normal flex items-start mb-1">

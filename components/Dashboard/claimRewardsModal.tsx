@@ -43,6 +43,10 @@ export default function ClaimRewardsModal({
             loading={false}
             transactionsGasOnNear={350}
             transactionsNumOnNear={4}
+            storage={{
+              contractId: rewardsObj?.data?.array?.[0]?.tokenId,
+              amount: "0.00125",
+            }}
             className="my-3 pl-8"
           />
           <ClaimAllRewards

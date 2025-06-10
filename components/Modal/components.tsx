@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Box, Typography, Stack, Alert, Link, useTheme } from "@mui/material";
 import Decimal from "decimal.js";
+import { getDepositAmount } from "btc-wallet";
 import { BeatLoader } from "react-spinners";
 import { twMerge } from "tailwind-merge";
 import { actionMapTitle } from "./utils";
@@ -18,14 +19,15 @@ import { isInvalid, formatWithCommas_usd } from "../../utils/uiNumber";
 import { YellowSolidSubmitButton, RedSolidSubmitButton } from "./button";
 import { getCollateralAmount } from "../../redux/selectors/getCollateralAmount";
 import { TipIcon, CloseIcon, WarnIcon, JumpTipIcon, ArrowRight } from "./svg";
-import ReactToolTip from "../ToolTip";
+import ReactToolTip, { TagToolTip } from "../ToolTip";
 import { IToken } from "../../interfaces/asset";
 import { isMemeCategory } from "../../redux/categorySelectors";
 import HtmlTooltip from "../common/html-tooltip";
 import { getTotalAccountBalance } from "../../redux/accountSelectors";
-import { NBTCTokenId, WBTCTokenId, WNEARTokenId } from "../../utils/config";
-import { beautifyPrice } from "../../utils/beautyNumber";
+import { NBTCTokenId, WBTCTokenId, WNEARTokenId, NBTC_ENV } from "../../utils/config";
+import { beautifyPrice, beautifyNumber } from "../../utils/beautyNumber";
 import { getAssetsCategory } from "../../redux/assetsSelectors";
+import { get_storage_balance_of } from "../../services/common";
 
 export const USNInfo = () => (
   <Box mt="1rem">
@@ -478,7 +480,6 @@ export const BtcOneClickTab = ({ nbtcTab, setNbtcTab, isMeme }) => {
     </div>
   );
 };
-
 export function FeeContainer({
   loading,
   transactionsNumOnNear,
@@ -486,23 +487,67 @@ export function FeeContainer({
   bridgeGasOnBtc,
   bridgeProtocolFee,
   className,
+  storage,
 }: {
   loading: boolean;
   transactionsNumOnNear?: string | number;
-  transactionsGasOnNear?: string | number;
+  transactionsGasOnNear?: string | number; // T
   bridgeGasOnBtc?: string | number;
   bridgeProtocolFee?: string | number;
+  storage?: {
+    contractId?: string;
+    amount: string;
+  };
   className?: string;
 }) {
+  const [repayAmount, setRepayAmount] = useState<string | number>("0");
+  const [extraFeeLoading, setExtraFeeLoading] = useState<boolean>(false);
+  const [storageDepositOnNear, setStorageDepositOnNear] = useState<string>("0");
   const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
   const isBtcWallet = selectedWalletId === "btc-wallet";
+  const isEmpty =
+    new Decimal(transactionsNumOnNear || 0).eq(0) && new Decimal(bridgeProtocolFee || 0).eq(0);
+  useEffect(() => {
+    if (isBtcWallet && !isEmpty) {
+      getExtraFee();
+    }
+  }, [isBtcWallet, JSON.stringify(storage || 0), isEmpty]);
+  async function getExtraFee() {
+    setExtraFeeLoading(true);
+    const { repayAmount } = await getDepositAmount("0", {
+      env: NBTC_ENV,
+    });
+    if (storage?.contractId) {
+      const res = await get_storage_balance_of({
+        accountId: window.accountId,
+        contractId: storage?.contractId,
+      });
+      if (!res) {
+        setStorageDepositOnNear(storage?.amount || "0");
+      }
+    }
+    const _repayAmount = shrinkToken(repayAmount || 0, 8, 8);
+    setRepayAmount(_repayAmount || 0);
+    setExtraFeeLoading(false);
+  }
   if (!isBtcWallet) return null;
   return (
     <div className={twMerge(`flex items-center justify-between`, className || "")}>
-      <span className="text-sm text-gray-300">
-        {new Decimal(bridgeGasOnBtc || 0).gt(0) ? "Fee" : "Gas Fee"}
+      <span className="flex items-center gap-1.5 text-sm text-gray-300">
+        Fee{" "}
+        <TagToolTip
+          title={
+            <div className="flex flex-col gap-1">
+              <p>1. Near{">"}0.5, Estimated amount, final deduction may vary.</p>
+              <p>
+                2. Near{"<"} 0.5, Estimated amount, final deduction may vary. NEAR shortage will
+                trigger nBTC swap, possibly increasing NEAR balance after completion.
+              </p>
+            </div>
+          }
+        />
       </span>
-      {loading ? (
+      {loading || extraFeeLoading ? (
         <BeatLoader size={5} color="#ffffff" />
       ) : (
         <FeeDetail
@@ -510,6 +555,8 @@ export function FeeContainer({
           transactionsGasOnNear={transactionsGasOnNear}
           bridgeGasOnBtc={bridgeGasOnBtc}
           bridgeProtocolFee={bridgeProtocolFee}
+          repayAmount={repayAmount}
+          storageDepositOnNear={storageDepositOnNear}
         />
       )}
     </div>
@@ -521,11 +568,15 @@ const FeeDetail = ({
   transactionsGasOnNear,
   bridgeGasOnBtc,
   bridgeProtocolFee,
+  storageDepositOnNear,
+  repayAmount,
 }: {
   transactionsNumOnNear?: string | number;
   transactionsGasOnNear?: string | number;
   bridgeGasOnBtc?: string | number;
   bridgeProtocolFee?: string | number;
+  storageDepositOnNear?: string | number;
+  repayAmount: string | number;
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const [nearNumPerT] = useState(0.0001);
@@ -545,6 +596,8 @@ const FeeDetail = ({
     bridgeProtocolFee,
     transactionsNumOnNear,
     transactionsGasOnNear,
+    storageDepositOnNear,
+    repayAmount,
     prices,
   });
   const { nbtc_num, btc_num, near_num, totalValue, empty } = useMemo(() => {
@@ -564,6 +617,18 @@ const FeeDetail = ({
       const v = new Decimal(bridgeProtocolFeeDecimals || 0).mul(prices[NBTCTokenId] || 0);
       totalValue = totalValue.plus(v);
       bridge_nbtc_num = bridge_nbtc_num.plus(bridgeProtocolFeeDecimals || 0);
+    }
+    // storage deposit
+    if (new Decimal(storageDepositOnNear || 0).gt(0)) {
+      const v_n = new Decimal(storageDepositOnNear || 0).mul(prices[WNEARTokenId] || 0);
+      near_near_num = near_near_num.plus(storageDepositOnNear || 0);
+      totalValue = totalValue.plus(v_n);
+    }
+    // repay amount
+    if (new Decimal(repayAmount || 0).gt(0)) {
+      const v = new Decimal(repayAmount || 0).mul(prices[NBTCTokenId] || 0);
+      near_nbtc_num = near_nbtc_num.plus(repayAmount);
+      totalValue = totalValue.plus(v);
     }
     if (new Decimal(transactionsNumOnNear || 0).gt(0)) {
       const signatureFee = new Decimal(transactionsNumOnNear || 0).mul(signatureFeePertTx);
@@ -601,6 +666,7 @@ const FeeDetail = ({
     bridgeProtocolFee,
     transactionsNumOnNear,
     transactionsGasOnNear,
+    storageDepositOnNear,
     JSON.stringify(prices || {}),
   ]);
   console.log("------------------after", {
@@ -629,7 +695,12 @@ const FeeDetail = ({
                     alt=""
                     className="w-4 h-4 rounded-full"
                   />
-                  <span className="text-white">{beautifyPrice(btc_num.toFixed())}</span>
+                  <span className="text-white">
+                    {beautifyNumber({
+                      num: btc_num.toFixed(),
+                      maxDecimal: 8,
+                    })}
+                  </span>
                 </div>
               </div>
             ) : null}
@@ -642,7 +713,12 @@ const FeeDetail = ({
                     alt=""
                     className="w-4 h-4 rounded-full"
                   />
-                  <span className="text-white">{beautifyPrice(nbtc_num.toFixed())}</span>
+                  <span className="text-white">
+                    {beautifyNumber({
+                      num: nbtc_num.toFixed(),
+                      maxDecimal: 8,
+                    })}
+                  </span>
                 </div>
               </div>
             ) : null}
