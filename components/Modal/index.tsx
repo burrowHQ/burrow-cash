@@ -51,15 +51,9 @@ import {
   CollateralTypeSelectorRepay,
 } from "./CollateralTypeSelector";
 import { useBtcAction, useCalculateWithdraw, useCalculateDeposit } from "../../hooks/useBtcBalance";
-import { beautifyPrice } from "../../utils/beautyNumber";
+import { beautifyNumber } from "../../utils/beautyNumber";
 import { useUserBalance } from "../../hooks/useUserBalance";
-import {
-  DEFAULT_POSITION,
-  lpTokenPrefix,
-  NBTCTokenId,
-  WNEARTokenId,
-  WBTCTokenId,
-} from "../../utils/config";
+import { DEFAULT_POSITION, lpTokenPrefix, NBTCTokenId, WNEARTokenId } from "../../utils/config";
 
 export const ModalContext = createContext(null) as any;
 const Modal = () => {
@@ -394,7 +388,12 @@ const Modal = () => {
               {isBtcChainWithdraw ? (
                 <>
                   <Receive
-                    value={beautifyPrice(withdrawReceiveAmount) as string}
+                    value={
+                      beautifyNumber({
+                        num: withdrawReceiveAmount,
+                        maxDecimal: 8,
+                      }) as string
+                    }
                     loading={cacuWithdrawLoading}
                   />
                   <FeeContainer
@@ -406,7 +405,12 @@ const Modal = () => {
               {isBtcChainSupply ? (
                 <>
                   <Receive
-                    value={beautifyPrice(depositReceiveAmount) as string}
+                    value={
+                      beautifyNumber({
+                        num: depositReceiveAmount,
+                        maxDecimal: 8,
+                      }) as string
+                    }
                     loading={cacuDepositLoading}
                   />
                   <FeeContainer

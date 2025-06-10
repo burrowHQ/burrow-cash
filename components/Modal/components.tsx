@@ -25,7 +25,7 @@ import { isMemeCategory } from "../../redux/categorySelectors";
 import HtmlTooltip from "../common/html-tooltip";
 import { getTotalAccountBalance } from "../../redux/accountSelectors";
 import { NBTCTokenId, WBTCTokenId, WNEARTokenId, NBTC_ENV } from "../../utils/config";
-import { beautifyPrice } from "../../utils/beautyNumber";
+import { beautifyPrice, beautifyNumber } from "../../utils/beautyNumber";
 import { getAssetsCategory } from "../../redux/assetsSelectors";
 import { get_storage_balance_of } from "../../services/common";
 
@@ -695,7 +695,12 @@ const FeeDetail = ({
                     alt=""
                     className="w-4 h-4 rounded-full"
                   />
-                  <span className="text-white">{beautifyPrice(btc_num.toFixed())}</span>
+                  <span className="text-white">
+                    {beautifyNumber({
+                      num: btc_num.toFixed(),
+                      maxDecimal: 8,
+                    })}
+                  </span>
                 </div>
               </div>
             ) : null}
@@ -708,7 +713,12 @@ const FeeDetail = ({
                     alt=""
                     className="w-4 h-4 rounded-full"
                   />
-                  <span className="text-white">{beautifyPrice(nbtc_num.toFixed())}</span>
+                  <span className="text-white">
+                    {beautifyNumber({
+                      num: nbtc_num.toFixed(),
+                      maxDecimal: 8,
+                    })}
+                  </span>
                 </div>
               </div>
             ) : null}
