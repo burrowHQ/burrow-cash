@@ -417,6 +417,12 @@ const Modal = () => {
                     loading={cacuDepositLoading}
                     bridgeProtocolFee={depositFee}
                     bridgeGasOnBtc={depositGasFee}
+                    storage={{
+                      contractId: isMeme
+                        ? process.env.NEXT_PUBLIC_MEMECONTRACT_NAME
+                        : process.env.NEXT_PUBLIC_CONTRACT_NAME,
+                      amount: "0.1",
+                    }}
                   />
                 </>
               ) : null}
