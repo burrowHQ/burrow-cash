@@ -43,27 +43,23 @@ const Trading = () => {
   const assets = useAppSelector(getAssetsSelector);
   const assetsMEME = useAppSelector(getAssetsMEME);
   const isLoading = Object.keys(assetsMEME.data).length === 0 && !isMainStream;
-  const [showPopupCate1, setShowPopup1] = useState(false);
   const [showPopupCate2, setShowPopup2] = useState(false);
   const [currentTokenCate1, setCurrentTokenCate1] = useState<any>({});
-  const [currentTokenCate2, setCurrentTokenCate2] = useState<any>();
   const [longAndShortPosition, setLongAndShortPosition] = useState<any>([]);
-  const combinedAssetsData = isMainStream ? assets.data : assetsMEME.data;
   const categoryAssets2Current = isMainStream ? categoryAssets2 : categoryAssets2MEME;
-  const assetData: any = combinedAssetsData[id];
+  const categoryAssets1Current = isMainStream ? assets.data : assetsMEME.data;
+  const assetData: any = categoryAssets1Current[id];
   const margin_position = assetData ? assetData?.margin_position : null;
   const metadata = assetData ? assetData?.metadata : {};
   const config = assetData ? assetData?.config : {};
   const margin_debt = assetData ? assetData?.margin_debt : {};
   const decimals = metadata?.decimals || 0;
   const extra_decimals = config?.extra_decimals || 0;
-
   let timer;
-
   useEffect(() => {
     if (id || !isLoading) {
-      setCurrentTokenCate1(combinedAssetsData[id]);
-      dispatch(setCategoryAssets1(combinedAssetsData[id]));
+      setCurrentTokenCate1(categoryAssets1Current[id]);
+      dispatch(setCategoryAssets1(categoryAssets1Current[id]));
     }
   }, [id, isLoading]);
 
@@ -71,38 +67,36 @@ const Trading = () => {
     setLongAndShortPosition([
       toInternationalCurrencySystem_number(
         +shrinkToken(margin_position, decimals + extra_decimals) *
-          (combinedAssetsData[id]?.price?.usd || 0),
+          (categoryAssets1Current[id]?.price?.usd || 0),
       ),
       toInternationalCurrencySystem_number(
         +shrinkToken(margin_debt?.balance, decimals + extra_decimals) *
-          (combinedAssetsData[id]?.price?.usd || 0),
+          (categoryAssets1Current[id]?.price?.usd || 0),
       ),
     ]);
-  }, [combinedAssetsData[id]?.price?.usd]);
+  }, [categoryAssets1Current[id]?.price?.usd]);
 
   useMemo(() => {
     setCurrentTokenCate1(ReduxcategoryAssets1);
   }, [ReduxcategoryAssets1]);
 
-  // get or init selected category 2
+  // init selected category 2
   useEffect(() => {
     if (id) {
-      if (
-        !ReduxcategoryAssets2 ||
-        (ReduxcategoryAssets2 && !isIncludes(categoryAssets2Current, ReduxcategoryAssets2))
-      ) {
-        dispatch(setCategoryAssets2(categoryAssets2Current[0]));
-        setCurrentTokenCate2(categoryAssets2Current[0]);
+      if (ReduxcategoryAssets2?.token_id) {
+        const t = categoryAssets2Current?.find(
+          (item) => item.token_id == ReduxcategoryAssets2?.token_id,
+        );
+        if (t) {
+          dispatch(setCategoryAssets2(t));
+        } else {
+          dispatch(setCategoryAssets2(categoryAssets2Current[0]));
+        }
       } else {
-        setCurrentTokenCate2(ReduxcategoryAssets2);
+        dispatch(setCategoryAssets2(categoryAssets2Current[0]));
       }
     }
-  }, [id, ReduxcategoryAssets2, categoryAssets2Current]);
-
-  function isIncludes(assets: any[], asset: any) {
-    const target = assets.find((a) => a.token_id == asset.token_id);
-    return !!target;
-  }
+  }, [id, ReduxcategoryAssets2?.token_id]);
   // mouseenter and leave inter
   const handlePopupToggle = () => {
     setShowPopup2(!showPopupCate2);
@@ -117,7 +111,6 @@ const Trading = () => {
     clearTimeout(timer);
 
     if (category === "1") {
-      setShowPopup1(true);
     } else if (category === "2") {
       setShowPopup2(true);
     }
@@ -126,7 +119,6 @@ const Trading = () => {
   const handleMouseLeave = (category) => {
     timer = setTimeout(() => {
       if (category === "1") {
-        setShowPopup1(false);
       } else if (category === "2") {
         setShowPopup2(false);
       }
@@ -142,7 +134,7 @@ const Trading = () => {
   const filterTitle = `${getSymbolById(
     currentTokenCate1?.token_id,
     currentTokenCate1?.metadata?.symbol,
-  )}/${getSymbolById(currentTokenCate2?.token_id, currentTokenCate2?.metadata?.symbol)}`;
+  )}/${getSymbolById(ReduxcategoryAssets2?.token_id, ReduxcategoryAssets2?.metadata?.symbol)}`;
 
   const [volumeStats, setVolumeStats] = useState<any>({});
   useEffect(() => {
@@ -169,17 +161,17 @@ const Trading = () => {
     return () => clearInterval(intervalId); // Cleanup on unmount
   }, [id]);
   const indexPrice = useMemo(() => {
-    // use combinedAssetsData to obtain the latest data updated regularly
-    if (currentTokenCate1?.token_id && currentTokenCate2?.token_id) {
+    // use categoryAssets1Current to obtain the latest data updated regularly
+    if (currentTokenCate1?.token_id && ReduxcategoryAssets2?.token_id) {
       const currentTokenCate1Price =
-        combinedAssetsData?.[currentTokenCate1?.token_id]?.price?.usd || 0;
+        categoryAssets1Current?.[currentTokenCate1?.token_id]?.price?.usd || 0;
       const currentTokenCate2Price =
-        combinedAssetsData?.[currentTokenCate2?.token_id]?.price?.usd || 0;
+        categoryAssets1Current?.[ReduxcategoryAssets2?.token_id]?.price?.usd || 0;
       if (new Decimal(currentTokenCate2Price).gt(0)) {
         return new Decimal(currentTokenCate1Price).div(currentTokenCate2Price).toFixed();
       }
     }
-  }, [currentTokenCate1, currentTokenCate2, combinedAssetsData]);
+  }, [currentTokenCate1, ReduxcategoryAssets2, categoryAssets1Current]);
   return (
     <LayoutBox>
       {isLoading ? (
@@ -237,7 +229,7 @@ const Trading = () => {
                         onClick={handlePopupToggle}
                         className="flex justify-center items-center"
                       >
-                        <p className="mr-1">{currentTokenCate2?.metadata?.symbol}</p>
+                        <p className="mr-1">{ReduxcategoryAssets2?.metadata?.symbol}</p>
                         <TokenArrow />
                       </div>
                       {showPopupCate2 && (
@@ -318,7 +310,7 @@ const Trading = () => {
                             onClick={handlePopupToggle}
                             className="flex justify-center items-center"
                           >
-                            <p className="mr-1">{currentTokenCate2?.metadata?.symbol}</p>
+                            <p className="mr-1">{ReduxcategoryAssets2?.metadata?.symbol}</p>
                             <TokenArrow />
                           </div>
                           {showPopupCate2 && (
@@ -368,7 +360,7 @@ const Trading = () => {
               <div style={{ height: isMobile ? "488px" : "calc(100% - 100px)" }}>
                 <TradingViewChart
                   baseSymbol={standardizeAsset(currentTokenCate1?.metadata)?.symbol}
-                  quoteSymbol={standardizeAsset(currentTokenCate2?.metadata)?.symbol}
+                  quoteSymbol={standardizeAsset(ReduxcategoryAssets2?.metadata)?.symbol}
                   isMeme={!isMainStream}
                 />
               </div>

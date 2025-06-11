@@ -209,7 +209,7 @@ const DeveloperItem = () => {
   return (
     <div className="flex items-center justify-between h-[60px] px-6">
       <Link href="https://github.com/burrowHQ/">
-        <a
+        <Link
           href="https://github.com/burrowHQ/"
           className="flex items-center gap-2"
           target="_blank"
@@ -217,10 +217,10 @@ const DeveloperItem = () => {
         >
           <span className="text-base text-gray-300">Github</span>
           <ArrowTopRightIcon fill="#979ABE" />
-        </a>
+        </Link>
       </Link>
       <Link href="https://immunefi.com/bounty/burrow/">
-        <a
+        <Link
           href="https://immunefi.com/bounty/burrow/"
           className="flex items-center gap-2"
           target="_blank"
@@ -228,7 +228,7 @@ const DeveloperItem = () => {
         >
           <span className="text-base text-gray-300">Bug Bounty</span>
           <ArrowTopRightIcon fill="#979ABE" />
-        </a>
+        </Link>
       </Link>
     </div>
   );

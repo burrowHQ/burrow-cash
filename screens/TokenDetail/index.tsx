@@ -4,6 +4,7 @@ import { useEffect, useState, createContext, useContext, useMemo } from "react";
 import { Modal as MUIModal } from "@mui/material";
 import { twMerge } from "tailwind-merge";
 import { useBtcWalletSelector } from "btc-wallet";
+import { BeatLoader } from "react-spinners";
 import { LayoutBox } from "../../components/LayoutContainer/LayoutContainer";
 import { updatePosition } from "../../redux/appSlice";
 import { updatePosition as updatePositionMEME } from "../../redux/appSliceMEME";
@@ -71,6 +72,9 @@ import { SatoshiIcon, BtcChainIcon } from "../../components/Icons/Icons";
 import { getPageTypeFromUrl } from "../../utils/commonUtils";
 import Breadcrumb from "../../components/common/breadcrumb";
 import { beautifyPrice } from "../../utils/beautyNumber";
+import NbtcDetailGuide from "../../components/BeginnerGuide/NbtcDetailGuide";
+import { useGuide } from "../../components/BeginnerGuide/GuideContext";
+import MaintenanceModal from "../../components/maintenanceModal";
 
 const DetailData = createContext(null) as any;
 const TokenDetail = () => {
@@ -81,26 +85,12 @@ const TokenDetail = () => {
   const rows = useAvailableAssets();
   const { account, autoConnect } = useBtcWalletSelector();
   const { id } = router.query;
-  const [updaterCounter, setUpDaterCounter] = useState(1);
   const tokenRow = rows.find((row: UIAsset) => {
     return row.tokenId === id;
   });
   const accountId = useAccountId();
   const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
   const isNBTC = NBTCTokenId === id && selectedWalletId === "btc-wallet";
-  useEffect(() => {
-    const t = setInterval(() => {
-      setUpDaterCounter((pre) => {
-        return pre + 1;
-      });
-    }, 60000);
-    if (!id || !isNBTC) {
-      clearInterval(t);
-    }
-    return () => {
-      clearInterval(t);
-    };
-  }, [isNBTC]);
   // connect btc wallet to get btc balance;
   useEffect(() => {
     if (accountId && isNBTC && !account) {
@@ -193,6 +183,8 @@ function TokenDetailView({
     }
     return acc;
   }, {});
+
+  const isNbtcToken = tokenRow.tokenId === NBTCTokenId;
 
   useEffect(() => {
     fetchTokenDetails(tokenRow.tokenId, 365).catch();
@@ -316,6 +308,7 @@ function TokenDetailView({
       ) : (
         <DetailPc tokenDetails={tokenDetails} handlePeriodClick={handlePeriodClick} />
       )}
+      <NbtcDetailGuide isNbtcToken={isNbtcToken} />
     </DetailData.Provider>
   );
 }
@@ -323,7 +316,14 @@ function TokenDetailView({
 function DetailMobile({ tokenDetails, handlePeriodClick }) {
   const { router, is_new, tokenRow, getIcons, getSymbols } = useContext(DetailData) as any;
   const [activeTab, setActiveTab] = useState<"market" | "your">("market");
-  const [open, setOpen] = useState<boolean>(false);
+  const { mobileTab, isNbtcDetailGuideActive } = useGuide();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (isNbtcDetailGuideActive) {
+      setActiveTab("your");
+    }
+  }, [isNbtcDetailGuideActive]);
 
   function switchTab(tab) {
     setActiveTab(tab);
@@ -935,19 +935,36 @@ function TokenRateModeChart({
       <HrLine />
       <div className="flex items-center justify-center h-[300px] xsm2:-ml-4">
         <InterestRateChart data={interestRates} />
-        {/* <span className="text-sm text-gray-300 text-opacity-50">Chart is coming soon</span> */}
       </div>
     </div>
   );
 }
 
 function TokenUserInfo() {
+  const [updaterCounter, setUpDaterCounter] = useState(1);
+  const [maintenanceModalOpen, setMaintenanceModalOpen] = useState<boolean>(false);
   const { tokenRow } = useContext(DetailData) as any;
-  const { availableBalance: btcAvailableBalance } = useBtcAction({
-    tokenId: tokenRow?.tokenId || "",
-    decimals: tokenRow?.decimals || 0,
-  });
   const { tokenId, tokens, isLpToken, price } = tokenRow;
+  const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
+  const isNBTC = NBTCTokenId === tokenId && selectedWalletId === "btc-wallet";
+  useEffect(() => {
+    const t = setInterval(() => {
+      setUpDaterCounter((pre) => {
+        return pre + 1;
+      });
+    }, 60000);
+    if (!isNBTC) {
+      clearInterval(t);
+    }
+    return () => {
+      clearInterval(t);
+    };
+  }, [isNBTC]);
+  const { balance: btcBalance, loading: btcBalanceLoading } = useBtcAction({
+    tokenId: tokenRow?.tokenId || "",
+    price: tokenRow?.price || 0,
+    updaterCounter,
+  });
   const accountId = useAccountId();
   const isMeme = useAppSelector(isMemeCategory);
   const isWrappedNear = tokenRow.symbol === "NEAR";
@@ -955,7 +972,6 @@ function TokenUserInfo() {
   const handleSupplyClick = useSupplyTrigger(tokenId);
   const handleBorrowClick = useBorrowTrigger(tokenId);
   const dispatch = useAppDispatch();
-  const isBtc = tokenId === NBTCTokenId;
   function getIcons() {
     return (
       <div className="flex items-center justify-center flex-wrap flex-shrink-0">
@@ -985,8 +1001,12 @@ function TokenUserInfo() {
     (acc, { maxBorrowAmount }) => acc + maxBorrowAmount,
     0,
   );
-  const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
-  const isNBTC = NBTCTokenId === tokenId && selectedWalletId === "btc-wallet";
+  function closeMaintenanceModalOpen() {
+    setMaintenanceModalOpen(false);
+  }
+  function openMaintenanceModalOpen() {
+    setMaintenanceModalOpen(true);
+  }
   return (
     <UserBox className="mb-[29px] xsm:mb-2.5">
       <div className="flex justify-between items-center">
@@ -1020,21 +1040,31 @@ function TokenUserInfo() {
               <SatoshiIcon />
             </span>
           </div>
-          {/* <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
-            <span className="text-gray-300">NEAR Chain</span>
-            <span className="flex items-center">
-              <span className="mr-[6px] text-sm">{accountId ? supplyBalance : "-"}</span>
-              <BtcChainIcon />
-            </span>
-          </div> */}
-          <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
-            <span className="text-gray-300">BTC Chain</span>
-            <span className="flex items-center">
-              <span className="mr-[6px] text-sm">
-                {accountId ? digitalProcess(btcAvailableBalance || 0, 8) : "-"}
+          <div data-tour="chain-balances">
+            <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
+              <span className="text-gray-300">BTC Chain Balance</span>
+              <span className="flex items-center">
+                <span className="mr-[6px] text-sm">
+                  {accountId ? (
+                    btcBalanceLoading ? (
+                      <BeatLoader size={5} color="#ffffff" />
+                    ) : (
+                      digitalProcess(btcBalance || 0, 8)
+                    )
+                  ) : (
+                    "-"
+                  )}
+                </span>
+                <BtcChainIcon />
               </span>
-              <BtcChainIcon />
-            </span>
+            </div>
+            <div className="text-xs flex items-center justify-between h-[42px] p-[14px] bg-dark-100 rounded-md mt-[11px]">
+              <span className="text-gray-300">NEAR Chain Balance</span>
+              <span className="flex items-center">
+                <span className="mr-[6px] text-sm">{accountId ? supplyBalance : "-"}</span>
+                <img src={tokenRow?.icon} className="w-4 h-4 rounded-full" alt="" />
+              </span>
+            </div>
           </div>
         </div>
       )}
@@ -1078,9 +1108,11 @@ function TokenUserInfo() {
         {accountId ? (
           <>
             <YellowSolidButton
-              disabled={isBtc ? !+btcAvailableBalance : !+supplyBalance}
+              disabled={isNBTC ? !+btcBalance && !+supplyBalance : !+supplyBalance}
               className="w-1 flex-grow"
+              // onClick={isNBTC ? openMaintenanceModalOpen : handleSupplyClick} TODOXXX
               onClick={handleSupplyClick}
+              data-tour="supply-button"
             >
               Supply
             </YellowSolidButton>
@@ -1105,6 +1137,7 @@ function TokenUserInfo() {
           <ConnectWalletButton accountId={accountId} className="w-full" />
         )}
       </div>
+      <MaintenanceModal isOpen={maintenanceModalOpen} onRequestClose={closeMaintenanceModalOpen} />
     </UserBox>
   );
 }

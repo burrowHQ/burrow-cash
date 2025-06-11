@@ -87,7 +87,7 @@ export default function TradingViewChart({
         "scalesProperties.textColor": "#C0C4E9",
       },
       custom_css_url:
-        "https://img.ref.finance/images/static/charting_library/custom-rhea-theme.css",
+        "https://img.rhea.finance/images/static/charting_library/custom-rhea-theme.css",
     };
     tvWidgetRef.current = new widget(widgetOptions);
     tvWidgetRef.current.applyOverrides({

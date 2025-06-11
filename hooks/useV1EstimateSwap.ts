@@ -103,6 +103,7 @@ export const useV1EstimateSwap = ({
       const msg = JSON.stringify({
         force: 0,
         actions: actionsList,
+        skip_degen_price_sync: true,
       });
       const avgFee = getAvgFeeFromServer({
         routes,

@@ -77,7 +77,9 @@ export const handleTransactionHash = async (
       );
       const hasErrorTx = results.find((item) => item.error);
       // Reporting transactions
+      console.log("-----------------------hasErrorTx--------", hasErrorTx);
       if (targetPositionTx && !hasErrorTx) {
+        console.log("---------------has------post-----margin---positions");
         const currentState = store.getState();
         await DataSource.shared.postMarginTradingPosition({
           addr: currentState?.account?.accountId,

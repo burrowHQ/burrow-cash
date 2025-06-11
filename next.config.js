@@ -9,7 +9,7 @@ module.exports = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "img.ref.finance",
+        hostname: "img.rhea.finance",
         port: "",
         pathname: "/**",
       },

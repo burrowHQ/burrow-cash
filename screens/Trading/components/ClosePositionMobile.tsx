@@ -28,6 +28,7 @@ import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
 import { getAppRefreshNumber } from "../../../redux/appSelectors";
 import { setRefreshNumber } from "../../../redux/appSlice";
 import { TagToolTip } from "../../../components/ToolTip";
+import { FeeContainer } from "../../../components/Modal/components";
 
 export const ModalContext = createContext(null) as any;
 const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
@@ -103,7 +104,6 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
   // get estimate token in amount
   useEffect(() => {
     if (positionType.label === "Short") {
-      // TODOXX
       getMinRequiredPAmount().then((res: any) => {
         const { requiredPAmountOnShort, requiredPAmountOnShort_pnl } = res;
         setTokenInAmount(requiredPAmountOnShort || "0");
@@ -152,13 +152,8 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
     return {
       HPFee: HPFeeValue.toNumber(),
       HPFeeAmount: HPFeeValue.toFixed(),
-      // swapFee:
-      //   ((estimateData?.fee ?? 0) / 10000) *
-      //   +shrinkToken(tokenInAmount || "0", assetP.metadata.decimals) *
-      //   (assetP?.price?.usd || 0),
     };
   }, [assets, isMainStream, item, marginAccountList, marginAccountListMEME]);
-  // TODOXX
   const pnlAfterSwap = useMemo(() => {
     if (new Decimal(estimateData?.amount_out || 0).gt(0) && new Decimal(tokenInAmount || 0).gt(0)) {
       if (positionType.label == "Long") {
@@ -189,7 +184,6 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
 
   // Methods
   const handleCloseOpsitionEvt = async () => {
-    // TODOXX
     // Swap Out Trial Calculation Result Verification
     const regular_p_value = new Decimal(
       shrinkToken(tokenInAmount || "0", assetP.metadata.decimals),
@@ -253,7 +247,11 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
       assetD.config.extra_decimals,
     ).toFixed(0, Decimal.ROUND_UP);
     const accruedInterest = new Decimal(assetD.borrow_apr).mul(dAmount).div(365 * 24 * 60 * mins);
-    const totalHpFee = get_total_hp_fee();
+    const totalHpFeePending = get_total_hp_fee();
+    const totalHpFee = shrinkTokenDecimal(totalHpFeePending, assetD.config.extra_decimals).toFixed(
+      0,
+      Decimal.ROUND_UP,
+    );
     const slippage = Number(ReduxSlippageTolerance) / 100;
     const min_amount_out = accruedInterest.plus(totalHpFee).plus(dAmount);
     const amountOut = min_amount_out.div(1 - slippage);
@@ -423,28 +421,19 @@ const ClosePositionMobile: React.FC<IClosePositionMobileProps> = ({
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Fee</div>
               <div className="flex items-center justify-center relative">
-                <p
-                // className="border-b border-dashed border-dark-800 cursor-pointer"
-                // onMouseEnter={() => setShowFeeModal(true)}
-                // onMouseLeave={() => setShowFeeModal(false)}
-                >
-                  ${beautifyPrice(Number(formatDecimal(Fee.HPFee)))}
-                </p>
-
-                {/* {showFeeModal && (
-                  <div className="absolute bg-[#14162B] text-white h-[50px] p-2 rounded text-xs top-[30px] left-[-66px] flex flex-col items-start justify-between z-[1] w-auto">
-                    <p>
-                      <span className="mr-1 whitespace-nowrap">Hold Fee:</span>$
-                      {beautifyPrice(Fee.HPFee)}
-                    </p>
-                    <p>
-                      <span className="mr-1 whitespace-nowrap">Trade Fee:</span>$
-                      {beautifyPrice(Fee.swapFee)}
-                    </p>
-                  </div>
-                )} */}
+                <p>${beautifyPrice(Number(formatDecimal(Fee.HPFee)))}</p>
               </div>
             </div>
+            <FeeContainer
+              loading={false}
+              transactionsGasOnNear={positionType.label === "Long" ? 650 : 950}
+              transactionsNumOnNear={positionType.label === "Long" ? 3 : 4}
+              className="my-3"
+              storage={{
+                contractId: positionType.label === "Short" ? assetD.token_id : "",
+                amount: "0.00125",
+              }}
+            />
             {swapUnSecurity && (
               <div className=" text-[#EA3F68] text-sm font-normal flex items-start mb-1">
                 <MaxPositionIcon />

@@ -23,6 +23,8 @@ import {
 import { APYCell } from "./APYCell";
 import getConfig, { incentiveTokens, topTokens } from "../../utils/config";
 import { beautifyPrice } from "../../utils/beautyNumber";
+import { PointsIcon } from "../../components/Icons/IconsV2";
+import HtmlTooltip from "../../components/common/html-tooltip";
 
 function MarketsTable({ rows, sorting, isMeme }: TableProps) {
   return (
@@ -395,12 +397,25 @@ function TableRowPc({
   getSymbols: () => React.ReactNode;
   isMeme: boolean;
 }) {
+  const pointTokens = [
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
+    "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
+    "usdt.tether-token.near",
+    "853d955acef822db058eb8505911ed77f175b99e.factory.bridge.near",
+    "zec.omft.near",
+    "eth.bridge.near",
+    "wrap.near",
+    "nbtc.bridge.near",
+    "token.burrow.near",
+  ];
+  const isPointToken = pointTokens.includes(row.tokenId);
   return (
     <Link
       key={row.tokenId}
       href={`/tokenDetail/${row.tokenId}?pageType=${isMeme ? "meme" : "main"}`}
     >
       <div
+        data-token-id={row.tokenId}
         className={`grid grid-cols-6 bg-gray-800 hover:bg-gray-500 cursor-pointer mt-0.5 h-[60px] ${
           lastRow ? "rounded-b-md" : ""
         }`}
@@ -453,6 +468,7 @@ function TableRowPc({
             )}
             {incentiveTokens.includes(row.tokenId) && !isMeme ? <BoosterTag /> : null}
           </span>
+          <span className="mt-2">{isPointToken && <PointTag multiple="1x" />}</span>
         </div>
         <div className="col-span-1 flex flex-col justify-center pl-6 xl:pl-14 whitespace-nowrap">
           {row.can_borrow ? (
@@ -482,6 +498,7 @@ function TableRowPc({
               "-"
             )}
           </span>
+          <span className="mt-2">{isPointToken && <PointTag multiple="3x" />}</span>
         </div>
         <div className="col-span-1 flex flex-col justify-center pl-4 xl:pl-8 whitespace-nowrap">
           {row.can_borrow ? (
@@ -522,12 +539,25 @@ function TableRowMobile({
   getSymbols: () => React.ReactNode;
   isMeme: boolean;
 }) {
+  const pointTokens = [
+    "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
+    "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
+    "usdt.tether-token.near",
+    "853d955acef822db058eb8505911ed77f175b99e.factory.bridge.near",
+    "zec.omft.near",
+    "eth.bridge.near",
+    "wrap.near",
+    "nbtc.bridge.near",
+    "token.burrow.near",
+  ];
+  const isPointToken = pointTokens.includes(row.tokenId);
   return (
     <Link
       key={row.tokenId}
       href={`/tokenDetail/${row.tokenId}?pageType=${isMeme ? "meme" : "main"}`}
     >
       <div
+        data-token-id={row.tokenId}
         className={`border border-dark-50 bg-dark-110 rounded-xl p-3.5 ${lastRow ? "" : "mb-4"}`}
       >
         <div className="flex items-center pb-4  -ml-1 relative">
@@ -553,6 +583,7 @@ function TableRowMobile({
             canShow={row.can_deposit}
             booster={incentiveTokens.includes(row.tokenId) && !isMeme}
             isMeme={isMeme}
+            extra={isPointToken && <PointTag multiple="1x" />}
           />
           <TemplateMobile
             title="Total Borrowed"
@@ -561,7 +592,11 @@ function TableRowMobile({
               row.can_borrow ? toInternationalCurrencySystem_usd(row.totalBorrowedMoney) : ""
             }
           />
-          <TemplateMobile title="Borrow APY" value={row.can_borrow ? format_apy(borrowAPY) : "-"} />
+          <TemplateMobile
+            title="Borrow APY"
+            value={row.can_borrow ? format_apy(borrowAPY) : "-"}
+            extra={isPointToken && <PointTag multiple="3x" />}
+          />
           <TemplateMobile
             title="Available Liquidity"
             value={
@@ -589,10 +624,12 @@ function TemplateMobile({
   title,
   value,
   subValue,
+  extra,
 }: {
   title: string;
   value: string | React.ReactNode;
   subValue?: string;
+  extra?: React.ReactNode;
 }) {
   return (
     <div className="flex flex-col">
@@ -602,11 +639,12 @@ function TemplateMobile({
         {!isInvalid(subValue) && (
           <span className="text-gray-300 text-xs ml-1 relative top-px">{subValue}</span>
         )}
+        <span className="ml-1">{extra}</span>
       </div>
     </div>
   );
 }
-function TemplateMobileAPY({ title, row, canShow, booster, isMeme }) {
+function TemplateMobileAPY({ title, row, canShow, booster, isMeme, extra }: any) {
   return (
     <div className="flex flex-col">
       <span className="text-gray-300 text-sm">{title}</span>
@@ -624,6 +662,7 @@ function TemplateMobileAPY({ title, row, canShow, booster, isMeme }) {
           <>-</>
         )}
         {booster ? <BoosterTag /> : null}
+        {extra}
       </div>
     </div>
   );
@@ -634,6 +673,28 @@ function BoosterTag() {
       <BoosterIcon />
       Boosted
     </div>
+  );
+}
+function PointTag({ multiple }: { multiple: string }) {
+  return (
+    <HtmlTooltip
+      title={
+        <span className="text-[12px] text-[#6A7279]">
+          <span className="text-white mr-1">{multiple}</span>
+          RHEA <span className="underline">Points Reward</span>
+        </span>
+      }
+      placement="top"
+      enterTouchDelay={0}
+      leaveTouchDelay={2000}
+    >
+      <div
+        className="flex items-center justify-center rounded-[6px] gap-1 text-[12px] text-[#A7A7A7] h-[18px] bg-[#202025] px-[6px] border-[0.5px] border-[#474752] w-fit cursor-pointer"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {multiple} <PointsIcon className="w-3 h-3" />
+      </div>
+    </HtmlTooltip>
   );
 }
 export default MarketsTable;

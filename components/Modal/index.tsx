@@ -23,7 +23,6 @@ import { recomputeHealthFactorRepay } from "../../redux/selectors/recomputeHealt
 import { getAssetsCategory } from "../../redux/assetsSelectors";
 import { recomputeHealthFactorRepayFromDeposits } from "../../redux/selectors/recomputeHealthFactorRepayFromDeposits";
 import { formatWithCommas_number } from "../../utils/uiNumber";
-import { DEFAULT_POSITION, lpTokenPrefix, NBTCTokenId } from "../../utils/config";
 import { Wrapper } from "./style";
 import { getModalData } from "./utils";
 import {
@@ -38,6 +37,8 @@ import {
   CollateralTip,
   BorrowLimit,
   Receive,
+  BtcOneClickTab,
+  FeeContainer,
 } from "./components";
 import Controls from "./Controls";
 import Action from "./Action";
@@ -49,11 +50,15 @@ import {
   CollateralTypeSelectorBorrow,
   CollateralTypeSelectorRepay,
 } from "./CollateralTypeSelector";
-import { useBtcAction } from "../../hooks/useBtcBalance";
-import { beautifyPrice } from "../../utils/beautyNumber";
+import { useBtcAction, useCalculateWithdraw, useCalculateDeposit } from "../../hooks/useBtcBalance";
+import { beautifyNumber } from "../../utils/beautyNumber";
+import { useUserBalance } from "../../hooks/useUserBalance";
+import { DEFAULT_POSITION, lpTokenPrefix, NBTCTokenId, WNEARTokenId } from "../../utils/config";
 
 export const ModalContext = createContext(null) as any;
 const Modal = () => {
+  const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
+  const [nbtcTab, setNbtcTab] = useState<"btc" | "near">("btc");
   const dispatch = useAppDispatch();
   const isMeme = useAppSelector(isMemeCategory);
   const isOpen = useAppSelector(getModalStatus);
@@ -62,9 +67,35 @@ const Modal = () => {
   const assets = useAppSelector(getAssetsCategory());
   const { amount } = useAppSelector(getSelectedValues);
   const { isRepayFromDeposits } = useDegenMode();
+  const [withdrawData, setWithdrawData] = useState<{
+    withdrawReceiveAmount: string;
+    cacuWithdrawLoading: boolean;
+    withdrawFee: string;
+    withdrawGasFee: string;
+    errorMsg: string;
+  }>({
+    withdrawReceiveAmount: "0",
+    cacuWithdrawLoading: false,
+    withdrawFee: "0",
+    withdrawGasFee: "0",
+    errorMsg: "",
+  });
+  const [depositData, setDepositData] = useState<{
+    depositFee: string;
+    depositGasFee: string;
+    cacuDepositLoading: boolean;
+    depositReceiveAmount: string;
+    depositMinDepositAmount: string;
+  }>({
+    depositFee: "0",
+    depositGasFee: "0",
+    cacuDepositLoading: false,
+    depositReceiveAmount: "0",
+    depositMinDepositAmount: "0",
+  });
   const theme = useTheme();
-  const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
   const { action = "Deposit", tokenId, position } = asset;
+  const { supplyBalance } = useUserBalance(tokenId, false);
   const { healthFactor, maxBorrowValue: adjustedMaxBorrowValue } = useAppSelector(
     action === "Withdraw"
       ? recomputeHealthFactorWithdraw(tokenId, +amount)
@@ -84,16 +115,6 @@ const Modal = () => {
   const maxBorrowAmountPositions = useAppSelector(getBorrowMaxAmount(tokenId));
   const maxWithdrawAmount = useAppSelector(getWithdrawMaxAmount(tokenId));
   const repayPositions = useAppSelector(getRepayPositions(tokenId));
-  const { availableBalance: btcAvailableBalance, totalFeeAmount } = useBtcAction({
-    tokenId: asset?.tokenId || "",
-    decimals: asset?.decimals || 0,
-  });
-  const receiveAmount = useMemo(() => {
-    return Decimal.max(new Decimal(amount || 0).minus(totalFeeAmount || 0), 0).toFixed(
-      asset?.decimals || 0,
-      Decimal.ROUND_DOWN,
-    );
-  }, [totalFeeAmount, amount]);
   const activePosition =
     action === "Repay" || action === "Borrow"
       ? selectedCollateralType
@@ -115,7 +136,6 @@ const Modal = () => {
   });
   useEffect(() => {
     if (isOpen) {
-      // TODO33 still need this???
       dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
       dispatch(fetchAssetsMEME()).then(() => dispatch(fetchRefPrices()));
       dispatch(fetchConfig());
@@ -152,21 +172,172 @@ const Modal = () => {
   };
   const repay_to_lp =
     action === "Repay" && isRepayFromDeposits && selectedCollateralType !== DEFAULT_POSITION;
+  // NBTC start
   const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
+  const isBtcWallet = selectedWalletId === "btc-wallet";
   const isBtcToken = asset.tokenId === NBTCTokenId && selectedWalletId === "btc-wallet";
   const isBtcSupply = action === "Supply" && isBtcToken;
   const isBtcWithdraw = action === "Withdraw" && isBtcToken;
-  if (isBtcWithdraw) {
-    const min_withdraw_amount = 0.000054;
-    if (new Decimal(amount || 0).lt(min_withdraw_amount)) {
-      alerts["btcWithdraw"] = {
-        title: `You must withdraw at least ${min_withdraw_amount} NBTC`,
+  const isBtcChainSupply = isBtcSupply && nbtcTab == "btc";
+  const isBtcChainWithdraw = isBtcWithdraw && nbtcTab == "btc";
+  const isOneClickAction = (isBtcSupply || isBtcWithdraw) && nbtcTab == "btc";
+  const { availableBalance: btcAvailableBalance, availableBalance$: btcAvailableBalance$ } =
+    useBtcAction({
+      tokenId: asset?.tokenId || "",
+      price: asset?.price || 0,
+    });
+  const {
+    receiveAmount: withdrawReceiveAmountPending,
+    loading: cacuWithdrawLoadingPending,
+    amount: withdrawAmountPending,
+    fee: withdrawFeePending,
+    btcGasFee: withdrawBtcGasFeePending,
+    errorMsg: withdrawErrorMsgPending,
+  } = useCalculateWithdraw({
+    isBtcWithdraw,
+    decimals: asset?.decimals || 0,
+    amount,
+  });
+
+  const {
+    fee: depositFeePending,
+    btcGasFee: depositBtcGasFeePending,
+    loading: cacuDepositLoadingPending,
+    receiveAmount: depositReceiveAmountPending,
+    minDepositAmount: depositMinDepositAmountPending,
+    amount: depositAmountPending,
+  } = useCalculateDeposit({
+    isBtcDeposit: isBtcChainSupply,
+    decimals: asset?.decimals || 0,
+    amount,
+    newUserOnNearChain: new Decimal(supplyBalance || 0).lte(0),
+  });
+  useEffect(() => {
+    if (amount == withdrawAmountPending) {
+      setWithdrawData({
+        withdrawReceiveAmount: withdrawReceiveAmountPending,
+        cacuWithdrawLoading: cacuWithdrawLoadingPending,
+        withdrawFee: withdrawFeePending,
+        withdrawGasFee: withdrawBtcGasFeePending,
+        errorMsg: withdrawErrorMsgPending,
+      });
+    }
+  }, [
+    withdrawReceiveAmountPending,
+    cacuWithdrawLoadingPending,
+    withdrawAmountPending,
+    withdrawFeePending,
+    withdrawBtcGasFeePending,
+    amount,
+  ]);
+  useEffect(() => {
+    if (amount == depositAmountPending) {
+      setDepositData({
+        depositFee: depositFeePending,
+        depositGasFee: depositBtcGasFeePending,
+        cacuDepositLoading: cacuDepositLoadingPending,
+        depositReceiveAmount: depositReceiveAmountPending,
+        depositMinDepositAmount: depositMinDepositAmountPending,
+      });
+    }
+  }, [
+    depositFeePending,
+    cacuDepositLoadingPending,
+    depositReceiveAmountPending,
+    depositMinDepositAmountPending,
+    depositAmountPending,
+    depositBtcGasFeePending,
+    amount,
+  ]);
+  const {
+    depositFee,
+    depositGasFee,
+    cacuDepositLoading,
+    depositReceiveAmount,
+    depositMinDepositAmount,
+  } = depositData;
+  const { withdrawReceiveAmount, cacuWithdrawLoading, withdrawFee, withdrawGasFee } = withdrawData;
+  // withdraw oneClick min
+  if (isBtcChainWithdraw) {
+    if (withdrawData.errorMsg) {
+      alerts["btcWithdrawErrorMsg"] = {
+        title: withdrawData.errorMsg,
         severity: "error",
       };
     } else {
-      delete alerts.btcWithdraw;
+      delete alerts.btcWithdrawErrorMsg;
     }
   }
+  // deposit oneClick min
+  if (isBtcChainSupply && nbtcTab == "btc") {
+    if (new Decimal(amount || 0).gt(0) && new Decimal(amount).lt(depositMinDepositAmount || 0)) {
+      alerts["btcDepositMinLimit"] = {
+        title: `You must deposit at least ${depositMinDepositAmount} NBTC`,
+        severity: "error",
+      };
+    } else {
+      delete alerts.btcDepositMinLimit;
+    }
+  }
+  const actionButtonDisabled =
+    alerts["btcWithdrawErrorMsg"] ||
+    alerts["btcDepositMinLimit"] ||
+    (isBtcChainSupply && cacuDepositLoading) ||
+    (isBtcChainWithdraw && cacuWithdrawLoading);
+
+  const { transactionsNumOnNear, transactionsGasOnNear, storage } = useMemo(() => {
+    if (!isBtcWallet || new Decimal(amount || 0).lte(0)) {
+      return {
+        transactionsNumOnNear: "0",
+        transactionsGasOnNear: "0",
+      };
+    } else if (action == "Supply") {
+      return {
+        transactionsNumOnNear: tokenId == WNEARTokenId ? "3" : "2",
+        transactionsGasOnNear: tokenId == WNEARTokenId ? "250" : "150",
+        storage: {
+          contractId: isMeme
+            ? process.env.NEXT_PUBLIC_MEMECONTRACT_NAME
+            : process.env.NEXT_PUBLIC_CONTRACT_NAME,
+          amount: "0.1",
+        },
+      };
+    } else if (action == "Withdraw") {
+      return {
+        transactionsNumOnNear: "3",
+        transactionsGasOnNear: "450",
+        storage: {
+          contractId: tokenId,
+          amount: "0.00125",
+        },
+      };
+    } else if (action == "Borrow") {
+      return {
+        transactionsNumOnNear: "2",
+        transactionsGasOnNear: "350",
+        storage: {
+          contractId: tokenId,
+          amount: "0.00125",
+        },
+      };
+    } else if (action == "Adjust") {
+      return {
+        transactionsNumOnNear: "2",
+        transactionsGasOnNear: "350",
+      };
+    } else if (action == "Repay") {
+      return {
+        transactionsNumOnNear: "2",
+        transactionsGasOnNear: "350",
+      };
+    } else {
+      return {
+        transactionsNumOnNear: "0",
+        transactionsGasOnNear: "0",
+      };
+    }
+  }, [action, amount, isBtcWallet]);
+  // NBTC end
   return (
     <MUIModal open={isOpen} onClose={handleClose}>
       <Wrapper
@@ -202,16 +373,62 @@ const Modal = () => {
               />
             ) : null}
             <RepayTab asset={asset} />
+            {isBtcSupply || isBtcWithdraw ? (
+              <BtcOneClickTab nbtcTab={nbtcTab} setNbtcTab={setNbtcTab} isMeme={isMeme} />
+            ) : null}
             <Controls
               amount={amount}
-              available={isBtcSupply ? btcAvailableBalance : available}
+              available={isBtcChainSupply ? btcAvailableBalance : available}
               action={action}
               asset={asset}
-              totalAvailable={isBtcSupply ? btcAvailableBalance : available}
-              available$={available$}
+              totalAvailable={isBtcChainSupply ? btcAvailableBalance : available}
+              available$={isBtcChainSupply ? btcAvailableBalance$ : available$}
             />
             <div className="flex flex-col gap-4 mt-6">
-              {isBtcWithdraw ? <Receive value={beautifyPrice(receiveAmount) as string} /> : null}
+              {isBtcChainWithdraw ? (
+                <>
+                  <Receive
+                    value={
+                      beautifyNumber({
+                        num: withdrawReceiveAmount,
+                        maxDecimal: 8,
+                      }) as string
+                    }
+                    loading={cacuWithdrawLoading}
+                  />
+                  <FeeContainer
+                    loading={cacuWithdrawLoading}
+                    bridgeProtocolFee={Number(withdrawFee || 0) + Number(withdrawGasFee || 0)}
+                  />
+                </>
+              ) : null}
+              {isBtcChainSupply ? (
+                <>
+                  <Receive
+                    value={
+                      beautifyNumber({
+                        num: depositReceiveAmount,
+                        maxDecimal: 8,
+                      }) as string
+                    }
+                    loading={cacuDepositLoading}
+                  />
+                  <FeeContainer
+                    loading={cacuDepositLoading}
+                    bridgeProtocolFee={depositFee}
+                    bridgeGasOnBtc={depositGasFee}
+                  />
+                </>
+              ) : null}
+              {!isBtcChainWithdraw && !isBtcChainSupply && isBtcWallet ? (
+                <FeeContainer
+                  loading={false}
+                  transactionsGasOnNear={transactionsGasOnNear}
+                  transactionsNumOnNear={transactionsNumOnNear}
+                  storage={storage}
+                />
+              ) : null}
+
               <HealthFactor value={healthFactor} />
               {repay_to_lp ? (
                 <HealthFactor value={single_healthFactor} title="Health Factor(Single)" />
@@ -235,7 +452,9 @@ const Modal = () => {
               healthFactor={healthFactor}
               collateralType={selectedCollateralType}
               poolAsset={assets[tokenId]}
-              isDisabled={alerts["btcWithdraw"]}
+              oneClickActionDepositAmount={depositReceiveAmount}
+              isDisabled={actionButtonDisabled}
+              isOneClickAction={isOneClickAction}
             />
             {isMeme && action === "Supply" ? (
               <AlertWarning

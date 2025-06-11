@@ -1,10 +1,10 @@
-// @ts-nocheck
 import Decimal from "decimal.js";
-import { USD_FORMAT, TOKEN_FORMAT, PERCENT_DIGITS, NEAR_STORAGE_DEPOSIT } from "../../store";
+import { USD_FORMAT, PERCENT_DIGITS, NEAR_STORAGE_DEPOSIT } from "../../store";
 import type { UIAsset } from "../../interfaces";
 import { formatWithCommas_number, toDecimal } from "../../utils/uiNumber";
 import { expandToken, shrinkToken } from "../../store/helper";
 import { decimalMax } from "../../utils";
+import { NBTCTokenId } from "../../utils/config";
 
 interface Alert {
   [key: string]: {
@@ -73,6 +73,8 @@ export const getModalData = (asset): UIAsset & Props & { disabled: boolean } => 
 
   const getAvailableWithdrawOrAdjust = toDecimal(Number(supplied + collateral));
   const isWrappedNear = symbol === "NEAR";
+  const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
+  const isNBTC = tokenId === NBTCTokenId && selectedWalletId === "btc-wallet";
   switch (action) {
     case "Supply":
       data.apy = supplyApy;
@@ -85,6 +87,8 @@ export const getModalData = (asset): UIAsset & Props & { disabled: boolean } => 
         data.available = toDecimal(
           Number(Math.max(0, available + availableNEAR - NEAR_STORAGE_DEPOSIT)),
         );
+      } else if (isNBTC) {
+        data.available = Decimal.max(new Decimal(available || 0).minus(0.000008), 0).toFixed();
       }
       data.alerts = {};
       break;
@@ -206,7 +210,7 @@ export const getModalData = (asset): UIAsset & Props & { disabled: boolean } => 
   return {
     ...asset,
     ...data,
-    available$: (data.available * price).toLocaleString(undefined, USD_FORMAT),
+    available$: (data.available * price).toLocaleString(undefined, USD_FORMAT as any),
     disabled,
   };
 };

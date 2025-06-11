@@ -227,7 +227,12 @@ function DashboardOverviewPc() {
           );
         })}
       </div>
-      <ClaimRewardsModal rewardsObj={rewardsObj} isOpen={isModalOpen} closeModal={closeModal} />
+      <ClaimRewardsModal
+        rewardsObj={rewardsObj}
+        isOpen={isModalOpen}
+        closeModal={closeModal}
+        memeCategory={memeCategory}
+      />
     </div>
   );
 }
@@ -259,7 +264,12 @@ function DashboardOverviewMobile() {
           <MainListIconMobile className="absolute bottom-0 left-0 right-0 w-full" />
         )}
       </div>
-      <ClaimRewardsModal rewardsObj={rewardsObj} isOpen={isModalOpen} closeModal={closeModal} />
+      <ClaimRewardsModal
+        rewardsObj={rewardsObj}
+        isOpen={isModalOpen}
+        closeModal={closeModal}
+        memeCategory={memeCategory}
+      />
     </div>
   );
 }

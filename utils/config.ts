@@ -10,6 +10,7 @@ export const hiddenAssets = [
   "a663b02cf0a4b149d2ad41910cb81e23e1c41c32.factory.bridge.near",
   "4691937a7508860f876c9c0a2a617e7d9e945d4b.factory.bridge.near",
   "v2-nearx.stader-labs.near",
+  "aurora",
 ];
 export const hiddenAssetsMEME = [
   "wrap.near",
@@ -20,7 +21,7 @@ export const hiddenAssetsMEME = [
   "abg-966.meme-cooking.near",
 ];
 export const lpTokenPrefix = "shadow_ref_v1";
-export const blackAssets = ["shadow_ref_v1-0"];
+export const blackAssets = ["shadow_ref_v1-0", "shadow_ref_v1-711"];
 export const MARGIN_MIN_COLLATERAL_USD = 1;
 export const defaultNetwork = (process.env.NEXT_PUBLIC_DEFAULT_NETWORK ||
   process.env.NODE_ENV ||
@@ -37,6 +38,7 @@ interface IAppConfig {
   indexUrl: string;
   findPathUrl: string;
   explorerUrl: string;
+  BURROW_API_URL: string;
 }
 export const STABLE_POOL_IDS = [
   "4179",
@@ -63,10 +65,22 @@ export const NBTCTokenId = {
   testnet: "nbtc-dev.testnet",
   mainnet: "nbtc.bridge.near",
 }[defaultNetwork];
+
+export const WBTCTokenId = {
+  testnet: "wbtc.fakes.testnet",
+  mainnet: "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
+}[defaultNetwork];
+
+export const WNEARTokenId = {
+  testnet: "wrap.testnet",
+  mainnet: "wrap.near",
+}[defaultNetwork];
+
 export const WALLET_CONNECT_ID =
   process.env.NEXT_PUBLIC_WALLET_CONNECT_ID || ("87e549918631f833447b56c15354e450" as string);
 
-export const missingPriceTokens = [REF_TOKEN, META_TOKEN, BRRR_TOKEN, BRRR_LABS_TOKEN];
+// export const missingPriceTokens = [REF_TOKEN, META_TOKEN, BRRR_TOKEN, BRRR_LABS_TOKEN];
+export const missingPriceTokens = [BRRR_TOKEN];
 export const incentiveTokens: string[] = [
   // "853d955acef822db058eb8505911ed77f175b99e.factory.bridge.near",
   // "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
@@ -78,7 +92,7 @@ export const topTokens: string[] = [
 ];
 
 export const NBTC_ENV = "mainnet";
-export const AWS_MEDIA_DOMAIN = "https://img.ref.finance";
+export const AWS_MEDIA_DOMAIN = "https://img.rhea.finance";
 export const ETH_OLD_CONTRACT_ID = "aurora";
 export const ETH_CONTRACT_ID = "eth.bridge.near";
 const getConfig = (env: string = defaultNetwork) => {
@@ -125,6 +139,7 @@ const getConfig = (env: string = defaultNetwork) => {
         REF_EXCHANGE_ID: "v2.ref-finance.near",
         DCL_EXCHANGE_ID: "dclv2.ref-labs.near",
         findPathUrl: "smartrouter.ref.finance",
+        BURROW_API_URL: "https://api.burrow.finance",
       } as unknown as ConnectConfig & IAppConfig;
 
     case "development":

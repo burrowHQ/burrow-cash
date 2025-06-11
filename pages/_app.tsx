@@ -11,6 +11,7 @@ import Upgrade from "../components/upgrade";
 import ProcessBar from "../components/process";
 import BlockContryTip from "../components/blockTip";
 import "../styles/global.css";
+import { GuideProvider } from "../components/BeginnerGuide/GuideContext";
 
 const ModalGAPrivacy = dynamic(() => import("../components/modalGAPrivacy/modalGAPrivacy"), {
   ssr: false,
@@ -24,12 +25,14 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       <BtcWalletSelectorContextProvider>
         <Provider store={store}>
           <PersistGate loading={null} persistor={persistor}>
-            <Head>
-              <meta name="viewport" content="width=device-width, initial-scale=1" />
-              <title>RHEA Finance</title>
-            </Head>
-            <Upgrade Component={Component} pageProps={pageProps} />
-            <ModalGAPrivacy />
+            <GuideProvider>
+              <Head>
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <title>RHEA Finance</title>
+              </Head>
+              <Upgrade Component={Component} pageProps={pageProps} />
+              <ModalGAPrivacy />
+            </GuideProvider>
           </PersistGate>
         </Provider>
       </BtcWalletSelectorContextProvider>

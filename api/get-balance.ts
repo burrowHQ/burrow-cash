@@ -49,12 +49,6 @@ const getBalance = async (
           account_id: accountId,
         },
       )) as string;
-      if (
-        tokenId === NBTCTokenId &&
-        window.selector?.store?.getState()?.selectedWalletId === "btc-wallet"
-      ) {
-        return Decimal.max(new Decimal(balanceInYocto || 0).minus(1000), "0").toFixed();
-      }
     }
     return balanceInYocto;
   } catch (err: any) {
