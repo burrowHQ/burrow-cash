@@ -109,6 +109,12 @@ const web3Modal = createWeb3Modal({
   wagmiConfig,
   projectId: WALLET_CONNECT_ID,
   allowUnsupportedChain: true,
+  featuredWalletIds: [
+    "971e689d0a5be527bac79629b4ee9b925e82208e5168b733496a09c0faed0709",
+    "15c8b91ade1a4e58f3ce4e7a0dd7f42b47db0c8df7e0d84f63eb39bcb96c4e0f",
+    "a797aa35c0fadbfc1a53e7f675162ed5226968b44a19ee3d24385c64d1d3c393",
+    "c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96",
+  ],
 });
 const walletConnect2 = setupWalletConnect({
   projectId: WALLET_CONNECT_ID,
