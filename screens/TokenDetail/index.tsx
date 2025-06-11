@@ -1110,7 +1110,6 @@ function TokenUserInfo() {
             <YellowSolidButton
               disabled={isNBTC ? !+btcBalance && !+supplyBalance : !+supplyBalance}
               className="w-1 flex-grow"
-              // onClick={isNBTC ? openMaintenanceModalOpen : handleSupplyClick} TODOXXX
               onClick={handleSupplyClick}
               data-tour="supply-button"
             >

@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import Modal from "react-modal";
 import { isMobileDevice } from "../../helpers/helpers";
-import { CloseIcon } from "../Modal/svg";
 
 export default function MaintenanceModal({
   isOpen,
