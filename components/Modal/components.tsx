@@ -654,12 +654,13 @@ const FeeDetail = ({
         }
       }
     }
+    const nbtc_sum_num = near_nbtc_num.plus(bridge_nbtc_num);
     return {
       nbtc_num: near_nbtc_num.plus(bridge_nbtc_num),
       btc_num: bridge_btc_num,
       near_num: near_near_num,
       totalValue,
-      empty: near_nbtc_num.eq(0) && bridge_btc_num.eq(0) && near_near_num.eq(0),
+      empty: nbtc_sum_num.eq(0) && bridge_btc_num.eq(0) && near_near_num.eq(0),
     };
   }, [
     bridgeGasOnBtc,
