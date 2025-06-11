@@ -12,12 +12,18 @@ const AdBanner = () => {
   const adVersion = "3";
 
   useEffect(() => {
-    const closedVersion = localStorage.getItem("adBannerClosedVersion");
-    if (closedVersion === adVersion) {
-      setIsVisible(false);
-    } else {
-      setIsVisible(true);
-    }
+    const checkAdVisibility = () => {
+      const lastClosedDate = localStorage.getItem("adBannerLastClosedDate");
+      const today = new Date().toDateString();
+
+      if (!lastClosedDate || lastClosedDate !== today) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+
+    checkAdVisibility();
   }, []);
 
   useEffect(() => {
@@ -39,7 +45,7 @@ const AdBanner = () => {
       videoRef.current.currentTime = 0;
     }
     setIsVisible(false);
-    localStorage.setItem("adBannerClosedVersion", adVersion);
+    localStorage.setItem("adBannerLastClosedDate", new Date().toDateString());
   };
 
   const handleVideoLoadStart = () => {
