@@ -56,7 +56,7 @@ const AdBanner = () => {
     setIsLoading(false);
   };
 
-  if (!isVisible || !videoUrl || !adVersion) return null;
+  if (!isVisible || !videoUrl || !adVersion || isMobile) return null;
 
   return (
     <Modal
@@ -117,7 +117,7 @@ const AdBanner = () => {
           />
           <div
             onClick={handleClose}
-            className="absolute top-6 right-6 cursor-pointer z-10 flex items-center justify-center w-8 h-8 rounded-full bg-black bg-opacity-50 hover:bg-opacity-80 transition"
+            className="absolute top-6 right-6 cursor-pointer z-50 flex items-center justify-center w-8 h-8 rounded-full bg-black bg-opacity-50 hover:bg-opacity-80 transition"
           >
             <AdBannerCloseIcon />
           </div>
