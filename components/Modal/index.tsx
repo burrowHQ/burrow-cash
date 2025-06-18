@@ -416,7 +416,7 @@ const Modal = () => {
                   <FeeContainer
                     loading={cacuDepositLoading}
                     bridgeProtocolFee={depositFee}
-                    bridgeGasOnBtc={depositGasFee}
+                    isDeposit={true}
                     storage={{
                       contractId: isMeme
                         ? process.env.NEXT_PUBLIC_MEMECONTRACT_NAME
