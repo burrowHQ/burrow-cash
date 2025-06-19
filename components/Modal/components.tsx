@@ -533,55 +533,94 @@ export function FeeContainer({
     setExtraFeeLoading(false);
   }
   if (!isBtcWallet) return null;
-  return (
-    <div className={twMerge(`flex items-center justify-between`, className || "")}>
-      <span className="flex items-center gap-1.5 text-sm text-gray-300">
-        Fee{" "}
-        <TagToolTip
-          title={
-            <div className="flex flex-col gap-1">
-              <p>1. Near{">"}0.5, Estimated amount, final deduction may vary.</p>
-              <p>
-                2. Near{"<"} 0.5, Estimated amount, final deduction may vary. NEAR shortage will
-                trigger nBTC swap, possibly increasing NEAR balance after completion.
-              </p>
-            </div>
-          }
-        />
-      </span>
-      {loading || extraFeeLoading ? (
-        <BeatLoader size={5} color="#ffffff" />
-      ) : (
+  if (isEmpty || loading || extraFeeLoading) {
+    return (
+      <div className={twMerge(`flex items-center justify-between`, className || "")}>
+        <span className="flex items-center gap-1.5 text-sm text-gray-300">Fee</span>
+        {loading || extraFeeLoading ? (
+          <BeatLoader size={5} color="#ffffff" />
+        ) : (
+          <span className="text-white border-b border-dashed text-sm">$0</span>
+        )}
+      </div>
+    );
+  } else if (isNewAccount) {
+    // bridge for new account
+    return (
+      <div className="flex flex-col gap-4">
+        <div className={twMerge(`flex items-center justify-between`, className || "")}>
+          <span className="flex items-center gap-1.5 text-sm text-gray-300">
+            Bridge Fee{" "}
+            <TagToolTip
+              title={
+                <div>
+                  Account Initial requires 3000 satoshi, with 2000 satoshi used for bridge cost.
+                </div>
+              }
+            />
+          </span>
+          <BridgeFeeDetailForNewAccount />
+        </div>
+        <div className={twMerge(`flex items-center justify-between`, className || "")}>
+          <span className="flex items-center gap-1.5 text-sm text-gray-300">
+            Gas Reservation{" "}
+            <TagToolTip
+              title={<div>800 satoshi will be retained in your mapped account as gas.</div>}
+            />
+          </span>
+          <ReservationDetailForNewAccount />
+        </div>
+      </div>
+    );
+  } else if (new Decimal(bridgeProtocolFee || 0).gt(0)) {
+    // bridge for old user
+    return (
+      <div className="flex flex-col gap-4">
+        <div className={twMerge(`flex items-center justify-between`, className || "")}>
+          <span className="flex items-center gap-1.5 text-sm text-gray-300">Fee</span>
+          <FeeDetailBridge
+            bridgeProtocolFee={bridgeProtocolFee}
+            storageDepositOnNear={storageDepositOnNear}
+            isDeposit={isDeposit}
+          />
+        </div>
+      </div>
+    );
+  } else {
+    // transtions on near chain
+    return (
+      <div className={twMerge(`flex items-center justify-between`, className || "")}>
+        <span className="flex items-center gap-1.5 text-sm text-gray-300">
+          Fee{" "}
+          <TagToolTip
+            title={
+              <div className="flex flex-col gap-1">
+                <p>1. Near{">"}0.5, Estimated amount, final deduction may vary.</p>
+                <p>
+                  2. Near{"<"} 0.5, Estimated amount, final deduction may vary. NEAR shortage will
+                  trigger nBTC swap, possibly increasing NEAR balance after completion.
+                </p>
+              </div>
+            }
+          />
+        </span>
         <FeeDetail
           transactionsNumOnNear={transactionsNumOnNear}
           transactionsGasOnNear={transactionsGasOnNear}
-          bridgeProtocolFee={bridgeProtocolFee}
-          repayAmount={repayAmount}
           storageDepositOnNear={storageDepositOnNear}
-          isNewAccount={isNewAccount}
-          isDeposit={isDeposit}
         />
-      )}
-    </div>
-  );
+      </div>
+    );
+  }
 }
-
 const FeeDetail = ({
   transactionsNumOnNear,
   transactionsGasOnNear,
-  bridgeProtocolFee,
   storageDepositOnNear,
-  repayAmount,
-  isNewAccount,
-  isDeposit,
 }: {
   transactionsNumOnNear?: string | number;
   transactionsGasOnNear?: string | number;
-  bridgeProtocolFee?: string | number;
   storageDepositOnNear?: string | number;
-  isNewAccount?: boolean;
-  isDeposit?: boolean;
-  repayAmount: string | number;
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const [nearNumPerT] = useState(0.0001);
@@ -597,184 +636,53 @@ const FeeDetail = ({
     };
   }, [JSON.stringify(assets || {})]);
   console.log("------------------before", {
-    bridgeProtocolFee,
     transactionsNumOnNear,
     transactionsGasOnNear,
     storageDepositOnNear,
-    repayAmount,
-    isNewAccount,
-    isDeposit,
     prices,
   });
-  const {
-    near_gas_num,
-    nbtc_gas_num,
-    storage_deposit_num,
-    repay_num,
-    deposit_bridge_fee,
-    withdraw_bridge_fee,
-    reserved_nbtc_gas,
-    reserved_near_gas,
-    empty,
-    totalValue,
-  } = useMemo(() => {
+  const { near_gas_num, nbtc_gas_num, storage_deposit_num, totalValue } = useMemo(() => {
     let totalValue = new Decimal(0);
     let near_gas_num = new Decimal(0);
     let nbtc_gas_num = new Decimal(0);
     let storage_deposit_num = new Decimal(0);
-    let repay_num = new Decimal(0);
-    let deposit_bridge_fee = new Decimal(0);
-    let withdraw_bridge_fee = new Decimal(0);
-    let reserved_nbtc_gas = new Decimal(0);
-    let reserved_near_gas = new Decimal(0);
-    const btcPrice = prices[WBTCTokenId] || 0;
     const nbtcPrice = prices[NBTCTokenId] || 0;
     const nearPrice = prices[WNEARTokenId] || 0;
-    if (isNewAccount) {
-      // new user
-      deposit_bridge_fee = new Decimal(0.00005);
-      reserved_nbtc_gas = new Decimal(0.000008);
-      reserved_near_gas = new Decimal(0.5);
-      totalValue = deposit_bridge_fee
-        .mul(btcPrice)
-        .plus(reserved_nbtc_gas.mul(nbtcPrice))
-        .plus(reserved_near_gas.mul(nearPrice));
-      return {
-        deposit_bridge_fee,
-        reserved_nbtc_gas,
-        reserved_near_gas,
-        totalValue,
-      } as any;
-    } else if (bridgeProtocolFee) {
-      const bridgeProtocolFee8 = new Decimal(bridgeProtocolFee || 0).toFixed(8);
-      if (isDeposit) {
-        // onClick supply
-        deposit_bridge_fee = new Decimal(bridgeProtocolFee8 || 0);
-        totalValue = deposit_bridge_fee.mul(btcPrice);
-        return {
-          deposit_bridge_fee,
-          totalValue,
-        } as any;
-      } else {
-        // onClick withdraw
-        withdraw_bridge_fee = new Decimal(bridgeProtocolFee8).plus(repayAmount || 0);
-        totalValue = withdraw_bridge_fee.mul(nbtcPrice);
-        return {
-          withdraw_bridge_fee,
-          totalValue,
-        } as any;
-      }
-    } else if (new Decimal(transactionsNumOnNear || 0).gt(0)) {
-      // transtions on near chain
-      const target: any = {};
-      const signatureFee = new Decimal(transactionsNumOnNear || 0).mul(signatureFeePertTx);
-      nbtc_gas_num = new Decimal(shrinkToken(signatureFee.toFixed(0), 8));
-      const v_s = new Decimal(nbtc_gas_num).mul(nbtcPrice);
-      totalValue = totalValue.plus(v_s);
-      if (Number(repayAmount || 0) > 0) {
-        repay_num = new Decimal(repayAmount);
-        const v_r = new Decimal(repayAmount || 0).mul(nbtcPrice);
-        totalValue = totalValue.plus(v_r);
-        target.repay_num = repay_num;
-      }
-      if (Number(storageDepositOnNear || 0) > 0) {
-        storage_deposit_num = new Decimal(storageDepositOnNear || 0);
-        const v_storage = storage_deposit_num.mul(nearPrice);
-        totalValue = totalValue.plus(v_storage);
-        target.storage_deposit_num = storage_deposit_num;
-      }
-      if (new Decimal(totalNEARBalance || 0).gt(0.5)) {
-        // use near as gas, each tx as 50T
-        const NEARGasT = new Decimal(transactionsNumOnNear || 0).mul(nearGasPerTx);
-        near_gas_num = NEARGasT.mul(nearNumPerT);
-        const v_n = new Decimal(near_gas_num).mul(nearPrice);
-        totalValue = totalValue.plus(v_n);
-        target.near_gas_num = near_gas_num;
-        target.nbtc_gas_num = nbtc_gas_num;
-      } else {
-        // use nbtc as gas
-        const gas_v = new Decimal(transactionsGasOnNear || 0).mul(nearNumPerT).mul(nearPrice);
-        totalValue = totalValue.plus(gas_v);
-        if (new Decimal(nbtcPrice).gt(0)) {
-          nbtc_gas_num = nbtc_gas_num.plus(gas_v.div(nbtcPrice).toFixed());
-        }
-        target.nbtc_gas_num = nbtc_gas_num;
-      }
-      target.totalValue = totalValue;
-      return target;
+    // transtions on near chain
+    const target: any = {};
+    const signatureFee = new Decimal(transactionsNumOnNear || 0).mul(signatureFeePertTx);
+    nbtc_gas_num = new Decimal(shrinkToken(signatureFee.toFixed(0), 8));
+    const v_s = new Decimal(nbtc_gas_num).mul(nbtcPrice);
+    totalValue = totalValue.plus(v_s);
+    if (Number(storageDepositOnNear || 0) > 0) {
+      storage_deposit_num = new Decimal(storageDepositOnNear || 0);
+      const v_storage = storage_deposit_num.mul(nearPrice);
+      totalValue = totalValue.plus(v_storage);
+      target.storage_deposit_num = storage_deposit_num;
     }
-    return {
-      empty: true,
-    };
-    // console.log("------------------after", {
-    //   near_gas_num: near_gas_num.toFixed(),
-    //   nbtc_gas_num: nbtc_gas_num.toFixed(),
-    //   storage_deposit_num: storage_deposit_num.toFixed(),
-    //   repay_num: repay_num.toFixed(),
-    //   deposit_bridge_fee: deposit_bridge_fee.toFixed(),
-    //   withdraw_bridge_fee: withdraw_bridge_fee.toFixed(),
-    //   reserved_nbtc_gas: reserved_nbtc_gas.toFixed(),
-    //   reserved_near_gas: reserved_near_gas.toFixed(),
-    // });
-    // let near_nbtc_num = new Decimal(0);
-    // let near_near_num = new Decimal(0);
-    // let bridge_nbtc_num = new Decimal(0);
-
-    // if (new Decimal(bridgeProtocolFeeDecimals || 0).gt(0)) {
-    //   const v = new Decimal(bridgeProtocolFeeDecimals || 0).mul(prices[NBTCTokenId] || 0);
-    //   totalValue = totalValue.plus(v);
-    //   bridge_nbtc_num = bridge_nbtc_num.plus(bridgeProtocolFeeDecimals || 0);
-    // }
-    // // storage deposit
-    // if (new Decimal(storageDepositOnNear || 0).gt(0)) {
-    //   const v_n = new Decimal(storageDepositOnNear || 0).mul(prices[WNEARTokenId] || 0);
-    //   near_near_num = near_near_num.plus(storageDepositOnNear || 0);
-    //   totalValue = totalValue.plus(v_n);
-    // }
-    // // repay amount
-    // if (new Decimal(repayAmount || 0).gt(0)) {
-    //   const v = new Decimal(repayAmount || 0).mul(prices[NBTCTokenId] || 0);
-    //   near_nbtc_num = near_nbtc_num.plus(repayAmount);
-    //   totalValue = totalValue.plus(v);
-    // }
-    // if (new Decimal(transactionsNumOnNear || 0).gt(0)) {
-    //   const signatureFee = new Decimal(transactionsNumOnNear || 0).mul(signatureFeePertTx);
-    //   const signatureFeeRead = shrinkToken(signatureFee.toFixed(0), 8);
-    //   near_nbtc_num = near_nbtc_num.plus(signatureFeeRead);
-    //   const v_s = new Decimal(signatureFeeRead).mul(prices[NBTCTokenId] || 0);
-    //   totalValue = totalValue.plus(v_s);
-    //   if (new Decimal(totalNEARBalance || 0).gt(0.5)) {
-    //     // use near as gas, each tx as 50T
-    //     const NEARGasT = new Decimal(transactionsNumOnNear || 0).mul(nearGasPerTx);
-    //     const NEARGasRead = NEARGasT.mul(nearNumPerT);
-    //     near_near_num = near_near_num.plus(NEARGasRead);
-    //     const v_n = new Decimal(NEARGasRead).mul(prices[WNEARTokenId] || 0);
-    //     totalValue = totalValue.plus(v_n);
-    //   } else {
-    //     // use nbtc as gas
-    //     const v = new Decimal(transactionsGasOnNear || 0)
-    //       .mul(nearNumPerT)
-    //       .mul(prices[WNEARTokenId] || 0);
-    //     totalValue = totalValue.plus(v);
-    //     if (new Decimal(prices[NBTCTokenId] || 0).gt(0)) {
-    //       near_nbtc_num = near_nbtc_num.plus(v.div(prices[NBTCTokenId]).toFixed());
-    //     }
-    //   }
-    // }
-    // const nbtc_sum_num = near_nbtc_num.plus(bridge_nbtc_num);
-    // return {
-    //   nbtc_num: near_nbtc_num.plus(bridge_nbtc_num),
-    //   near_num: near_near_num,
-    //   totalValue,
-    //   empty: nbtc_sum_num.eq(0) && near_near_num.eq(0),
-    // };
+    if (new Decimal(totalNEARBalance || 0).gt(0.5)) {
+      // use near as gas, each tx as 50T
+      const NEARGasT = new Decimal(transactionsNumOnNear || 0).mul(nearGasPerTx);
+      near_gas_num = NEARGasT.mul(nearNumPerT);
+      const v_n = new Decimal(near_gas_num).mul(nearPrice);
+      totalValue = totalValue.plus(v_n);
+      target.near_gas_num = near_gas_num;
+      target.nbtc_gas_num = nbtc_gas_num;
+    } else {
+      // use nbtc as gas
+      const gas_v = new Decimal(transactionsGasOnNear || 0).mul(nearNumPerT).mul(nearPrice);
+      totalValue = totalValue.plus(gas_v);
+      if (new Decimal(nbtcPrice).gt(0)) {
+        nbtc_gas_num = nbtc_gas_num.plus(gas_v.div(nbtcPrice).toFixed());
+      }
+      target.nbtc_gas_num = nbtc_gas_num;
+    }
+    target.totalValue = totalValue;
+    return target;
   }, [
-    bridgeProtocolFee,
     transactionsNumOnNear,
     transactionsGasOnNear,
     storageDepositOnNear,
-    isNewAccount,
-    repayAmount,
     JSON.stringify(prices || {}),
   ]);
   return (
@@ -784,80 +692,11 @@ const FeeDetail = ({
       onOpen={() => setShowTooltip(true)}
       onClose={() => setShowTooltip(false)}
       title={
-        empty ? (
-          ""
-        ) : (
-          <div className="flex flex-col gap-2">
-            {deposit_bridge_fee?.gt(0) ? (
-              <div className="flex items-center justify-between gap-10">
-                <span>Bridge Fee</span>
-                <div className="flex items-center gap-1.5">
-                  <img
-                    src="https://img.rhea.finance/images/btc-icon.png"
-                    alt=""
-                    className="w-4 h-4 rounded-full"
-                  />
-                  <span className="text-white">
-                    {beautifyNumber({
-                      num: deposit_bridge_fee.toFixed(),
-                      maxDecimal: 8,
-                    })}
-                  </span>
-                </div>
-              </div>
-            ) : null}
-            {withdraw_bridge_fee?.gt(0) ? (
-              <div className="flex items-center justify-between gap-10">
-                <span>Bridge Fee</span>
-                <div className="flex items-center gap-1.5">
-                  <img
-                    src="https://img.rhea.finance/images/nbtc-icon.jpg"
-                    alt=""
-                    className="w-4 h-4 rounded-full"
-                  />
-                  <span className="text-white">
-                    {beautifyNumber({
-                      num: withdraw_bridge_fee.toFixed(),
-                      maxDecimal: 8,
-                    })}
-                  </span>
-                </div>
-              </div>
-            ) : null}
-            {reserved_near_gas?.gt(0) ? (
-              <div className="flex items-center justify-between gap-10">
-                <span>Reserved NEAR</span>
-                <div className="flex items-center gap-1.5">
-                  <img
-                    src="https://img.rhea.finance/images/near-icon.png"
-                    alt=""
-                    className="w-4 h-4 rounded-full"
-                  />
-                  <span className="text-white">{beautifyPrice(reserved_near_gas.toFixed())}</span>
-                </div>
-              </div>
-            ) : null}
-            {reserved_nbtc_gas?.gt(0) ? (
-              <div className="flex items-center justify-between gap-10">
-                <span>Reserved NBTC</span>
-                <div className="flex items-center gap-1.5">
-                  <img
-                    src="https://img.rhea.finance/images/nbtc-icon.jpg"
-                    alt=""
-                    className="w-4 h-4 rounded-full"
-                  />
-                  <span className="text-white">
-                    {beautifyNumber({
-                      num: reserved_nbtc_gas.toFixed(),
-                      maxDecimal: 8,
-                    })}
-                  </span>
-                </div>
-              </div>
-            ) : null}
-            {near_gas_num?.gt(0) ? (
-              <div className="flex items-center justify-between gap-10">
-                <span>NEAR Gas</span>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-start justify-between gap-6">
+            <span>Gas Fee</span>
+            <div className="flex items-center gap-2">
+              {near_gas_num?.gt(0) ? (
                 <div className="flex items-center gap-1.5">
                   <img
                     src="https://img.rhea.finance/images/near-icon.png"
@@ -866,11 +705,8 @@ const FeeDetail = ({
                   />
                   <span className="text-white">{beautifyPrice(near_gas_num.toFixed())}</span>
                 </div>
-              </div>
-            ) : null}
-            {nbtc_gas_num?.gt(0) ? (
-              <div className="flex items-center justify-between gap-10">
-                <span>NBTC Gas</span>
+              ) : null}
+              {nbtc_gas_num?.gt(0) ? (
                 <div className="flex items-center gap-1.5">
                   <img
                     src="https://img.rhea.finance/images/nbtc-icon.jpg"
@@ -884,41 +720,247 @@ const FeeDetail = ({
                     })}
                   </span>
                 </div>
-              </div>
-            ) : null}
-            {repay_num?.gt(0) ? (
-              <div className="flex items-center justify-between gap-10">
-                <span>Repay Fee</span>
-                <div className="flex items-center gap-1.5">
-                  <img
-                    src="https://img.rhea.finance/images/nbtc-icon.jpg"
-                    alt=""
-                    className="w-4 h-4 rounded-full"
-                  />
-                  <span className="text-white">
-                    {beautifyNumber({
-                      num: repay_num.toFixed(),
-                      maxDecimal: 8,
-                    })}
-                  </span>
-                </div>
-              </div>
-            ) : null}
-            {storage_deposit_num?.gt(0) ? (
-              <div className="flex items-center justify-between gap-10">
-                <span>Storage Fee</span>
-                <div className="flex items-center gap-1.5">
-                  <img
-                    src="https://img.rhea.finance/images/near-icon.png"
-                    alt=""
-                    className="w-4 h-4 rounded-full"
-                  />
-                  <span className="text-white">{beautifyPrice(storage_deposit_num.toFixed())}</span>
-                </div>
-              </div>
-            ) : null}
+              ) : null}
+            </div>
           </div>
-        )
+          {storage_deposit_num?.gt(0) ? (
+            <div className="flex items-center justify-between gap-6">
+              <span>Register Fee</span>
+              <div className="flex items-center gap-1.5">
+                <img
+                  src="https://img.rhea.finance/images/near-icon.png"
+                  alt=""
+                  className="w-4 h-4 rounded-full"
+                />
+                <span className="text-white">{beautifyPrice(storage_deposit_num.toFixed())}</span>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      }
+    >
+      <span
+        className="text-white border-b border-dashed text-sm"
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowTooltip(!showTooltip);
+        }}
+      >
+        {beautifyPrice(totalValue?.toFixed() || 0, true)}
+      </span>
+    </HtmlTooltip>
+  );
+};
+const FeeDetailBridge = ({
+  bridgeProtocolFee,
+  storageDepositOnNear,
+  isDeposit,
+}: {
+  bridgeProtocolFee?: string | number;
+  storageDepositOnNear?: string | number;
+  isDeposit?: boolean;
+}) => {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const assets = useAppSelector(getAssetsCategory(false));
+  const prices = useMemo(() => {
+    return {
+      [WBTCTokenId]: assets?.data?.[WBTCTokenId]?.price?.usd || 0,
+      [NBTCTokenId]: assets?.data?.[NBTCTokenId]?.price?.usd || 0,
+      [WNEARTokenId]: assets?.data?.[WNEARTokenId]?.price?.usd || 0,
+    };
+  }, [JSON.stringify(assets || {})]);
+  const { storage_deposit_num, deposit_bridge_fee, withdraw_bridge_fee, totalValue } =
+    useMemo(() => {
+      let totalValue = new Decimal(0);
+      let deposit_bridge_fee = new Decimal(0);
+      let withdraw_bridge_fee = new Decimal(0);
+      let storage_deposit_num = new Decimal(0);
+      const btcPrice = prices[WBTCTokenId] || 0;
+      const nbtcPrice = prices[NBTCTokenId] || 0;
+      const nearPrice = prices[WNEARTokenId] || 0;
+      const bridgeProtocolFee8 = new Decimal(bridgeProtocolFee || 0).toFixed(8);
+      if (isDeposit) {
+        // onClick supply
+        deposit_bridge_fee = new Decimal(bridgeProtocolFee8 || 0);
+        totalValue = deposit_bridge_fee.mul(btcPrice);
+        if (Number(storageDepositOnNear || 0) > 0) {
+          storage_deposit_num = new Decimal(storageDepositOnNear || 0);
+          const v_storage = storage_deposit_num.mul(nearPrice);
+          totalValue = totalValue.plus(v_storage);
+        }
+        return {
+          deposit_bridge_fee,
+          storage_deposit_num,
+          totalValue,
+        } as any;
+      } else {
+        // onClick withdraw
+        withdraw_bridge_fee = new Decimal(bridgeProtocolFee8);
+        totalValue = withdraw_bridge_fee.mul(nbtcPrice);
+        return {
+          withdraw_bridge_fee,
+          totalValue,
+        } as any;
+      }
+    }, [bridgeProtocolFee, storageDepositOnNear, isDeposit, JSON.stringify(prices || {})]);
+  return (
+    <HtmlTooltip
+      open={showTooltip}
+      placement="top"
+      onOpen={() => setShowTooltip(true)}
+      onClose={() => setShowTooltip(false)}
+      title={
+        <div className="flex flex-col gap-2">
+          {deposit_bridge_fee?.gt(0) ? (
+            <div className="flex items-center justify-between gap-6">
+              <span>Bridge Fee</span>
+              <div className="flex items-center gap-1.5">
+                <img
+                  src="https://img.rhea.finance/images/btc-icon.png"
+                  alt=""
+                  className="w-4 h-4 rounded-full"
+                />
+                <span className="text-white">
+                  {beautifyNumber({
+                    num: deposit_bridge_fee.toFixed(),
+                    maxDecimal: 8,
+                  })}
+                </span>
+              </div>
+            </div>
+          ) : null}
+          {withdraw_bridge_fee?.gt(0) ? (
+            <div className="flex items-center justify-between gap-6">
+              <span>Bridge Fee</span>
+              <div className="flex items-center gap-1.5">
+                <img
+                  src="https://img.rhea.finance/images/nbtc-icon.jpg"
+                  alt=""
+                  className="w-4 h-4 rounded-full"
+                />
+                <span className="text-white">
+                  {beautifyNumber({
+                    num: withdraw_bridge_fee.toFixed(),
+                    maxDecimal: 8,
+                  })}
+                </span>
+              </div>
+            </div>
+          ) : null}
+          {storage_deposit_num?.gt(0) ? (
+            <div className="flex items-center justify-between gap-6">
+              <span>Register Fee</span>
+              <div className="flex items-center gap-1.5">
+                <img
+                  src="https://img.rhea.finance/images/near-icon.png"
+                  alt=""
+                  className="w-4 h-4 rounded-full"
+                />
+                <span className="text-white">{beautifyPrice(storage_deposit_num.toFixed())}</span>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      }
+    >
+      <span
+        className="text-white border-b border-dashed text-sm"
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowTooltip(!showTooltip);
+        }}
+      >
+        {beautifyPrice(totalValue?.toFixed() || 0, true)}
+      </span>
+    </HtmlTooltip>
+  );
+};
+const BridgeFeeDetailForNewAccount = () => {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const assets = useAppSelector(getAssetsCategory(false));
+  const prices = useMemo(() => {
+    return {
+      [WBTCTokenId]: assets?.data?.[WBTCTokenId]?.price?.usd || 0,
+      [NBTCTokenId]: assets?.data?.[NBTCTokenId]?.price?.usd || 0,
+      [WNEARTokenId]: assets?.data?.[WNEARTokenId]?.price?.usd || 0,
+    };
+  }, [JSON.stringify(assets || {})]);
+  const { totalValue } = useMemo(() => {
+    let totalValue = new Decimal(0);
+    const deposit_bridge_fee = new Decimal(0.00005);
+    const btcPrice = prices[WBTCTokenId] || 0;
+    totalValue = deposit_bridge_fee.mul(btcPrice);
+    return {
+      totalValue,
+    };
+  }, [JSON.stringify(prices || {})]);
+  return (
+    <HtmlTooltip
+      open={showTooltip}
+      placement="top"
+      onOpen={() => setShowTooltip(true)}
+      onClose={() => setShowTooltip(false)}
+      title={
+        <div className="flex items-center justify-between gap-6">
+          <span>
+            <img
+              src="https://img.rhea.finance/images/btc-icon.png"
+              alt=""
+              className="w-4 h-4 rounded-full"
+            />
+          </span>
+          <span className="text-white">0.00005</span>
+        </div>
+      }
+    >
+      <span
+        className="text-white border-b border-dashed text-sm"
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowTooltip(!showTooltip);
+        }}
+      >
+        {beautifyPrice(totalValue?.toFixed() || 0, true)}
+      </span>
+    </HtmlTooltip>
+  );
+};
+const ReservationDetailForNewAccount = () => {
+  const [showTooltip, setShowTooltip] = useState(false);
+  const assets = useAppSelector(getAssetsCategory(false));
+  const prices = useMemo(() => {
+    return {
+      [WBTCTokenId]: assets?.data?.[WBTCTokenId]?.price?.usd || 0,
+      [NBTCTokenId]: assets?.data?.[NBTCTokenId]?.price?.usd || 0,
+      [WNEARTokenId]: assets?.data?.[WNEARTokenId]?.price?.usd || 0,
+    };
+  }, [JSON.stringify(assets || {})]);
+  const { totalValue } = useMemo(() => {
+    let totalValue = new Decimal(0);
+    const _fee = new Decimal(0.000008);
+    const btcPrice = prices[WBTCTokenId] || 0;
+    totalValue = _fee.mul(btcPrice);
+    return {
+      totalValue,
+    };
+  }, [JSON.stringify(prices || {})]);
+  return (
+    <HtmlTooltip
+      open={showTooltip}
+      placement="top"
+      onOpen={() => setShowTooltip(true)}
+      onClose={() => setShowTooltip(false)}
+      title={
+        <div className="flex items-center justify-between gap-6">
+          <span>
+            <img
+              src="https://img.rhea.finance/images/btc-icon.png"
+              alt=""
+              className="w-4 h-4 rounded-full"
+            />
+          </span>
+          <span className="text-white">0.000008</span>
+        </div>
       }
     >
       <span
