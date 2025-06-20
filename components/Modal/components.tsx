@@ -488,11 +488,13 @@ export function FeeContainer({
   className,
   storage,
   isDeposit,
+  bridgeGasFee,
 }: {
   loading: boolean;
   transactionsNumOnNear?: string | number;
   transactionsGasOnNear?: string | number; // T
   bridgeProtocolFee?: string | number;
+  bridgeGasFee?: string | number;
   isDeposit?: boolean;
   storage?: {
     contractId?: string;
@@ -578,7 +580,11 @@ export function FeeContainer({
       <div className="flex flex-col gap-4">
         <div className={twMerge(`flex items-center justify-between`, className || "")}>
           <span className="flex items-center gap-1.5 text-sm text-gray-300">Fee</span>
-          <FeeDetailBridge bridgeProtocolFee={bridgeProtocolFee} isDeposit={isDeposit} />
+          <FeeDetailBridge
+            bridgeProtocolFee={bridgeProtocolFee}
+            bridgeGasFee={bridgeGasFee}
+            isDeposit={isDeposit}
+          />
         </div>
       </div>
     );
@@ -749,9 +755,11 @@ const FeeDetail = ({
 };
 const FeeDetailBridge = ({
   bridgeProtocolFee,
+  bridgeGasFee,
   isDeposit,
 }: {
   bridgeProtocolFee?: string | number;
+  bridgeGasFee?: string | number;
   isDeposit?: boolean;
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
@@ -763,31 +771,37 @@ const FeeDetailBridge = ({
       [WNEARTokenId]: assets?.data?.[WNEARTokenId]?.price?.usd || 0,
     };
   }, [JSON.stringify(assets || {})]);
-  const { deposit_bridge_fee, withdraw_bridge_fee, totalValue } = useMemo(() => {
-    let totalValue = new Decimal(0);
-    let deposit_bridge_fee = new Decimal(0);
-    let withdraw_bridge_fee = new Decimal(0);
-    const btcPrice = prices[WBTCTokenId] || 0;
-    const nbtcPrice = prices[NBTCTokenId] || 0;
-    const bridgeProtocolFee8 = new Decimal(bridgeProtocolFee || 0).toFixed(8);
-    if (isDeposit) {
-      // onClick supply
-      deposit_bridge_fee = new Decimal(bridgeProtocolFee8 || 0);
-      totalValue = deposit_bridge_fee.mul(btcPrice);
-      return {
-        deposit_bridge_fee,
-        totalValue,
-      } as any;
-    } else {
-      // onClick withdraw
-      withdraw_bridge_fee = new Decimal(bridgeProtocolFee8);
-      totalValue = withdraw_bridge_fee.mul(nbtcPrice);
-      return {
-        withdraw_bridge_fee,
-        totalValue,
-      } as any;
-    }
-  }, [bridgeProtocolFee, isDeposit, JSON.stringify(prices || {})]);
+  const { deposit_bridge_fee, withdraw_bridge_fee, withdraw_bridge_gas_fee, totalValue } =
+    useMemo(() => {
+      let totalValue = new Decimal(0);
+      let deposit_bridge_fee = new Decimal(0);
+      let withdraw_bridge_fee = new Decimal(0);
+      let withdraw_bridge_gas_fee = new Decimal(0);
+      const btcPrice = prices[WBTCTokenId] || 0;
+      const nbtcPrice = prices[NBTCTokenId] || 0;
+      const bridgeProtocolFee8 = new Decimal(bridgeProtocolFee || 0).toFixed(8);
+      const bridgeGasFee8 = new Decimal(bridgeGasFee || 0).toFixed(8);
+      if (isDeposit) {
+        // onClick supply
+        deposit_bridge_fee = new Decimal(bridgeProtocolFee8 || 0);
+        totalValue = deposit_bridge_fee.mul(btcPrice);
+        return {
+          deposit_bridge_fee,
+          totalValue,
+        } as any;
+      } else {
+        // onClick withdraw
+        withdraw_bridge_fee = new Decimal(bridgeProtocolFee8);
+        withdraw_bridge_gas_fee = new Decimal(bridgeGasFee8);
+        totalValue = withdraw_bridge_fee.mul(nbtcPrice);
+        totalValue = totalValue.plus(withdraw_bridge_gas_fee.mul(nbtcPrice));
+        return {
+          withdraw_bridge_fee,
+          withdraw_bridge_gas_fee,
+          totalValue,
+        } as any;
+      }
+    }, [bridgeProtocolFee, isDeposit, bridgeGasFee, JSON.stringify(prices || {})]);
   return (
     <HtmlTooltip
       open={showTooltip}
@@ -826,6 +840,24 @@ const FeeDetailBridge = ({
                 <span className="text-white">
                   {beautifyNumber({
                     num: withdraw_bridge_fee.toFixed(),
+                    maxDecimal: 8,
+                  })}
+                </span>
+              </div>
+            </div>
+          ) : null}
+          {withdraw_bridge_gas_fee?.gt(0) ? (
+            <div className="flex items-center justify-between gap-6">
+              <span>Gas Fee</span>
+              <div className="flex items-center gap-1.5">
+                <img
+                  src="https://img.rhea.finance/images/nbtc-icon.jpg"
+                  alt=""
+                  className="w-4 h-4 rounded-full"
+                />
+                <span className="text-white">
+                  {beautifyNumber({
+                    num: withdraw_bridge_gas_fee.toFixed(),
                     maxDecimal: 8,
                   })}
                 </span>

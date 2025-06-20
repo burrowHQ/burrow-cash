@@ -398,7 +398,8 @@ const Modal = () => {
                   />
                   <FeeContainer
                     loading={cacuWithdrawLoading}
-                    bridgeProtocolFee={Number(withdrawFee || 0) + Number(withdrawGasFee || 0)}
+                    bridgeProtocolFee={Number(withdrawFee || 0)}
+                    bridgeGasFee={Number(withdrawGasFee || 0)}
                   />
                 </>
               ) : null}
