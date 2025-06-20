@@ -578,11 +578,7 @@ export function FeeContainer({
       <div className="flex flex-col gap-4">
         <div className={twMerge(`flex items-center justify-between`, className || "")}>
           <span className="flex items-center gap-1.5 text-sm text-gray-300">Fee</span>
-          <FeeDetailBridge
-            bridgeProtocolFee={bridgeProtocolFee}
-            storageDepositOnNear={storageDepositOnNear}
-            isDeposit={isDeposit}
-          />
+          <FeeDetailBridge bridgeProtocolFee={bridgeProtocolFee} isDeposit={isDeposit} />
         </div>
       </div>
     );
@@ -753,11 +749,9 @@ const FeeDetail = ({
 };
 const FeeDetailBridge = ({
   bridgeProtocolFee,
-  storageDepositOnNear,
   isDeposit,
 }: {
   bridgeProtocolFee?: string | number;
-  storageDepositOnNear?: string | number;
   isDeposit?: boolean;
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
@@ -769,40 +763,31 @@ const FeeDetailBridge = ({
       [WNEARTokenId]: assets?.data?.[WNEARTokenId]?.price?.usd || 0,
     };
   }, [JSON.stringify(assets || {})]);
-  const { storage_deposit_num, deposit_bridge_fee, withdraw_bridge_fee, totalValue } =
-    useMemo(() => {
-      let totalValue = new Decimal(0);
-      let deposit_bridge_fee = new Decimal(0);
-      let withdraw_bridge_fee = new Decimal(0);
-      let storage_deposit_num = new Decimal(0);
-      const btcPrice = prices[WBTCTokenId] || 0;
-      const nbtcPrice = prices[NBTCTokenId] || 0;
-      const nearPrice = prices[WNEARTokenId] || 0;
-      const bridgeProtocolFee8 = new Decimal(bridgeProtocolFee || 0).toFixed(8);
-      if (isDeposit) {
-        // onClick supply
-        deposit_bridge_fee = new Decimal(bridgeProtocolFee8 || 0);
-        totalValue = deposit_bridge_fee.mul(btcPrice);
-        if (Number(storageDepositOnNear || 0) > 0) {
-          storage_deposit_num = new Decimal(storageDepositOnNear || 0);
-          const v_storage = storage_deposit_num.mul(nearPrice);
-          totalValue = totalValue.plus(v_storage);
-        }
-        return {
-          deposit_bridge_fee,
-          storage_deposit_num,
-          totalValue,
-        } as any;
-      } else {
-        // onClick withdraw
-        withdraw_bridge_fee = new Decimal(bridgeProtocolFee8);
-        totalValue = withdraw_bridge_fee.mul(nbtcPrice);
-        return {
-          withdraw_bridge_fee,
-          totalValue,
-        } as any;
-      }
-    }, [bridgeProtocolFee, storageDepositOnNear, isDeposit, JSON.stringify(prices || {})]);
+  const { deposit_bridge_fee, withdraw_bridge_fee, totalValue } = useMemo(() => {
+    let totalValue = new Decimal(0);
+    let deposit_bridge_fee = new Decimal(0);
+    let withdraw_bridge_fee = new Decimal(0);
+    const btcPrice = prices[WBTCTokenId] || 0;
+    const nbtcPrice = prices[NBTCTokenId] || 0;
+    const bridgeProtocolFee8 = new Decimal(bridgeProtocolFee || 0).toFixed(8);
+    if (isDeposit) {
+      // onClick supply
+      deposit_bridge_fee = new Decimal(bridgeProtocolFee8 || 0);
+      totalValue = deposit_bridge_fee.mul(btcPrice);
+      return {
+        deposit_bridge_fee,
+        totalValue,
+      } as any;
+    } else {
+      // onClick withdraw
+      withdraw_bridge_fee = new Decimal(bridgeProtocolFee8);
+      totalValue = withdraw_bridge_fee.mul(nbtcPrice);
+      return {
+        withdraw_bridge_fee,
+        totalValue,
+      } as any;
+    }
+  }, [bridgeProtocolFee, isDeposit, JSON.stringify(prices || {})]);
   return (
     <HtmlTooltip
       open={showTooltip}
@@ -844,19 +829,6 @@ const FeeDetailBridge = ({
                     maxDecimal: 8,
                   })}
                 </span>
-              </div>
-            </div>
-          ) : null}
-          {storage_deposit_num?.gt(0) ? (
-            <div className="flex items-center justify-between gap-6">
-              <span>Register Fee</span>
-              <div className="flex items-center gap-1.5">
-                <img
-                  src="https://img.rhea.finance/images/near-icon.png"
-                  alt=""
-                  className="w-4 h-4 rounded-full"
-                />
-                <span className="text-white">{beautifyPrice(storage_deposit_num.toFixed())}</span>
               </div>
             </div>
           ) : null}
