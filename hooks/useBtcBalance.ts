@@ -116,11 +116,12 @@ export function useCalculateWithdraw({
     });
     const receiveAmount = shrinkToken(result?.receiveAmount || "0", decimals);
     const btcGasFee = shrinkToken(result?.gasFee || "0", decimals);
+    const withdrawFee = shrinkToken(result?.withdrawFee || "0", decimals);
     setWithdrawData({
       loading: false,
       receiveAmount,
       errorMsg: result?.errorMsg || "",
-      fee: Decimal.max(new Decimal(amount || 0).minus(receiveAmount), 0).toFixed(),
+      fee: withdrawFee,
       btcGasFee,
       amount,
     });
