@@ -237,6 +237,10 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
       "sender",
       "coin98-wallet",
     ],
+    initialPosition: {
+      right: "30px",
+      bottom: "40px",
+    },
   });
   window.modal = modal;
   window.selectorSubscription = subscription;
