@@ -19,5 +19,5 @@ export async function get_storage_balance_of({
       account_id: accountId,
     }),
   }).then((res) => res.json());
-  return !!result?.data;
+  return result?.data;
 }
