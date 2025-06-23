@@ -4,13 +4,20 @@ import getBalance from "./get-balance";
 import getPortfolioMEME from "./get-portfolio-meme";
 import getShadowRecords from "./get-shadows";
 import { getAccount as getAccountWallet } from "../utils/wallet-selector-compat";
+import { hiddenAssetsMEME } from "../utils/config";
 
 const getAccountMEME = async () => {
   const account = await getAccountWallet();
   const { accountId } = account;
   if (accountId) {
     const assets = await getAssetsMEMEDetail();
-    const tokenIds = assets.map((asset) => asset.token_id);
+    const tokenIds = assets.reduce((acc: string[], asset) => {
+      const token_id: string = asset.token_id;
+      if (!hiddenAssetsMEME.includes(token_id)) {
+        acc.push(token_id);
+      }
+      return acc;
+    }, []);
     const shadowRecords = await getShadowRecords();
     let accountBalance = "0";
     try {

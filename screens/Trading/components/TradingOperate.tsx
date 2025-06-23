@@ -933,7 +933,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Fee</div>
               <div className="flex items-center justify-center relative">
-                {/* TODOXXX Long */}
                 <p
                   className="border-b border-dashed border-dark-800 cursor-pointer"
                   onMouseEnter={() => setShowFeeModal(true)}
@@ -1086,7 +1085,6 @@ const TradingOperate: React.FC<TradingOperateProps> = ({ onMobileClose, id }) =>
             <div className="flex items-center justify-between text-sm mb-4">
               <div className="text-gray-300">Fee</div>
               <div className="flex items-center justify-center relative">
-                {/* TODOXXX Short */}
                 <p
                   className="border-b border-dashed border-dark-800 cursor-pointer"
                   onMouseEnter={() => setShowFeeModal(true)}

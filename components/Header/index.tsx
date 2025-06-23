@@ -85,7 +85,6 @@ const DexMenuItem = () => {
 const CommunityItem = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
-  const isMobile = isMobileDevice();
 
   const handleMouseLeave = () => {
     const id = setTimeout(() => setIsHovered(false), 300);
@@ -139,6 +138,7 @@ const Header = () => {
   const [open, setOpen] = useState(false);
   const isFetching = useAppSelector(isAssetsFetching);
   const theme = useTheme();
+  const isMobile = isMobileDevice();
   useEffect(() => {
     if (isFetching) {
       setOpen(true);
@@ -151,7 +151,6 @@ const Header = () => {
     }
     setOpen(false);
   };
-
   return (
     <Box
       sx={{
@@ -179,7 +178,8 @@ const Header = () => {
           </Menu>
           <Box display="flex" justifyContent="flex-end" alignItems="stretch" className=" gap-4">
             <Bridge />
-            <WalletButton />
+            {!isMobile ? <WalletButton /> : null}
+
             <Set />
           </Box>
           <Snackbar
@@ -206,7 +206,7 @@ const Header = () => {
             <RheaLogo />
           </Logo>
           <Box className="flex items-center">
-            <WalletButton />
+            {isMobile ? <WalletButton /> : null}
             <MenuMobile />
           </Box>
         </WrapperMobile>
@@ -254,7 +254,6 @@ const Links = () => {
   );
 };
 const BugBounty = () => {
-  const isMobile = isMobileDevice();
   return (
     <a
       href="https://immunefi.com/bounty/burrow/"
@@ -270,7 +269,6 @@ const BugBounty = () => {
 };
 
 const Github = () => {
-  const isMobile = isMobileDevice();
   return (
     <a
       href="https://github.com/burrowHQ/"

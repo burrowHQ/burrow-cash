@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, createContext, useContext } from "react";
+import { useState, useRef, createContext, useContext } from "react";
 import { Button, Box, useTheme, Modal as MUIModal } from "@mui/material";
 import type { WalletSelector } from "@near-wallet-selector/core";
 import { BeatLoader } from "react-spinners";
@@ -9,8 +9,11 @@ import { logoutAccount, fetchAccount, setAccountId } from "../../redux/accountSl
 import { logoutAccount as logoutAccountMEME, fetchAccountMEME } from "../../redux/accountSliceMEME";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { getBurrow, accountTrim, standardizeAsset } from "../../utils";
-import { hideModal as _hideModal } from "../../redux/appSlice";
-import { hideModal as _hideModalMEME } from "../../redux/appSliceMEME";
+import { hideModal as _hideModal, fetchConfig } from "../../redux/appSlice";
+import {
+  hideModal as _hideModalMEME,
+  fetchConfig as fetchMemeConfig,
+} from "../../redux/appSliceMEME";
 import { getAccountBalance, getAccountId } from "../../redux/accountSelectors";
 import { getAccountRewards } from "../../redux/selectors/getAccountRewards";
 import { trackConnectWallet, trackLogout } from "../../utils/telemetry";
@@ -26,6 +29,9 @@ import { fetchMarginAccount } from "../../redux/marginAccountSlice";
 import { fetchMarginAccountMEME } from "../../redux/marginAccountSliceMEME";
 import BeginnerGuideWrapper from "../BeginnerGuide/BeginnerGuideWrapper";
 import { useGuide } from "../BeginnerGuide/GuideContext";
+import { fetchMarginConfig } from "../../redux/marginConfigSlice";
+import { fetchMarginConfigMEME } from "../../redux/marginConfigSliceMEME";
+import { fetchAllPools } from "../../redux/poolSlice";
 
 const WalletContext = createContext(null) as any;
 const WalletButton = () => {
@@ -49,10 +55,17 @@ const WalletButton = () => {
   };
   const fetchData = (id?: string) => {
     dispatch(setAccountId(id));
-    dispatch(fetchAccount());
-    dispatch(fetchAccountMEME());
-    dispatch(fetchMarginAccount());
-    dispatch(fetchMarginAccountMEME());
+    if (id) {
+      dispatch(fetchAccount());
+      dispatch(fetchAccountMEME());
+      dispatch(fetchMarginAccount());
+      dispatch(fetchMarginAccountMEME());
+    }
+    dispatch(fetchConfig());
+    dispatch(fetchMemeConfig());
+    dispatch(fetchMarginConfig());
+    dispatch(fetchMarginConfigMEME());
+    dispatch(fetchAllPools());
     dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
     dispatch(fetchAssetsMEME()).then(() => dispatch(fetchRefPrices()));
   };
