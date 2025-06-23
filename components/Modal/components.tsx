@@ -5,7 +5,7 @@ import { getDepositAmount } from "btc-wallet";
 import { BeatLoader } from "react-spinners";
 import { twMerge } from "tailwind-merge";
 import { actionMapTitle } from "./utils";
-import { shrinkToken, TOKEN_FORMAT } from "../../store";
+import { shrinkToken, TOKEN_FORMAT, expandTokenDecimal } from "../../store";
 import { useDegenMode } from "../../hooks/hooks";
 import { useAppSelector, useAppDispatch } from "../../redux/hooks";
 import { toggleUseAsCollateral, updateAmount, showModal } from "../../redux/appSlice";
@@ -28,6 +28,11 @@ import { NBTCTokenId, WBTCTokenId, WNEARTokenId, NBTC_ENV } from "../../utils/co
 import { beautifyPrice, beautifyNumber } from "../../utils/beautyNumber";
 import { getAssetsCategory } from "../../redux/assetsSelectors";
 import { get_storage_balance_of } from "../../services/common";
+import {
+  NEAR_DECIMALS,
+  NEAR_STORAGE_DEPOSIT_MIN,
+  NEAR_STORAGE_EXTRA_DEPOSIT,
+} from "../../store/constants";
 
 export const USNInfo = () => (
   <Box mt="1rem">
@@ -504,7 +509,7 @@ export function FeeContainer({
 }) {
   const [repayAmount, setRepayAmount] = useState<string | number>("0");
   const [extraFeeLoading, setExtraFeeLoading] = useState<boolean>(false);
-  const [storageDepositOnNear, setStorageDepositOnNear] = useState<string>("0");
+  const [storageDepositOnNear, setStorageDepositOnNear] = useState<string | number>("0");
   const [isNewAccount, setIsNewAccount] = useState<boolean>(false);
   const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
   const isBtcWallet = selectedWalletId === "btc-wallet";
@@ -521,12 +526,25 @@ export function FeeContainer({
       env: NBTC_ENV,
     });
     if (storage?.contractId) {
-      const res = await get_storage_balance_of({
+      const res: any = await get_storage_balance_of({
         accountId: window.accountId,
         contractId: storage?.contractId,
       });
       if (!res) {
+        // register
         setStorageDepositOnNear(storage?.amount || "0");
+      } else {
+        // Supplement
+        if (
+          storage?.contractId == process.env.NEXT_PUBLIC_CONTRACT_NAME ||
+          storage?.contractId == process.env.NEXT_PUBLIC_MEMECONTRACT_NAME
+        ) {
+          const balanceAvailableDecimal = new Decimal(res?.available || "0");
+          const nearStorageDepositMin = expandTokenDecimal(NEAR_STORAGE_DEPOSIT_MIN, NEAR_DECIMALS);
+          if (balanceAvailableDecimal.lessThan(nearStorageDepositMin)) {
+            setStorageDepositOnNear(NEAR_STORAGE_EXTRA_DEPOSIT);
+          }
+        }
       }
     }
     const _repayAmount = shrinkToken(repayAmount || 0, 8, 8);
