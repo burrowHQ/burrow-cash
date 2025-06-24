@@ -574,7 +574,7 @@ export function FeeContainer({
             <TagToolTip
               title={
                 <div>
-                  Account Initial requires 3000 satoshi, with 2000 satoshi used for bridge cost.
+                  Account Initial requires 800 satoshi, with 400 satoshi used for bridge cost.
                 </div>
               }
             />
@@ -898,6 +898,7 @@ const FeeDetailBridge = ({
   );
 };
 const BridgeFeeDetailForNewAccount = () => {
+  const [initFee] = useState(0.000012);
   const [showTooltip, setShowTooltip] = useState(false);
   const assets = useAppSelector(getAssetsCategory(false));
   const prices = useMemo(() => {
@@ -909,7 +910,7 @@ const BridgeFeeDetailForNewAccount = () => {
   }, [JSON.stringify(assets || {})]);
   const { totalValue } = useMemo(() => {
     let totalValue = new Decimal(0);
-    const deposit_bridge_fee = new Decimal(0.00005);
+    const deposit_bridge_fee = new Decimal(initFee);
     const btcPrice = prices[WBTCTokenId] || 0;
     totalValue = deposit_bridge_fee.mul(btcPrice);
     return {
@@ -931,7 +932,7 @@ const BridgeFeeDetailForNewAccount = () => {
               className="w-4 h-4 rounded-full"
             />
           </span>
-          <span className="text-white">0.00005</span>
+          <span className="text-white">{initFee}</span>
         </div>
       }
     >
