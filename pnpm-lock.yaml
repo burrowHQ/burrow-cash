@@ -4088,16 +4088,8 @@ packages:
   bser@2.1.1:
     resolution: {integrity: sha512-gQxTNE/GAfIIrmHLUE3oJyp5FO6HRBfhjnw4/wMmA63ZGDJnWBmgY/lyQBpnDUkGmAhbSe39tx2d/iTOAfglwQ==}
 
-<<<<<<< HEAD
-  btc-wallet@0.5.72-beta:
-    resolution:
-      {
-        integrity: sha512-81T1gh5MzIQNgjiK4ajB7h+zZP+AsYZ+9Ud1988t2fTkRPt3heveDyeLmXVHpvW0gnA6oQAOdYA6MIKBkOOA1A==,
-      }
-=======
   btc-wallet@0.5.73-beta:
     resolution: {integrity: sha512-Mtm39vdNKf3zJabzC/D8tYk6wwluE2U1gNVsZi3PpG47hI1wEHPusAhPYxb9L15bjPfxRpBcOm4TLKqBRx8IxA==}
->>>>>>> main
     peerDependencies:
       react: '>=17.0.0'
       react-dom: '>=17.0.0'
