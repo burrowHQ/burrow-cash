@@ -574,7 +574,7 @@ export function FeeContainer({
             <TagToolTip
               title={
                 <div>
-                  Account Initial requires 800 satoshi, with 400 satoshi used for bridge cost.
+                  Account Initial requires 800 satoshi, with 2000 satoshi used for bridge cost.
                 </div>
               }
             />
@@ -898,7 +898,7 @@ const FeeDetailBridge = ({
   );
 };
 const BridgeFeeDetailForNewAccount = () => {
-  const [initFee] = useState(0.000012);
+  const [initFee] = useState(0.000028);
   const [showTooltip, setShowTooltip] = useState(false);
   const assets = useAppSelector(getAssetsCategory(false));
   const prices = useMemo(() => {
