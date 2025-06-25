@@ -373,7 +373,7 @@ function DetailMobile({ tokenDetails, handlePeriodClick }) {
           </div>
         </div>
         {/* Tab */}
-        <div className="grid grid-cols-2 bg-gray-800 rounded-xl h-[42px] text-white text-base items-center justify-items-stretch mt-6 mb-6">
+        {/* <div className="grid grid-cols-2 bg-gray-800 rounded-xl h-[42px] text-white text-base items-center justify-items-stretch mt-6 mb-6">
           <div className="relative flex items-center justify-center border-r border-dark-50">
             <span
               onClick={() => {
@@ -410,14 +410,11 @@ function DetailMobile({ tokenDetails, handlePeriodClick }) {
               <YellowBallIcon className="absolute top-6" id="1019" />
             </div>
           </div>
-        </div>
+        </div> */}
         {/* Tab content */}
-        <MarketInfo
-          className={`${isMarket ? "" : "hidden"}`}
-          tokenDetails={tokenDetails}
-          handlePeriodClick={handlePeriodClick}
-        />
-        <YourInfo className={`${isYour ? "" : "hidden"}`} />
+        <YourInfo className="my-6" />
+        <MarketInfo tokenDetails={tokenDetails} handlePeriodClick={handlePeriodClick} />
+
         {/* Get token  modal */}
         <TokenFetchModal open={open} setOpen={setOpen} />
       </div>
@@ -447,7 +444,7 @@ function TokenFetchModal({ open, setOpen }: { open: boolean; setOpen: any }) {
   );
 }
 
-function MarketInfo({ className, tokenDetails, handlePeriodClick }) {
+function MarketInfo({ className, tokenDetails, handlePeriodClick }: any) {
   const { interestRates } = tokenDetails || {};
   const { tokenRow } = useContext(DetailData) as any;
 
@@ -465,7 +462,7 @@ function MarketInfo({ className, tokenDetails, handlePeriodClick }) {
   );
 }
 
-function YourInfo({ className }) {
+function YourInfo({ className }: { className?: string }) {
   const { supplied, borrowed, tokenRow } = useContext(DetailData) as any;
   return (
     <div className={`${className}`}>
