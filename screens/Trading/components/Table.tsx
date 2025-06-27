@@ -182,7 +182,7 @@ const TradingTable = ({
   const filteredAccountSupplied = combinedAccountSupplied.filter((token) => {
     const assetDetails =
       token.type === "main" ? getAssetById(token.token_id) : getAssetByIdMEME(token.token_id);
-    return assetDetails && token.balance.toString().length >= assetDetails.config.extra_decimals;
+    return assetDetails && token.balance.toString().length > assetDetails.config.extra_decimals;
   });
 
   const handleWithdrawAllClick = async () => {
