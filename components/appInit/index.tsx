@@ -67,9 +67,8 @@ const Init = () => {
     fetchData();
     fetchDataAccount();
   };
-  useEffect(fetchData, []);
   useEffect(() => {
-    if (accountId) {
+    if (accountId && Number(appRefreshNumber) > 0) {
       fetchDataAccount();
     }
   }, [accountId, appRefreshNumber]);
