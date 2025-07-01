@@ -57,8 +57,10 @@ import { DEFAULT_POSITION, lpTokenPrefix, NBTCTokenId, WNEARTokenId } from "../.
 
 export const ModalContext = createContext(null) as any;
 const Modal = () => {
+  const [btcCanSupplyAvailableBalance, setBtcCanSupplyAvailableBalance] = useState<string>("0");
   const [selectedCollateralType, setSelectedCollateralType] = useState(DEFAULT_POSITION);
   const [nbtcTab, setNbtcTab] = useState<"btc" | "near">("btc");
+  const [newUserNbtcReserveAmount] = useState<number>(0.000008);
   const dispatch = useAppDispatch();
   const isMeme = useAppSelector(isMemeCategory);
   const isOpen = useAppSelector(getModalStatus);
@@ -134,6 +136,9 @@ const Modal = () => {
     borrowed: repayAmount,
     poolAsset: assets[tokenId],
   });
+  const newUserOnNearChain = useMemo(() => {
+    return new Decimal(supplyBalance || 0).lte(0);
+  }, [supplyBalance]);
   useEffect(() => {
     if (isOpen) {
       dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
@@ -210,7 +215,7 @@ const Modal = () => {
     isBtcDeposit: isBtcChainSupply,
     decimals: asset?.decimals || 0,
     amount,
-    newUserOnNearChain: new Decimal(supplyBalance || 0).lte(0),
+    newUserOnNearChain,
   });
   useEffect(() => {
     if (amount == withdrawAmountPending) {
@@ -249,6 +254,29 @@ const Modal = () => {
     depositBtcGasFeePending,
     amount,
   ]);
+  // TODOXXX
+  useEffect(() => {
+    if (Number(depositData?.depositFee || 0) > 0) {
+      const maxSupplyBalance = Decimal.max(
+        0,
+        new Decimal(btcAvailableBalance || 0)
+          .minus(depositData?.depositFee)
+          .minus(newUserOnNearChain ? newUserNbtcReserveAmount : 0),
+      );
+      setBtcCanSupplyAvailableBalance(maxSupplyBalance.toFixed());
+    }
+  }, [depositData?.depositFee, btcAvailableBalance, newUserOnNearChain]);
+  const btcCanSupplyAvailableBalance$ = useMemo(() => {
+    return new Decimal(btcCanSupplyAvailableBalance || 0).mul(price || 0).toFixed(2);
+  }, [asset?.price, btcCanSupplyAvailableBalance]);
+  const oneDepositBridgeAmount = useMemo(() => {
+    if (isBtcChainSupply && +(amount || 0) > 0 && +(depositData?.depositFee || 0) > 0) {
+      return new Decimal(amount)
+        .plus(depositData?.depositFee)
+        .plus(newUserOnNearChain ? newUserNbtcReserveAmount : "0");
+    }
+    return "0";
+  }, [amount, depositData?.depositFee, isBtcChainSupply, newUserOnNearChain]);
   const {
     depositFee,
     depositGasFee,
@@ -268,11 +296,17 @@ const Modal = () => {
       delete alerts.btcWithdrawErrorMsg;
     }
   }
-  // deposit oneClick min
+  // deposit oneClick min TODOXXX
   if (isBtcChainSupply && nbtcTab == "btc") {
-    if (new Decimal(amount || 0).gt(0) && new Decimal(amount).lt(depositMinDepositAmount || 0)) {
+    if (
+      new Decimal(oneDepositBridgeAmount || 0).gt(0) &&
+      new Decimal(oneDepositBridgeAmount).lt(depositMinDepositAmount || 0)
+    ) {
       alerts["btcDepositMinLimit"] = {
-        title: `You must deposit at least ${depositMinDepositAmount} NBTC`,
+        title: `You must deposit at least ${new Decimal(depositMinDepositAmount)
+          .minus(depositData?.depositFee || 0)
+          .minus(newUserOnNearChain ? newUserNbtcReserveAmount : "0")
+          .toFixed()} NBTC`,
         severity: "error",
       };
     } else {
@@ -376,13 +410,14 @@ const Modal = () => {
             {isBtcSupply || isBtcWithdraw ? (
               <BtcOneClickTab nbtcTab={nbtcTab} setNbtcTab={setNbtcTab} isMeme={isMeme} />
             ) : null}
+            {/* TODOXXX */}
             <Controls
               amount={amount}
-              available={isBtcChainSupply ? btcAvailableBalance : available}
+              available={isBtcChainSupply ? btcCanSupplyAvailableBalance : available}
               action={action}
               asset={asset}
-              totalAvailable={isBtcChainSupply ? btcAvailableBalance : available}
-              available$={isBtcChainSupply ? btcAvailableBalance$ : available$}
+              totalAvailable={isBtcChainSupply ? btcCanSupplyAvailableBalance : available}
+              available$={isBtcChainSupply ? btcCanSupplyAvailableBalance$ : available$}
             />
             <div className="flex flex-col gap-4 mt-6">
               {isBtcChainWithdraw ? (
@@ -404,28 +439,17 @@ const Modal = () => {
                 </>
               ) : null}
               {isBtcChainSupply ? (
-                <>
-                  <Receive
-                    value={
-                      beautifyNumber({
-                        num: depositReceiveAmount,
-                        maxDecimal: 8,
-                      }) as string
-                    }
-                    loading={cacuDepositLoading}
-                  />
-                  <FeeContainer
-                    loading={cacuDepositLoading}
-                    bridgeProtocolFee={depositFee}
-                    isDeposit={true}
-                    storage={{
-                      contractId: isMeme
-                        ? process.env.NEXT_PUBLIC_MEMECONTRACT_NAME
-                        : process.env.NEXT_PUBLIC_CONTRACT_NAME,
-                      amount: "0.1",
-                    }}
-                  />
-                </>
+                <FeeContainer
+                  loading={Number(amount || 0) > 0 ? cacuDepositLoading : false}
+                  bridgeProtocolFee={Number(amount || 0) > 0 ? depositFee : 0}
+                  isDeposit={true}
+                  storage={{
+                    contractId: isMeme
+                      ? process.env.NEXT_PUBLIC_MEMECONTRACT_NAME
+                      : process.env.NEXT_PUBLIC_CONTRACT_NAME,
+                    amount: "0.1",
+                  }}
+                />
               ) : null}
               {!isBtcChainWithdraw && !isBtcChainSupply && isBtcWallet ? (
                 <FeeContainer
@@ -453,13 +477,14 @@ const Modal = () => {
               )}
             </div>
             <Alerts data={alerts} />
+            {/* TODOXXX */}
             <Action
               maxBorrowAmount={maxBorrowAmount}
               maxWithdrawAmount={maxWithdrawAmount}
               healthFactor={healthFactor}
               collateralType={selectedCollateralType}
               poolAsset={assets[tokenId]}
-              oneClickActionDepositAmount={depositReceiveAmount}
+              oneClickActionDepositAmount={oneDepositBridgeAmount}
               isDisabled={actionButtonDisabled}
               isOneClickAction={isOneClickAction}
             />

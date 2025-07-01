@@ -43,9 +43,7 @@ const BalanceReminder = () => {
       combinedAccountSupplied.some((token) => {
         const assetDetails =
           token.type === "main" ? getAssetById(token.token_id) : getAssetByIdMEME(token.token_id);
-        return (
-          assetDetails && token.balance.toString().length >= assetDetails.config.extra_decimals
-        );
+        return assetDetails && token.balance.toString().length > assetDetails.config.extra_decimals;
       });
     const userWithdrawableUsd = combinedAccountSupplied?.reduce((acc, cur) => {
       const asset = allAssets[cur.token_id];

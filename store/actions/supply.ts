@@ -15,7 +15,7 @@ export async function supply({
   isMax,
   isMeme,
   isOneClickAction,
-  receiveAmount,
+  bridgeAmount,
 }: {
   tokenId: string;
   extraDecimals: number;
@@ -24,29 +24,25 @@ export async function supply({
   isMax: boolean;
   isMeme: boolean;
   isOneClickAction: boolean;
-  receiveAmount: string;
+  bridgeAmount: string;
 }): Promise<any> {
   const { account, logicContract, logicMEMEContract, hideModal, fetchData } = await getBurrow();
   const { decimals } = (await getMetadata(tokenId))!;
   const tokenContract = await getTokenContract(tokenId);
   const burrowContractId = isMeme ? logicMEMEContract.contractId : logicContract.contractId;
   let expandedAmount;
-  let expandedReceiveAmount;
-  let collateralAmount;
+  let expandedBridgeAmount;
   if (tokenId === NBTCTokenId) {
     expandedAmount = expandTokenDecimal(amount, decimals);
-    expandedReceiveAmount = expandTokenDecimal(receiveAmount, decimals);
+    expandedBridgeAmount = expandTokenDecimal(bridgeAmount, decimals);
   } else {
     const tokenBalance = new Decimal(await getBalance(tokenId, account.accountId));
     expandedAmount = isMax
       ? tokenBalance
       : decimalMin(expandTokenDecimal(amount, decimals), tokenBalance);
   }
-  if (isOneClickAction) {
-    collateralAmount = expandTokenDecimal(expandedReceiveAmount, extraDecimals);
-  } else {
-    collateralAmount = expandTokenDecimal(expandedAmount, extraDecimals);
-  }
+  const collateralAmount = expandTokenDecimal(expandedAmount, extraDecimals);
+
   const collateralActions = {
     actions: [
       {
@@ -62,10 +58,10 @@ export async function supply({
       const txHash = await executeBTCDepositAndAction({
         action: {
           receiver_id: burrowContractId,
-          amount: expandedReceiveAmount.toFixed(0, Decimal.ROUND_DOWN),
+          amount: expandedAmount.toFixed(0, Decimal.ROUND_DOWN),
           msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
         },
-        amount: expandedAmount.toFixed(0, Decimal.ROUND_DOWN),
+        amount: expandedBridgeAmount.toFixed(0, Decimal.ROUND_DOWN),
         env: NBTC_ENV,
         registerDeposit: "100000000000000000000000",
         pollResult: false,
