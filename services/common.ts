@@ -1,6 +1,7 @@
 import getConfig from "../utils/config";
+import { getAuthenticationHeaders } from "../utils/signature";
 
-const { BURROW_API_URL } = getConfig();
+const { BURROW_API_URL, indexUrl } = getConfig();
 
 export async function get_storage_balance_of({
   contractId,
@@ -21,3 +22,16 @@ export async function get_storage_balance_of({
   }).then((res) => res.json());
   return result?.data;
 }
+
+export const addUserWallet = async (params: any) => {
+  const result = await fetch(indexUrl + "/add-user-wallet", {
+    method: "POST",
+    headers: {
+      Authentication: getAuthenticationHeaders(`/add-user-wallet`),
+    },
+    body: JSON.stringify(params),
+  }).catch(async (res) => {
+    return res;
+  });
+  return result;
+};
