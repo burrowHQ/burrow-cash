@@ -111,7 +111,7 @@ export default function Action({
             extraDecimals,
             useAsCollateral,
             amount,
-            receiveAmount: isOneClickAction ? oneClickActionDepositAmount : 0,
+            bridgeAmount: isOneClickAction ? oneClickActionDepositAmount : 0,
             isMax,
             isMeme,
             isOneClickAction,
