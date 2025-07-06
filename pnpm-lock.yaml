@@ -169,8 +169,8 @@ importers:
         specifier: ^0.7.0
         version: 0.7.0
       btc-wallet:
-        specifier: 0.5.78-beta
-        version: 0.5.78-beta(@types/react@17.0.2)(bufferutil@4.0.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.22.4)
+        specifier: 0.5.79-beta
+        version: 0.5.79-beta(@types/react@17.0.2)(bufferutil@4.0.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.22.4)
       crypto-browserify:
         specifier: 3.12.0
         version: 3.12.0
@@ -4088,8 +4088,8 @@ packages:
   bser@2.1.1:
     resolution: {integrity: sha512-gQxTNE/GAfIIrmHLUE3oJyp5FO6HRBfhjnw4/wMmA63ZGDJnWBmgY/lyQBpnDUkGmAhbSe39tx2d/iTOAfglwQ==}
 
-  btc-wallet@0.5.78-beta:
-    resolution: {integrity: sha512-b/077ojxW9o6oiIg4MaEgOf+URz0c3jnEJjX6WgvsrF3Gam5x1kKYU3JnQDmvgu3lPnGlo5n70z8S7mLLYBivg==}
+  btc-wallet@0.5.79-beta:
+    resolution: {integrity: sha512-GRLhCmNfc1XljWmrkT+I6gJMiXtDK+HhGUhkqrwWDJIB2nUK/mzV29473/ntbj+4vfM5zHdS9d1SULk3uzsnHw==}
     peerDependencies:
       react: '>=17.0.0'
       react-dom: '>=17.0.0'
@@ -15532,7 +15532,7 @@ snapshots:
     dependencies:
       node-int64: 0.4.0
 
-  btc-wallet@0.5.78-beta(@types/react@17.0.2)(bufferutil@4.0.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.22.4):
+  btc-wallet@0.5.79-beta(@types/react@17.0.2)(bufferutil@4.0.9)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.22.4):
     dependencies:
       '@bitcoinerlab/secp256k1': 1.2.0
       '@ethereumjs/util': 9.1.0
