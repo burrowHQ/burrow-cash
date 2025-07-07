@@ -16,11 +16,6 @@ import { GuideProvider } from "../components/BeginnerGuide/GuideContext";
 const ModalGAPrivacy = dynamic(() => import("../components/modalGAPrivacy/modalGAPrivacy"), {
   ssr: false,
 });
-
-const AdBanner = dynamic(() => import("../components/AdBanner"), {
-  ssr: false,
-});
-
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ErrorBoundary fallback={FallbackError}>
@@ -36,7 +31,6 @@ export default function MyApp({ Component, pageProps }: AppProps) {
               </Head>
               <Upgrade Component={Component} pageProps={pageProps} />
               <ModalGAPrivacy />
-              <AdBanner />
             </GuideProvider>
           </PersistGate>
         </Provider>
