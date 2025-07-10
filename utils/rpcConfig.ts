@@ -27,10 +27,10 @@ export function getExtendConfig(
             url: "https://free.rpc.fastnear.com",
             simpleName: "fastnear rpc",
           },
-          lavaRpc: {
-            url: "https://near.lava.build",
-            simpleName: "lava rpc",
-          },
+          // lavaRpc: {
+          //   url: "https://near.lava.build",
+          //   simpleName: "lava rpc",
+          // },
           // freeRpc: {
           //   url: "https://rpc.mainnet.fastnear.com?apiKey=d17d0e02e6ed9582b1c9d100bda7038e2dac7945099804fadafc430884f6b54a",
           //   simpleName: "fastnear rpc",
