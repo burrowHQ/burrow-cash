@@ -4,7 +4,7 @@ import type { UIAsset } from "../../interfaces";
 import { formatWithCommas_number, toDecimal } from "../../utils/uiNumber";
 import { expandToken, shrinkToken } from "../../store/helper";
 import { decimalMax } from "../../utils";
-import { NBTCTokenId } from "../../utils/config";
+import { ETH_OLD_CONTRACT_ID, NBTCTokenId } from "../../utils/config";
 
 interface Alert {
   [key: string]: {
@@ -50,6 +50,7 @@ export const getModalData = (asset): UIAsset & Props & { disabled: boolean } => 
     healthFactor,
     amount,
     maxWithdrawAmount,
+    maxWithdrawAmount_ETH,
     isRepayFromDeposits,
     canUseAsCollateral,
     tokenId,
@@ -127,7 +128,6 @@ export const getModalData = (asset): UIAsset & Props & { disabled: boolean } => 
       data.rates = [];
       break;
     case "Repay": {
-      // TODO available
       let minRepay = "0";
       if (poolAsset?.supplied?.shares) {
         minRepay = shrinkToken(
@@ -154,7 +154,10 @@ export const getModalData = (asset): UIAsset & Props & { disabled: boolean } => 
       data.totalTitle = `Repay Borrow Amount`;
       data.available = toDecimal(
         isRepayFromDeposits
-          ? Math.min(maxWithdrawAmount, repayAmount)
+          ? Math.min(
+              tokenId == ETH_OLD_CONTRACT_ID ? maxWithdrawAmount_ETH : maxWithdrawAmount,
+              repayAmount,
+            )
           : Math.min(
               isWrappedNear
                 ? Number(Math.max(0, available + availableNEAR - NEAR_STORAGE_DEPOSIT))

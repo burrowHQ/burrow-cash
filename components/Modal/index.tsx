@@ -53,7 +53,14 @@ import {
 import { useBtcAction, useCalculateWithdraw, useCalculateDeposit } from "../../hooks/useBtcBalance";
 import { beautifyNumber } from "../../utils/beautyNumber";
 import { useUserBalance } from "../../hooks/useUserBalance";
-import { DEFAULT_POSITION, lpTokenPrefix, NBTCTokenId, WNEARTokenId } from "../../utils/config";
+import {
+  DEFAULT_POSITION,
+  lpTokenPrefix,
+  NBTCTokenId,
+  WNEARTokenId,
+  ETH_CONTRACT_ID,
+  ETH_OLD_CONTRACT_ID,
+} from "../../utils/config";
 
 export const ModalContext = createContext(null) as any;
 const Modal = () => {
@@ -116,6 +123,7 @@ const Modal = () => {
   );
   const maxBorrowAmountPositions = useAppSelector(getBorrowMaxAmount(tokenId));
   const maxWithdrawAmount = useAppSelector(getWithdrawMaxAmount(tokenId));
+  const maxWithdrawAmount_ETH = useAppSelector(getWithdrawMaxAmount(ETH_CONTRACT_ID));
   const repayPositions = useAppSelector(getRepayPositions(tokenId));
   const activePosition =
     action === "Repay" || action === "Borrow"
@@ -130,6 +138,7 @@ const Modal = () => {
     ...asset,
     maxBorrowAmount,
     maxWithdrawAmount,
+    maxWithdrawAmount_ETH,
     isRepayFromDeposits,
     healthFactor,
     amount,

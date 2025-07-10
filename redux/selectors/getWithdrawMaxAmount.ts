@@ -6,7 +6,12 @@ import { shrinkToken, expandTokenDecimal, MAX_RATIO } from "../../store";
 import { decimalMax, decimalMin } from "../../utils";
 import { Assets } from "../assetState";
 import { Portfolio } from "../accountState";
-import { DEFAULT_POSITION, lpTokenPrefix } from "../../utils/config";
+import {
+  DEFAULT_POSITION,
+  lpTokenPrefix,
+  ETH_OLD_CONTRACT_ID,
+  ETH_CONTRACT_ID,
+} from "../../utils/config";
 
 const sumReducerDecimal = (sum: Decimal, cur: Decimal) => sum.add(cur);
 
@@ -145,7 +150,7 @@ export const getWithdrawMaxAmount = (tokenId: string) =>
         app = appMain;
       }
       const asset = assets[tokenId];
-      if (!asset || app.selected.tokenId !== tokenId) return 0;
+      if (!asset || (app.selected.tokenId !== tokenId && tokenId !== ETH_CONTRACT_ID)) return 0;
       if (!["Withdraw", "Adjust", "Repay"].includes(app.selected.action as string)) return 0;
 
       const { metadata, config } = asset;
