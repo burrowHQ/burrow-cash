@@ -24,6 +24,10 @@ export function getExtendConfig(
       return {
         RPC_LIST: {
           defaultRpc: {
+            url: "https://nearinner.deltarpc.com",
+            simpleName: "delta rpc",
+          },
+          fastNear: {
             url: "https://free.rpc.fastnear.com",
             simpleName: "fastnear rpc",
           },
