@@ -300,7 +300,7 @@ function AccountDetail({ onClose }: { onClose?: () => void }) {
   } = useContext(WalletContext) as any;
   useEffect(() => {
     if (accountId) {
-      checkNewAccount(accountId).then((res) => {
+      checkNewAccount({ csna: accountId }).then((res) => {
         setIsNewCsnaAccount(res);
       });
     }
