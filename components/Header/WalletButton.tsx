@@ -1,8 +1,9 @@
-import { useState, useRef, createContext, useContext } from "react";
+import { useState, useRef, createContext, useContext, useEffect } from "react";
 import { Button, Box, useTheme, Modal as MUIModal } from "@mui/material";
 import type { WalletSelector } from "@near-wallet-selector/core";
 import { BeatLoader } from "react-spinners";
 import { useDebounce } from "react-use";
+import { checkNewAccount } from "btc-wallet";
 import { fetchAssets, fetchRefPrices } from "../../redux/assetsSlice";
 import { fetchAssetsMEME } from "../../redux/assetsSliceMEME";
 import { logoutAccount, fetchAccount, setAccountId } from "../../redux/accountSlice";
@@ -287,6 +288,7 @@ function Account() {
 }
 
 function AccountDetail({ onClose }: { onClose?: () => void }) {
+  const [isNewCsnaAccount, setIsNewCsnaAccount] = useState<boolean>(true);
   const {
     balance,
     accountId,
@@ -296,6 +298,13 @@ function AccountDetail({ onClose }: { onClose?: () => void }) {
     rewards,
     currentWallet,
   } = useContext(WalletContext) as any;
+  useEffect(() => {
+    if (accountId) {
+      checkNewAccount(accountId).then((res) => {
+        setIsNewCsnaAccount(res);
+      });
+    }
+  }, [accountId]);
   const changeWalletDisable = currentWallet?.id === "keypom";
   return (
     <div className="border border-dark-50 bg-dark-110 lg:rounded-md p-4 xsm:rounded-b-xl xsm:p-6">
@@ -309,7 +318,11 @@ function AccountDetail({ onClose }: { onClose?: () => void }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <span className=" text-white text-lg">{accountTrim(accountId)}</span>
-          <CopyToClipboardComponent text={accountId} className="ml-2" />
+          <CopyToClipboardComponent
+            text={accountId}
+            className="ml-2"
+            disabled={!!isNewCsnaAccount}
+          />
         </div>
         {isMobile && (
           <div className="flex items-center">
