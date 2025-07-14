@@ -1,6 +1,11 @@
 import { Html, Head, Main, NextScript } from "next/document";
 
 export default function Document() {
+  const SITE_META = {
+    title: "RHEA Finance",
+    image: "https://img.rhea.finance/images/rhea-twitter-share2.jpg",
+    url: "http://lending.rhea.finance",
+  };
   return (
     <Html lang="en">
       <Head>
@@ -17,8 +22,20 @@ export default function Document() {
           name="keywords"
           content="NEAR DEX,DEX on NEAR,Top dex on NEAR, DEX, Lending, Borrow, Margin Trading"
         />
+        <meta property="twitter:title" content={SITE_META.title} key="twitter-title" />
+        <meta property="twitter:site" content={SITE_META.title} key="twitter-site" />
+        <meta property="twitter:image" content={SITE_META.image} key="twitter-image" />
+        <meta property="twitter:image:src" content={SITE_META.image} key="twitter-image-src" />
+        <meta property="twitter:card" content="summary_large_image" />
+
+        <meta property="og:url" content={SITE_META.url} />
+        <meta property="og:title" content={SITE_META.title} />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content={SITE_META.title} />
+        <meta property="og:image" content={SITE_META.image} key="og-image" />
         <link rel="icon" href="/favicon.png" />
         <link rel="apple-touch-icon" href="/favicon.png" />
+        <link rel="manifest" href="/manifest" />
       </Head>
       <body id="root">
         <Main />

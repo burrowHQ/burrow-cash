@@ -3,7 +3,15 @@ import CopyToClipboard from "react-copy-to-clipboard";
 import { twMerge } from "tailwind-merge";
 import { CopyIcon } from "./svg";
 
-function CopyToClipboardComponent({ text, className }: { text: string; className?: string }) {
+function CopyToClipboardComponent({
+  text,
+  className,
+  disabled,
+}: {
+  text: string;
+  disabled: boolean;
+  className?: string;
+}) {
   const [showTip, setShowTip] = useState<boolean>(false);
   const [copyButtonDisabled, setCopyButtonDisabled] = useState<boolean>(false);
   function showToast() {
@@ -14,6 +22,17 @@ function CopyToClipboardComponent({ text, className }: { text: string; className
       setShowTip(false);
       setCopyButtonDisabled(false);
     }, 1000);
+  }
+  if (disabled) {
+    return (
+      <div className={twMerge("relative flex items-center justify-center top-px", className)}>
+        <CopyToClipboard text={text}>
+          <div className=" cursor-not-allowed">
+            <CopyIcon className="text-gray-300 text-opacity-50" />
+          </div>
+        </CopyToClipboard>
+      </div>
+    );
   }
   return (
     <div className={twMerge("relative flex items-center justify-center top-px", className)}>

@@ -2,10 +2,10 @@ import Decimal from "decimal.js";
 import { updateAmount } from "../../redux/appSlice";
 import { updateAmount as updateAmountMEME } from "../../redux/appSliceMEME";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { formatWithCommas_number } from "../../utils/uiNumber";
 import RangeSlider from "./RangeSlider";
 import TokenBox from "./TokenBox";
 import { isMemeCategory } from "../../redux/categorySelectors";
+import { beautifyPrice, beautifyNumber } from "../../utils/beautyNumber";
 
 export default function Controls({ amount, available, action, asset, totalAvailable, available$ }) {
   const dispatch = useAppDispatch();
@@ -26,12 +26,10 @@ export default function Controls({ amount, available, action, asset, totalAvaila
   const handleSliderChange = (percent) => {
     const p = percent < 1 ? 0 : percent > 99 ? 100 : percent;
     const value = new Decimal(available).mul(p).div(100).toFixed();
-    const decimalLength = value?.split(".")?.[1]?.length || 0;
     if (isMeme) {
       dispatch(
         updateAmountMEME({
           isMax: p === 100,
-          // amount: new Decimal(value || 0).toFixed(Math.min(decimalLength, asset.decimals)),
           amount: new Decimal(value || 0).toFixed(),
         }),
       );
@@ -39,15 +37,13 @@ export default function Controls({ amount, available, action, asset, totalAvaila
       dispatch(
         updateAmount({
           isMax: p === 100,
-          // amount: new Decimal(value || 0).toFixed(Math.min(decimalLength, asset.decimals)),
           amount: new Decimal(value || 0).toFixed(),
         }),
       );
     }
   };
 
-  const sliderValue = Math.round((amount * 100) / available) || 0;
-
+  const sliderValue = +available == 0 ? 0 : Math.round((amount * 100) / available) || 0;
   const inputAmount = `${amount}`
     .replace(/[^0-9.-]/g, "")
     .replace(/(\..*)\./g, "$1")
@@ -56,10 +52,13 @@ export default function Controls({ amount, available, action, asset, totalAvaila
   return (
     <div>
       {/* balance field */}
-      <div className="flex items-center justify-between text-sm text-gray-300 mb-3 px-1">
+      <div
+        className="flex items-center justify-between text-sm text-gray-300 mb-3 px-1"
+        data-tour="modal-available"
+      >
         <span className="text-sm text-gray-300">Available</span>
         <span className="flex items-center text-sm text-white">
-          {formatWithCommas_number(totalAvailable)}
+          {beautifyPrice(totalAvailable || 0)}
           <span className="text-xs text-gray-300 ml-2">({available$})</span>
         </span>
       </div>

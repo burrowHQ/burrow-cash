@@ -10,12 +10,13 @@ import { fetchAccount, logoutAccount } from "../../redux/accountSlice";
 import { logoutAccount as logoutAccountMEME } from "../../redux/accountSliceMEME";
 import RpcList from "../Rpc";
 import { Layout, Modal } from "..";
-import Popup from "../popup";
 import { ToastMessage } from "../ToastMessage";
 import BalanceReminder from "../BalanceReminder";
 import PubTestModal from "../PubTestModal";
+import OneClickBtcResultModal from "../Modal/oneClickBtcResultModal";
 import Init from "../appInit";
 import { RefreshIcon } from "../Header/svg";
+import { addUserWallet } from "../../services/common";
 
 export default function Upgrade({ Component, pageProps }) {
   const [upgrading, setUpgrading] = useState<boolean>(true);
@@ -44,6 +45,20 @@ export default function Upgrade({ Component, pageProps }) {
     JSON.stringify(config || {}),
     JSON.stringify(configMEME || {}),
   ]);
+  const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
+  useEffect(() => {
+    if (accountId && selectedWalletId) {
+      const selectedWalletId = window.selector?.store?.getState()?.selectedWalletId;
+      const walletType =
+        selectedWalletId == "btc-wallet"
+          ? JSON.parse(localStorage.getItem("SATOSHI_WALLET_DEFAULT:current-connector-id") || "")
+          : selectedWalletId;
+      addUserWallet({
+        account_id: accountId,
+        wallet_address: walletType,
+      });
+    }
+  }, [accountId, selectedWalletId]);
   async function fetch() {
     localStorage.removeItem("persist:root");
     await dispatch(fetchAssets()).then(() => dispatch(fetchRefPrices()));
@@ -78,6 +93,7 @@ export default function Upgrade({ Component, pageProps }) {
           <BalanceReminder />
           <RpcList />
           <PubTestModal />
+          <OneClickBtcResultModal />
         </Layout>
       )}
     </div>

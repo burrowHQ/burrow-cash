@@ -270,3 +270,12 @@ export const getOpenPositionLoading = createSelector(
   (state: RootState) => state.app,
   (app) => app.openPositionLoading,
 );
+
+export const getOneClickBtcModalOpen = createSelector(
+  (state: RootState) => state.app,
+  (app) => app.showOneClickBtcModal,
+);
+export const getOneClickBtcResultStatus = createSelector(
+  (state: RootState) => state.app,
+  (app) => app.oneClickBtcStatus,
+);

@@ -91,6 +91,8 @@ export enum ChangeMethodsREFV1 {
 }
 export enum ViewMethodsPyth {
   get_price,
+  list_prices_no_older_than,
+  list_prices,
 }
 
 export enum ChangeMethodsPyth {}

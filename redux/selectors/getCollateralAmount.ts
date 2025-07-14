@@ -33,7 +33,6 @@ export const getCollateralAmount = (tokenId: string, memeCategory?: boolean) =>
 
       if (!hasAssets(assets)) return "0";
       try {
-        // TODO33
         const { metadata, config } = assets.data[tokenId];
         const position = tokenId.indexOf(lpTokenPrefix) > -1 ? tokenId : DEFAULT_POSITION;
         const collateral = account.portfolio.positions[position]?.collateral?.[tokenId];

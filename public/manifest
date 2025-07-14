@@ -1,0 +1,11 @@
+{
+  "background_color": "#00F7A5",
+  "display": "fullscreen",
+  "icons": [
+    { "sizes": "192x192", "src": "/rhea.png", "type": "image/png" },
+    { "sizes": "512x512", "src": "/rhea.png", "type": "image/png" }
+  ],
+  "name": "RHEA Lending",
+  "short_name": "RHEA Lending",
+  "theme_color": "#00F7A5"
+}

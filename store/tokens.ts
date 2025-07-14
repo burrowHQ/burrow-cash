@@ -33,6 +33,7 @@ import {
 
 import { ETH_CONTRACT_ID, ETH_OLD_CONTRACT_ID } from "../utils/config";
 import { store } from "../redux/store";
+import { get_all_tokens_metadata } from "../api/get-token";
 
 Decimal.set({ precision: DEFAULT_PRECISION });
 
@@ -90,14 +91,14 @@ export const getBalance = async (
 
 export const getAllMetadata = async (token_ids: string[]): Promise<IMetadata[]> => {
   try {
+    const tokensMap = await get_all_tokens_metadata();
+    const metadata: IMetadata[] = token_ids.map((token_id) => tokensMap[token_id]);
+    return metadata;
+  } catch (err) {
     const metadata: IMetadata[] = (
       await Promise.all(token_ids.map((token_id) => getMetadata(token_id)))
     ).filter((m): m is IMetadata => !!m);
-
     return metadata;
-  } catch (err) {
-    console.error(err);
-    throw new Error("getAllMetadata");
   }
 };
 

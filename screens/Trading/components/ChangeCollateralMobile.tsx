@@ -22,6 +22,7 @@ import { beautifyPrice } from "../../../utils/beautyNumber";
 import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
 import { useLiqPrice } from "../../../hooks/useLiqPrice";
 import { IPositionType } from "../../../interfaces/margin";
+import { FeeContainer } from "../../../components/Modal/components";
 
 export const ModalContext = createContext(null) as any;
 const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose, rowData }) => {
@@ -567,6 +568,12 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                       )}
                     </div>
                   </div>
+                  <FeeContainer
+                    loading={false}
+                    transactionsGasOnNear={new Decimal(amount || 0).gt(0) ? 450 : 0}
+                    transactionsNumOnNear={new Decimal(amount || 0).gt(0) ? 3 : 0}
+                    className="my-3"
+                  />
                   <div
                     className={`flex items-center bg-primary justify-between text-dark-200 text-base rounded-md h-12 text-center  ${
                       Number(inputValue) === 0 || Number.isNaN(inputValue) || isAddCollateralLoading
@@ -708,6 +715,12 @@ const ChangeCollateralMobile: FC<ChangeCollateralMobileProps> = ({ open, onClose
                       )}
                     </div>
                   </div>
+                  <FeeContainer
+                    loading={false}
+                    transactionsGasOnNear={new Decimal(amount || 0).gt(0) ? 650 : 0}
+                    transactionsNumOnNear={new Decimal(amount || 0).gt(0) ? 3 : 0}
+                    className="my-3"
+                  />
                   <div
                     className={`flex items-center bg-orange justify-between text-dark-200 text-base rounded-md h-12 text-center  ${
                       Number(inputValue) === 0 ||

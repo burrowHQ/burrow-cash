@@ -1,4 +1,3 @@
-import Decimal from "decimal.js";
 import * as math from "mathjs";
 
 export function formatWithCommas(value: string): string {

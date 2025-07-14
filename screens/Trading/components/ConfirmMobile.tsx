@@ -24,6 +24,7 @@ import { useRegisterTokenType } from "../../../hooks/useRegisterTokenType";
 import { getAccountCategory } from "../../../redux/accountSelectors";
 import { setRefreshNumber, setOpenPositionLoading } from "../../../redux/appSlice";
 import { getAppRefreshNumber } from "../../../redux/appSelectors";
+import { FeeContainer } from "../../../components/Modal/components";
 
 export const ModalContext = createContext(null) as any;
 const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
@@ -304,7 +305,18 @@ const ConfirmMobile: React.FC<IConfirmMobileProps | any> = ({
               <div className="text-gray-300">Liq. Price</div>
               <div>{beautifyPrice(confirmInfo.LiqPrice)}</div>
             </div>
-
+            <FeeContainer
+              loading={false}
+              transactionsGasOnNear={550}
+              transactionsNumOnNear={4}
+              className="my-3"
+              storage={{
+                contractId: isMemeStream
+                  ? process.env.NEXT_PUBLIC_MEMECONTRACT_NAME
+                  : process.env.NEXT_PUBLIC_CONTRACT_NAME,
+                amount: "0.1",
+              }}
+            />
             {isMinTokenPAmount && (
               <div className=" text-[#EA3F68] text-sm font-normal flex items-start mb-1">
                 <MaxPositionIcon />

@@ -5,11 +5,9 @@ import { setupHereWallet } from "@near-wallet-selector/here-wallet";
 import { setupNightly } from "@near-wallet-selector/nightly";
 import { setupMyNearWallet } from "@near-wallet-selector/my-near-wallet";
 import { setupMeteorWallet } from "@near-wallet-selector/meteor-wallet";
-import { setupWalletConnect } from "@near-wallet-selector/wallet-connect";
+import { setupWalletConnect } from "rhea-wallet-connect";
 import { setupNearMobileWallet } from "@near-wallet-selector/near-mobile-wallet";
-import { setupModal } from "ref-modal-ui";
 import { setupLedger } from "@near-wallet-selector/ledger";
-import { setupMintbaseWallet } from "@near-wallet-selector/mintbase-wallet";
 import { setupBitteWallet } from "@near-wallet-selector/bitte-wallet";
 import { setupCoin98Wallet } from "@near-wallet-selector/coin98-wallet";
 import type { WalletSelectorModal } from "ref-modal-ui";
@@ -22,7 +20,8 @@ import { setupKeypom } from "@keypom/selector";
 import { setupOKXWallet } from "@near-wallet-selector/okx-wallet";
 import { setupHotWallet } from "@near-wallet-selector/hot-wallet";
 import { setupMeteorWalletApp } from "@near-wallet-selector/meteor-wallet-app";
-import { setupBTCWallet } from "btc-wallet";
+import { setupBTCWallet, setupWalletSelectorModal } from "btc-wallet";
+import { setupIntearWallet } from "@near-wallet-selector/intear-wallet";
 // @ts-nocheck
 import type { Config } from "@wagmi/core";
 // @ts-nocheck
@@ -34,7 +33,7 @@ import { setupEthereumWallets } from "@near-wallet-selector/ethereum-wallets";
 // @ts-nocheck
 import { createWeb3Modal } from "@web3modal/wagmi";
 // @ts-nocheck
-import { getRpcList } from "../components/Rpc/tool";
+import { getRpcList, getSelectedRpc } from "../components/Rpc/tool";
 
 import getConfig, {
   defaultNetwork,
@@ -110,11 +109,17 @@ const web3Modal = createWeb3Modal({
   wagmiConfig,
   projectId: WALLET_CONNECT_ID,
   allowUnsupportedChain: true,
+  featuredWalletIds: [
+    "971e689d0a5be527bac79629b4ee9b925e82208e5168b733496a09c0faed0709",
+    "15c8b91ade1a4e58f3ce4e7a0dd7f42b47db0c8df7e0d84f63eb39bcb96c4e0f",
+    "a797aa35c0fadbfc1a53e7f675162ed5226968b44a19ee3d24385c64d1d3c393",
+    "c57ca95b47569778a828d19178114f4db188b89b763c899ba0be274e97267d96",
+  ],
 });
 const walletConnect2 = setupWalletConnect({
   projectId: WALLET_CONNECT_ID,
   metadata: {
-    name: "REHA Finance",
+    name: "RHEA Finance",
     description: "RHEA with NEAR Wallet Selector",
     url: "https://github.com/near/wallet-selector",
     icons: ["https://avatars.githubusercontent.com/u/37784886"],
@@ -144,17 +149,12 @@ const KEYPOM_OPTIONS = {
 export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorArgs) => {
   if (init) return selector;
   init = true;
-  const RPC_LIST = getRpcList();
-  let endPoint = "defaultRpc";
-  try {
-    endPoint = window.localStorage.getItem("endPoint") || endPoint;
-    if (!RPC_LIST[endPoint]) {
-      endPoint = "defaultRpc";
-      localStorage.removeItem("endPoint");
-    }
-  } catch (error) {}
+  const { selectedRpc, rpcListSorted } = getSelectedRpc();
   selector = await setupWalletSelector({
     modules: [
+      setupHotWallet(),
+      setupHereWallet(),
+      setupOKXWallet({}),
       setupMeteorWallet(),
       setupEthereumWallets({
         wagmiConfig,
@@ -166,7 +166,6 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         env: NBTC_ENV,
       }) as any,
       myNearWallet,
-      setupOKXWallet({}),
       setupSender() as any,
       walletConnect2,
       setupNearMobileWallet({
@@ -175,7 +174,6 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
           name: "NEAR Wallet Selector",
         },
       }),
-      setupHereWallet(),
       setupNightly(),
       setupKeypom({
         networkId: defaultNetwork,
@@ -189,26 +187,22 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
         },
       }),
       setupLedger(),
-      setupMintbaseWallet({
-        walletUrl: "https://wallet.mintbase.xyz",
-        contractId: LOGIC_CONTRACT_NAME,
-        deprecated: false,
-      }),
       setupBitteWallet({
         walletUrl: "https://wallet.bitte.ai",
         contractId: LOGIC_CONTRACT_NAME,
         deprecated: false,
       }),
       setupCoin98Wallet(),
-      setupHotWallet(),
       setupMeteorWalletApp({
         contractId: LOGIC_CONTRACT_NAME,
       }),
+      setupIntearWallet(),
     ],
     network: {
       networkId: defaultNetwork,
-      nodeUrl: RPC_LIST[endPoint].url,
+      nodeUrl: selectedRpc,
     } as Network,
+    fallbackRpcUrls: rpcListSorted,
     debug: !!isTestnet,
     optimizeWalletOrder: false,
   });
@@ -228,13 +222,12 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
       }
     });
 
-  const modal = setupModal(selector as any, {
+  const modal = setupWalletSelectorModal(selector as any, {
     contractId: LOGIC_CONTRACT_NAME,
     blockFunctionKeyWallets: [
       "okx-wallet",
       "my-near-wallet",
       "meteor-wallet",
-      "neth",
       "nightly",
       "ledger",
       "keypom",
@@ -244,6 +237,10 @@ export const getWalletSelector = async ({ onAccountChange }: GetWalletSelectorAr
       "sender",
       "coin98-wallet",
     ],
+    initialPosition: {
+      right: "30px",
+      bottom: "40px",
+    },
   });
   window.modal = modal;
   window.selectorSubscription = subscription;

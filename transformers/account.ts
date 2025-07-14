@@ -64,7 +64,7 @@ export const transformPortfolio = (account) => {
 export const transformAccount = (account) => {
   if (!account) return undefined;
 
-  const { accountId, accountBalance, tokenIds } = account;
+  const { accountId, accountBalance, totalAccountBalance, tokenIds } = account;
 
   return {
     accountId,
@@ -73,6 +73,7 @@ export const transformAccount = (account) => {
         .map((b, i) => ({ [tokenIds[i]]: b }))
         .reduce((a, b) => ({ ...a, ...b }), {}),
       near: accountBalance,
+      totalNear: totalAccountBalance,
     },
     portfolio: transformPortfolio(account),
   };

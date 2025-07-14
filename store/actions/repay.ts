@@ -6,7 +6,7 @@ import { ChangeMethodsNearToken, ChangeMethodsToken } from "../../interfaces";
 import { getTokenContract, getMetadata, prepareAndExecuteTransactions } from "../tokens";
 import getBalance from "../../api/get-balance";
 import { FunctionCallOptions } from "../wallet";
-import { DEFAULT_POSITION } from "../../utils/config";
+import { DEFAULT_POSITION, ETH_CONTRACT_ID, ETH_OLD_CONTRACT_ID } from "../../utils/config";
 import getPortfolio from "../../api/get-portfolio";
 import getPortfolioMEME from "../../api/get-portfolio-meme";
 import { NEAR_STORAGE_DEPOSIT_DECIMAL } from "../constants";
@@ -32,7 +32,9 @@ export async function repay({
 }) {
   // TODO repay from wallet
   const { account, logicContract, logicMEMEContract } = await getBurrow();
-  const tokenContract = await getTokenContract(tokenId);
+  const tokenContract = await getTokenContract(
+    tokenId == ETH_OLD_CONTRACT_ID ? ETH_CONTRACT_ID : tokenId,
+  );
   const { decimals } = (await getMetadata(tokenId))!;
   let detailedAccount;
   let logicContractId;
@@ -55,7 +57,9 @@ export async function repay({
     minRepay,
   );
   // wallet balance
-  const tokenBalance = new Decimal(await getBalance(tokenId, account.accountId));
+  const tokenBalance = new Decimal(
+    await getBalance(tokenId == ETH_OLD_CONTRACT_ID ? ETH_CONTRACT_ID : tokenId, account.accountId),
+  );
   const accountBalance = decimalMax(
     0,
     new Decimal((await account.getAccountBalance()).available).sub(NEAR_STORAGE_DEPOSIT_DECIMAL),

@@ -1,4 +1,6 @@
 import { twMerge } from "tailwind-merge";
+import Decimal from "decimal.js";
+import { isInvalid } from "./uiNumber";
 
 export const beautifyPrice = (
   num: string | number | undefined,
@@ -123,6 +125,87 @@ export const beautifyPrice = (
       {isDollar ? "$" : ""}
       {integerPart}
       {formattedDecimal ? `.${formattedDecimal}` : ""}
+    </span>
+  );
+};
+
+export const beautifyNumber = ({
+  num,
+  isDollar,
+  decimalPlaces = 5,
+  digitsPlaces = 4,
+  maxDecimal,
+}: {
+  num: string | number;
+  isDollar?: boolean;
+  decimalPlaces?: number;
+  digitsPlaces?: number;
+  maxDecimal?: number;
+}) => {
+  if (isInvalid(num)) return "-";
+  if (new Decimal(num || 0).eq(0)) return "0";
+  const numStr = new Decimal(num || 0).toFixed();
+  const [integerPart, decimalPart = ""] = numStr.split(".");
+  if (+integerPart >= 100) {
+    const significantDigits = decimalPart.slice(0, 2).replace(/0+$/, "");
+    return (
+      <span key={num} className="animate-flipIn">
+        {isDollar ? "$" : ""}
+        {`${integerPart}${significantDigits ? `.${significantDigits}` : ""}`}
+      </span>
+    );
+  } else if (+integerPart > 0 && +integerPart < 100) {
+    let totalDigits = `${integerPart}${decimalPart ? `.${decimalPart}` : ""}`.slice(0, 6);
+    if (decimalPart) {
+      totalDigits = totalDigits.replace(/0+$/, "");
+      if (totalDigits.endsWith(".")) {
+        totalDigits = totalDigits.slice(0, -1);
+      }
+    }
+
+    return (
+      <span key={num} className="animate-flipIn">
+        {isDollar ? "$" : ""}
+        {totalDigits}
+      </span>
+    );
+  }
+  // 0.xxxxx
+  const nonZeroIndex = decimalPart.split("").findIndex((n) => +n !== 0);
+  if (nonZeroIndex <= 1) {
+    let significantDigits = decimalPart.replace(/0+$/, "").slice(0, maxDecimal || decimalPlaces);
+    while (significantDigits.endsWith("0")) {
+      significantDigits = significantDigits.slice(0, -1);
+    }
+    significantDigits = significantDigits.replace(/0+$/, "");
+    return (
+      <span key={num} className="animate-flipIn">
+        {isDollar ? "$" : ""}
+        {`${integerPart}${significantDigits ? `.${significantDigits}` : ""}`}
+      </span>
+    );
+  }
+  const nonZeroPart = decimalPart.substring(nonZeroIndex);
+  let digits;
+  if (new Decimal(maxDecimal || 0).gte(3)) {
+    if (new Decimal(nonZeroIndex).gte(maxDecimal || 0)) {
+      return "0";
+    }
+    digits = nonZeroPart.slice(0, Math.max(+(maxDecimal || 0) - +nonZeroIndex, 0));
+  } else {
+    digits = nonZeroPart.slice(0, digitsPlaces);
+  }
+  while (digits.endsWith("0")) {
+    digits = digits.slice(0, -1);
+  }
+  return (
+    <span key={num} className="animate-flipIn">
+      {isDollar ? "$" : ""}
+      {+integerPart === 0 ? "0.0" : integerPart + ".0"}
+      <span className={twMerge("px-px need-small", "")} style={{ color: "#00F7A5" }}>
+        {nonZeroIndex}
+      </span>
+      {digits}
     </span>
   );
 };

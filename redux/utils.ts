@@ -7,7 +7,13 @@ import type { Asset, Assets, AssetsState } from "./assetState";
 import type { AccountState } from "./accountState";
 import type { AppState } from "./appSlice";
 import { UIAsset } from "../interfaces";
-import { BRRR_TOKEN, defaultNetwork, NBTCTokenId } from "../utils/config";
+import {
+  BRRR_TOKEN,
+  defaultNetwork,
+  NBTCTokenId,
+  ETH_CONTRACT_ID,
+  ETH_OLD_CONTRACT_ID,
+} from "../utils/config";
 import { standardizeAsset } from "../utils";
 
 export const sumReducer = (sum: number, a: number) => sum + a;
@@ -103,7 +109,6 @@ export const transformAsset = (
     available: 0,
     extraDecimals: 0,
   };
-
   if (account.accountId) {
     const decimals = asset.metadata.decimals + asset.config.extra_decimals;
     const supplied = Number(
@@ -120,9 +125,9 @@ export const transformAsset = (
     const borrowed = asset.isLpToken
       ? account.portfolio.positions?.[tokenId]?.borrowed?.[tokenId]?.balance || 0
       : account.portfolio.borrowed?.[tokenId]?.balance || 0;
-    const available = account.balances[tokenId] || 0;
+    const available =
+      account.balances[tokenId == ETH_OLD_CONTRACT_ID ? ETH_CONTRACT_ID : tokenId] || 0;
     const availableNEAR = account.balances["near"] || 0;
-
     accountAttrs = {
       supplied,
       collateral,

@@ -28,6 +28,7 @@ export interface IPortfolioReward {
   totalAmount: number;
   dailyAmount: number;
   unclaimedAmount: number;
+  unclaimedAmountExtend: string;
   unclaimedAmountUSD: number;
   boosterLogBase: number;
   newDailyAmount: number;
@@ -419,6 +420,7 @@ export const getAccountRewards = (memeCategory?: boolean) => {
               symbol,
               tokenId: rewardTokenId,
               unclaimedAmount,
+              unclaimedAmountExtend: farmData.unclaimed_amount,
               dailyAmount,
               newDailyAmount,
               multiplier,
@@ -450,6 +452,7 @@ export const getAccountRewards = (memeCategory?: boolean) => {
           symbol,
           tokenId: rewardTokenId,
           unclaimedAmount,
+          unclaimedAmountExtend: farmData.unclaimed_amount,
           dailyAmount,
           newDailyAmount,
           multiplier,
@@ -471,6 +474,9 @@ export const getAccountRewards = (memeCategory?: boolean) => {
           if (!rewards[asset.tokenId]) return { ...rewards, [asset.tokenId]: asset };
           const updatedAsset = rewards[asset.tokenId];
           updatedAsset.unclaimedAmount += asset.unclaimedAmount;
+          updatedAsset.unclaimedAmountExtend = new Decimal(asset.unclaimedAmountExtend || 0)
+            .plus(updatedAsset.unclaimedAmountExtend || 0)
+            .toFixed(0);
           updatedAsset.dailyAmount += asset.dailyAmount;
           updatedAsset.newDailyAmount += asset.newDailyAmount;
           return { ...rewards, [asset.tokenId]: updatedAsset };
@@ -571,6 +577,7 @@ export const getAccountRewardsForApy = (memeCategory?: boolean) => {
               symbol,
               tokenId: rewardTokenId,
               unclaimedAmount,
+              unclaimedAmountExtend: farmData.unclaimed_amount,
               dailyAmount,
               newDailyAmount,
               multiplier,
@@ -604,6 +611,7 @@ export const getAccountRewardsForApy = (memeCategory?: boolean) => {
           symbol,
           tokenId: rewardTokenId,
           unclaimedAmount,
+          unclaimedAmountExtend: farmData.unclaimed_amount,
           dailyAmount,
           newDailyAmount,
           multiplier,

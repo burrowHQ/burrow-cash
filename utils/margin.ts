@@ -14,6 +14,7 @@ export function getMetadatas(tokenAssets) {
 export function get_swap_indication_info(swapTransaction, registered_dexes) {
   const msg = swapTransaction?.functionCalls?.[0]?.args?.msg || "{}";
   const msgObj = JSON.parse(msg);
+  msgObj.skip_degen_price_sync = true;
   let dex = "";
   const dexMap = Object.entries(registered_dexes).reduce((acc, cur: any) => {
     return {

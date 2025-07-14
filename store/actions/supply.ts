@@ -14,6 +14,8 @@ export async function supply({
   amount,
   isMax,
   isMeme,
+  isOneClickAction,
+  bridgeAmount,
 }: {
   tokenId: string;
   extraDecimals: number;
@@ -21,14 +23,18 @@ export async function supply({
   amount: string;
   isMax: boolean;
   isMeme: boolean;
-}): Promise<void> {
-  const { account, logicContract, logicMEMEContract, hideModal, selector } = await getBurrow();
+  isOneClickAction: boolean;
+  bridgeAmount: string;
+}): Promise<any> {
+  const { account, logicContract, logicMEMEContract, hideModal, fetchData } = await getBurrow();
   const { decimals } = (await getMetadata(tokenId))!;
   const tokenContract = await getTokenContract(tokenId);
   const burrowContractId = isMeme ? logicMEMEContract.contractId : logicContract.contractId;
   let expandedAmount;
+  let expandedBridgeAmount;
   if (tokenId === NBTCTokenId) {
     expandedAmount = expandTokenDecimal(amount, decimals);
+    expandedBridgeAmount = expandTokenDecimal(bridgeAmount, decimals);
   } else {
     const tokenBalance = new Decimal(await getBalance(tokenId, account.accountId));
     expandedAmount = isMax
@@ -36,33 +42,40 @@ export async function supply({
       : decimalMin(expandTokenDecimal(amount, decimals), tokenBalance);
   }
   const collateralAmount = expandTokenDecimal(expandedAmount, extraDecimals);
+
   const collateralActions = {
     actions: [
       {
         IncreaseCollateral: {
           token_id: tokenId,
-          max_amount: collateralAmount.toFixed(0),
+          max_amount: collateralAmount.toFixed(0, Decimal.ROUND_DOWN),
         },
       },
     ],
   };
-  const wallet = await selector.wallet();
-  if (wallet.id == "btc-wallet" && tokenId === NBTCTokenId) {
+  if (isOneClickAction) {
     try {
-      await executeBTCDepositAndAction({
+      const txHash = await executeBTCDepositAndAction({
         action: {
           receiver_id: burrowContractId,
-          amount: expandedAmount.toFixed(0),
+          amount: expandedAmount.toFixed(0, Decimal.ROUND_DOWN),
           msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
         },
+        amount: expandedBridgeAmount.toFixed(0, Decimal.ROUND_DOWN),
         env: NBTC_ENV,
         registerDeposit: "100000000000000000000000",
+        pollResult: false,
       });
+      return {
+        txHash,
+        fetchData,
+      };
     } catch (error) {
       if (hideModal) hideModal();
+      return "error";
     }
   } else {
-    await prepareAndExecuteTokenTransactions(tokenContract, {
+    const result = await prepareAndExecuteTokenTransactions(tokenContract, {
       methodName: ChangeMethodsToken[ChangeMethodsToken.ft_transfer_call],
       args: {
         receiver_id: burrowContractId,
@@ -70,5 +83,6 @@ export async function supply({
         msg: useAsCollateral ? JSON.stringify({ Execute: collateralActions }) : "",
       },
     });
+    return result;
   }
 }

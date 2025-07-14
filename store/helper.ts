@@ -75,18 +75,28 @@ const getPythPrices = async () => {
   );
   try {
     const array_coins = Object.entries(COINList) as any[];
-    const allRequest = array_coins.map(([, coin]) => {
-      return view(pythContract, ViewMethodsPyth[ViewMethodsPyth.get_price], {
-        price_identifier: coin.price_identifier,
-      });
-    });
     let near_pyth_price_obj: IPythPrice = {
       price: "0",
       conf: "0",
       expo: 0,
       publish_time: 0,
     };
-    const price_array = (await Promise.all(allRequest)) as IPythPrice[];
+    // const allRequest = array_coins.map(([, coin]) => {
+    //   return view(pythContract, ViewMethodsPyth[ViewMethodsPyth.get_price], {
+    //     price_identifier: coin.price_identifier,
+    //   });
+    // });
+    // const price_array = (await Promise.all(allRequest)) as IPythPrice[];
+    const identifiers = array_coins.map((coin) => coin[1].price_identifier);
+    const list_prices_map = await view(
+      pythContract,
+      ViewMethodsPyth[ViewMethodsPyth.list_prices_no_older_than],
+      {
+        price_ids: identifiers,
+        age: 60,
+      },
+    );
+    const price_array = array_coins.map((coin) => list_prices_map[coin[1].price_identifier]);
     const format_price: IAssetPrice[] = price_array.map((priceObject: IPythPrice, index) => {
       const coin = array_coins[index];
       if (!priceObject) {
@@ -266,6 +276,7 @@ export const getContract = async (
     changeMethods: Object.values(changeMethods)
       .filter((m) => typeof m === "string")
       .map((m) => m as string),
+    useLocalViewExecution: true,
   });
   return contract;
 };
