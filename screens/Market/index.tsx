@@ -121,7 +121,7 @@ const Market = () => {
               className="text-base text-primary underline ml-1 cursor-pointer"
               onClick={() => {
                 window.open(
-                  "https://guide.ref.finance/products/guides/rhea-point-system",
+                  "https://guide.rhea.finance/products/guides/rhea-point-system",
                   "_blank",
                 );
               }}
