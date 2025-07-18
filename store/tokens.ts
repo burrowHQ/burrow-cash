@@ -90,6 +90,12 @@ export const getBalance = async (
 };
 
 export const getAllMetadata = async (token_ids: string[]): Promise<IMetadata[]> => {
+  if (process.env.NEXT_PUBLIC_DEFAULT_NETWORK == "testnet") {
+    const metadata: IMetadata[] = (
+      await Promise.all(token_ids.map((token_id) => getMetadata(token_id)))
+    ).filter((m): m is IMetadata => !!m);
+    return metadata;
+  }
   try {
     const tokensMap = await get_all_tokens_metadata();
     const metadata: IMetadata[] = token_ids.map((token_id) => tokensMap[token_id]);
