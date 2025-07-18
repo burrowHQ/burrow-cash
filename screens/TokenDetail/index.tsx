@@ -1104,14 +1104,17 @@ function TokenUserInfo() {
       <div className="flex items-center gap-2 mt-[35px]">
         {accountId ? (
           <>
-            <YellowSolidButton
-              disabled={isNBTC ? !+btcBalance && !+supplyBalance : !+supplyBalance}
-              className="w-1 flex-grow"
-              onClick={handleSupplyClick}
-              data-tour="supply-button"
-            >
-              Supply
-            </YellowSolidButton>
+            {tokenRow?.can_deposit && (
+              <YellowSolidButton
+                disabled={isNBTC ? !+btcBalance && !+supplyBalance : !+supplyBalance}
+                className="w-1 flex-grow"
+                onClick={handleSupplyClick}
+                data-tour="supply-button"
+              >
+                Supply
+              </YellowSolidButton>
+            )}
+
             {tokenRow?.can_borrow && (
               <RedSolidButton
                 disabled={!+totalBorrowAmount}
