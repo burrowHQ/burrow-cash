@@ -21,7 +21,7 @@ export const hiddenAssetsMEME = [
   "abg-966.meme-cooking.near",
 ];
 export const lpTokenPrefix = "shadow_ref_v1";
-export const blackAssets = ["shadow_ref_v1-0", "shadow_ref_v1-711"];
+export const blackAssets = ["shadow_ref_v1-711"];
 export const MARGIN_MIN_COLLATERAL_USD = 1;
 export const defaultNetwork = (process.env.NEXT_PUBLIC_DEFAULT_NETWORK ||
   process.env.NODE_ENV ||
@@ -136,8 +136,8 @@ const getConfig = (env: string = defaultNetwork) => {
         PYTH_ORACLE_ID: "pyth-oracle.near",
         PRICE_ORACLE_ID: "priceoracle.near",
         MEME_PRICE_ORACLE_ID: "meme-priceoracle.ref-labs.near",
-        REF_EXCHANGE_ID: "v2.ref-finance.near",
-        DCL_EXCHANGE_ID: "dclv2.ref-labs.near",
+        REF_EXCHANGE_ID: "ref-v1.private-mainnet.ref-dev-team.near",
+        DCL_EXCHANGE_ID: "ref-dcl.private-mainnet.ref-dev-team.near",
         findPathUrl: "smartrouter.ref.finance",
         BURROW_API_URL: "https://api.burrow.finance",
       } as unknown as ConnectConfig & IAppConfig;
