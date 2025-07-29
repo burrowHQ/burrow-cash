@@ -13,7 +13,6 @@ export const hiddenAssets = [
   "aurora",
 ];
 export const hiddenAssetsMEME = [
-  "wrap.near",
   "ftv2.nekotoken.near",
   "usdt.tether-token.near",
   "nbtc.toalice.near",
