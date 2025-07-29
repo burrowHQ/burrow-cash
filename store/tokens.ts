@@ -93,6 +93,10 @@ export const getAllMetadata = async (token_ids: string[]): Promise<IMetadata[]> 
   try {
     const tokensMap = await get_all_tokens_metadata();
     const metadata: IMetadata[] = token_ids.map((token_id) => tokensMap[token_id]);
+    const emptyMetadatas = metadata.filter((meta) => !meta);
+    if (emptyMetadatas.length) {
+      throw new Error("missing token metadata");
+    }
     return metadata;
   } catch (err) {
     const metadata: IMetadata[] = (
