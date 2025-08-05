@@ -161,10 +161,10 @@ const ToolTip = ({
                     className="text-xs text-primary underline cursor-pointer"
                     onClick={(e) => {
                       e.stopPropagation();
-                      router.push("/staking");
+                      window.open("https://app.rhea.finance/stake");
                     }}
                   >
-                    staking BRRR🔥
+                    staking XRHEA
                   </span>
                 </div>,
               ]
