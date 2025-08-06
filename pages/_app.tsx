@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Head from "next/head";
 import { Provider } from "react-redux";
 import { BtcWalletSelectorContextProvider } from "btc-wallet";
@@ -17,6 +18,9 @@ const ModalGAPrivacy = dynamic(() => import("../components/modalGAPrivacy/modalG
   ssr: false,
 });
 export default function MyApp({ Component, pageProps }: AppProps) {
+  useEffect(() => {
+    window.location.href = "https://app.rhea.finance";
+  }, []);
   return (
     <ErrorBoundary fallback={FallbackError}>
       <ProcessBar />
