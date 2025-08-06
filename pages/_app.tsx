@@ -19,7 +19,7 @@ const ModalGAPrivacy = dynamic(() => import("../components/modalGAPrivacy/modalG
 });
 export default function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
-    window.location.href = "https://app.rhea.finance";
+    window.location.href = "https://app.rhea.finance/lending";
   }, []);
   return (
     <ErrorBoundary fallback={FallbackError}>
