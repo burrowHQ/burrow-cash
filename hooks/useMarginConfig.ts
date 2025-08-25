@@ -16,7 +16,10 @@ export function useMarginConfigToken() {
 
   const filterTokens = (tokens, value) =>
     Object.entries(tokens.registered_tokens)
-      .filter(([_, v]) => v === value)
+      .filter(
+        ([_, v]) =>
+          v === value && _ !== "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
+      )
       .map(([token]) => token);
 
   const filteredMarginConfigTokens1 = filterTokens(marginConfigTokens, 1);
@@ -80,7 +83,7 @@ export function useMarginConfigToken() {
     }
   };
   return {
-    filterMarginConfigList: { ...categoryAssets1Map, ...categoryAssets1MEMEMap },
+    filterMarginConfigList: { ...categoryAssets1Map },
     marginConfigTokens,
     marginConfigTokensMEME,
     categoryAssets1,
