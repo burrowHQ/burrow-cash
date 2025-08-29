@@ -38,6 +38,7 @@ interface IAppConfig {
   findPathUrl: string;
   explorerUrl: string;
   BURROW_API_URL: string;
+  XRHEA_TOKEN: string;
 }
 export const STABLE_POOL_IDS = [
   "4179",
@@ -132,6 +133,7 @@ const getConfig = (env: string = defaultNetwork) => {
           // "shadow_ref_v1-4179",
           // "aurora",
         ],
+        XRHEA_TOKEN: "xtoken.rhealab.near",
         PYTH_ORACLE_ID: "pyth-oracle.near",
         PRICE_ORACLE_ID: "priceoracle.near",
         MEME_PRICE_ORACLE_ID: "meme-priceoracle.ref-labs.near",
@@ -156,6 +158,7 @@ const getConfig = (env: string = defaultNetwork) => {
         ],
         NATIVE_TOKENS: ["usdc.fakes.testnet"],
         NEW_TOKENS: ["usdc.fakes.testnet", "shadow_ref_v1-0", "shadow_ref_v1-2"],
+        XRHEA_TOKEN: "xrhea-dev.testnet",
         DCL_EXCHANGE_ID: "dclv2.ref-dev.testnet", // refv2-dev.ref-dev.testnet
         REF_EXCHANGE_ID: "ref-finance-101.testnet", // exchange.ref-dev.testnet
         PYTH_ORACLE_ID: "pyth-oracle.testnet",

@@ -70,6 +70,7 @@ export enum ViewMethodsToken {
   get_nearx_price,
   ft_price,
   storage_balance_bounds,
+  get_high_precision_virtual_price,
 }
 
 export enum ChangeMethodsToken {

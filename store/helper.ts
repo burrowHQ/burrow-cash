@@ -26,7 +26,7 @@ import {
 } from "../utils/pythOracleConfig";
 // eslint-disable-next-line import/no-cycle
 import { getTokenContract } from "./tokens";
-import { ETH_CONTRACT_ID, ETH_OLD_CONTRACT_ID } from "../utils/config";
+import getConfig, { ETH_CONTRACT_ID, ETH_OLD_CONTRACT_ID } from "../utils/config";
 import { getAuthenticationHeaders } from "../utils/signature";
 
 Decimal.set({ precision: DEFAULT_PRECISION });
@@ -68,6 +68,7 @@ export const getPrices = async ({ isMeme }: { isMeme?: boolean }): Promise<IPric
   }
 };
 const getPythPrices = async () => {
+  const { XRHEA_TOKEN } = getConfig();
   const { view, pythContract, logicContract } = await getBurrow();
   const COINList = await view(
     logicContract,
@@ -81,12 +82,12 @@ const getPythPrices = async () => {
       expo: 0,
       publish_time: 0,
     };
-    // const allRequest = array_coins.map(([, coin]) => {
-    //   return view(pythContract, ViewMethodsPyth[ViewMethodsPyth.get_price], {
-    //     price_identifier: coin.price_identifier,
-    //   });
-    // });
-    // const price_array = (await Promise.all(allRequest)) as IPythPrice[];
+    let rhea_pyth_price_obj: IPythPrice = {
+      price: "0",
+      conf: "0",
+      expo: 0,
+      publish_time: 0,
+    };
     const identifiers = array_coins.map((coin) => coin[1].price_identifier);
     const list_prices_map = await view(
       pythContract,
@@ -118,6 +119,9 @@ const getPythPrices = async () => {
       const p = new Decimal(10).pow(expo).mul(price).toNumber();
       if (coin[0] === nearTokenId) {
         near_pyth_price_obj = priceObject;
+      }
+      if (coin[0] === XRHEA_TOKEN) {
+        rhea_pyth_price_obj = priceObject;
       }
       coin[1].fraction_digits = coin[1].fraction_digits || FRACTION_DIGITS;
       const discrepancy_denominator = new Decimal(10).pow(coin[1].fraction_digits).toNumber();
@@ -184,25 +188,26 @@ const getPythPrices = async () => {
         },
       };
     }
-    // try {
-    //   const listTokenPrice = await fetch(`${getConfig().recordsUrl}/list-token-price`, {
-    //     method: "GET",
-    //     headers: {
-    //       Authentication: getAuthenticationHeaders("/list-token-price"),
-    //     },
-    //   }).then((r) => r.json());
-    //   if (listTokenPrice?.[SFRAX_TOKEN]?.price) {
-    //     format_price_map[SFRAX_TOKEN] = {
-    //       asset_id: SFRAX_TOKEN,
-    //       price: {
-    //         multiplier: new Decimal(listTokenPrice?.[SFRAX_TOKEN]?.price)
-    //           .mul(new Decimal(10).pow(FRACTION_DIGITS))
-    //           .toFixed(0),
-    //         decimals: 18 + FRACTION_DIGITS,
-    //       },
-    //     };
-    //   }
-    // } catch (error) {}
+    if (rhea_pyth_price_obj) {
+      const rhea_price = new Decimal(10)
+        .pow(rhea_pyth_price_obj.expo)
+        .mul(rhea_pyth_price_obj.price);
+      const XRHEA_CONTRACT = await getTokenContract(XRHEA_TOKEN);
+      const xrhea_proportion = (await view(
+        XRHEA_CONTRACT,
+        ViewMethodsToken[ViewMethodsToken.get_high_precision_virtual_price],
+      )) as string;
+      const xrhea_price = new Decimal(rhea_price)
+        .mul(xrhea_proportion)
+        .div(new Decimal(10).pow(24));
+      format_price_map[XRHEA_TOKEN] = {
+        asset_id: XRHEA_TOKEN,
+        price: {
+          multiplier: xrhea_price.mul(new Decimal(10).pow(FRACTION_DIGITS)).toFixed(0),
+          decimals: 18 + FRACTION_DIGITS,
+        },
+      };
+    }
     return {
       prices: Object.values(format_price_map) as IAssetPrice[],
       recency_duration_sec: 0,
