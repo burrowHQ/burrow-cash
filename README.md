@@ -1,6 +1,6 @@
 # RHEA Lending
 
-Update for deployment.
+Update for deployment
 
 # Quick Start
 
