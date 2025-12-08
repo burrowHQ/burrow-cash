@@ -220,7 +220,7 @@ importers:
         specifier: ^0.5.8
         version: 0.5.13(near-api-js@4.0.3)
       next:
-        specifier: ^15.3.6
+        specifier: 15.3.6
         version: 15.3.6(@babel/core@7.26.10)(babel-plugin-macros@3.1.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       only-allow:
         specifier: ^1.2.1
