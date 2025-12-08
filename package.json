@@ -82,7 +82,7 @@
     "millify": "^5.0.1",
     "near-api-js": "4.0.3",
     "neth": "^0.5.8",
-    "next": "latest",
+    "next": "15.3.6",
     "only-allow": "^1.2.1",
     "pluralize": "^8.0.0",
     "postcss": "^8.4.28",
